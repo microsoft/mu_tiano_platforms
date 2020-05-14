@@ -7,6 +7,7 @@
 import os
 import logging
 import io
+import shutil
 
 from edk2toolext.environment import shell_environment
 from edk2toolext.environment.uefi_build import UefiBuilder
@@ -217,6 +218,10 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         VirtualDrive = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "VirtualDrive")
         os.makedirs(VirtualDrive, exist_ok=True)
         OutputPath_FV = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
+
+        # Copy required tests.
+        TestEfiOutputPath = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "X64")
+        shutil.copy(os.path.join(TestEfiOutputPath, "VarPolicyUnitTestApp.efi"), VirtualDrive)
 
         #
         # QEMU must be on the path
