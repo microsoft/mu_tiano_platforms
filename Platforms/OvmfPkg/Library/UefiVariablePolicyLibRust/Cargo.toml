@@ -1,0 +1,38 @@
+[package]
+name = "UefiVariablePolicyLibRust"
+version = "0.1.0"
+authors = ["Bret Barkelew <brbarkel@microsoft.com>"]
+edition = "2018"
+publish = false
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[profile.release]
+panic = "abort"
+
+[profile.dev]
+panic = "abort"
+
+[lib]
+name = "UefiVariablePolicyLibRust"
+crate-type = ["staticlib"]
+
+# This is needed while mu_rust is private in the Microsoft organization.
+[net]
+git-fetch-with-cli = true
+
+[dependencies]
+r-efi = "3.0.0"
+
+[dependencies.allocation]
+git = "https://github.com/microsoft/mu_rust.git"
+branch = "personal/brbarkel/rust_standalone_varpol"
+features = ["alloc_by_c"]
+
+[dependencies.panic]
+git = "https://github.com/microsoft/mu_rust.git"
+branch = "personal/brbarkel/rust_standalone_varpol"
+
+[dependencies.variable_policy]
+git = "https://github.com/microsoft/mu_rust.git"
+branch = "personal/brbarkel/rust_standalone_varpol"

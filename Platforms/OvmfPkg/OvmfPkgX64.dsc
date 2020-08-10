@@ -214,7 +214,9 @@
   AuthVariableLib|MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
 !endif
   VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
-  UefiVariablePolicyLib|MdeModulePkg/Library/UefiVariablePolicyLib/UefiVariablePolicyLib.inf # MU_CHANGE - add variable policy
+  #UefiVariablePolicyLib|MdeModulePkg/Library/UefiVariablePolicyLib/UefiVariablePolicyLib.inf # MU_CHANGE - add variable policy
+  #UefiVariablePolicyLib|MdeModulePkg/Library/UefiVariablePolicyLibRust/UefiVariablePolicyLib.inf
+  UefiVariablePolicyLib|OvmfPkg/Library/UefiVariablePolicyLibRust/UefiVariablePolicyLib.inf
 
   #
   # Network libraries
