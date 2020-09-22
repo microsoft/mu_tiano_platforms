@@ -1,0 +1,10 @@
+/BuildConfig.conf
+
+*.pyc
+*.bak
+/Build
+/Conf
+/.vs
+/.vscode
+
+*_extdep/
