@@ -30,10 +30,6 @@ parameters:
 - name: run_flags
   type: string
   default: ''
-- name: run_core_ci
-  type: string
-  default: false
-
 - name: extra_install_step
   type: stepList
   default: []
@@ -41,7 +37,7 @@ parameters:
 steps:
 - checkout: self
   clean: true
-  fetchDepth: 1
+  #mu_change - can't limit depth if we want to use PR_EVAL - fetchDepth: 1
 
 - task: UsePythonVersion@0
   inputs:
@@ -54,12 +50,25 @@ steps:
 # Set default
 - bash: echo "##vso[task.setvariable variable=pkg_count]${{ 1 }}"
 
+
+# MU_CHANGE [BEGIN] - Workaround an azure pipelines bug.
+# $System.PullRequest.targetBranch looks like "dev/whatever" on GitHub,
+# but looks like "refs/heads/dev/whatever" on DevOps. The DevOps version
+# can't be used for comparison for the PR Eval.
+- powershell:
+    $TargetBranch = "$(System.PullRequest.targetBranch)".replace('refs/heads/', '');
+    Write-Host "##vso[task.setvariable variable=pr_compare_branch]origin/$TargetBranch";
+  displayName: Workaround for Branch Names
+  condition: eq(variables['Build.Reason'], 'PullRequest')
+# MU_CHANGE [END]
+
 # trim the package list if this is a PR
 - task: CmdLine@1
   displayName: Check if ${{ parameters.build_pkg }} need testing
   inputs:
     filename: stuart_pr_eval
-    arguments: -c ${{ parameters.build_file }} -t ${{ parameters.build_target}} -a ${{ parameters.build_arch}} --pr-target origin/$(System.PullRequest.targetBranch) --output-count-format-string "##vso[task.setvariable variable=pkg_count;isOutpout=true]{pkgcount}"
+    # MU_CHANGE - Workaround an azure pipelines bug.
+    arguments: -c ${{ parameters.build_file }} -t ${{ parameters.build_target}} -a ${{ parameters.build_arch}} --pr-target $(pr_compare_branch) --output-count-format-string "##vso[task.setvariable variable=pkg_count;isOutpout=true]{pkgcount}"
   condition: eq(variables['Build.Reason'], 'PullRequest')
 
  # Setup repo
@@ -107,32 +116,6 @@ steps:
   condition: and(and(gt(variables.pkg_count, 0), succeeded()), eq(variables['Run'], true))
   timeoutInMinutes: 1
 
-# Run the Core CI code checks
-- task: CmdLine@1
-  displayName: Build and Test ${{ parameters.build_pkg }} ${{ parameters.build_arch}}
-  inputs:
-    filename: stuart_ci_build
-    arguments: -c ${{ parameters.build_file }} -p ${{ parameters.build_pkg }} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} -t "NO-TARGET" -a ${{ parameters.build_arch}}
-  condition: and(eq(variables['run_core_ci'], true), and(gt(variables.pkg_count, 0), succeeded()))
-
-  # install spell check prereqs
-- template: spell-check-prereq-steps.yml
-
-# Publish Test Results to Azure Pipelines/TFS
-- task: PublishTestResults@2
-  displayName: 'Publish junit test results'
-  continueOnError: true
-  condition: and(eq(variables['run_core_ci'], true), and( succeededOrFailed(),gt(variables.pkg_count, 0)))
-  inputs:
-    testResultsFormat: 'JUnit' # Options: JUnit, NUnit, VSTest, xUnit
-    testResultsFiles: 'Build/TestSuites.xml'
-    #searchFolder: '$(System.DefaultWorkingDirectory)' # Optional
-    mergeTestResults: true # Optional
-    testRunTitle: $(System.JobName) # Optional
-    buildPlatform: ${{ parameters.build_pkg }}
-    #buildConfiguration: # Optional
-    publishRunAttachments: true # Optional
-
 # Copy the build logs to the artifact staging directory
 - task: CopyFiles@2
   displayName: "Copy build logs"
@@ -152,6 +135,7 @@ steps:
       **/BUILD_TOOLS_REPORT.html
       **/OVERRIDELOG.TXT
       BASETOOLS_BUILD*.*
+      **/FD_REPORT.HTML
     flattenFolders: true
   condition: succeededOrFailed()
 

@@ -1,0 +1,49 @@
+## @file
+#Override : 00000002 | OvmfPkg/Library/PlatformDebugLibIoPort/PlatformRomDebugLibIoPortNocheck.inf | 2c8ef850ea784a91ba18b6abec266e7d | 2020-09-22T23-25-55 | 0db3dd437148e3d433f6b16937916e25e8c7848f
+#  Instance of Debug Library for an hypervisor debug console port.
+#  It uses Print Library to produce formatted output strings.
+#
+#  Copyright (c) 2020, Citrix Systems, Inc.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformRomDebugLibIoPortNocheck
+  FILE_GUID                      = 9ec4183c-d9e9-4c1d-879e-7b1cfa90d591 # MU_CHANGE
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DebugLib
+  CONSTRUCTOR                    = PlatformRomDebugLibIoPortConstructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DebugIoPortNocheck.c
+  DebugLib.c
+  DebugLibDetect.h
+  DebugLibDetectRom.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  IoLib
+  PcdLib
+  PrintLib
+  BaseLib
+  DebugPrintErrorLevelLib
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdDebugIoPort                ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue        ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask            ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdFixedDebugPrintErrorLevel    ## CONSUMES
+

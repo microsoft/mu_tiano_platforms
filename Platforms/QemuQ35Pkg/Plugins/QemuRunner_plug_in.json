@@ -1,0 +1,5 @@
+{
+    "scope": "qemuq35",
+    "name": "QEMU Runner",
+    "module": "QemuRunner"
+  }
