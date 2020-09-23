@@ -1,0 +1,50 @@
+## @file
+#Override : 00000002 | OvmfPkg/Library/PlatformDebugLibIoPort/PlatformRomDebugLibIoPort.inf | d1a331addc22b214d691f399b9b8144a | 2020-09-22T23-25-44 | 0db3dd437148e3d433f6b16937916e25e8c7848f
+#  Instance of Debug Library for the QEMU debug console port.
+#  It uses Print Library to produce formatted output strings.
+#
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2017, Red Hat, Inc.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformRomDebugLibIoPort
+  FILE_GUID                      = 288a0da9-f379-4470-8838-c7f559f02dfe # MU_CHANGE
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DebugLib|SEC
+  CONSTRUCTOR                    = PlatformRomDebugLibIoPortConstructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DebugIoPortQemu.c
+  DebugLib.c
+  DebugLibDetect.h
+  DebugLibDetectRom.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  IoLib
+  PcdLib
+  PrintLib
+  BaseLib
+  DebugPrintErrorLevelLib
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdDebugIoPort                ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue        ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask            ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdFixedDebugPrintErrorLevel    ## CONSUMES
+
