@@ -1,0 +1,35 @@
+## @file
+#  MsPlatformThemeLib.inf
+#
+#  Description:    Supplies the platform theme.
+#
+# Copyright (C) Microsoft Corporation. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformThemeLib
+  FILE_GUID                      = 79c6ac5e-69ee-4bcc-bffc-82151491cfdf
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformThemeLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+ PlatformThemeLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MsGraphicsPkg/MsGraphicsPkg.dec
+
+[LibraryClasses]
+  DebugLib
+
+[Protocols]
+
+[Guids]

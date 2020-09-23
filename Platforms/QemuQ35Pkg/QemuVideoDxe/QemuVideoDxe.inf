@@ -1,0 +1,66 @@
+## @file
+#  This driver is a sample implementation of the Graphics Output Protocol for
+#  the QEMU (Cirrus Logic 5446) video controller.
+#
+#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+#Override : 00000002 | Platforms/OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf | d9dceba9fbee7fc34cad35a930657365 | 2020-09-22T23-08-08 | 0db3dd437148e3d433f6b16937916e25e8c7848f
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = QemuVideoDxe
+  FILE_GUID                      = bc5c35eb-e6fa-45b8-a31f-7943464c82aa
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeQemuVideo
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+#  DRIVER_BINDING                =  gQemuVideoDriverBinding
+#  COMPONENT_NAME                =  gQemuVideoComponentName
+#
+
+[Sources.common]
+  ComponentName.c
+  Driver.c
+  Gop.c
+  Initialize.c
+  Qemu.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  MsGraphicsPkg/MsGraphicsPkg.dec # MU_CHANGE use MsGopOverrideProtocolGuid
+
+[LibraryClasses]
+  BaseMemoryLib
+  FrameBufferBltLib
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  PcdLib
+  PciLib
+  PrintLib
+  TimerLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiGraphicsOutputProtocolGuid                # PROTOCOL BY_START
+  gEfiDevicePathProtocolGuid                    # PROTOCOL BY_START
+  gEfiPciIoProtocolGuid                         # PROTOCOL TO_START
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+  gMsGraphicsPkgTokenSpaceGuid.PcdMsGopOverrideProtocolGuid   # MU_CHANGE use MsGopOverrideProtocolGuid
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution # MU_CHANGE use pcds to control default resolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution   # MU_CHANGE use pcds to control default resolution
