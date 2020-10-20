@@ -2,9 +2,13 @@
 Mu Tiano Platform Repository
 ============================
 
-Q35: [![Q35 Build Status](https://windowspartners.visualstudio.com/MSCoreUEFI/_apis/build/status/mu_tiano_platforms/CI__VS2019-Q35-Platform?branchName=release%2F202008)](https://windowspartners.visualstudio.com/MSCoreUEFI/_build/latest?definitionId=169&branchName=release%2F202005)
-Ovmf: [![Ovmf Build Status](https://windowspartners.visualstudio.com/MSCoreUEFI/_apis/build/status/mu_tiano_platforms/CI__VS2019-OVMF-Platform?branchName=release%2F202008)](https://windowspartners.visualstudio.com/MSCoreUEFI/_build/latest?definitionId=162&branchName=release%2F202005)
-Core CI: [![Core CI Build Status](https://windowspartners.visualstudio.com/MSCoreUEFI/_apis/build/status/mu_tiano_platforms/CI__VS2019-Core-Ci?branchName=release%2F202008)](https://windowspartners.visualstudio.com/MSCoreUEFI/_build/latest?definitionId=172&branchName=release%2F202005)
+============================= ================= ===============
+ Platform                     VS2017            GCC
+============================= ================= ===============
+Q35                           |Q35VsBuild|      |Q35GccBuild|
+Ovmf                          |OvmfVsBuild|     |OvmfGccBuild|
+CoreCI                        |CoreVsBuild|     |CoreGccBuild|
+============================= ================= ===============
 
 This repository is a platform repository for Project Mu.
 See the RepoDetails.md for more information about this repo.
@@ -101,3 +105,17 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
 CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
+
+
+.. ===================================================================
+.. This is a bunch of directives to make the README file more readable
+.. ===================================================================
+
+.. |Q35VsBuild| image:: https://windowspartners.visualstudio.com/MSCoreUEFI/_apis/build/status/mu_tiano_platforms/CI__VS2019-Q35-Platform?branchName=release%2F202008
+.. |Q35GccBuild| image:: https://windowspartners.visualstudio.com/MSCoreUEFI/_apis/build/status/mu_tiano_platforms/CI__GCC5-Q35-Platform?branchName=release%2F202008
+
+.. |OvmfVsBuild| image:: https://windowspartners.visualstudio.com/MSCoreUEFI/_apis/build/status/mu_tiano_platforms/CI__VS2019-OVMF-Platform?branchName=release%2F202008
+.. |OvmfGccBuild| image:: https://windowspartners.visualstudio.com/MSCoreUEFI/_apis/build/status/mu_tiano_platforms/CI__GCC5-OVMF-Platform?branchName=release%2F202008
+
+.. |CoreVsBuild| image:: https://windowspartners.visualstudio.com/MSCoreUEFI/_apis/build/status/mu_tiano_platforms/CI__VS2019-Core-Ci?branchName=release%2F202008
+.. |CoreGccBuild| image:: https://img.shields.io/badge/coverage-coming_soon-blue
