@@ -119,6 +119,8 @@ class Settings(CiSetupSettingsManager, CiBuildSettingsManager, UpdateSettingsMan
                 scopes += ("gcc_aarch64_linux",)
             if "ARM" in self.ActualArchitectures:
                 scopes += ("gcc_arm_linux",)
+            if "RISCV64" in self.ActualArchitectures:
+                scopes += ("gcc_riscv64_unknown",)
 
         return scopes
 

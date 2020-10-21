@@ -5,7 +5,7 @@ Most of the CI leverages edk2-pytools to support cross platform building and exe
 
 ## Core CI
 
-Focused on building and testing all packages in this repo.
+Focused on building and testing all packages in Edk2 without an actual target platform.
 
 See `.pytools/ReadMe.py` for more details
 
