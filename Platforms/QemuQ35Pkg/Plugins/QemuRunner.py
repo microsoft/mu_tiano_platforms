@@ -86,9 +86,10 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             shutil.copy(unit_test, VirtualDrive)
 
         # Setup Startup.nsh if needed
-        if (env.GetValue("MAKE_STARTUP_NSH").upper() == "TRUE") or (env.GetValue("RUN_UNIT_TESTS").upper() == "TRUE"):
+        should_run_unit_tests = (env.GetValue("RUN_UNIT_TESTS").upper() == "TRUE")
+        if (env.GetValue("MAKE_STARTUP_NSH").upper() == "TRUE") or should_run_unit_tests:
             f = open(os.path.join(VirtualDrive, "startup.nsh"), "w")
-            if (env.GetValue("RUN_UNIT_TESTS").upper() == "TRUE"):
+            if should_run_unit_tests:
                 # Write out script to find the filesystem - this is to avoid hardcoding fs0:
                 script = '';
                 script += '#!/bin/nsh\n'
@@ -108,7 +109,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
                 f.write(script)
             else:
                 f.write("# BOOT SUCCESS !!! \n")
-            #f.write("reset -s\n")
+            f.write("reset -s\n")
             f.close()
         
         # Run QEMU
@@ -118,7 +119,9 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         if ret != 0x0 and ret != 0xc0000005:
             #for some reason getting a c0000005 on successful return
             return ret
-
+        # if you didn't do unit tests, don't check for errors
+        if not should_run_unit_tests:
+            return 0
         #now parse the xml for errors
         failure_count = 0
         logging.info("UnitTest Completed")
