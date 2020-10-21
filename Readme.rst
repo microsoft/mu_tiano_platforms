@@ -10,10 +10,55 @@ Ovmf                          |OvmfVsBuild|     |OvmfGccBuild|
 CoreCI                        |CoreVsBuild|     |CoreGccBuild|
 ============================= ================= ===============
 
-This repository is a platform repository for Project Mu.
-See the RepoDetails.md for more information about this repo.
+This repository is part of Project Mu.  Please see Project Mu for details https://microsoft.github.io/mu
 
-Please see Project Mu for details https://microsoft.github.io/mu
+Branch Status - release/202008
+==============================
+
+:Status:
+  In Development
+
+:Entered Development:
+  2020/09/23
+
+:Anticipated Stabilization:
+  November 2020
+
+Branch Changes - release/202008
+===============================
+
+Breaking Changes-dev
+--------------------
+
+- None
+
+Main Changes-dev
+----------------
+
+- None
+
+Bug Fixes-dev
+-------------
+
+- None
+
+2008_RefBoot Changes
+--------------------
+
+- N/A
+
+2008_CIBuild Changes
+--------------------
+
+- N/A
+
+2008_Rebase Changes
+-------------------
+
+| Starting commit: N/A
+| Destination commit: N/A
+
+- N/A
 
 
 Code of Conduct
@@ -39,6 +84,7 @@ development can serve as an standalone example of feature enablement or it can b
 after development is complete.
 
 To create a new feature branch:
+
 1. Checkout the latest release branch
 2. Create a branch named feature/<your feature name here>
 3. Create a `Branch_ReadMe.md` in the docs folder of your new branch.
@@ -48,8 +94,8 @@ A template for `Branch_ReadMe.md` can be found in `docs/BranchReadMe_template.md
 Copyright & License
 ===================
 
-Copyright (c) Microsoft Corporation. All rights reserved.
-SPDX-License-Identifier: BSD-2-Clause-Patent
+| Copyright (C) Microsoft Corporation
+| SPDX-License-Identifier: BSD-2-Clause-Patent
 
 Upstream License (TianoCore)
 ============================
@@ -106,7 +152,6 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 
-
 .. ===================================================================
 .. This is a bunch of directives to make the README file more readable
 .. ===================================================================
@@ -118,4 +163,4 @@ POSSIBILITY OF SUCH DAMAGE.
 .. |OvmfGccBuild| image:: https://windowspartners.visualstudio.com/MSCoreUEFI/_apis/build/status/mu_tiano_platforms/CI__GCC5-OVMF-Platform?branchName=release%2F202008
 
 .. |CoreVsBuild| image:: https://windowspartners.visualstudio.com/MSCoreUEFI/_apis/build/status/mu_tiano_platforms/CI__VS2019-Core-Ci?branchName=release%2F202008
-.. |CoreGccBuild| image:: https://img.shields.io/badge/coverage-coming_soon-blue
+.. |CoreGccBuild| image:: https://img.shields.io/badge/ci-coming_soon-blue
