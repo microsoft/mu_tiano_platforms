@@ -130,7 +130,7 @@ command-line would be:
 The QemuQ35Pkg platform uses the QemuRunner plugin for executing QEMU with the
 locally compiled firmware.  This runner has numerous configuration options which allow
 for automating unit test execution or other efi application execution.  See the plugin details
-for a complete list of capabilities and configurations.  [Platforms/QemuQ35Pkg/Plugins/QemuRunner](../Platforms/QemuQ35Pkg/Plugins/QemuRunner/ReadMe.md)
+for a complete list of capabilities and configurations.  [Platforms/QemuQ35Pkg/Plugins/QemuRunner](../Plugins/QemuRunner/ReadMe.md)
 
 ## References
 
