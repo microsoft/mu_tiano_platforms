@@ -1,12 +1,14 @@
 ##
-# This plugin runs the QEMU command, monitoring for asserts
+# This plugin runs the QEMU command and monitors for asserts.
+# It can also possibly run tests and parse the results
 #
 # Copyright (c) Microsoft Corporation
-#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
-
 #####
+# env Variables used in this plugin
+#
 # STARTUP_NSH_DIRTY:
 #                     True:  don't empty folder before copying.
 #                     False: empty folder before copying new contents

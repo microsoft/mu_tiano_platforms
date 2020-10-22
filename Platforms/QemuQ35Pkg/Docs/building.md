@@ -7,16 +7,29 @@ with VS2019 and Ubuntu 18.04 with GCC5 toolchain.
 
 ## Developer environment
 
-- [Python 3.8.x - Download & Install](https://www.python.org/downloads/)
-- [GIT - Download & Install](https://git-scm.com/download/)
+This is a Project Mu platform and thus the default environment requirements can be found
+here at the [Project Mu Prerequisites page.](https://microsoft.github.io/mu/CodeDevelopment/prerequisites/)
+
+In addition if you want to run your locally compiled firmware you need
+
 - [QEMU - Download, Install, and add to your path](https://www.qemu.org/download/)
-- Additional packages found necessary for Ubuntu 18.04
-  - apt-get install gcc g++ make uuid-dev qemu
 
 This build uses edk2-pytools for functionality.  Documentation can be
 found [here](https://github.com/tianocore/edk2-pytool-extensions/tree/master/docs).
-On most Linux distros this requires an extra step for mono and nuget support.
-https://github.com/tianocore/edk2-pytool-extensions/blob/master/docs/usability/using_extdep.md#a-note-on-nuget-on-linux
+
+### Additional Notes on Linux
+
+This platform builds with edk2-pytools which supports both Windows and Linux environments.  Each
+distro has its own configuration and setup but here are a few helpful hints to get started
+to resolve dependencies.  If you can build Edk2 based firmware you should be pretty close.  
+
+A newer version of *Mono* is currently required to support pytools based external dependencies (using nuget). More details are available here <https://github.com/tianocore/edk2-pytool-extensions/blob/master/docs/usability/using_extdep.md#a-note-on-nuget-on-linux>
+
+Additionally on Ubuntu 18.04 this command has resolved many missing packages.
+
+```bash
+apt-get install gcc g++ make uuid-dev qemu
+```
 
 ## Building with Pytools
 
@@ -45,7 +58,7 @@ https://github.com/tianocore/edk2-pytool-extensions/blob/master/docs/usability/u
     pip install --upgrade -r pip-requirements.txt
     ```
 
-4. Initialize & Update Submodules - only when submodules updated
+4. Initialize & Update Submodules - only when submodules are added/removed
 
     ``` bash
     stuart_setup -c Platforms/QemuQ35Pkg/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG>
@@ -77,12 +90,12 @@ https://github.com/tianocore/edk2-pytool-extensions/blob/master/docs/usability/u
       stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> --FlashOnly
       ```
 
-8. Alternative Options
+!!! info "Alternative invocation options"
     - All the commands specified here can use a shortcut, which is to invoke the Build file directly. For example:
 
-      ``` bash
-      py Platforms/QemuQ35Pkg/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG>  --FlashOnly
-      ```
+    ``` bash
+    py Platforms/QemuQ35Pkg/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG>  --FlashOnly
+    ```
 
     - Setup and update can be done by passing it in
 
@@ -96,21 +109,12 @@ https://github.com/tianocore/edk2-pytool-extensions/blob/master/docs/usability/u
 
     - Under the hood, it just does the invocation of Stuart for you.
 
-### Notes
-
-1. QEMU must be on your path.  On Windows this is a manual process and not part of the QEMU installer.
-2. QEMU output will be in Build/BUILDLOG_QemuQ35Pkg.txt as well as Build/QemuQ35Pkg/QEMULOG_QemuQ35Pkg.txt
-
-**NOTE:** Logging the execution output will be in the normal stuart log as well as to your console (if you have the correct logging level set, by default it doesn't output to console).
-
-### Custom Build Options
-
-**MAKE_STARTUP_NSH=TRUE** will output a *startup.nsh* file to the location mapped as fs0. This is
-used in CI in combination with the `--FlashOnly` feature to run QEMU to the UEFI shell and then execute
-the contents of *startup.nsh*.
-
-**QEMU_HEADLESS=TRUE** Since CI servers run headless QEMU must be told to run with no display otherwise
-an error occurs. Locally you don't need to set this.
+!!! note "Notes"
+    1. QEMU **must** be on your path.  On Windows this is a manual process and not part of the QEMU installer.
+    2. QEMU build output will be in `Build/BUILDLOG_QemuQ35Pkg.txt`.
+    3. In cases where the `--flashonly` or `--flashrom` parameters were used to invoke the runner and
+       a startup.nsh was requested, the output log will changed to `Build/BUILDLOG_QemuQ35Pkg_With_Run.txt`
+    3. Logging to your local console window can be controlled and is often not as detailed as the log files.
 
 ### Passing Build Defines
 
@@ -121,7 +125,15 @@ command-line would be:
 
 `stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py BLD_*_E1000_ENABLE=1`
 
+## Advanced options for automation and testing
+
+The QemuQ35Pkg platform uses the QemuRunner plugin for executing QEMU with the
+locally compiled firmware.  This runner has numerous configuration options which allow
+for automating unit test execution or other efi application execution.  See the plugin details
+for a complete list of capabilities and configurations.  [Platforms/QemuQ35Pkg/Plugins/QemuRunner](../Platforms/QemuQ35Pkg/Plugins/QemuRunner/ReadMe.md)
+
 ## References
 
 - [Installing and using Pytools](https://github.com/tianocore/edk2-pytool-extensions/blob/master/docs/using.md#installing)
 - More on [python virtual environments](https://docs.python.org/3/library/venv.html)
+- [Qemu Documentation](https://www.qemu.org/docs/master/)

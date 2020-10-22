@@ -31,7 +31,7 @@ QemuQ35Pkg is a great environment to demonstrate Project Mu features without any
 Please refer to [Docs/feature_ReadMe.md](Docs/feature_ReadMe.md) for the latest information about features currently
 enabled in QemuQ35Pkg.
 
-## Compiling and Running QEMU
+## Compiling, Running, and Testing QemuQ35Pkg Firmware
 
 QemuQ35Pkg uses the Project Mu repositories and Edk2 PyTools for its build operations.
 Specific details can be found here [Docs/building.md](Docs/building.md)
