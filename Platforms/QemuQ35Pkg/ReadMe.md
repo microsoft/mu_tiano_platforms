@@ -22,7 +22,7 @@ Below is a diagram from Qemu.org about the Q35 chipset which emulates a ICH9 (I/
 The advantages of the ICH9 over the I440FX (which is what QEMU often emulates) is that it has PCI-E instead of just PCI
 as well as having an integrated AHCI controller and no ISA bus.
 
-Visit the feature wiki detailing QEMU Q35 for more information: https://wiki.qemu.org/Features/Q35
+Visit the feature wiki detailing QEMU Q35 for more information: <https://wiki.qemu.org/Features/Q35>
 
 ## Firmware Features
 

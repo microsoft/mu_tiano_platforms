@@ -22,4 +22,5 @@ Fill in your expected roadmap, what do you hope to accomplish? What still needs 
 
 The goal of feature branches in `mu_tiano_platforms` is to showcase a feature and allow for development of that feature.
 Branches shouldn't linger on unnecessarily.
-They exist as proofs of concept and should try to become ready to be merged into a release branch or be archived as a useful learning exercise.
+They exist as proofs of concept and should try to become ready to be merged into a release branch or be archived as a
+useful learning exercise.
