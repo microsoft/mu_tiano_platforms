@@ -6,12 +6,15 @@
       Commit:         [{{mu_tiano_platforms.commit}}]({{mu_tiano_platforms.commitlink}})  
       Commit Date:    {{mu_tiano_platforms.date}}  
 
-This is a Project Mu **"Platform"** repository. It contains the edk2 OvmfPkg which supports IA32/X64 virtual firmware
-for QEMU.  It also contains a Project Mu QEMU Q35 variant that is customized to enable many of the features of Project Mu.
+Mu Tiano Platform is a public repository of Project Mu based firmware for the QEMU processor emulator. It contains
+a QemuQ35Pkg that is customized to enable many of the features of Project Mu. It also contains the original
+upstream OvmfPkg from edk2 which supports IA32/X64 virtual firmware for QEMU.
 
-The idea behind this repository is to provide a free, open source, sample reference platform for enabling Project Mu features.
-Eventually there may be numerous feature branches that demonstrate how to enable advanced capabilities.  By providing an
-end-to-end example, these features can be easily tested and evaluated before being integrated into other platforms.
+This repository is to provide a readily available, free, and feature rich platform to use as an example for feature
+enablement and validation, demonstrating how a single firmware codebase can be shared across multiple products and
+architectures, promoting serviceable, maintainable, up-to-date and secure firmware. Eventually there may be numerous
+feature branches that demonstrate how to enable advanced capabilities.  By providing an end-to-end example, these
+features can be easily tested and evaluated before being integrated into other platforms.
 
 ## Upstream Alignment
 
@@ -29,12 +32,12 @@ The expectation is that only the latest release branch is in active development.
     facing product and therefore long term servicing will not be supported.  Security issues
     will also not be backported.
 
-## More Info
+## Platform Firmware Support
 
 Buildable platforms can be found under the `Platforms` folder inside the root of this repo.
 Details about the platform and how to build/use each platform can be found in their respective directories.
 
-- [Q35 Platform](Platforms/QemuQ35Pkg/ReadMe.md)
+- [Q35 Platform](Platforms/QemuQ35Pkg/Docs/QemuQ35_ReadMe.md)
 - [Ovmf upstream Platform](Platforms/OvmfPkg/ReadMe.md)
 
 For general details about Project Mu please see the Project Mu docs (<https://github.com/Microsoft/mu>).
