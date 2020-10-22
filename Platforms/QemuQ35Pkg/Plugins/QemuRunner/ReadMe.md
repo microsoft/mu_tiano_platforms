@@ -21,7 +21,7 @@ stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py MAKE_STARTUP_NSH=TRUE RUN_
 Boolean string value to indicate if QEMU should be configured to run headless/no graphics.
 By default graphics will be used but in some server/remote scenarios headless is required.
 
-**TRUE**:   configure QEMU to run headless or with no graphics
+**TRUE**:   configure QEMU to run headless or with no graphics  
 **FALSE**:  configure QEMU for local graphics (default)
 
 ### MAKE_STARTUP_NSH
@@ -34,7 +34,7 @@ if the local compiled firmware is capable of booting to the UEFI shell without a
 exception, or catastrophic firmware failure.  
 
 **TRUE**:   make `startup.nsh` file  
-**FALSE**:  do not make `startup.nsh` file.  (default)
+**FALSE**:  do not make `startup.nsh` file. (default)
 
 ### RUN_UNIT_TESTS
 
@@ -44,7 +44,7 @@ effect it must be combined with `MAKE_STARTUP_NSH=TRUE`.  After QEMU is done exe
 the plugin will attempt to parse the XML based results and display the results.
 
 **TRUE**:   find, execute, and evaluate UEFI shell unit tests  
-**FALSE**:  do not(default)
+**FALSE**:  do not (default)
 
 ### STARTUP_GLOB_CSV
 
