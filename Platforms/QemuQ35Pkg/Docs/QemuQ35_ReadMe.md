@@ -59,3 +59,19 @@ and then transfer them through the Microsoft WHEA pipeline.  From there an OEM c
 provided reports to check on in market device health.  *Some work still pending completion.
 
 [Details](Features/feature_whea.md)
+
+## Mu Customized Components
+
+### Modules
+
+| Modules | Link to Documentation |
+| --- | --- |
+| **QemuVideoDxe** | [QEMU Cirrus Video Controller](../QemuVideoDxe/ReadMe.md) |
+
+### Libraries
+
+| Libraries | Link to Documentation |
+| --- | --- |
+| **MsPlatformDevicesLib** | [MsPlatformDevicesLib](../Library/MsPlatformDevicesLibQemuQ35/ReadMe.md) |
+| **PlatformDebugLibIoPort** | [PlatformDebugLibIoPort](../Library/PlatformDebugLibIoPort/ReadMe.md) |
+| **PlatformThemeLib** | [PlatformThemeLib](../Library/PlatformThemeLib/ReadMe.md) |
