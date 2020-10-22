@@ -10,10 +10,11 @@ execute those tests with a `startup.nsh` file, and then parse the results once Q
 The plugin has numerous configuration options to support the Q35 Platform.  These can be set
 when calling `stuart_build` or `platform_build` by adding `<name>=<value>` to the command line.
 
-!!! info "Example"
-    ```bash
-    stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py MAKE_STARTUP_NSH=TRUE
-    ```
+**Example** setting up unit test to run automatically
+
+```bash
+stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py MAKE_STARTUP_NSH=TRUE RUN_UNIT_TESTS=TRUE
+```
 
 ### QEMU_HEADLESS
 
@@ -32,7 +33,7 @@ the startup.nsh file will contain a single command to shutdown the system.  This
 if the local compiled firmware is capable of booting to the UEFI shell without a software assert, system
 exception, or catastrophic firmware failure.  
 
-**TRUE**:   make `startup.nsh` file.
+**TRUE**:   make `startup.nsh` file  
 **FALSE**:  do not make `startup.nsh` file.  (default)
 
 ### RUN_UNIT_TESTS
@@ -42,7 +43,7 @@ unit tests, copy them to the virtual drive folder, and add them to the `startup.
 effect it must be combined with `MAKE_STARTUP_NSH=TRUE`.  After QEMU is done executing
 the plugin will attempt to parse the XML based results and display the results.
 
-**TRUE**:   find, execute, and evaluate UEFI shell unit tests
+**TRUE**:   find, execute, and evaluate UEFI shell unit tests  
 **FALSE**:  do not(default)
 
 ### STARTUP_GLOB_CSV
@@ -60,5 +61,5 @@ contents.  When running automated tests multiple times they may write some state
 may change their execution.  Sometimes that is desired and this option allows the plugin to copy new files to the virtual
 drive but not delete files.  
 
-**TRUE**:   don't delete all drive content before copying new content
+**TRUE**:   don't delete all drive content before copying new content  
 **FALSE**:  delete all drive contents before copying new content (default)
