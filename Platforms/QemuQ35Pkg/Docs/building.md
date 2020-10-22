@@ -16,7 +16,7 @@ with VS2019 and Ubuntu 18.04 with GCC5 toolchain.
 This build uses edk2-pytools for functionality.  Documentation can be
 found [here](https://github.com/tianocore/edk2-pytool-extensions/tree/master/docs).
 On most Linux distros this requires an extra step for mono and nuget support.
-https://github.com/tianocore/edk2-pytool-extensions/blob/master/docs/usability/using_extdep.md#a-note-on-nuget-on-linux
+<https://github.com/tianocore/edk2-pytool-extensions/blob/master/docs/usability/using_extdep.md#a-note-on-nuget-on-linux>
 
 ## Building with Pytools
 
@@ -51,7 +51,8 @@ https://github.com/tianocore/edk2-pytool-extensions/blob/master/docs/usability/u
     stuart_setup -c Platforms/QemuQ35Pkg/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG>
     ```
 
-    - `TOOL_CHAIN_TAG` being the toolchain you want to build with, currently `VS2017`, `VS2019`, and `GCC5` are supported values
+    - `TOOL_CHAIN_TAG` being the toolchain you want to build with, currently `VS2017`, `VS2019`, and `GCC5` are
+      supported values
 
 5. Initialize & Update Dependencies - only as needed when ext_deps change
 
@@ -101,7 +102,8 @@ https://github.com/tianocore/edk2-pytool-extensions/blob/master/docs/usability/u
 1. QEMU must be on your path.  On Windows this is a manual process and not part of the QEMU installer.
 2. QEMU output will be in Build/BUILDLOG_QemuQ35Pkg.txt as well as Build/QemuQ35Pkg/QEMULOG_QemuQ35Pkg.txt
 
-**NOTE:** Logging the execution output will be in the normal stuart log as well as to your console (if you have the correct logging level set, by default it doesn't output to console).
+**NOTE:** Logging the execution output will be in the normal stuart log as well as to your console (if you have the
+correct logging level set, by default it doesn't output to console).
 
 ### Custom Build Options
 

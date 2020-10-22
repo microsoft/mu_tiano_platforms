@@ -37,7 +37,7 @@ Details about the platform and how to build/use each platform can be found in th
 - [Q35 Platform](Platforms/QemuQ35Pkg/ReadMe.md)
 - [Ovmf upstream Platform](Platforms/OvmfPkg/ReadMe.md)
 
-For general details about Project Mu please see the Project Mu docs (https://github.com/Microsoft/mu).
+For general details about Project Mu please see the Project Mu docs (<https://github.com/Microsoft/mu>).
 
 ## Microsoft Open Source Code of Conduct
 
@@ -68,7 +68,7 @@ Please follow the general Project Mu Pull Request process.
 
 Project Mu contributions will be licensed as BSD-2-Clause-Patent and will contain the SPDX-License-Identifier.
 
-```
+```text
 Copyright (C) Microsoft Corporation
 SPDX-License-Identifier: BSD-2-Clause-Patent
 ```
