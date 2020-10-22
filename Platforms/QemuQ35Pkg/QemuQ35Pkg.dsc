@@ -475,6 +475,14 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdRequireIommu|FALSE # don't require IOMMU
 
+[PcdsPatchableInModule]
+!if $(SOURCE_DEBUG_ENABLE) == TRUE
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
+!else
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2F
+!endif
+
+
 [PcdsFixedAtBuild]
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
@@ -520,13 +528,6 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80080246
   #gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x800002CF # use when debugging depex loading issues
 
-!if $(SOURCE_DEBUG_ENABLE) == TRUE
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
-  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugLoadImageMethod|0x2
-!else
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2F
-!endif
-
   # This PCD is used to set the base address of the PCI express hierarchy. It
   # is only consulted when OVMF runs on Q35. In that case it is programmed into
   # the PCIEXBAR register.
@@ -535,6 +536,9 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   # never lets the RAM below 4 GB exceed 2816 MB.
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xB0000000
 
+!if $(SOURCE_DEBUG_ENABLE) == TRUE
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugLoadImageMethod|0x2
+!endif
 
 
 [PcdsFixedAtBuild.common]
@@ -980,9 +984,12 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
       BcfgCommandLib|ShellPkg/Library/UefiShellBcfgCommandLib/UefiShellBcfgCommandLib.inf
 
     <PcdsFixedAtBuild>
-      gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0xFF
       gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
       gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|8000
+    <PcdsPatchableInModule>
+      #Turn off Halt on Assert and Print Assert so that libraries can
+      #be tested in more of a release mode environment
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0xFF
   }
 
 
@@ -1033,8 +1040,32 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   #UefiTestingPkg/FunctionalSystemTests/SmmPagingProtectionsTest/Smm/SmmPagingProtectionsTestSmm.inf
   #UefiTestingPkg/FunctionalSystemTests/HeapGuardTest/Smm/HeapGuardTestSmm.inf
   #UefiTestingPkg/FunctionalSystemTests/VarPolicyUnitTestApp/VarPolicyUnitTestApp.inf
-  CryptoPkg/Test/UnitTest/Library/BaseCryptLib/TestBaseCryptLibShell.inf
+  CryptoPkg/Test/UnitTest/Library/BaseCryptLib/TestBaseCryptLibShell.inf {
+    <PcdsPatchableInModule>
+      #Turn off Halt on Assert and Print Assert so that libraries can
+      #be tested in more of a release mode environment
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
+  }
+
   MsCorePkg/UnitTests/JsonTest/JsonTestApp.inf
+  XmlSupportPkg/Test/UnitTest/XmlTreeLib/XmlTreeLibUnitTestsUefi.inf
+  XmlSupportPkg/Test/UnitTest/XmlTreeQueryLib/XmlTreeQueryLibUnitTestsUefi.inf {
+    <PcdsPatchableInModule>
+      #Turn off Halt on Assert and Print Assert so that libraries can
+      #be tested in more of a release mode environment
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
+  }
+
+  UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTest/SampleUnitTestUefiShell.inf {
+    <PcdsPatchableInModule>
+      #Turn off Halt on Assert and Print Assert so that libraries can
+      #be tested in more of a release mode environment
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
+  }
+  # MemMap and MAT Test
+  UefiTestingPkg/FunctionalSystemTests/MemmapAndMatTestApp/MemmapAndMatTestApp.inf
+  # MorLock v1 and v2 Test
+  # this fails on QEMU - UefiTestingPkg/FunctionalSystemTests/MorLockTestApp/MorLockTestApp.inf
 
   #########################################
   # SMM Phase modules

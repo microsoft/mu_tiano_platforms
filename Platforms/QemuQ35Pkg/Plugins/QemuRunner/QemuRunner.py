@@ -5,6 +5,31 @@
 #
 ##
 
+
+#####
+# STARTUP_NSH_DIRTY:
+#                     True:  don't empty folder before copying.
+#                     False: empty folder before copying new contents
+# QEMU_HEADLESS:
+#                     True:  configure QEMU to run headless (no graphics)
+#                     False: configure QEMU for local graphics
+#
+# MAKE_STARTUP_NSH:
+#                     True: Create a startup nsh file with all unit tests
+#                     False: don't create startup.nsh file
+#
+# RUN_UNIT_TESTS:
+#                     True: if combined with MAKE_STARTUP_NSH will add all unit tests
+#                           to startup nsh and copy efi files to virtual drive
+#                     False: Don't copy unit tests to virtual drive and don't add to nsh
+#
+#
+# STARTUP_GLOB_CSV:
+#                     CSV of glob patterns to use to add to startup nsh.  Default is *Test*.efi
+#
+# BUILD_OUTPUT_BASE: Output directory for this build
+#####
+
 import logging
 import os
 import sys
@@ -21,6 +46,19 @@ from edk2toollib import utility_functions
 from edk2toollib.uefi.edk2.parsers.dsc_parser import DscParser
 from edk2toollib.uefi.edk2.parsers.inf_parser import InfParser
 from edk2toolext.environment.multiple_workspace import MultipleWorkspace
+
+STARTUP_NSH_SCRIPT = r'''
+#!/bin/nsh
+echo -off
+for %a run (0 10)
+    if exist fs%a:\{first_file} then
+        fs%a:
+        goto FOUND_IT
+    endif
+endfor
+
+:FOUND_IT
+'''
 
 
 class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
@@ -79,43 +117,29 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         else:
             args += " -vga cirrus" #std is what the default is
 
-        # Find the unit tests and copy them to the virtual drive
-        unit_tests = QemuRunner.collect_unit_tests(env)
-        for unit_test in unit_tests:
-            logging.debug("Copying " + unit_test)
-            shutil.copy(unit_test, VirtualDrive)
-
-        # Setup Startup.nsh if needed
         should_run_unit_tests = (env.GetValue("RUN_UNIT_TESTS").upper() == "TRUE")
-        if (env.GetValue("MAKE_STARTUP_NSH").upper() == "TRUE") or should_run_unit_tests:
+        # Setup Startup.nsh if needed
+        if (env.GetValue("MAKE_STARTUP_NSH").upper() == "TRUE"):
             f = open(os.path.join(VirtualDrive, "startup.nsh"), "w")
             if should_run_unit_tests:
                 # Write out script to find the filesystem - this is to avoid hardcoding fs0:
-                script = '';
-                script += '#!/bin/nsh\n'
-                #script += 'echo -off\n'
-                script += 'for %a run (0 5)\n'
-                script += '    if exist fs%a:\*TestApp.efi then\n'
-                script += '        fs%a:\n'
-                script += '        goto TESTS\n'
-                script += '    endif\n'
-                script += 'endfor\n'
-                script += '\n'
-                script += ':TESTS\n'
+                f.write(STARTUP_NSH_SCRIPT.format(first_file="startup.nsh"))
+                unit_tests = QemuRunner.collect_built_unit_tests(env)
                 for unit_test in unit_tests:
-                    script += os.path.basename(unit_test)
+                    logging.debug("Copying " + unit_test)
+                    shutil.copy(unit_test, VirtualDrive)
+                    f.write(os.path.basename(unit_test))
                     logging.critical(f"Writing {unit_test} to startup nsh file")
-                    script += "\n"
-                f.write(script)
-            else:
-                f.write("# BOOT SUCCESS !!! \n")
+                    f.write("\n")
+                f.write("stall 2000000\n")
             f.write("reset -s\n")
             f.close()
-        
+
         # Run QEMU
-        qemu_out_file = os.path.join(env.GetValue("WORKSPACE"), env.GetValue("OUTPUT_DIRECTORY"),f"QEMULOG.txt")
-        ret = QemuRunner.RunCmd(executable, args,  outfile=qemu_out_file, thread_target=QemuRunner.QemuCmdReader)
-        
+        #ret = QemuRunner.RunCmd(executable, args,  thread_target=QemuRunner.QemuCmdReader)
+        ret = utility_functions.RunCmd(executable, args)
+        ## TODO: restore the customized RunCmd once unit tests with asserts are figured out
+
         if ret != 0x0 and ret != 0xc0000005:
             #for some reason getting a c0000005 on successful return
             return ret
@@ -129,33 +153,41 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             xml_result_file = os.path.join(VirtualDrive, os.path.basename(unit_test)[:-4] + "_JUNIT.XML")
             if os.path.isfile(xml_result_file):
                 logging.info('\n' + os.path.basename(unit_test))
-                root = xml.etree.ElementTree.parse(xml_result_file).getroot()
-                for suite in root:
-                    logging.info(" ")
-                    for case in suite:
-                        logging.info('\t\t' + case.attrib['classname'] + " - ")
-                        caseresult = "\t\t\tPASS"
-                        level = logging.INFO
-                        for result in case:
-                            if result.tag == 'failure':
-                                failure_count += 1
-                                level = logging.ERROR
-                                caseresult = "\t\tFAIL" + " - " + result.attrib['message']
-                        logging.log( level, caseresult)
+                try:
+                    root = xml.etree.ElementTree.parse(xml_result_file).getroot()
+                    for suite in root:
+                        logging.info(" ")
+                        for case in suite:
+                            logging.info('\t\t' + case.attrib['classname'] + " - ")
+                            caseresult = "\t\t\tPASS"
+                            level = logging.INFO
+                            for result in case:
+                                if result.tag == 'failure':
+                                    failure_count += 1
+                                    level = logging.ERROR
+                                    caseresult = "\t\tFAIL" + " - " + result.attrib['message']
+                            logging.log( level, caseresult)
+                except Exception as ex:
+                    logging.error("Exception trying to read xml." + str(ex))
+                    failure_count += 1
+
             else:
                 logging.warning("%s Test Failed - No Results File" % os.path.basename(unit_test))
                 failure_count += 1
         return failure_count
 
     @staticmethod
-    def collect_unit_tests(env):
+    def collect_built_unit_tests(env):
         ''' returns a list of absolute paths to unit test EFI's '''
         path = env.GetValue("BUILD_OUTPUT_BASE")
         cp = os.path.join(path, "X64")
-        testList = glob.glob(os.path.join(cp, "*TestApp.efi"))
-        #testList.extend(glob.glob(os.path.join(cp, "*TestSmm.efi")))
-        testList.extend(glob.glob(os.path.join(cp, "*TestShell.efi")))
-        return testList
+
+        globlist = env.GetValue("STARTUP_GLOB_CSV", "*Test*.efi")
+        globlist = globlist.split(",")
+        test_list = []
+        for globpattern in globlist:
+            test_list.extend(glob.glob(os.path.join(cp, globpattern)))
+        return list(set(test_list))
 
     ####
     # Helper functions for running commands from the shell in python environment
