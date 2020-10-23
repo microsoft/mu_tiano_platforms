@@ -548,7 +548,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 
 # Enable SHELL to build instead of just taking the binary
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|16000
-  gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask|0x1f    # All profiles
+  #gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask|0x1f    # All profiles
 
   gMsGraphicsPkgTokenSpaceGuid.PcdUiThemeInDxe|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerInBootOrder|FALSE
@@ -969,10 +969,6 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
-  ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf {
-    <PcdsFixedAtBuild>
-      gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
-  }
   ShellPkg/Application/Shell/Shell.inf {
     <LibraryClasses>
       ShellCommandLib|ShellPkg/Library/UefiShellCommandLib/UefiShellCommandLib.inf

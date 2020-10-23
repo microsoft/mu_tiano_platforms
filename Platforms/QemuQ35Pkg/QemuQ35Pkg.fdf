@@ -382,7 +382,7 @@ INF  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResour
 INF  FatPkg/EnhancedFatDxe/Fat.inf
 INF  MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
 
-INF  ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
+#INF  ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
 
 #
 # Network modules
