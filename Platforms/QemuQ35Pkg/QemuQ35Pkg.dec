@@ -1,0 +1,31 @@
+## @file
+#  ProjectMu QemuQ35Pkg
+#
+#  Package is a derivitive of the open source OvmfPkg
+#
+#  Copyright (c) Microsoft Corporation
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = QemuQ35Pkg
+  PACKAGE_GUID                   = 4544c001-2e3c-4ec0-b038-4fc68055beca
+  PACKAGE_VERSION                = 0.1
+
+[Includes]
+
+[LibraryClasses]
+
+[Guids]
+
+[Ppis]
+
+[Protocols]
+
+[PcdsFixedAtBuild]
+
+[PcdsDynamic, PcdsDynamicEx]
+
+[PcdsFeatureFlag]
