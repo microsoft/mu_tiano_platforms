@@ -85,6 +85,20 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             logging.debug("Copying " + unit_test)
             shutil.copy(unit_test, VirtualDrive)
 
+        # Copy required SBAT stuff
+        TestAppSearchPath = os.path.join(env.GetValue("BUILD_OUTPUT_BASE"), "X64", "*TestApp.efi")
+        EnrollDefaultKeysPath = os.path.join(env.GetValue("BUILD_OUTPUT_BASE"), "X64", "*EnrollDefaultKeys.efi")
+        CdBootPath = os.path.join(env.GetValue("CDBOOT_PATH"), "cdboot_*.efi")
+        for testapp in glob.iglob(TestAppSearchPath, recursive=False):
+            logging.info(f"Copying {testapp}")
+            shutil.copy(testapp, VirtualDrive)
+        for testapp in glob.iglob(EnrollDefaultKeysPath, recursive=False):
+            logging.info(f"Copying {testapp}")
+            shutil.copy(testapp, VirtualDrive)
+        for testapp in glob.iglob(CdBootPath, recursive=False):
+            logging.info(f"Copying {testapp}")
+            shutil.copy(testapp, VirtualDrive)
+
         # Setup Startup.nsh if needed
         should_run_unit_tests = (env.GetValue("RUN_UNIT_TESTS").upper() == "TRUE")
         if (env.GetValue("MAKE_STARTUP_NSH").upper() == "TRUE") or should_run_unit_tests:

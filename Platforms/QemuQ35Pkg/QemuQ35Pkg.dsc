@@ -46,6 +46,11 @@
     SMM_CRYPTO_ARCH = X64
   !endif
 
+  # Configure Secure Boot
+  !ifndef SECURE_BOOT_ENABLE
+   SECURE_BOOT_ENABLE = TRUE
+  !endif
+
 ################################################################################
 #
 # SKU Identification section - list of all SKU IDs supported by this Platform.
@@ -945,6 +950,15 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
     <LibraryClasses>
       NULL|OvmfPkg/Library/PxeBcPcdProducerLib/PxeBcPcdProducerLib.inf
   }
+
+  # Secure Boot support
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
+  QemuQ35Pkg/EnrollDefaultKeys/EnrollDefaultKeys.inf
+  QemuQ35Pkg/TestApp/TestApp.inf # this is a test app for testing SBAT
+!endif
+
+
   #
   # Usb Support
   #
@@ -956,10 +970,6 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
   ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf {
-    <PcdsFixedAtBuild>
-      gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
-  }
-  OvmfPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf {
     <PcdsFixedAtBuild>
       gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
   }

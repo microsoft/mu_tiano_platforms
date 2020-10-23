@@ -1,0 +1,57 @@
+## @file
+#  Enroll default PK, KEK, db, dbx.
+#
+#  Copyright (C) 2014-2019, Red Hat, Inc.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+#Override : 00000002 | OvmfPkg/EnrollDefaultKeys/EnrollDefaultKeys.inf | f5891caadd4b24a93dd48965f448896f | 2020-10-23T19-38-20 | 7471e68b93cd4d6f67845f8f19e4749d794281fc
+
+[Defines]
+  INF_VERSION                    = 1.28
+  BASE_NAME                      = EnrollDefaultKeys
+  FILE_GUID                      = A0BAA8A3-041D-48A8-BC87-C36D121B5E3D
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 0.1
+  ENTRY_POINT                    = ShellCEntryLib
+
+[Sources]
+  AuthData.c
+  EnrollDefaultKeys.c
+  EnrollDefaultKeys.h
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  QemuQ35Pkg/QemuQ35Pkg.dec
+  SecurityPkg/SecurityPkg.dec
+  ShellPkg/ShellPkg.dec
+
+[Guids]
+  gEfiCertPkcs7Guid
+  gEfiCertSha256Guid
+  gEfiCertX509Guid
+  gEfiCustomModeEnableGuid
+  gEfiGlobalVariableGuid
+  gEfiImageSecurityDatabaseGuid
+  gEfiSecureBootEnableDisableGuid
+  gMicrosoftVendorGuid
+  gOvmfPkKek1AppPrefixGuid
+  gEfiCertVersionRecordResourceGuid # MU_CHANGE
+  gTestCertGuid # MU_CHANGE
+
+[Protocols]
+  gEfiSmbiosProtocolGuid ## CONSUMES
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PrintLib
+  ShellCEntryLib
+  UefiBootServicesTableLib
+  UefiLib
+  UefiRuntimeServicesTableLib
