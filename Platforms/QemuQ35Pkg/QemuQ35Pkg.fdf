@@ -491,6 +491,22 @@ INF  UefiTestingPkg/FunctionalSystemTests/SmmPagingProtectionsTest/Smm/SmmPaging
 INF  UefiTestingPkg/FunctionalSystemTests/HeapGuardTest/Smm/HeapGuardTestSmm.inf
 !endif
 
+!if $(PRM_ENABLE) == TRUE
+# PRM Configuration Driver
+INF PrmPkg/PrmConfigDxe/PrmConfigDxe.inf
+
+# PRM Sample Modules
+INF PrmPkg/Samples/PrmSamplePrintModule/PrmSamplePrintModule.inf
+INF PrmPkg/Samples/PrmSampleAcpiParameterBufferModule/PrmSampleAcpiParameterBufferModule.inf
+INF PrmPkg/Samples/PrmSampleHardwareAccessModule/PrmSampleHardwareAccessModule.inf
+INF PrmPkg/Samples/PrmSampleContextBufferModule/PrmSampleContextBufferModule.inf
+
+# PRM Module Loader Driver
+INF PrmPkg/PrmLoaderDxe/PrmLoaderDxe.inf
+
+# PRM SSDT Installation Driver
+INF PrmPkg/PrmSsdtInstallDxe/PrmSsdtInstallDxe.inf
+!endif
 
 FILE FREEFORM = PCD(gDfciPkgTokenSpaceGuid.PcdDfciTimerFile) {
     SECTION RAW = DfciPkg/Include/Resources/DfciWorking.bmp
