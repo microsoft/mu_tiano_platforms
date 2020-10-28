@@ -36,12 +36,9 @@ import logging
 import os
 import sys
 import time
-import shutil
-import glob
 import threading
 import datetime
 import subprocess
-import xml.etree.ElementTree
 from edk2toolext.environment import plugin_manager
 from edk2toolext.environment.plugintypes import uefi_helper_plugin
 from edk2toollib import utility_functions
@@ -67,8 +64,6 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             logging.critical("Virtual Drive Path Invalid")
             return -1
         OutputPath_FV = os.path.join(env.GetValue("BUILD_OUTPUT_BASE"), "FV")
-
-        HostMountPath = env.GetValue("HOST_MOUNT_PATH")
 
         # Check if QEMU is on the path, if not find it
         executable = "qemu-system-x86_64"

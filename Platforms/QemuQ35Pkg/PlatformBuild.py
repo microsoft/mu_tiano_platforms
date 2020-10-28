@@ -10,6 +10,7 @@ import io
 import shutil
 import glob
 import time
+import xml.etree.ElementTree
 
 from edk2toolext.environment import shell_environment
 from edk2toolext.environment.uefi_build import UefiBuilder
@@ -243,9 +244,16 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         VirtualDrive.AddFile(nshpath)
         VirtualDrive.DismountDrive()
         ret = self.Helper.QemuRun(self.env)
+        if ret != 0:
+            logging.critical("Failed running Qemu")
+            return ret
+
+        failures = ut.report_results(VirtualDrive)
+
+
 
         # do stuff with unit test results here
-        return 0
+        return failures
 
 class UnitTestSupport(object):
 
@@ -268,38 +276,39 @@ class UnitTestSupport(object):
             virtualdrive.AddFile(test)
             nshfile.AddLine(os.path.basename(test))
 
-    def __tood(self):
-        # if you didn't do unit tests, don't check for errors
-        if not should_run_unit_tests:
-            return 0
+    def report_results(self, virtualdrive) -> int:
+
         #now parse the xml for errors
         failure_count = 0
         logging.info("UnitTest Completed")
-        for unit_test in unit_tests:
-            xml_result_file = os.path.join(VirtualDrive, os.path.basename(unit_test)[:-4] + "_JUNIT.XML")
-            if os.path.isfile(xml_result_file):
-                logging.info('\n' + os.path.basename(unit_test))
-                try:
-                    root = xml.etree.ElementTree.parse(xml_result_file).getroot()
-                    for suite in root:
-                        logging.info(" ")
-                        for case in suite:
-                            logging.info('\t\t' + case.attrib['classname'] + " - ")
-                            caseresult = "\t\t\tPASS"
-                            level = logging.INFO
-                            for result in case:
-                                if result.tag == 'failure':
-                                    failure_count += 1
-                                    level = logging.ERROR
-                                    caseresult = "\t\tFAIL" + " - " + result.attrib['message']
-                            logging.log( level, caseresult)
-                except Exception as ex:
-                    logging.error("Exception trying to read xml." + str(ex))
-                    failure_count += 1
-
-            else:
-                logging.warning("%s Test Failed - No Results File" % os.path.basename(unit_test))
+        for unit_test in self.test_list:
+            xml_result_file = os.path.basename(unit_test)[:-4] + "_JUNIT.XML"
+            try:
+                data = virtualdrive.GetFileContent(xml_result_file)
+            except:
+                logging.error(f"unit test ({unit_test}) produced no result file")
                 failure_count += 1
+                continue
+
+            logging.info('\n' + os.path.basename(unit_test))
+            try:
+                root = xml.etree.ElementTree.fromstring(data)
+                for suite in root:
+                    logging.info(" ")
+                    for case in suite:
+                        logging.info('\t\t' + case.attrib['classname'] + " - ")
+                        caseresult = "\t\t\tPASS"
+                        level = logging.INFO
+                        for result in case:
+                            if result.tag == 'failure':
+                                failure_count += 1
+                                level = logging.ERROR
+                                caseresult = "\t\tFAIL" + " - " + result.attrib['message']
+                        logging.log( level, caseresult)
+            except Exception as ex:
+                logging.error("Exception trying to read xml." + str(ex))
+                failure_count += 1
+        virtualdrive.DismountDrive()
         return failure_count
 
 
@@ -308,26 +317,50 @@ class VirtualDriveManager(object):
 
     def __init__(self, vhd_path:os.PathLike, host_drive_letter:str):
         self.path_to_vhd = os.path.abspath(vhd_path)
-        self._host_drive_letter = host_drive_letter
-        self.host_path = os.path.join(self._host_drive_letter + ':', "/")
+        self.set_host_drive_letter(host_drive_letter)
         self._host_mounted = False
 
     def __del__(self):
         if self._host_mounted:
             self.DismountDrive()
 
-    def MakeDrive(self, size: int=100):
-        scriptfile = os.path.join(os.path.dirname(self.path_to_vhd), "vhd_script.tmp")
-        with open(scriptfile, "w") as sf:
-            sf.write(f"create vdisk file={self.path_to_vhd} maximum={size}\n")
-            sf.write(f"select vdisk file={self.path_to_vhd}\n")
-            sf.write(f"convert gpt\n")
-            sf.write(f"create partition primary\n")
-            sf.write(f'format fs=fat32 label="install" quick\n')
-            sf.write(f'assign letter={self._host_drive_letter}\n')
-        ret = RunCmd("diskpart", f" /S {scriptfile}")
-        time.sleep(15)  # sleep 15 seconds
-        os.remove(scriptfile)
+    def set_host_drive_letter(self, letter):
+        self._host_drive_letter = letter
+        self.host_path = os.path.join(self._host_drive_letter + ':', "/")
+
+
+    def MakeDrive(self, size: int=50):
+
+        # New-VHD -Path {self.path_to_vhd} -SizeBytes {size}MB
+        stream = io.StringIO()
+        ret = RunCmd("powershell", f"New-VHD -Path {self.path_to_vhd} -SizeBytes {size}MB")
+        if ret != 0:
+            raise Exception("Failed to create new vhd.  Are you running from Admin prompt")
+
+        RunCmd("powershell", f"Mount-VHD -Path {self.path_to_vhd}")
+
+        #get-disk
+        RunCmd("powershell", f"Get-Disk", outstream=stream)
+        number = None
+        output = stream.getvalue()
+        for line in output.splitlines():
+            if "Msft Virtual" in line:
+                logging.debug("Found a Virtual Drive Mounted: " + line)
+                if number != None:
+                    raise Exception("Multiple VHD's mounted.  No idea which one is desired")
+                else:
+                    number = line.split()[0]
+
+
+        # initialize-disk -number ##
+        RunCmd("powershell", f"initialize-disk -number {number}")
+
+        #  new-partition -DiskNumber ## -AssignDriveLetter
+        RunCmd("powershell", f"new-partition -DiskNumber {number} -DriveLetter {self._host_drive_letter} -UseMaximumSize")
+
+        # format-volume -DriveLetter ## -FileSystem Fat32
+        RunCmd("powershell", f"format-volume -DriveLetter {self._host_drive_letter} -FileSystem FAT")
+
         self._host_mounted = True
         return ret
 
@@ -335,25 +368,42 @@ class VirtualDriveManager(object):
         if not self._host_mounted:
             if not os.path.isfile:
                 raise Exception("Virtual Drive file does not exist")
+            ret = RunCmd("powershell", f"Mount-VHD -Path {self.path_to_vhd} -NoDriveLetter")
+            if ret != 0:
+                raise Exception("Failed to create new vhd.  Are you running from Admin prompt")
 
-            scriptfile = os.path.join(os.path.dirname(self.path_to_vhd), "vhd_script.tmp")
-            with open(scriptfile, "w") as sf:
-                sf.write(f"select vdisk file={self.path_to_vhd}\n")
-                sf.write(f'assign letter={self._host_drive_letter}\n')
-            RunCmd("diskpart", f" /S {scriptfile}")
-            #time.sleep(15)  # sleep 15 seconds
-            os.remove(scriptfile)
+            stream = io.StringIO()
+            #get-disk
+            RunCmd("powershell", f"Get-Disk", outstream=stream)
+            number = None
+            output = stream.getvalue()
+            for line in output.splitlines():
+                if "Msft Virtual" in line:
+                    logging.debug("Found a Virtual Drive Mounted: " + line)
+                    if number != None:
+                        raise Exception("Multiple VHD's mounted.  No idea which one is desired")
+                    else:
+                        number = line.split()[0]
+            RunCmd("powershell", f"Add-PartitionAccessPath -DiskNumber {number} -PartitionNumber 1 -AssignDriveLetter")
+            stream = io.StringIO()
+            RunCmd("powershell", f"Get-Partition -DiskNumber {number}", outstream=stream)
+            output = stream.getvalue()
+            letter = None
+            for line in output.splitlines():
+                if "Basic" in line:
+                    logging.debug("Found partition: " + line)
+                    if letter != None:
+                        raise Exception("Multiple partitions.  No idea which one is desired")
+                    else:
+                        letter = line.split()[1]
+                        self.set_host_drive_letter(letter)
+
             self._host_mounted = True
 
     def DismountDrive(self):
+        # dismount-VHD -path <path>
         if self._host_mounted:
-            scriptfile = os.path.join(os.path.dirname(self.path_to_vhd), "vhd_script.tmp")
-            with open(scriptfile, "w") as sf:
-                sf.write(f"select vdisk file={self.path_to_vhd}\n")
-                sf.write(f"detach vdisk\n")
-            RunCmd("diskpart", f" /S {scriptfile}")
-            time.sleep(15)  # sleep 15 seconds
-            os.remove(scriptfile)
+            RunCmd("powershell", f"Dismount-VHD -path {self.path_to_vhd}")
             self._host_mounted = False
 
     def AddFile(self, HostFilePath):
@@ -390,7 +440,7 @@ endfor
         self._add_shutdown_to_end = True
 
     def WriteOut(self, host_file_path):
-        with open(host_file_path, "wb") as nsh:
+        with open(host_file_path, "w") as nsh:
             if self._use_fs_finder:
                 this_file = os.path.basename(host_file_path)
                 nsh.write(StartUpScriptManager.FS_FINDER_SCRIPT.format(first_file=this_file))
