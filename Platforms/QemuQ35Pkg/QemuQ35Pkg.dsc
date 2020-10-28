@@ -1110,7 +1110,6 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
 !endif
 
-!if $(PRM_ENABLE) == TRUE
   #
   # PRM Configuration Driver
   #
@@ -1146,7 +1145,6 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   # PRM Information UEFI Application
   #
   PrmPkg/Application/PrmInfo/PrmInfo.inf
-!endif
 
 ################################################################################
 #

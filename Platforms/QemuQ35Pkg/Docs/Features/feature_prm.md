@@ -31,12 +31,3 @@ The goals of the PRM feature within `QemuQ35Pkg` are:
 
 For more information about the PRM feature and to access the platform agnostic PRM code/documentation visit
 [edk2-staging/PlatformRuntimeMechanism](https://github.com/tianocore/edk2-staging/tree/PlatformRuntimeMechanism).
-
-## PRM Build Define
-
-PRM can be enabled by setting the following build define:
-` BLD_*_PRM_ENABLE=1 `
-
-For example, the full `stuart_build` command to enable PRM is:
-
-`stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py BLD_*_PRM_ENABLE=1`
