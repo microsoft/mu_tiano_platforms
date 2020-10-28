@@ -49,20 +49,6 @@ from edk2toollib.uefi.edk2.parsers.dsc_parser import DscParser
 from edk2toollib.uefi.edk2.parsers.inf_parser import InfParser
 from edk2toolext.environment.multiple_workspace import MultipleWorkspace
 
-STARTUP_NSH_SCRIPT = r'''
-#!/bin/nsh
-echo -off
-for %a run (0 10)
-    if exist fs%a:\{first_file} then
-        fs%a:
-        goto FOUND_IT
-    endif
-endfor
-
-:FOUND_IT
-'''
-
-
 class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
     def __init__(self):
@@ -76,15 +62,13 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
     @staticmethod
     def Runner(env):
         ''' Runs QEMU '''
-        VirtualDrive = os.path.join(env.GetValue("BUILD_OUTPUT_BASE"), "VirtualDrive")
-        if os.path.isdir(VirtualDrive):
-            if env.GetValue("STARTUP_NSH_DIRTY", "false").upper() == "TRUE":
-                logging.info("Leaving the Virtual Drive Dirty as requested.  Be aware this can impact your unit tests results")
-            else:
-                shutil.rmtree(VirtualDrive)
-
-        os.makedirs(VirtualDrive, exist_ok=True)
+        VirtualDrive = env.GetValue("VIRTUAL_DRIVE_PATH")
+        if not os.path.isfile(VirtualDrive):
+            logging.critical("Virtual Drive Path Invalid")
+            return -1
         OutputPath_FV = os.path.join(env.GetValue("BUILD_OUTPUT_BASE"), "FV")
+
+        HostMountPath = env.GetValue("HOST_MOUNT_PATH")
 
         # Check if QEMU is on the path, if not find it
         executable = "qemu-system-x86_64"
@@ -98,7 +82,8 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         # turn off network
         args += " -net none"
         # Mount disk with startup.nsh
-        args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
+        ###args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
+        args += f" -hdd {VirtualDrive}"
 
         args += " -machine q35,smm=on" #,accel=(tcg|kvm)"
         args += " -m 2048"
@@ -119,77 +104,14 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         else:
             args += " -vga cirrus" #std is what the default is
 
-        should_run_unit_tests = (env.GetValue("RUN_UNIT_TESTS").upper() == "TRUE")
-        # Setup Startup.nsh if needed
-        if (env.GetValue("MAKE_STARTUP_NSH").upper() == "TRUE"):
-            f = open(os.path.join(VirtualDrive, "startup.nsh"), "w")
-            if should_run_unit_tests:
-                # Write out script to find the filesystem - this is to avoid hardcoding fs0:
-                f.write(STARTUP_NSH_SCRIPT.format(first_file="startup.nsh"))
-                unit_tests = QemuRunner.collect_built_unit_tests(env)
-                for unit_test in unit_tests:
-                    logging.debug("Copying " + unit_test)
-                    shutil.copy(unit_test, VirtualDrive)
-                    f.write(os.path.basename(unit_test))
-                    logging.critical(f"Writing {unit_test} to startup nsh file")
-                    f.write("\n")
-                f.write("stall 2000000\n")
-            f.write("reset -s\n")
-            f.close()
-
         # Run QEMU
         #ret = QemuRunner.RunCmd(executable, args,  thread_target=QemuRunner.QemuCmdReader)
         ret = utility_functions.RunCmd(executable, args)
         ## TODO: restore the customized RunCmd once unit tests with asserts are figured out
+        if ret == 0xc0000005:
+            ret = 0
 
-        if ret != 0x0 and ret != 0xc0000005:
-            #for some reason getting a c0000005 on successful return
-            return ret
-        # if you didn't do unit tests, don't check for errors
-        if not should_run_unit_tests:
-            return 0
-        #now parse the xml for errors
-        failure_count = 0
-        logging.info("UnitTest Completed")
-        for unit_test in unit_tests:
-            xml_result_file = os.path.join(VirtualDrive, os.path.basename(unit_test)[:-4] + "_JUNIT.XML")
-            if os.path.isfile(xml_result_file):
-                logging.info('\n' + os.path.basename(unit_test))
-                try:
-                    root = xml.etree.ElementTree.parse(xml_result_file).getroot()
-                    for suite in root:
-                        logging.info(" ")
-                        for case in suite:
-                            logging.info('\t\t' + case.attrib['classname'] + " - ")
-                            caseresult = "\t\t\tPASS"
-                            level = logging.INFO
-                            for result in case:
-                                if result.tag == 'failure':
-                                    failure_count += 1
-                                    level = logging.ERROR
-                                    caseresult = "\t\tFAIL" + " - " + result.attrib['message']
-                            logging.log( level, caseresult)
-                except Exception as ex:
-                    logging.error("Exception trying to read xml." + str(ex))
-                    failure_count += 1
-
-            else:
-                logging.warning("%s Test Failed - No Results File" % os.path.basename(unit_test))
-                failure_count += 1
-        return failure_count
-
-    @staticmethod
-    def collect_built_unit_tests(env):
-        ''' returns a list of absolute paths to unit test EFI's '''
-        path = env.GetValue("BUILD_OUTPUT_BASE")
-        cp = os.path.join(path, "X64")
-
-        globlist = env.GetValue("STARTUP_GLOB_CSV", "*Test*.efi")
-        globlist = globlist.split(",")
-        test_list = []
-        for globpattern in globlist:
-            test_list.extend(glob.glob(os.path.join(cp, globpattern)))
-        return list(set(test_list))
+        return ret
 
     ####
     # Helper functions for running commands from the shell in python environment
