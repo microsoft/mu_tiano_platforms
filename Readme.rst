@@ -72,6 +72,61 @@ Bug Fixes-dev
 
 - N/A
 
+Getting Started
+===============
+
+The best way to get started is to review the details of this repository and look at the platforms in this repo.
+
+- `Repo Details <RepoDetails.md>`_
+
+Platforms can be found under the `Platforms` folder inside the root of this repo.
+
+Details about the platform and how to build/use each platform can be found in their respective directories.
+
+- `Q35 Platform <Platforms/QemuQ35Pkg/Docs/QemuQ35_ReadMe.md>`_
+- `Ovmf upstream Platform <Platforms/OvmfPkg/ReadMe.md>`_
+
+Feature Branches
+================
+
+This repository is used to develop and validate new core features on the Q35 platform.  This repository supports a
+feature branch pattern where new features are developed and introduced in a branch.  The feature branch used for
+development can serve as an standalone example of feature enablement or it can be merged into the main release branch
+after development is complete.
+
+To create a new feature branch:
+
+1. Checkout the latest release branch
+2. Create a branch named feature/{release you branched from}/<your feature name here>
+3. Create a `Branch_ReadMe.md` in the docs folder of your new branch.
+
+A template for `Branch_ReadMe.md` can be found in `docs/BranchReadMe_template.md`
+
+An example of a feature branch name would be feature/202008/sbat.
+The feature is sbat and it is based on release/202008.
+
+Features must be "ON by default" and QemuQ35Pkg tries to avoid switches where possible. If your feature is required
+to boot to an OS, please make changes to OvmfPkg which is considered the minimum platform.
+
+Feature branches over two releases old will be archived. For example, feature/202002/sbat would get archived
+when release/202008 was released, by moving it to archived/feature/202002/sbat. As such, feature branch owners
+will need to rebase their feature on top of release branches as they are released and publish a new feature branch.
+
+Example Branches
+===============
+
+Example branches are different from feature branches in that they are not meant to merge into Q35 eventually.
+The goal is for them to be shared as an example of how to integrate a specific feature.
+Naming follows feature branches so an example example branch would be example/202008/prm.
+In the example branch, please create a Branch_ReadMe.md in the docs folder, similar to a feature branch.
+However, in your Branch_ReadMe.md, please specify that this is an example branch.
+
+Commits should be laid out in an easy to understand manner with an empty commit that specifies that the example starts after the empty commit.
+This can be done by running git commit --allow-empty -m "Example of {feature} starts here".
+This will allow those you share it with to easily understand what commits are relevant.
+
+Example branches also follow the same archiving process, so example branches will only last two releases.
+Example branch owners will need to rebase their example branches for them to stay current.
 
 Code of Conduct
 ===============
@@ -86,22 +141,6 @@ Contributions
 
 Contributions are always welcome and encouraged!
 Please open any issues in the Project Mu GitHub tracker and read https://microsoft.github.io/mu/How/contributing/
-
-Feature Branches
-================
-
-This repository is used to develop and validate new core features on the Q35 platform.  This repository supports a
-feature branch pattern where new features are developed and introduced in a branch.  The feature branch used for
-development can serve as an standalone example of feature enablement or it can be merged into the main release branch
-after development is complete.
-
-To create a new feature branch:
-
-1. Checkout the latest release branch
-2. Create a branch named feature/<your feature name here>
-3. Create a `Branch_ReadMe.md` in the docs folder of your new branch.
-
-A template for `Branch_ReadMe.md` can be found in `docs/BranchReadMe_template.md`
 
 Copyright & License
 ===================
