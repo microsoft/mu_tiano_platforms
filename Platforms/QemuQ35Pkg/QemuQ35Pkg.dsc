@@ -1110,9 +1110,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
 !endif
 
-  #
   # PRM Configuration Driver
-  #
   PrmPkg/PrmConfigDxe/PrmConfigDxe.inf {
     <LibraryClasses>
       NULL|PrmPkg/Samples/PrmSampleAcpiParameterBufferModule/Library/DxeAcpiParameterBufferModuleConfigLib/DxeAcpiParameterBufferModuleConfigLib.inf
@@ -1121,18 +1119,16 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   }
 
   #
-  # PRM Module Loader Driver
+  # Platform Runtime Mechanism (PRM) feature
   #
+
+  # PRM Module Loader Driver
   PrmPkg/PrmLoaderDxe/PrmLoaderDxe.inf
 
-  #
   # PRM SSDT Installation Driver
-  #
   PrmPkg/PrmSsdtInstallDxe/PrmSsdtInstallDxe.inf
 
-  #
   # PRM Sample Modules
-  #
   PrmPkg/Samples/PrmSamplePrintModule/PrmSamplePrintModule.inf
   PrmPkg/Samples/PrmSampleAcpiParameterBufferModule/PrmSampleAcpiParameterBufferModule.inf
   PrmPkg/Samples/PrmSampleHardwareAccessModule/PrmSampleHardwareAccessModule.inf {
@@ -1141,9 +1137,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   }
   PrmPkg/Samples/PrmSampleContextBufferModule/PrmSampleContextBufferModule.inf
 
-  #
   # PRM Information UEFI Application
-  #
   PrmPkg/Application/PrmInfo/PrmInfo.inf
 
 ################################################################################
