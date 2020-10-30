@@ -60,6 +60,15 @@ provided reports to check on in market device health.  *Some work still pending 
 
 [Details](Features/feature_whea.md)
 
+### Platform Runtime Mechanism (PRM)
+
+Platform Runtime Mechanism (PRM) introduces the capability of moving certain classes of SMM code out of SMM and into
+a code module that executes within OS context. This feature adds the PRM infrastructure to the firmware that enables
+loading PRM modules which in turn are exposed to the OS for invocation. To accomplish this, a set of open source
+sample PRM modules are used to demonstrate the feature and show how additional modules can be added.
+
+[Details](Features/feature_prm.md)
+
 ## Mu Customized Components
 
 ### Modules
