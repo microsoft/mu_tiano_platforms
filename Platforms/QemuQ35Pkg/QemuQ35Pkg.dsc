@@ -282,6 +282,11 @@
   !include CryptoPkg/Driver/Bin/CryptoDriver.inc.dsc
 !endif
 
+  # Platform Runtime Mechanism (PRM) libraries
+  PrmContextBufferLib|PrmPkg/Library/DxePrmContextBufferLib/DxePrmContextBufferLib.inf
+  PrmModuleDiscoveryLib|PrmPkg/Library/DxePrmModuleDiscoveryLib/DxePrmModuleDiscoveryLib.inf
+  PrmPeCoffLib|PrmPkg/Library/DxePrmPeCoffLib/DxePrmPeCoffLib.inf
+
 #########################################
 # SEC Libraries
 #########################################
@@ -1105,6 +1110,35 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
 !endif
 
+  # PRM Configuration Driver
+  PrmPkg/PrmConfigDxe/PrmConfigDxe.inf {
+    <LibraryClasses>
+      NULL|PrmPkg/Samples/PrmSampleAcpiParameterBufferModule/Library/DxeAcpiParameterBufferModuleConfigLib/DxeAcpiParameterBufferModuleConfigLib.inf
+      NULL|PrmPkg/Samples/PrmSampleContextBufferModule/Library/DxeContextBufferModuleConfigLib/DxeContextBufferModuleConfigLib.inf
+      NULL|PrmPkg/Samples/PrmSampleHardwareAccessModule/Library/DxeHardwareAccessModuleConfigLib/DxeHardwareAccessModuleConfigLib.inf
+  }
+
+  #
+  # Platform Runtime Mechanism (PRM) feature
+  #
+
+  # PRM Module Loader Driver
+  PrmPkg/PrmLoaderDxe/PrmLoaderDxe.inf
+
+  # PRM SSDT Installation Driver
+  PrmPkg/PrmSsdtInstallDxe/PrmSsdtInstallDxe.inf
+
+  # PRM Sample Modules
+  PrmPkg/Samples/PrmSamplePrintModule/PrmSamplePrintModule.inf
+  PrmPkg/Samples/PrmSampleAcpiParameterBufferModule/PrmSampleAcpiParameterBufferModule.inf
+  PrmPkg/Samples/PrmSampleHardwareAccessModule/PrmSampleHardwareAccessModule.inf {
+    <LibraryClasses>
+      DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+  }
+  PrmPkg/Samples/PrmSampleContextBufferModule/PrmSampleContextBufferModule.inf
+
+  # PRM Information UEFI Application
+  PrmPkg/Application/PrmInfo/PrmInfo.inf
 
 ################################################################################
 #
