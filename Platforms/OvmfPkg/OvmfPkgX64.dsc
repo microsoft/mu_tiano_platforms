@@ -217,6 +217,7 @@
   #UefiVariablePolicyLib|MdeModulePkg/Library/UefiVariablePolicyLib/UefiVariablePolicyLib.inf # MU_CHANGE - add variable policy
   #UefiVariablePolicyLib|MdeModulePkg/Library/UefiVariablePolicyLibRust/UefiVariablePolicyLib.inf
   UefiVariablePolicyLib|OvmfPkg/Library/UefiVariablePolicyLibRust/UefiVariablePolicyLib.inf
+  RustExtraIntrinsicsLib|OvmfPkg/Library/RustExtraIntrinsicsLib/RustExtraIntrinsicsLib.inf
 
   #
   # Network libraries

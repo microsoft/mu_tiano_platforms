@@ -36,3 +36,4 @@
   BaseMemoryLib
   MemoryAllocationLib
   SafeIntLib
+  RustExtraIntrinsicsLib

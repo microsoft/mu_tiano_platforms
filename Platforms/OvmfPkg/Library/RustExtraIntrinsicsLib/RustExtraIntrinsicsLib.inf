@@ -1,0 +1,29 @@
+## @file RustExtraIntrinsicsLib.inf
+# Extra intrinsics that aren't included in BaseIntrinsics to supplement what would
+# normally be provided by the compiler_intrinsics crate.
+# This is to avoid competition between the two.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+
+[Defines]
+  INF_VERSION         = 0x00010017
+  BASE_NAME           = RustExtraIntrinsicsLib
+  FILE_GUID           = C067C316-D271-4CA2-9D47-CAF4FE121C16
+  VERSION_STRING      = 1.0
+  MODULE_TYPE         = BASE
+  LIBRARY_CLASS       = RustExtraIntrinsicsLib
+
+
+[Sources]
+  RustExtraIntrinsicsLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+
+[LibraryClasses]
+  BaseMemoryLib
