@@ -62,6 +62,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
         args += " -machine q35,smm=on" #,accel=(tcg|kvm)"
         args += " -m 2048"
+        args += " -cpu qemu64,+rdrand" # most compatible x64 CPU model + RDRAND support (not included by default)
         #args += " -smp ..."
         args += " -global driver=cfi.pflash01,property=secure,value=on"
         args += " -drive if=pflash,format=raw,unit=0,file=" + \
