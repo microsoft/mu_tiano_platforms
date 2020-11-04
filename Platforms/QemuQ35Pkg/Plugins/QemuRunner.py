@@ -46,6 +46,12 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         os.makedirs(VirtualDrive, exist_ok=True)
         OutputPath_FV = os.path.join(env.GetValue("BUILD_OUTPUT_BASE"), "FV")
 
+        # Copy required tests.
+        TestEfiOutputPath = os.path.join(
+            env.GetValue("BUILD_OUTPUT_BASE"), "X64")
+        shutil.copy(os.path.join(TestEfiOutputPath,
+                                 "VarPolicyUnitTestApp.efi"), VirtualDrive)
+
         # Check if QEMU is on the path, if not find it
         executable = "qemu-system-x86_64"
 

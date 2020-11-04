@@ -187,7 +187,9 @@
   MtrrLib                        |UefiCpuPkg/Library/MtrrLib/MtrrLib.inf # Memory Type Range Register (https://en.wikipedia.org/wiki/Memory_type_range_register)
 
   # Variable Libraries
-  UefiVariablePolicyLib     |MdeModulePkg/Library/UefiVariablePolicyLib/UefiVariablePolicyLib.inf
+  #UefiVariablePolicyLib     |MdeModulePkg/Library/UefiVariablePolicyLib/UefiVariablePolicyLib.inf
+  UefiVariablePolicyLib     |OvmfPkg/Library/UefiVariablePolicyLibRust/UefiVariablePolicyLib.inf
+  RustExtraIntrinsicsLib    |OvmfPkg/Library/RustExtraIntrinsicsLib/RustExtraIntrinsicsLib.inf
   MuVariablePolicyHelperLib |MdeModulePkg/Library/MuVariablePolicyHelperLib/MuVariablePolicyHelperLib.inf
   AuthVariableLib           |SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf
   VarCheckLib               |MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
@@ -1037,7 +1039,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   ## Unit Tests
   #UefiTestingPkg/FunctionalSystemTests/SmmPagingProtectionsTest/Smm/SmmPagingProtectionsTestSmm.inf
   #UefiTestingPkg/FunctionalSystemTests/HeapGuardTest/Smm/HeapGuardTestSmm.inf
-  #UefiTestingPkg/FunctionalSystemTests/VarPolicyUnitTestApp/VarPolicyUnitTestApp.inf
+  UefiTestingPkg/FunctionalSystemTests/VarPolicyUnitTestApp/VarPolicyUnitTestApp.inf
   CryptoPkg/Test/UnitTest/Library/BaseCryptLib/TestBaseCryptLibShell.inf
   MsCorePkg/UnitTests/JsonTest/JsonTestApp.inf
 
