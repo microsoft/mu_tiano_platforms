@@ -495,7 +495,6 @@ INF  UefiTestingPkg/FunctionalSystemTests/HeapGuardTest/Smm/HeapGuardTestSmm.inf
 INF PrmPkg/PrmConfigDxe/PrmConfigDxe.inf
 
 # PRM Sample Modules
-INF PrmPkg/Samples/PrmSamplePrintModule/PrmSamplePrintModule.inf
 INF PrmPkg/Samples/PrmSampleAcpiParameterBufferModule/PrmSampleAcpiParameterBufferModule.inf
 INF PrmPkg/Samples/PrmSampleHardwareAccessModule/PrmSampleHardwareAccessModule.inf
 INF PrmPkg/Samples/PrmSampleContextBufferModule/PrmSampleContextBufferModule.inf
