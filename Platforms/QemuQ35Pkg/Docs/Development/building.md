@@ -7,11 +7,12 @@ with VS2019 and Ubuntu 18.04 with GCC5 toolchain.
 
 ## Developer environment
 
-- [Python 3.8.x - Download & Install](https://www.python.org/downloads/)
-- [GIT - Download & Install](https://git-scm.com/download/)
+This is a Project Mu platform and thus the default environment requirements can be found
+here at the [Project Mu Prerequisites page.](https://microsoft.github.io/mu/CodeDevelopment/prerequisites/)
+
+In addition if you want to run your locally compiled firmware you need
+
 - [QEMU - Download, Install, and add to your path](https://www.qemu.org/download/)
-- Additional packages found necessary for Ubuntu 18.04
-  - apt-get install gcc g++ make uuid-dev qemu
 
 This build uses edk2-pytools for functionality.  Documentation can be
 found [here](https://github.com/tianocore/edk2-pytool-extensions/tree/master/docs).

@@ -7,6 +7,11 @@
 import os
 import logging
 import io
+import shutil
+import glob
+import time
+import xml.etree.ElementTree
+import tempfile
 
 from edk2toolext.environment import shell_environment
 from edk2toolext.environment.uefi_build import UefiBuilder
@@ -211,7 +216,187 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         return 0
 
     def FlashRomImage(self):
-        return self.Helper.QemuRun(self.env)
+        #Make virtual drive - Allow caller to override path otherwise use default
+        startupnsh = StartUpScriptManager()
+        should_run_unit_tests = (self.env.GetValue("RUN_UNIT_TESTS").upper() == "TRUE")
+
+        if os.name == 'nt':
+            DefaultVirtualDrivePath = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "VirtualDrive.vhd")
+            VirtualDrivePath = self.env.GetValue("VIRTUAL_DRIVE_PATH", DefaultVirtualDrivePath)
+            self.env.SetValue("VIRTUAL_DRIVE_PATH", VirtualDrivePath, "Set Virtual Drive path in case not set")
+
+            VirtualDrive = VirtualDriveManager(VirtualDrivePath, self.env)
+
+            if self.env.GetValue("KEEP_EXISTING_VIRTUAL_DRIVE_CONTENTS", "false").upper() == "TRUE":
+                logging.info("Leaving the Virtual Drive as requested.  Be aware this can impact your unit tests results")
+            else:
+                if os.path.isfile(VirtualDrivePath):
+                    os.remove(VirtualDrivePath)
+                VirtualDrive.MakeDrive()
+
+            if should_run_unit_tests:
+                ut = UnitTestSupport(os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "X64"))
+                ut.set_glob_csv(self.env.GetValue("STARTUP_GLOB_CSV", "*Test*.efi"))
+                ut.find_tests()
+                ut.copy_tests_to_virtual_drive(VirtualDrive, startupnsh)
+            nshpath =  os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "startup.nsh")
+            startupnsh.WriteOut(nshpath)
+            VirtualDrive.AddFile(nshpath)
+        else:
+            logging.warning("Linux currently isn't supported for the virtual drive. Falling back to an older method")
+            if should_run_unit_tests:
+                logging.critical("Linux doesn't support running unit tests since it doesn't support VHD.")
+            DefaultVirtualDrivePath = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "VirtualDrive")
+            VirtualDrivePath = self.env.GetValue("VIRTUAL_DRIVE_PATH", DefaultVirtualDrivePath)
+            if not os.path.exists(VirtualDrivePath):
+                os.makedirs(VirtualDrivePath)
+            nshpath =  os.path.join(VirtualDrivePath, "startup.nsh")
+            self.env.SetValue("VIRTUAL_DRIVE_PATH", VirtualDrivePath, "Set Virtual Drive path in case not set")
+            startupnsh.WriteOut(nshpath)
+
+        ret = self.Helper.QemuRun(self.env)
+        if ret != 0:
+            logging.critical("Failed running Qemu")
+            return ret
+
+        failures = 0
+        if should_run_unit_tests:
+            failures = ut.report_results(VirtualDrive)
+
+        # do stuff with unit test results here
+        return failures
+
+class UnitTestSupport(object):
+
+    def __init__(self, host_efi_build_output_path: os.PathLike):
+        self.test_list = []
+        self._globlist = []
+        self.host_efi_path = host_efi_build_output_path
+
+    def set_glob_csv(self, csv_string):
+        self._globlist = csv_string.split(",")
+
+    def find_tests(self):
+        test_list = []
+        for globpattern in self._globlist:
+            test_list.extend(glob.glob(os.path.join(self.host_efi_path, globpattern)))
+        self.test_list = list(set(test_list))
+
+    def copy_tests_to_virtual_drive(self, virtualdrive, nshfile):
+        for test in self.test_list:
+            virtualdrive.AddFile(test)
+            nshfile.AddLine(os.path.basename(test))
+
+    def report_results(self, virtualdrive) -> int:
+
+        #now parse the xml for errors
+        failure_count = 0
+        logging.info("UnitTest Completed")
+        for unit_test in self.test_list:
+            xml_result_file = os.path.basename(unit_test)[:-4] + "_JUNIT.XML"
+            try:
+                data = virtualdrive.GetFileContent(xml_result_file)
+            except:
+                logging.error(f"unit test ({unit_test}) produced no result file")
+                failure_count += 1
+                continue
+
+            logging.info('\n' + os.path.basename(unit_test))
+            try:
+                root = xml.etree.ElementTree.fromstring(data)
+                for suite in root:
+                    logging.info(" ")
+                    for case in suite:
+                        logging.info('\t\t' + case.attrib['classname'] + " - ")
+                        caseresult = "\t\t\tPASS"
+                        level = logging.INFO
+                        for result in case:
+                            if result.tag == 'failure':
+                                failure_count += 1
+                                level = logging.ERROR
+                                caseresult = "\t\tFAIL" + " - " + result.attrib['message']
+                        logging.log( level, caseresult)
+            except Exception as ex:
+                logging.error("Exception trying to read xml." + str(ex))
+                failure_count += 1
+        return failure_count
+
+
+
+class VirtualDriveManager(object):
+
+    def __init__(self, vhd_path:os.PathLike, env:object):
+        self.path_to_vhd = os.path.abspath(vhd_path)
+        self._env = env
+
+    def MakeDrive(self, size: int=60):
+        ret = RunCmd("VHDCreate", f'-sz {size}MB {self.path_to_vhd}')
+        if ret != 0:
+            logging.error("Failed to create VHD")
+            return ret
+
+        ret = RunCmd("DiskFormat", f"-ft fat -ptt bios {self.path_to_vhd}")
+        if ret != 0:
+            logging.error("Failed to format VHD")
+            return ret
+        return ret
+
+    def AddFile(self, HostFilePath:os.PathLike):
+        file_name = os.path.basename(HostFilePath)
+        ret = RunCmd("FileInsert", f"{HostFilePath} {file_name} {self.path_to_vhd}")
+        return ret
+
+    def GetFileContent(self, VirtualFilePath):
+        temp_extract_path = tempfile.mktemp()
+        logging.info(f"Extracting {VirtualFilePath} to {temp_extract_path}")
+        ret = self.ExtractFile(VirtualFilePath, temp_extract_path)
+        if ret != 0:
+            raise FileNotFoundError(VirtualFilePath)
+        with open(temp_extract_path, "rb") as f:
+            return f.read()
+
+    def ExtractFile(self, VirtualFilePath, HostFilePath:os.PathLike):
+        ret = RunCmd("FileExtract", f"{VirtualFilePath} {HostFilePath} {self.path_to_vhd}")
+        return ret
+
+
+class StartUpScriptManager(object):
+
+    FS_FINDER_SCRIPT = r'''
+#!/bin/nsh
+echo -off
+for %a run (0 10)
+    if exist fs%a:\{first_file} then
+        fs%a:
+        goto FOUND_IT
+    endif
+endfor
+
+:FOUND_IT
+'''
+
+    def __init__(self):
+        self._use_fs_finder = False
+        self._lines = []
+        self._add_shutdown_to_end = True
+
+    def WriteOut(self, host_file_path):
+        with open(host_file_path, "w") as nsh:
+            if self._use_fs_finder:
+                this_file = os.path.basename(host_file_path)
+                nsh.write(StartUpScriptManager.FS_FINDER_SCRIPT.format(first_file=this_file))
+
+            for l in self._lines:
+                nsh.write(l + "\n")
+
+            if self._add_shutdown_to_end:
+                nsh.write("reset -s\n")
+
+    def AddLine(self, line):
+        self._lines.append(line.strip())
+        self._use_fs_finder = True
+
+
 
 if __name__ == "__main__":
     import argparse
