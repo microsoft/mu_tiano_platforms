@@ -95,6 +95,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         args += " -device qemu-xhci,id=usb"
         args += " -device usb-mouse,id=input0,bus=usb.0,port=1"  # add a usb mouse
         #args += " -device usb-kbd,id=input1,bus=usb.0,port=2"    # add a usb keyboar
+        args += " -smbios type=0,vendor=Palindrome,uefi=on -smbios type=1,manufacturer=Palindrome,product=MuQemuQ35,serial=42-42-42-42"
 
         if (env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
             args += " -display none"  # no graphics
