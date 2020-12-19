@@ -257,10 +257,12 @@ INF  MsCorePkg/Universal/StatusCodeHandler/Serial/Pei/SerialStatusCodeHandlerPei
 INF  MsCorePkg/Core/GuidedSectionExtractPeim/GuidedSectionExtract.inf
 INF  MsWheaPkg/MsWheaReport/Pei/MsWheaReportPei.inf
 INF  OemPkg/DeviceStatePei/DeviceStatePei.inf
+INF  MfciPkg/MfciPei/MfciPei.inf
 
 INF  MsGraphicsPkg/MsUiTheme/Pei/MsUiThemePpi.inf
 INF  MsGraphicsPkg/MsEarlyGraphics/Pei/MsEarlyGraphics.inf
 INF  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTablePei/FirmwarePerformancePei.inf
+
 # Shared Crypto
 !if $(ENABLE_SHARED_CRYPTO) == TRUE
   !include CryptoPkg/Driver/Bin/CryptoDriver.BOOTBLOCK.inc.fdf
@@ -522,6 +524,7 @@ FILE FREEFORM = PCD(gZeroTouchPkgTokenSpaceGuid.PcdZeroTouchCertificateFile) {
   INF PcBdsPkg/MsBootPolicy/MsBootPolicy.inf
   INF MdeModulePkg/Universal/BootManagerPolicyDxe/BootManagerPolicyDxe.inf
   INF DfciPkg/DfciManager/DfciManager.inf
+  INF MfciPkg/MfciDxe/MfciDxe.inf
   INF MsGraphicsPkg/OnScreenKeyboardDxe/OnScreenKeyboardDxe.inf
   INF MsGraphicsPkg/SimpleWindowManagerDxe/SimpleWindowManagerDxe.inf
   FILE APPLICATION=PCD(gPcBdsPkgTokenSpaceGuid.PcdShellFile) {
