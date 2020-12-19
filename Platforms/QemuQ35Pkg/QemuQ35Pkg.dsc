@@ -32,6 +32,7 @@
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
   DEFINE TPM_ENABLE              = FALSE
   DEFINE TPM_CONFIG_ENABLE       = FALSE
+  DEFINE OPT_INTO_MFCI_PRE_PRODUCTION = TRUE
 
   # Configure Shared Crypto
   !ifndef ENABLE_SHARED_CRYPTO # by default true
@@ -256,6 +257,7 @@
   DfciXmlSettingSchemaSupportLib    |DfciPkg/Library/DfciXmlSettingSchemaSupportLib/DfciXmlSettingSchemaSupportLib.inf
   DfciXmlPermissionSchemaSupportLib |DfciPkg/Library/DfciXmlPermissionSchemaSupportLib/DfciXmlPermissionSchemaSupportLib.inf
   DfciXmlIdentitySchemaSupportLib   |DfciPkg/Library/DfciXmlIdentitySchemaSupportLib/DfciXmlIdentitySchemaSupportLib.inf
+
    #XML libraries
   XmlTreeQueryLib                   |XmlSupportPkg/Library/XmlTreeQueryLib/XmlTreeQueryLib.inf
   XmlTreeLib                        |XmlSupportPkg/Library/XmlTreeLib/XmlTreeLib.inf
@@ -487,7 +489,6 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2F
 !endif
 
-
 [PcdsFixedAtBuild]
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
@@ -660,6 +661,14 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x0|"1.3"|NV,BS
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableRev|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x8|3|NV,BS
 !endif
+
+################################################################################
+#
+# MFCI DSC include - packaged this way because MFCI aspires to one day be a binary
+#
+################################################################################
+!include MfciPkg/MfciPkg.dsc.inc
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform.
@@ -743,6 +752,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   MsGraphicsPkg/MsEarlyGraphics/Pei/MsEarlyGraphics.inf
   MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTablePei/FirmwarePerformancePei.inf
   OemPkg/DeviceStatePei/DeviceStatePei.inf
+  MfciPkg/MfciPei/MfciPei.inf
 
 [PcdsFixedAtBuild]
   !include CryptoPkg/Driver/Packaging/Crypto.pcd.STANDARD.inc.dsc
@@ -1160,6 +1170,13 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 
   # PRM Information UEFI Application
   PrmPkg/Application/PrmInfo/PrmInfo.inf
+
+  # MfciDxe overrides
+  MfciPkg/MfciDxe/MfciDxe.inf {
+    <LibraryClasses>
+      MfciRetrievePolicyLib|MfciPkg/Library/MfciRetrievePolicyLibViaHob/MfciRetrievePolicyLibViaHob.inf
+      MfciDeviceIdSupportLib|MfciPkg/Library/MfciDeviceIdSupportLibSmbios/MfciDeviceIdSupportLibSmbios.inf
+  }
 
 ################################################################################
 #
