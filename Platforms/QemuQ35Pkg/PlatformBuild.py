@@ -237,6 +237,16 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         self.env.SetValue("BLD_*_%s_BYTES" % var_name, "{" + (",".join(("0x%X" % byte) for byte in cur_guid.bytes_le)) + "}", desc_string)
         return
 
+    def BuildRustApp(self):
+        app_path = os.path.join(self.ws, "SBManage")
+        cmd = "cargo"
+        params = ("+nightly", "build", "-Z", "build-std=core,alloc", "-Z", "build-std-features=compiler-builtins-mem",
+                  "--target", "x86_64-unknown-uefi", "--manifest-path", os.path.join(app_path, "Cargo.toml"))
+        ret = RunCmd(cmd, " ".join(params))
+        result_path = os.path.join(
+            app_path, "target", "x86_64-unknown-uefi", "debug", "secure-boot-manager.efi")
+        return result_path if ret == 0 else None
+
     def FlashRomImage(self):
         #Make virtual drive - Allow caller to override path otherwise use default
         startup_nsh = StartUpScriptManager()
@@ -244,6 +254,11 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         output_base = self.env.GetValue("BUILD_OUTPUT_BASE")
         shutdown_after_run = (self.env.GetValue("SHUTDOWN_AFTER_RUN", "FALSE").upper() == "TRUE")
         empty_drive = (self.env.GetValue("EMPTY_DRIVE", "FALSE").upper() == "TRUE")
+
+
+        rust_app_path = self.BuildRustApp()
+        if rust_app_path is None:
+            return -1
 
         if os.name == 'nt':
             VirtualDrivePath = self.env.GetValue("VIRTUAL_DRIVE_PATH", os.path.join(output_base, "VirtualDrive.vhd"))
@@ -278,7 +293,19 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             nshpath = os.path.join(output_base, "startup.nsh")
             startup_nsh.WriteOut(nshpath, shutdown_after_run)
 
-            VirtualDrive.AddFile(nshpath)
+            VirtualDrive.AddFile(rust_app_path)
+            bin_file_path = os.path.join(output_base, "bin_file.bin")
+            with open(bin_file_path, 'wb') as of:
+                of.write(b'\xDE\xAD\xBE\xEF')
+            VirtualDrive.AddFile(bin_file_path)
+            text_file_path = os.path.join(output_base, "text_file.txt")
+            with open(text_file_path, 'w') as of:
+                of.write('DEADBEEF\n')
+            VirtualDrive.AddFile(text_file_path)
+            # openssl genpkey -algorithm RSA -out example.org.key -pkeyopt rsa_keygen_bits:2048 -aes192
+            test_key_path = os.path.join(output_base, "TestPrivateKey.pem")
+            VirtualDrive.AddFile(test_key_path)
+
 
         else:
             VirtualDrivePath = self.env.GetValue("VIRTUAL_DRIVE_PATH", os.path.join(output_base, "VirtualDrive"))
@@ -295,7 +322,8 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 
             nshpath = os.path.join(VirtualDrivePath, "startup.nsh")
             self.env.SetValue("VIRTUAL_DRIVE_PATH", VirtualDrivePath, "Set Virtual Drive path in case not set")
-            startup_nsh.WriteOut(nshpath, shutdown_after_run)
+            #startup_nsh.WriteOut(nshpath, shutdown_after_run)
+            shutil.copy(rust_app_path, VirtualDrive)
 
         ret = self.Helper.QemuRun(self.env)
         if ret != 0:
