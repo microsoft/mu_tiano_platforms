@@ -469,6 +469,7 @@ INF  MsCorePkg/MuCryptoDxe/MuCryptoDxe.inf
 INF  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
 INF  MsGraphicsPkg/MsEarlyGraphics/Dxe/MsEarlyGraphics.inf
 INF  MsWheaPkg/MsWheaReport/Dxe/MsWheaReportDxe.inf
+INF  MsWheaPkg/MsWheaReport/Smm/MsWheaReportSmm.inf
 INF  MdeModulePkg/Universal/ReportStatusCodeRouter/Smm/ReportStatusCodeRouterSmm.inf
 INF  MsCorePkg/Universal/StatusCodeHandler/Serial/Smm/SerialStatusCodeHandlerSmm.inf
 INF  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableSmm/FirmwarePerformanceSmm.inf
