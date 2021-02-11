@@ -19,7 +19,7 @@ jobs:
       package: 'QemuQ35Pkg'
       vm_image: 'windows-latest'
       should_run: true
-      run_flags: "MAKE_STARTUP_NSH=TRUE QEMU_HEADLESS=TRUE"
+      run_flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE"
 
     #Use matrix to speed up the build process
     strategy:
