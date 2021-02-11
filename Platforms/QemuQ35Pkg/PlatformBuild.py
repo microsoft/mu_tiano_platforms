@@ -176,11 +176,12 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
     def GetName(self):
         ''' Get the name of the repo, platform, or product being build '''
         ''' Used for naming the log file, among others '''
-        # check the startup nsh flag and if set then rename the log file.
-        # this helps in CI so we don't overwrite the build log since running
-        # uses the stuart_build command.
-        if(shell_environment.GetBuildVars().GetValue("MAKE_STARTUP_NSH", "FALSE") == "TRUE"):
-            return "QemuQ35Pkg_With_Run"
+        # Check the FlashImage bool and rename the log file if true.
+        # Two builds are done during CI: one without the --FlashOnly flag
+        # followed by one with the flag. self.FlashImage will be true if the
+        # --FlashOnly flag is passed, meaning we will keep separate build and run logs
+        if(self.FlashImage):
+            return "QemuQ35Pkg_Run"
         return "QemuQ35Pkg"
 
     def GetLoggingLevel(self, loggerType):
@@ -198,9 +199,10 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         self.env.SetValue("PRODUCT_NAME", "QemuQ35", "Platform Hardcoded")
         self.env.SetValue("ACTIVE_PLATFORM", "QemuQ35Pkg/QemuQ35Pkg.dsc", "Platform Hardcoded")
         self.env.SetValue("TARGET_ARCH", "IA32 X64", "Platform Hardcoded")
-        self.env.SetValue("MAKE_STARTUP_NSH", "FALSE", "Default to false")
-        self.env.SetValue("RUN_UNIT_TESTS", "FALSE", "Default to false")
+        self.env.SetValue("EMPTY_DRIVE", "FALSE", "Default to false")
+        self.env.SetValue("RUN_TESTS", "FALSE", "Default to false")
         self.env.SetValue("QEMU_HEADLESS", "FALSE", "Default to false")
+        self.env.SetValue("SHUTDOWN_AFTER_RUN", "FALSE", "Default to false")
         # needed to make FV size build report happy
         self.env.SetValue("BLD_*_BUILDID_STRING", "Unknown", "Default")
         # Default turn on build reporting.
@@ -219,42 +221,60 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 
     def FlashRomImage(self):
         #Make virtual drive - Allow caller to override path otherwise use default
-        startupnsh = StartUpScriptManager()
-        should_run_unit_tests = (self.env.GetValue("RUN_UNIT_TESTS").upper() == "TRUE")
+        startup_nsh = StartUpScriptManager()
+        run_tests = (self.env.GetValue("RUN_TESTS", "FALSE").upper() == "TRUE")
+        output_base = self.env.GetValue("BUILD_OUTPUT_BASE")
+        shutdown_after_run = (self.env.GetValue("SHUTDOWN_AFTER_RUN", "FALSE").upper() == "TRUE")
+        empty_drive = (self.env.GetValue("EMPTY_DRIVE", "FALSE").upper() == "TRUE")
 
         if os.name == 'nt':
-            DefaultVirtualDrivePath = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "VirtualDrive.vhd")
-            VirtualDrivePath = self.env.GetValue("VIRTUAL_DRIVE_PATH", DefaultVirtualDrivePath)
-            self.env.SetValue("VIRTUAL_DRIVE_PATH", VirtualDrivePath, "Set Virtual Drive path in case not set")
-
+            VirtualDrivePath = self.env.GetValue("VIRTUAL_DRIVE_PATH", os.path.join(output_base, "VirtualDrive.vhd"))
             VirtualDrive = VirtualDriveManager(VirtualDrivePath, self.env)
+            self.env.SetValue("VIRTUAL_DRIVE_PATH", VirtualDrivePath, "Set Virtual Drive path in case not set")
+            ut = UnitTestSupport(os.path.join(output_base, "X64"))
 
-            if self.env.GetValue("KEEP_EXISTING_VIRTUAL_DRIVE_CONTENTS", "false").upper() == "TRUE":
-                logging.info("Leaving the Virtual Drive as requested.  Be aware this can impact your unit tests results")
-            else:
+            if empty_drive:
                 if os.path.isfile(VirtualDrivePath):
                     os.remove(VirtualDrivePath)
                 VirtualDrive.MakeDrive()
+            elif run_tests:
+                logging.info("EMPTY_DRIVE=FALSE. This could impact your test results")
 
-            if should_run_unit_tests:
-                ut = UnitTestSupport(os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "X64"))
-                ut.set_glob_csv(self.env.GetValue("STARTUP_GLOB_CSV", "*Test*.efi"))
+            test_regex = self.env.GetValue("TEST_REGEX", "")
+
+            if test_regex != "":
+                ut.set_test_regex(test_regex)
                 ut.find_tests()
-                ut.copy_tests_to_virtual_drive(VirtualDrive, startupnsh)
-            nshpath =  os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "startup.nsh")
-            startupnsh.WriteOut(nshpath)
+                ut.copy_tests_to_virtual_drive(VirtualDrive)
+
+            if run_tests:
+                if test_regex == "":
+                    logging.warning("No tests specified using TEST_REGEX flag but RUN_TESTS is TRUE")
+                if not shutdown_after_run:
+                    logging.info("SHUTDOWN_AFTER_RUN=FALSE (default). XML test results will not be \
+                        displayed until after the QEMU instance ends")
+                ut.write_tests_to_startup_nsh(startup_nsh)
+
+            nshpath = os.path.join(output_base, "startup.nsh")
+            startup_nsh.WriteOut(nshpath, shutdown_after_run)
             VirtualDrive.AddFile(nshpath)
+
         else:
+            VirtualDrivePath = self.env.GetValue("VIRTUAL_DRIVE_PATH", os.path.join(output_base, "VirtualDrive"))
             logging.warning("Linux currently isn't supported for the virtual drive. Falling back to an older method")
-            if should_run_unit_tests:
-                logging.critical("Linux doesn't support running unit tests since it doesn't support VHD.")
-            DefaultVirtualDrivePath = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "VirtualDrive")
-            VirtualDrivePath = self.env.GetValue("VIRTUAL_DRIVE_PATH", DefaultVirtualDrivePath)
+
+            if run_tests:
+                logging.critical("Linux doesn't support running unit tests due to lack of VHD support")
+
+            if os.path.exists(VirtualDrivePath) and empty_drive:
+                shutil.rmtree(VirtualDrivePath)
+
             if not os.path.exists(VirtualDrivePath):
                 os.makedirs(VirtualDrivePath)
-            nshpath =  os.path.join(VirtualDrivePath, "startup.nsh")
+
+            nshpath = os.path.join(VirtualDrivePath, "startup.nsh")
             self.env.SetValue("VIRTUAL_DRIVE_PATH", VirtualDrivePath, "Set Virtual Drive path in case not set")
-            startupnsh.WriteOut(nshpath)
+            startup_nsh.WriteOut(nshpath, shutdown_after_run)
 
         ret = self.Helper.QemuRun(self.env)
         if ret != 0:
@@ -262,7 +282,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             return ret
 
         failures = 0
-        if should_run_unit_tests:
+        if run_tests and os.name == 'nt':
             failures = ut.report_results(VirtualDrive)
 
         # do stuff with unit test results here
@@ -275,18 +295,21 @@ class UnitTestSupport(object):
         self._globlist = []
         self.host_efi_path = host_efi_build_output_path
 
-    def set_glob_csv(self, csv_string):
+    def set_test_regex(self, csv_string):
         self._globlist = csv_string.split(",")
 
     def find_tests(self):
         test_list = []
         for globpattern in self._globlist:
             test_list.extend(glob.glob(os.path.join(self.host_efi_path, globpattern)))
-        self.test_list = list(set(test_list))
+        self.test_list = list(dict.fromkeys(test_list))
 
-    def copy_tests_to_virtual_drive(self, virtualdrive, nshfile):
+    def copy_tests_to_virtual_drive(self, virtualdrive):
         for test in self.test_list:
             virtualdrive.AddFile(test)
+    
+    def write_tests_to_startup_nsh(self,nshfile):
+        for test in self.test_list:
             nshfile.AddLine(os.path.basename(test))
 
     def report_results(self, virtualdrive) -> int:
@@ -380,9 +403,8 @@ endfor
     def __init__(self):
         self._use_fs_finder = False
         self._lines = []
-        self._add_shutdown_to_end = True
 
-    def WriteOut(self, host_file_path):
+    def WriteOut(self, host_file_path, shutdown:bool):
         with open(host_file_path, "w") as nsh:
             if self._use_fs_finder:
                 this_file = os.path.basename(host_file_path)
@@ -391,7 +413,7 @@ endfor
             for l in self._lines:
                 nsh.write(l + "\n")
 
-            if self._add_shutdown_to_end:
+            if shutdown:
                 nsh.write("reset -s\n")
 
     def AddLine(self, line):

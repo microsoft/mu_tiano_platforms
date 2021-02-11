@@ -108,9 +108,9 @@ correct logging level set, by default it doesn't output to console).
 
 ### Custom Build Options
 
-**MAKE_STARTUP_NSH=TRUE** will output a *startup.nsh* file to the location mapped as fs0. This is
-used in CI in combination with the `--FlashOnly` feature to run QEMU to the UEFI shell and then execute
-the contents of *startup.nsh*.
+**SHUTDOWN_AFTER_RUN=TRUE** will output a *startup.nsh* file to the location mapped as fs0 with `reset -s` as
+the final line. This is used in CI in combination with the `--FlashOnly` feature to run QEMU to the UEFI shell
+and then execute the contents of *startup.nsh*.
 
 **QEMU_HEADLESS=TRUE** Since CI servers run headless QEMU must be told to run with no display otherwise
 an error occurs. Locally you don't need to set this.
