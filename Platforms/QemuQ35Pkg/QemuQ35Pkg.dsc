@@ -186,10 +186,12 @@
   MemoryTypeInfoSecVarCheckLib   |MdeModulePkg/Library/MemoryTypeInfoSecVarCheckLib/MemoryTypeInfoSecVarCheckLib.inf # MU_CHANGE TCBZ1086
   MemoryTypeInformationChangeLib |MdeModulePkg/Library/MemoryTypeInformationChangeLibNull/MemoryTypeInformationChangeLibNull.inf
   MtrrLib                        |UefiCpuPkg/Library/MtrrLib/MtrrLib.inf # Memory Type Range Register (https://en.wikipedia.org/wiki/Memory_type_range_register)
+  MmUnblockMemoryLib             |MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
+  MemoryProtectionLib            |MdeModulePkg/Library/BaseMemoryProtectionLibNull/BaseMemoryProtectionLibNull.inf
 
   # Variable Libraries
-  UefiVariablePolicyLib     |MdeModulePkg/Library/UefiVariablePolicyLib/UefiVariablePolicyLib.inf
-  MuVariablePolicyHelperLib |MdeModulePkg/Library/MuVariablePolicyHelperLib/MuVariablePolicyHelperLib.inf
+  VariablePolicyLib         |MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLib.inf
+  VariablePolicyHelperLib   |MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
   AuthVariableLib           |SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf
   VarCheckLib               |MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
   SerializeVariablesLib     |OvmfPkg/Library/SerializeVariablesLib/SerializeVariablesLib.inf
@@ -257,6 +259,7 @@
   DfciXmlSettingSchemaSupportLib    |DfciPkg/Library/DfciXmlSettingSchemaSupportLib/DfciXmlSettingSchemaSupportLib.inf
   DfciXmlPermissionSchemaSupportLib |DfciPkg/Library/DfciXmlPermissionSchemaSupportLib/DfciXmlPermissionSchemaSupportLib.inf
   DfciXmlIdentitySchemaSupportLib   |DfciPkg/Library/DfciXmlIdentitySchemaSupportLib/DfciXmlIdentitySchemaSupportLib.inf
+  DfciSettingChangedNotificationLib |DfciPkg/Library/DfciSettingChangedNotificationLib/DfciSettingChangedNotificationLibNull.inf
 
    #XML libraries
   XmlTreeQueryLib                   |XmlSupportPkg/Library/XmlTreeQueryLib/XmlTreeQueryLib.inf
@@ -405,7 +408,7 @@
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER]
-  RngLib|SecurityPkg/RandomNumberGenerator/RngDxeLib/RngDxeLib.inf
+  RngLib|MdePkg/Library/DxeRngLib/DxeRngLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   PlatformBootManagerLib|MsCorePkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
@@ -839,7 +842,6 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 !endif
   }
 
-  MdeModulePkg/Universal/Variable/UefiVariablePolicy/Dxe/VariablePolicyDxe.inf
   MdeModulePkg/Universal/SmmCommunicationBufferDxe/SmmCommunicationBufferDxe.inf
 
   OvmfPkg/8259InterruptControllerDxe/8259.inf
@@ -1128,7 +1130,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
     <LibraryClasses>
       NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
       # mu_change
-      NULL|MdeModulePkg/Universal/Variable/UefiVariablePolicy/Library/VarCheckPolicyLib/VarCheckPolicyLib.inf
+      NULL|MdeModulePkg/Library/VarCheckPolicyLib/VarCheckPolicyLib.inf
   }
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
 
