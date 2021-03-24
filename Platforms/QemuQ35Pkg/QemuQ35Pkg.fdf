@@ -266,6 +266,8 @@ INF  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTablePei/FirmwarePerform
 # Shared Crypto
 !if $(ENABLE_SHARED_CRYPTO) == TRUE
   !include CryptoPkg/Driver/Bin/CryptoDriver.BOOTBLOCK.inc.fdf
+!else
+  INF  CryptoPkg/Driver/CryptoPei.inf
 !endif
 
 ################################################################################
@@ -486,6 +488,9 @@ INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
 #SHARED_CRYPTO Crypto Bin Modules
 !if $(ENABLE_SHARED_CRYPTO) == TRUE
   !include CryptoPkg/Driver/Bin/CryptoDriver.DXE.inc.fdf
+!else
+  INF  CryptoPkg/Driver/CryptoDxe.inf
+  INF  CryptoPkg/Driver/CryptoSmm.inf
 !endif
 
 !if $(BUILD_UNIT_TESTS) == TRUE
