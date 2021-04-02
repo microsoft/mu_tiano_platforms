@@ -547,6 +547,15 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugLoadImageMethod|0x2
 !endif
 
+  # Memory Protection Settings
+  gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy             | 0x00000002
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy       | 0x00007FD5
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask  | 0x03                    ## UEFI and SMM Null Detection
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPageType                 | 0x0000000000000050      ## BsData and RtData
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPoolType                 | 0x0000000000000050      ## BsData and RtData
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask             | 0x0000000000000003      ## UEFI page guard and pool guard
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                     | TRUE
+
 
 [PcdsFixedAtBuild.common]
   # a PCD that controls the enumeration and connection of ConIn's. When true, ConIn is only connected once a console input is requests
