@@ -24,19 +24,19 @@ Ovmf_GCC5_                    |OvmfGccBuild|
 
 This repository is part of Project Mu.  Please see Project Mu for details https://microsoft.github.io/mu
 
-Branch Status - release/202008
+Branch Status - release/202102
 ==============================
 
 :Status:
   In Development
 
 :Entered Development:
-  2020/09/23
+  2021/04/01
 
 :Anticipated Stabilization:
-  November 2020
+  May 2021
 
-Branch Changes - release/202008
+Branch Changes - release/202102
 ===============================
 
 Breaking Changes-dev
@@ -54,23 +54,23 @@ Bug Fixes-dev
 
 - None
 
-2008_RefBoot Changes
+2102_RefBoot Changes
 --------------------
 
-- N/A
+- Incomplete
 
-2008_CIBuild Changes
+2102_CIBuild Changes
 --------------------
 
-- N/A
+- Incomplete
 
-2008_Rebase Changes
+2102_Rebase Changes
 -------------------
 
-| Starting commit: N/A
-| Destination commit: N/A
+| Starting commit: 93da9998
+| Destination commit: 61973f6f
 
-- N/A
+- None
 
 Getting Started
 ===============
@@ -102,14 +102,14 @@ To create a new feature branch:
 
 A template for `Branch_ReadMe.md` can be found in `docs/BranchReadMe_template.md`
 
-An example of a feature branch name would be feature/202008/sbat.
-The feature is sbat and it is based on release/202008.
+An example of a feature branch name would be feature/202102/sbat.
+The feature is sbat and it is based on release/202102.
 
 Features must be "ON by default" and QemuQ35Pkg tries to avoid switches where possible. If your feature is required
 to boot to an OS, please make changes to OvmfPkg which is considered the minimum platform.
 
 Feature branches over two releases old will be archived. For example, feature/202002/sbat would get archived
-when release/202008 was released, by moving it to archived/feature/202002/sbat. As such, feature branch owners
+when release/202102 was released, by moving it to archived/feature/202002/sbat. As such, feature branch owners
 will need to rebase their feature on top of release branches as they are released and publish a new feature branch.
 
 Example Branches
@@ -117,7 +117,7 @@ Example Branches
 
 Example branches are different from feature branches in that they are not meant to merge into Q35 eventually.
 The goal is for them to be shared as an example of how to integrate a specific feature.
-Naming follows feature branches so an example example branch would be example/202008/prm.
+Naming follows feature branches so an example example branch would be example/202102/prm.
 In the example branch, please create a Branch_ReadMe.md in the docs folder, similar to a feature branch.
 However, in your Branch_ReadMe.md, please specify that this is an example branch.
 
@@ -221,20 +221,20 @@ POSSIBILITY OF SUCH DAMAGE.
 .. This is a bunch of directives to make the README file more readable
 .. ===================================================================
 
-.. _Windows_VS2019: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=58&&branchName=release%2F202008
-.. |WindowsCiBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20CI%20VS2019?branchName=release%2F202008
+.. _Windows_VS2019: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=58&&branchName=release%2F202102
+.. |WindowsCiBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20CI%20VS2019?branchName=release%2F202102
 .. |WindowsCiTest| image:: https://img.shields.io/azure-devops/tests/projectmu/mu/58.svg
 
-.. _Ubuntu_GCC5: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=57&branchName=release%2F202008
-.. |UbuntuCiBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20CI%20Ubuntu%20GCC5?branchName=release%2F202008
+.. _Ubuntu_GCC5: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=57&branchName=release%2F202102
+.. |UbuntuCiBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20CI%20Ubuntu%20GCC5?branchName=release%2F202102
 .. |UbuntuCiTest| image:: https://img.shields.io/azure-devops/tests/projectmu/mu/57.svg
 
-.. _Q35_VS2019: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=59&&branchName=release%2F202008
-.. |Q35VsBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20Q35%20Plat%20CI%20VS2019?branchName=release%2F202008
-.. _Q35_GCC5: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=60&&branchName=release%2F202008
-.. |Q35GccBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20Q35%20Plat%20CI%20GCC5?branchName=release%2F202008
+.. _Q35_VS2019: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=59&&branchName=release%2F202102
+.. |Q35VsBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20Q35%20Plat%20CI%20VS2019?branchName=release%2F202102
+.. _Q35_GCC5: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=60&&branchName=release%2F202102
+.. |Q35GccBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20Q35%20Plat%20CI%20GCC5?branchName=release%2F202102
 
-.. _Ovmf_VS2019: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=61&&branchName=release%2F202008
-.. |OvmfVsBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20OVMF%20Plat%20CI%20VS2019?branchName=release%2F202008
-.. _Ovmf_GCC5: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=62&&branchName=release%2F202008
-.. |OvmfGccBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20OVMF%20Plat%20CI%20GCC5?branchName=release%2F202008
+.. _Ovmf_VS2019: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=61&&branchName=release%2F202102
+.. |OvmfVsBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20OVMF%20Plat%20CI%20VS2019?branchName=release%2F202102
+.. _Ovmf_GCC5: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=62&&branchName=release%2F202102
+.. |OvmfGccBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20OVMF%20Plat%20CI%20GCC5?branchName=release%2F202102
