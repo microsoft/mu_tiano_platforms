@@ -233,12 +233,11 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             self.env.SetValue("VIRTUAL_DRIVE_PATH", VirtualDrivePath, "Set Virtual Drive path in case not set")
             ut = UnitTestSupport(os.path.join(output_base, "X64"))
 
-            if empty_drive:
-                if os.path.isfile(VirtualDrivePath):
+            if empty_drive and os.path.isfile(VirtualDrivePath):
                     os.remove(VirtualDrivePath)
+            
+            if not os.path.isfile(VirtualDrivePath):
                 VirtualDrive.MakeDrive()
-            elif run_tests:
-                logging.info("EMPTY_DRIVE=FALSE. This could impact your test results")
 
             test_regex = self.env.GetValue("TEST_REGEX", "")
 
@@ -250,6 +249,9 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             if run_tests:
                 if test_regex == "":
                     logging.warning("No tests specified using TEST_REGEX flag but RUN_TESTS is TRUE")
+                elif not empty_drive:
+                    logging.info("EMPTY_DRIVE=FALSE. This could impact your test results")
+
                 if not shutdown_after_run:
                     logging.info("SHUTDOWN_AFTER_RUN=FALSE (default). XML test results will not be \
                         displayed until after the QEMU instance ends")
@@ -257,6 +259,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 
             nshpath = os.path.join(output_base, "startup.nsh")
             startup_nsh.WriteOut(nshpath, shutdown_after_run)
+
             VirtualDrive.AddFile(nshpath)
 
         else:
