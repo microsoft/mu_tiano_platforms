@@ -13,7 +13,7 @@ when calling `stuart_build` or `platform_build` by adding `<name>=<value>` to th
 **Example** setting up unit test to run automatically
 
 ```bash
-stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py SHUTDOWN_AFTER_RUN=TRUE RUN_UNIT_TESTS=TRUE
+stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py SHUTDOWN_AFTER_RUN=TRUE RUN_TESTS=TRUE
 ```
 
 ### QEMU_HEADLESS
