@@ -175,7 +175,6 @@
   LockBoxLib            |OvmfPkg/Library/LockBoxLib/LockBoxBaseLib.inf
   PlatformSecureLib     |OvmfPkg/Library/PlatformSecureLib/PlatformSecureLib.inf
   PasswordStoreLib      |MsCorePkg/Library/PasswordStoreLibNull/PasswordStoreLibNull.inf
-  BaseBinSecurityLib    |MdePkg/Library/BaseBinSecurityLibNull/BaseBinSecurityLibNull.inf
   PasswordPolicyLib     |OemPkg/Library/PasswordPolicyLib/PasswordPolicyLib.inf
   MsSecureBootLib       |OemPkg/Library/MsSecureBootLib/MsSecureBootLib.inf
   PlatformKeyLib        |OemPkg/Library/PlatformKeyLibNull/PlatformKeyLibNull.inf
