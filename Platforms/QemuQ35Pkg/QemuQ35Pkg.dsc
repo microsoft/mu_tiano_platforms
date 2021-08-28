@@ -579,6 +579,7 @@
   PcdLib                     |MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   QemuFwCfgLib               |OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
   BaseCryptLib               |CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
+  PcdDatabaseLoaderLib       |MdeModulePkg/Library/PcdDatabaseLoaderLib/Pei/PcdDatabaseLoaderLibPei.inf
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
   DebugAgentLib              |SourceLevelDebugPkg/Library/DebugAgent/SecPeiDebugAgentLib.inf
 !endif
@@ -647,6 +648,7 @@
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxDxeLib.inf
   QemuLoadImageLib|OvmfPkg/Library/GenericQemuLoadImageLib/GenericQemuLoadImageLib.inf
   MpInitLib|UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
+  PcdDatabaseLoaderLib|MdeModulePkg/Library/PcdDatabaseLoaderLib/Dxe/PcdDatabaseLoaderLibDxe.inf
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
   DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/DxeDebugAgentLib.inf
 !endif
@@ -897,8 +899,6 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv4PXESupport|0x01
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv6PXESupport|0x01
 
-  gMsGraphicsPkgTokenSpaceGuid.PcdPostBackgroundColoringSkipCount|0
-
 [PcdsDynamicHii]
 !if $(TPM_ENABLE) == TRUE && $(TPM_CONFIG_ENABLE) == TRUE
   gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x0|"1.3"|NV,BS
@@ -1097,7 +1097,10 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   MdeModulePkg/Universal/Metronome/Metronome.inf
   PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
   MdeModulePkg/Universal/DriverHealthManagerDxe/DriverHealthManagerDxe.inf
-  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf {
+    <PcdsDynamicExDefault>
+      gMsGraphicsPkgTokenSpaceGuid.PcdPostBackgroundColoringSkipCount|0
+  } 
 
   OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf
   OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
