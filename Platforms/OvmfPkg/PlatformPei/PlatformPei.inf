@@ -97,7 +97,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack
+  # gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack MU_CHANGE
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase

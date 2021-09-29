@@ -273,12 +273,13 @@ MemMapInitialization (
             }                                                       \
           } while (0)
 
+
 VOID
 NoexecDxeInitialization (
   VOID
   )
 {
-  UPDATE_BOOLEAN_PCD_FROM_FW_CFG (PcdSetNxForStack);
+  // UPDATE_BOOLEAN_PCD_FROM_FW_CFG (PcdSetNxForStack); // MU_CHANGE Remove refs to memory protection PCDs
 }
 
 VOID
