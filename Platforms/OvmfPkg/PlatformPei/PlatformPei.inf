@@ -34,6 +34,7 @@
   Platform.c
   Platform.h
 
+
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
@@ -45,6 +46,7 @@
 [Guids]
   gEfiMemoryTypeInformationGuid
   gFdtHobGuid
+  gMemoryProtectionSettingsGuid # MU_CHANGE
 
 [LibraryClasses]
   BaseLib
@@ -95,6 +97,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
+
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable
   # gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack MU_CHANGE

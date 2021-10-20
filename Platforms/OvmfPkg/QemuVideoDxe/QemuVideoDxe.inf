@@ -63,7 +63,4 @@
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
-  gUefiOvmfPkgTokenSpaceGuid.PcdVideoResolutionSource
-  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
+  # gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask # MU_CHANGE Memory Protection PCDs are deprecated

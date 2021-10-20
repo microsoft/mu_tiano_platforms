@@ -107,6 +107,7 @@ AddIoMemoryRangeHob (
   AddIoMemoryBaseSizeHob (MemoryBase, (UINT64)(MemoryLimit - MemoryBase));
 }
 
+
 VOID
 AddMemoryBaseSizeHob (
   EFI_PHYSICAL_ADDRESS  MemoryBase,
@@ -127,6 +128,7 @@ AddMemoryBaseSizeHob (
     );
 }
 
+
 VOID
 AddMemoryRangeHob (
   EFI_PHYSICAL_ADDRESS  MemoryBase,
@@ -135,6 +137,7 @@ AddMemoryRangeHob (
 {
   AddMemoryBaseSizeHob (MemoryBase, (UINT64)(MemoryLimit - MemoryBase));
 }
+
 
 VOID
 MemMapInitialization (
@@ -456,7 +459,6 @@ MiscInitialization (
       ASSERT (FALSE);
       return;
   }
-
   PcdStatus = PcdSet16S (PcdOvmfHostBridgePciDevId, mHostBridgeDevId);
   ASSERT_RETURN_ERROR (PcdStatus);
 
@@ -499,6 +501,7 @@ MiscInitialization (
   }
 }
 
+
 VOID
 BootModeInitialization (
   VOID
@@ -509,7 +512,6 @@ BootModeInitialization (
   if (CmosRead8 (0xF) == 0xFE) {
     mBootMode = BOOT_ON_S3_RESUME;
   }
-
   CmosWrite8 (0xF, 0x00);
 
   Status = PeiServicesSetBootMode (mBootMode);
@@ -518,6 +520,7 @@ BootModeInitialization (
   Status = PeiServicesInstallPpi (mPpiBootMode);
   ASSERT_EFI_ERROR (Status);
 }
+
 
 VOID
 ReserveEmuVariableNvStore (
@@ -547,6 +550,7 @@ ReserveEmuVariableNvStore (
   ASSERT_RETURN_ERROR (PcdStatus);
 }
 
+
 VOID
 DebugDumpCmos (
   VOID
@@ -560,13 +564,13 @@ DebugDumpCmos (
     if ((Loop % 0x10) == 0) {
       DEBUG ((DEBUG_INFO, "%02x:", Loop));
     }
-
     DEBUG ((DEBUG_INFO, " %02x", CmosRead8 (Loop)));
     if ((Loop % 0x10) == 0xf) {
       DEBUG ((DEBUG_INFO, "\n"));
     }
   }
 }
+
 
 VOID
 S3Verification (
@@ -593,9 +597,9 @@ S3Verification (
     ASSERT (FALSE);
     CpuDeadLoop ();
   }
-
- #endif
+#endif
 }
+
 
 VOID
 Q35BoardVerification (
@@ -617,6 +621,7 @@ Q35BoardVerification (
   ASSERT (FALSE);
   CpuDeadLoop ();
 }
+
 
 /**
   Fetch the boot CPU count and the possible CPU count from QEMU, and expose
@@ -735,7 +740,6 @@ MaxCpuCountInitialization (
         if ((CpuStatus & QEMU_CPUHP_STAT_ENABLED) != 0) {
           ++Present;
         }
-
         //
         // Attempt to select the next CPU.
         //
@@ -791,6 +795,7 @@ MaxCpuCountInitialization (
   ASSERT_RETURN_ERROR (PcdStatus);
 }
 
+
 /**
   Perform Platform PEI initialization.
 
@@ -807,11 +812,25 @@ InitializePlatform (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_STATUS  Status;
-
+  EFI_STATUS    Status;
+  // MU_CHANGE START
+  MEMORY_PROTECTION_SETTINGS Settings;
+  
+  Settings = (MEMORY_PROTECTION_SETTINGS) MEMORY_PROTECTION_SETTINGS_DEBUG;
+  Settings.HeapGuardPolicy.SmmPageGuard = 0;
+  Settings.HeapGuardPolicy.SmmPoolGuard = 0;
+  
+  BuildGuidDataHob (
+    &gMemoryProtectionSettingsGuid,
+    &Settings,
+    sizeof(Settings)
+    );
+  // MU_CHANGE END
   DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
 
   DebugDumpCmos ();
+
+
 
   if (QemuFwCfgS3Enabled ()) {
     DEBUG ((DEBUG_INFO, "S3 support was detected on QEMU\n"));
@@ -843,11 +862,12 @@ InitializePlatform (
 
   InitializeRamRegions ();
 
+
+
   if (mBootMode != BOOT_ON_S3_RESUME) {
     if (!FeaturePcdGet (PcdSmmSmramRequire)) {
       ReserveEmuVariableNvStore ();
     }
-
     PeiFvInitialization ();
     MemTypeInfoInitialization ();
     MemMapInitialization ();
