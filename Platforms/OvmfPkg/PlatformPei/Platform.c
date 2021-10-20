@@ -35,6 +35,7 @@
 #include <IndustryStandard/Q35MchIch9.h>
 #include <IndustryStandard/QemuCpuHotplug.h>
 #include <OvmfPlatforms.h>
+#include <Guid/MemoryProtectionSettings.h> // MU_CHANGE
 
 #include "Platform.h"
 #include "Cmos.h"
@@ -699,7 +700,19 @@ InitializePlatform (
   )
 {
   EFI_STATUS    Status;
-
+  // MU_CHANGE START
+  MEMORY_PROTECTION_SETTINGS Settings;
+  
+  Settings = (MEMORY_PROTECTION_SETTINGS) MEMORY_PROTECTION_SETTINGS_DEBUG;
+  Settings.HeapGuardPolicy.SmmPageGuard = 0;
+  Settings.HeapGuardPolicy.SmmPoolGuard = 0;
+  
+  BuildGuidDataHob (
+    &gMemoryProtectionSettingsGuid,
+    &Settings,
+    sizeof(Settings)
+    );
+  // MU_CHANGE END
   DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
 
   DebugDumpCmos ();

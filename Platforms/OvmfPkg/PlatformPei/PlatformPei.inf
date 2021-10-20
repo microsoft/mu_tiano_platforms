@@ -47,6 +47,7 @@
 [Guids]
   gEfiMemoryTypeInformationGuid
   gEfiXenInfoGuid
+  gMemoryProtectionSettingsGuid # MU_CHANGE
 
 [LibraryClasses]
   BaseLib

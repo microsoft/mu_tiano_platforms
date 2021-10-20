@@ -63,4 +63,4 @@
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
-  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask
+  # gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask # MU_CHANGE Memory Protection PCDs are deprecated

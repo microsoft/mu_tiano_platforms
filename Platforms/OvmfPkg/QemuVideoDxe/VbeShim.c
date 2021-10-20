@@ -68,8 +68,10 @@ InstallVbeShim (
   UINT8                *Ptr;
   UINTN                Printed;
   VBE_MODE_INFO        *VbeModeInfo;
-
-  if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & (BIT0|BIT7)) == BIT0) {
+  // MU_CHANGE BEGIN Page 0 will be protected
+  // if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & (BIT0|BIT7)) == BIT0) {
+  if (TRUE) {
+  // MU_CHANGE END
     DEBUG ((
       DEBUG_WARN,
       "%a: page 0 protected, not installing VBE shim\n",
