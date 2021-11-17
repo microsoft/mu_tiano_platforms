@@ -76,6 +76,12 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         else:
             args += " -vga cirrus" #std is what the default is
 
+        # Check for gdb server setting
+        gdb_port = env.GetValue("GDB_SERVER")
+        if (gdb_port != None):
+            logging.log(logging.INFO, "Enabling GDB server at port tcp::" + gdb_port + ".")
+            args += " -gdb tcp::" + gdb_port
+
         # Run QEMU
         #ret = QemuRunner.RunCmd(executable, args,  thread_target=QemuRunner.QemuCmdReader)
         ret = utility_functions.RunCmd(executable, args)

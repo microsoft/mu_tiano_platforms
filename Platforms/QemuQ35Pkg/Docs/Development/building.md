@@ -115,6 +115,8 @@ and then execute the contents of *startup.nsh*.
 **QEMU_HEADLESS=TRUE** Since CI servers run headless QEMU must be told to run with no display otherwise
 an error occurs. Locally you don't need to set this.
 
+**GDB_SERVER=\<TCP Port\>** Enables the GDB port in the QEMU instance at the provided TCP port.
+
 ### Passing Build Defines
 
 To pass build defines through *stuart_build*, prepend `BLD_*_` to the define name and pass it on the
