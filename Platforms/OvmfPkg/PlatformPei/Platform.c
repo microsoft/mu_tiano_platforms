@@ -704,8 +704,8 @@ InitializePlatform (
   MEMORY_PROTECTION_SETTINGS Settings;
   
   Settings = (MEMORY_PROTECTION_SETTINGS) MEMORY_PROTECTION_SETTINGS_DEBUG;
-  Settings.HeapGuardPolicy.SmmPageGuard = 0;
-  Settings.HeapGuardPolicy.SmmPoolGuard = 0;
+  Settings.HeapGuardPolicy.Fields.SmmPageGuard = 0;
+  Settings.HeapGuardPolicy.Fields.SmmPoolGuard = 0;
   
   BuildGuidDataHob (
     &gMemoryProtectionSettingsGuid,
