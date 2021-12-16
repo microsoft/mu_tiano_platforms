@@ -235,7 +235,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 
             if empty_drive and os.path.isfile(VirtualDrivePath):
                     os.remove(VirtualDrivePath)
-            
+
             if not os.path.isfile(VirtualDrivePath):
                 VirtualDrive.MakeDrive()
 
@@ -310,26 +310,31 @@ class UnitTestSupport(object):
     def copy_tests_to_virtual_drive(self, virtualdrive):
         for test in self.test_list:
             virtualdrive.AddFile(test)
-    
+
     def write_tests_to_startup_nsh(self,nshfile):
         for test in self.test_list:
             nshfile.AddLine(os.path.basename(test))
 
     def report_results(self, virtualdrive) -> int:
+        from html import unescape
 
+        report_folder_path = os.path.join(os.path.dirname(virtualdrive.path_to_vhd), "unit_test_results")
+        os.makedirs(report_folder_path, exist_ok=True)
         #now parse the xml for errors
         failure_count = 0
         logging.info("UnitTest Completed")
         for unit_test in self.test_list:
             xml_result_file = os.path.basename(unit_test)[:-4] + "_JUNIT.XML"
+            output_xml_file = os.path.join(report_folder_path, xml_result_file)
             try:
-                data = virtualdrive.GetFileContent(xml_result_file)
+                data = virtualdrive.GetFileContent(xml_result_file, output_xml_file)
             except:
                 logging.error(f"unit test ({unit_test}) produced no result file")
                 failure_count += 1
                 continue
 
-            logging.info('\n' + os.path.basename(unit_test))
+            logging.info('\n' + os.path.basename(unit_test) + "\n  Full Log: " + output_xml_file)
+
             try:
                 root = xml.etree.ElementTree.fromstring(data)
                 for suite in root:
@@ -342,7 +347,7 @@ class UnitTestSupport(object):
                             if result.tag == 'failure':
                                 failure_count += 1
                                 level = logging.ERROR
-                                caseresult = "\t\tFAIL" + " - " + result.attrib['message']
+                                caseresult = "\t\tFAIL" + " - " + unescape(result.attrib['message'])
                         logging.log( level, caseresult)
             except Exception as ex:
                 logging.error("Exception trying to read xml." + str(ex))
@@ -374,8 +379,10 @@ class VirtualDriveManager(object):
         ret = RunCmd("FileInsert", f"{HostFilePath} {file_name} {self.path_to_vhd}")
         return ret
 
-    def GetFileContent(self, VirtualFilePath):
-        temp_extract_path = tempfile.mktemp()
+    def GetFileContent(self, VirtualFilePath, HostFilePath: os.PathLike=None):
+        temp_extract_path = HostFilePath
+        if temp_extract_path == None:
+            temp_extract_path = tempfile.mktemp()
         logging.info(f"Extracting {VirtualFilePath} to {temp_extract_path}")
         ret = self.ExtractFile(VirtualFilePath, temp_extract_path)
         if ret != 0:
