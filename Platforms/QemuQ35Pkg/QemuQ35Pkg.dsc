@@ -1088,7 +1088,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf {
     <PcdsDynamicExDefault>
       gMsGraphicsPkgTokenSpaceGuid.PcdPostBackgroundColoringSkipCount|0
-  } 
+  }
 
   OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf
   OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
@@ -1416,6 +1416,9 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
       MfciRetrievePolicyLib|MfciPkg/Library/MfciRetrievePolicyLibViaHob/MfciRetrievePolicyLibViaHob.inf
       MfciDeviceIdSupportLib|MfciPkg/Library/MfciDeviceIdSupportLibSmbios/MfciDeviceIdSupportLibSmbios.inf
   }
+
+  MdePkg/Test/ShellTest/MemoryAttributeProtocolFuncTestApp/MemoryAttributeProtocolFuncTestApp.inf
+
 
 ################################################################################
 #
