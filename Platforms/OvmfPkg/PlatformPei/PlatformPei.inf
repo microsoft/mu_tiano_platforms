@@ -47,6 +47,7 @@
 [Guids]
   gEfiMemoryTypeInformationGuid
   gEfiXenInfoGuid
+  gMemoryProtectionSettingsGuid # MU_CHANGE
 
 [LibraryClasses]
   BaseLib
@@ -99,7 +100,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack
+  # gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack MU_CHANGE
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase
