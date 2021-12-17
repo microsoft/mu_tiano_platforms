@@ -1443,3 +1443,4 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 [BuildOptions.common.EDKII.DXE_SMM_DRIVER, BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER, BuildOptions.common.EDKII.SMM_CORE, BuildOptions.common.EDKII.DXE_DRIVER, BuildOptions.common.EDKII.DXE_CORE, BuildOptions.common.EDKII.UEFI_DRIVER, BuildOptions.common.EDKII.UEFI_APPLICATION]
   MSFT:*_*_*_DLINK_FLAGS = /ALIGN:4096
   GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000
+  CLANGPDB:*_*_*_DLINK_FLAGS = /ALIGN:4096
