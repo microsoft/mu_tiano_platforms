@@ -531,7 +531,7 @@ FILE FREEFORM = PCD(gZeroTouchPkgTokenSpaceGuid.PcdZeroTouchCertificateFile) {
   INF MsGraphicsPkg/RenderingEngineDxe/RenderingEngineDxe.inf
   INF MsGraphicsPkg/DisplayEngineDxe/DisplayEngineDxe.inf
   INF OemPkg/BootMenu/BootMenu.inf
-  INF OemPkg/FrontPage/FrontPage.inf
+  INF QemuQ35Pkg/FrontPage/FrontPage.inf
   INF PcBdsPkg/MsBootPolicy/MsBootPolicy.inf
   INF MdeModulePkg/Universal/BootManagerPolicyDxe/BootManagerPolicyDxe.inf
   INF DfciPkg/DfciManager/DfciManager.inf
@@ -543,26 +543,26 @@ FILE FREEFORM = PCD(gZeroTouchPkgTokenSpaceGuid.PcdZeroTouchCertificateFile) {
     SECTION UI= "EdkShell"
   }
   FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdLogoFile) {
-    SECTION RAW = OemPkg/FrontPage/Resources/BootLogo.bmp
+    SECTION RAW = QemuQ35Pkg/FrontPage/Resources/BootLogo.bmp
     SECTION UI = "Logo"
   }
   FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdFrontPageLogoFile) {
-    SECTION RAW = OemPkg/FrontPage/Resources/FrontpageLogo.bmp
+    SECTION RAW = QemuQ35Pkg/FrontPage/Resources/FrontpageLogo.bmp
   }
   FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdLowBatteryFile) {
-    SECTION RAW = OemPkg/FrontPage/Resources/LBAT.bmp
+    SECTION RAW = QemuQ35Pkg/FrontPage/Resources/LBAT.bmp
   }
   FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdThermalFile) {
-    SECTION RAW = OemPkg/FrontPage/Resources/THOT.bmp
+    SECTION RAW = QemuQ35Pkg/FrontPage/Resources/THOT.bmp
   }
   FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdVolumeUpIndicatorFile) {
-    SECTION RAW = OemPkg/FrontPage/Resources/VolumeUp.bmp
+    SECTION RAW = QemuQ35Pkg/FrontPage/Resources/VolumeUp.bmp
   }
   FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdFirmwareSettingsIndicatorFile) {
-    SECTION RAW = OemPkg/FrontPage/Resources/FirmwareSettings.bmp
+    SECTION RAW = QemuQ35Pkg/FrontPage/Resources/FirmwareSettings.bmp
   }
   FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdBootFailIndicatorFile ) {
-    SECTION RAW = OemPkg/FrontPage/Resources/NoBoot.bmp
+    SECTION RAW = QemuQ35Pkg/FrontPage/Resources/NoBoot.bmp
   }
   FILE FREEFORM = PCD(gSetupDataPkgTokenSpaceGuid.PcdConfigPolicyVariableGuid) {
     SECTION RAW = $(CONF_BIN_FILE)

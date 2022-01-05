@@ -1015,7 +1015,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   OemPkg/FrontpageButtonsVolumeUp/FrontpageButtonsVolumeUp.inf
 
   # Application that presents and manages FrontPage.
-  OemPkg/FrontPage/FrontPage.inf
+  QemuQ35Pkg/FrontPage/FrontPage.inf
 
   # Application that presents & manages the Boot Menu Setup on Front Page.
   OemPkg/BootMenu/BootMenu.inf
