@@ -42,6 +42,7 @@
 #define FRONT_PAGE_ACTION_SEC_CHANGE_SB_CONFIG          0x1003
 #define FRONT_PAGE_ACTION_SEC_DISPLAY_SB_WHAT_IS        0x1004
 #define FRONT_PAGE_ACTION_SEC_SET_SYSTEM_PASSWORD       0x1006
+#define FRONT_PAGE_ACTION_REBOOT_TO_FRONTPAGE           0x1007
 #define FRONT_PAGE_ACTION_EXIT_FRONTPAGE                0x1001
 
 #define LABEL_PCINFO_FW_VERSION_TAG_START               0x2000
@@ -70,6 +71,13 @@
     0x7f98efe9, 0x50aa, 0x4598, { 0xb7, 0xc1, 0xcb, 0x72, 0xe1, 0xcc, 0x52, 0x24 } \
   }
 
-#define FRONT_PAGE_SECURITY_VARID   0x0074
+typedef struct _FRONT_PAGE_UI_CONTROLS {
+  // Used to indicate that a restart is required prior to altering any
+  // security-sensitive controls.
+  BOOLEAN   PostSecurityLocks;
+} FRONT_PAGE_UI_CONTROLS;
+
+#define FRONT_PAGE_UI_CONTROLS_VARID  0x0072    // Presentation-layer controls.
+#define FRONT_PAGE_SECURITY_VARID     0x0074
 
 #endif  // FRONT_PAGE_VFR_H

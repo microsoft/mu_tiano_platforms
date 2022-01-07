@@ -23,6 +23,12 @@ formset
   class     = FRONT_PAGE_CLASS,                         // Formset class
   subclass  = FRONT_PAGE_SUBCLASS,                      // Formset subclass
 
+  ////////////////////////////////
+  // Varstores
+  varstore FRONT_PAGE_UI_CONTROLS,
+    varid = FRONT_PAGE_UI_CONTROLS_VARID,
+    name = FrontPageUiControls,
+    guid = FRONT_PAGE_CONFIG_FORMSET_GUID;
 
   /////////////////////////////////////////////////////////////////////////////
   // Form ID 0: PC Information
@@ -125,80 +131,116 @@ formset
     //
     // PRIMARY FORM
     // This form is the primary Security form, and is displayed whenever FrontPage is entered normally.
-    // This form is hidden when we are post-ReadyToBoot.
+    // This form is hidden when we are post-security locks.
     //
+    suppressif NOT ideqval  FrontPageUiControls.PostSecurityLocks == 0x00;
+      // - System Password
+      //
+      text
+        help    = STRING_TOKEN(STR_NULL_STRING),                                          // System Password section header
+        text    = STRING_TOKEN(STR_SEC_SYSTEM_PASSWORD_HEADING);                          //
+      text
+        help    = STRING_TOKEN(STR_NULL_STRING),                                          // SPACING
+        text    = STRING_TOKEN(STR_NULL_STRING);                                          //
+      text
+        help    = STRING_TOKEN(STR_NULL_STRING),                                          // System Password description
+        text    = STRING_TOKEN(STR_SEC_SYSTEM_PASSWORD_DESCRIPTION);                      //
+      text
+        help    = STRING_TOKEN(STR_NULL_STRING),                                          // SPACING
+        text    = STRING_TOKEN(STR_NULL_STRING);                                          //
 
-    // - System Password
-    //
-    text
-      help    = STRING_TOKEN(STR_NULL_STRING),                                          // System Password section header
-      text    = STRING_TOKEN(STR_SEC_SYSTEM_PASSWORD_HEADING);                          //
-    text
-      help    = STRING_TOKEN(STR_NULL_STRING),                                          // SPACING
-      text    = STRING_TOKEN(STR_NULL_STRING);                                          //
-    text
-      help    = STRING_TOKEN(STR_NULL_STRING),                                          // System Password description
-      text    = STRING_TOKEN(STR_SEC_SYSTEM_PASSWORD_DESCRIPTION);                      //
-    text
-      help    = STRING_TOKEN(STR_NULL_STRING),                                          // SPACING
-      text    = STRING_TOKEN(STR_NULL_STRING);                                          //
+      text
+        help    = STRING_TOKEN(STR_NULL_STRING),                                          // Set password button
+        text    = STRING_TOKEN(STR_SEC_SYSTEM_PASSWORD_SET_BUTTON),                       //
+        flags   = INTERACTIVE,                                                            // INTERACTIVE = Button
+        key     = FRONT_PAGE_ACTION_SEC_SET_SYSTEM_PASSWORD;
 
-    text
-      help    = STRING_TOKEN(STR_NULL_STRING),                                          // Set password button
-      text    = STRING_TOKEN(STR_SEC_SYSTEM_PASSWORD_SET_BUTTON),                       //
-      flags   = INTERACTIVE,                                                            // INTERACTIVE = Button
-      key     = FRONT_PAGE_ACTION_SEC_SET_SYSTEM_PASSWORD;
+      text
+        help    = STRING_TOKEN(STR_NULL_STRING),                                          // SPACING
+        text    = STRING_TOKEN(STR_NULL_STRING);                                          //
+      text
+        help    = STRING_TOKEN(STR_NULL_STRING),                                          // SPACING
+        text    = STRING_TOKEN(STR_NULL_STRING);                                          //
 
-    text
-      help    = STRING_TOKEN(STR_NULL_STRING),                                          // SPACING
-      text    = STRING_TOKEN(STR_NULL_STRING);                                          //
-    text
-      help    = STRING_TOKEN(STR_NULL_STRING),                                          // SPACING
-      text    = STRING_TOKEN(STR_NULL_STRING);                                          //
+      // - Secure Boot
+      //
+      text
+        help    = STRING_TOKEN(STR_NULL_STRING),                                          // Secure Boot section header
+        text    = STRING_TOKEN(STR_SEC_SB_HEADING);                                       //
 
-    // - Secure Boot
-    //
-    text
-      help    = STRING_TOKEN(STR_NULL_STRING),                                          // Secure Boot section header
-      text    = STRING_TOKEN(STR_SEC_SB_HEADING);                                       //
+      text
+        help    = STRING_TOKEN(STR_NULL_STRING),                                          // SPACING
+        text    = STRING_TOKEN(STR_NULL_STRING);                                          //
 
-    text
-      help    = STRING_TOKEN(STR_NULL_STRING),                                          // SPACING
-      text    = STRING_TOKEN(STR_NULL_STRING);                                          //
+      text
+        help    = STRING_TOKEN(STR_NULL_STRING),                                          // Secure Boot State
+        text    = STRING_TOKEN(STR_SEC_SB_STATE_TEXT);                                    // This will be filled in with the current state.
 
-    text
-      help    = STRING_TOKEN(STR_NULL_STRING),                                          // Secure Boot State
-      text    = STRING_TOKEN(STR_SEC_SB_STATE_TEXT);                                    // This will be filled in with the current state.
+      text
+        help    = STRING_TOKEN(STR_NULL_STRING),                                          // SPACING
+        text    = STRING_TOKEN(STR_NULL_STRING);                                          //
 
-    text
-      help    = STRING_TOKEN(STR_NULL_STRING),                                          // SPACING
-      text    = STRING_TOKEN(STR_NULL_STRING);                                          //
+      text
+        help    = STRING_TOKEN(STR_NULL_STRING),                                          // Change SB config button
+        text    = STRING_TOKEN(STR_SEC_SB_CHANGE_CONFIG_BUTTON),                          //
+        flags   = INTERACTIVE,                                                            // INTERACTIVE = Button
+        key     = FRONT_PAGE_ACTION_SEC_CHANGE_SB_CONFIG;
 
-    text
-      help    = STRING_TOKEN(STR_NULL_STRING),                                          // Change SB config button
-      text    = STRING_TOKEN(STR_SEC_SB_CHANGE_CONFIG_BUTTON),                          //
-      flags   = INTERACTIVE,                                                            // INTERACTIVE = Button
-      key     = FRONT_PAGE_ACTION_SEC_CHANGE_SB_CONFIG;
+      text
+        help    = STRING_TOKEN(STR_NULL_STRING),                                          // SPACING
+        text    = STRING_TOKEN(STR_NULL_STRING);                                          //
 
-    text
-      help    = STRING_TOKEN(STR_NULL_STRING),                                          // SPACING
-      text    = STRING_TOKEN(STR_NULL_STRING);                                          //
-
-    text
-      help    = STRING_TOKEN(STR_NULL_STRING),                                          // "What is Secure Boot?" link
-      text    = STRING_TOKEN(STR_SEC_SB_WHAT_IS_LINK),                                  //
-      flags   = INTERACTIVE | READ_ONLY,                                                // INTERACTIVE = Button, READ_ONLY = Link-Style Button
-      key     = FRONT_PAGE_ACTION_SEC_DISPLAY_SB_WHAT_IS;
-    text
-      help    = STRING_TOKEN(STR_NULL_STRING),                                          // SPACING
-      text    = STRING_TOKEN(STR_NULL_STRING);                                          //
-    text
-      help    = STRING_TOKEN(STR_NULL_STRING),                                          // SPACING
-      text    = STRING_TOKEN(STR_NULL_STRING);                                          //
-
+      text
+        help    = STRING_TOKEN(STR_NULL_STRING),                                          // "What is Secure Boot?" link
+        text    = STRING_TOKEN(STR_SEC_SB_WHAT_IS_LINK),                                  //
+        flags   = INTERACTIVE | READ_ONLY,                                                // INTERACTIVE = Button, READ_ONLY = Link-Style Button
+        key     = FRONT_PAGE_ACTION_SEC_DISPLAY_SB_WHAT_IS;
+      text
+        help    = STRING_TOKEN(STR_NULL_STRING),                                          // SPACING
+        text    = STRING_TOKEN(STR_NULL_STRING);                                          //
+      text
+        help    = STRING_TOKEN(STR_NULL_STRING),                                          // SPACING
+        text    = STRING_TOKEN(STR_NULL_STRING);                                          //
+    endif; // suppressif NOT ideqval  FrontPageUiControls.PostSecurityLocks == 0x00;
     //
     // END PRIMARY FORM
     //
+
+    //
+    // POST SECURITY LOCKS FORM
+    // This form is presented to the user if FrontPage is displayed post-security locks.
+    // This form will indicate that security settings cannot be modified at this time
+    // and that the user should reboot to modify security settings.
+    //
+    suppressif ideqval  FrontPageUiControls.PostSecurityLocks == 0x00;
+
+      text
+        help = STRING_TOKEN(STR_NULL_STRING),                                   // Section Header
+        text = STRING_TOKEN(STR_SEC_POST_SEC_LOCK_HEADING);                     //
+
+      text
+        help = STRING_TOKEN(STR_NULL_STRING),                                   // SPACING
+        text = STRING_TOKEN(STR_NULL_STRING);                                   //
+
+      text
+        help = STRING_TOKEN(STR_NULL_STRING),                                   // PostSecurityLocks description
+        text = STRING_TOKEN(STR_SEC_POST_SEC_LOCK_TEXT);                        //
+
+      text
+        help = STRING_TOKEN(STR_NULL_STRING),                                   // SPACING
+        text = STRING_TOKEN(STR_NULL_STRING);                                   //
+
+      text
+        help  = STRING_TOKEN(STR_NULL_STRING),                                  // Restart button
+        text  = STRING_TOKEN(STR_SEC_POST_SEC_LOCK_BUTTON),                     //
+        flags = INTERACTIVE,                                                    // INTERACTIVE = Button
+        key   = FRONT_PAGE_ACTION_REBOOT_TO_FRONTPAGE;
+
+    endif;  // suppressif ideqval  FrontPageUiControls.PostSecurityLocks == 0x00
+    //
+    // END POST SECURITY LOCKS FORM
+    //
+
     // FORCE UPDATE SECTION
     // This section can change opcodes to force the rendering engine to redraw the form.
     label   LABEL_UPDATE_SECURITY_START;

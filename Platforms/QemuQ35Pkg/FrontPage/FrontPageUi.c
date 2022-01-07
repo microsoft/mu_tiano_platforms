@@ -140,6 +140,66 @@ VOID RefreshSecurityForm ( VOID ) {
 }
 
 /**
+  Handle a request to reboot back into FrontPage.
+
+  @retval EFI_SUCCESS
+
+**/
+STATIC
+EFI_STATUS
+HandleRebootToFrontPage (
+  IN  EFI_IFR_TYPE_VALUE                     *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
+  )
+{
+    EFI_STATUS  Status;
+    UINT32      Attributes = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE;
+    UINTN       DataSize;
+    UINT64      OsIndications;
+
+    DEBUG(( DEBUG_INFO, "[%a:%a]\n", gEfiCallerBaseName, __FUNCTION__ ));
+
+    //
+    // Step 1: Read the current OS indications variable.
+    DataSize = sizeof( OsIndications );
+    Status = gRT->GetVariable( EFI_OS_INDICATIONS_VARIABLE_NAME,
+                               &gEfiGlobalVariableGuid,
+                               &Attributes,
+                               &DataSize,
+                               (VOID*)&OsIndications );
+
+    //
+    // Step 2: Update OS indications variable to enable the boot to FrontPage.
+    if (!EFI_ERROR( Status ) || Status == EFI_NOT_FOUND)
+    {
+        if (Status == EFI_NOT_FOUND) {
+            OsIndications = EFI_OS_INDICATIONS_BOOT_TO_FW_UI;
+            Attributes = (EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE);
+        } else {
+            OsIndications |= EFI_OS_INDICATIONS_BOOT_TO_FW_UI;
+        }
+        Status = gRT->SetVariable( EFI_OS_INDICATIONS_VARIABLE_NAME,
+                                   &gEfiGlobalVariableGuid,
+                                   Attributes,
+                                   DataSize,
+                                   (VOID*)&OsIndications );
+    }
+
+    //
+    // Step 3: Reboot!
+    if (!EFI_ERROR( Status ))
+    {
+        DEBUG(( DEBUG_INFO, "[%a:%a] Requesting reboot...\n", gEfiCallerBaseName, __FUNCTION__ ));
+        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+        mResetRequired = TRUE;
+    } else {
+        DEBUG ((DEBUG_ERROR, "[%a:%a] Status = %r\n", gEfiCallerBaseName, __FUNCTION__, Status));
+    }
+
+    return Status;
+}
+
+/**
   This function processes the results of changes in configuration.
 
   @param This            Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
@@ -215,6 +275,10 @@ UiCallback (
         break;
     case FRONT_PAGE_ACTION_EXIT_FRONTPAGE:
         *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+        break;
+
+    case FRONT_PAGE_ACTION_REBOOT_TO_FRONTPAGE:
+        Status = HandleRebootToFrontPage( Value, ActionRequest );
         break;
 
     default:
