@@ -1024,8 +1024,6 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 
   MdeModulePkg/Universal/BootManagerPolicyDxe/BootManagerPolicyDxe.inf
 
-  # AuthManager provides authentication for DFCI. AuthManagerNull passes out a consistent token to allow the rest
-  # of FrontPage to be developed and tested while RngLib or other parts of the authentication process are being developed.
   DfciPkg/IdentityAndAuthManager/IdentityAndAuthManagerDxe.inf
 
   # Processes ingoing and outgoing DFCI settings requests.
