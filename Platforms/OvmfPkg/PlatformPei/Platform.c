@@ -706,7 +706,7 @@ InitializePlatform (
   Settings = (MEMORY_PROTECTION_SETTINGS) MEMORY_PROTECTION_SETTINGS_DEBUG;
   Settings.HeapGuardPolicy.Fields.SmmPageGuard = 0;
   Settings.HeapGuardPolicy.Fields.SmmPoolGuard = 0;
-  Settings.ImageProtectionPolicy.Fields.FromUnknown = 1;  //load 3rd party stuff with Image Protection
+  Settings.ImageProtectionPolicy.Fields.FromUnknown = 1;  //load 3rd party stuff with Image Protections
 
   BuildGuidDataHob (
     &gMemoryProtectionSettingsGuid,
