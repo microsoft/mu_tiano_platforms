@@ -1447,7 +1447,8 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 
 # Force PE/COFF sections to be aligned at 4KB boundaries to support page level
 # protection of DXE_SMM_DRIVER/SMM_CORE modules and set the NX compat flag. Setting subsystem
-# to CONSOLE is a workaround for compiler incompatibility
+# to CONSOLE is a workaround for linker incompatibility. /NXCOMPAT is currently only supported on
+# the Microsoft toolchain.
 [BuildOptions.common.EDKII.UEFI_APPLICATION]
   MSFT:*_*_*_DLINK_FLAGS = /DLL /ALIGN:4096 /SUBSYSTEM:CONSOLE /NXCOMPAT
   MSFT:*_*_*_GENFW_FLAGS = --keepoptionalheader
