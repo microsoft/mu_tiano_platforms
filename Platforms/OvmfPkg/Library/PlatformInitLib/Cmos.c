@@ -6,7 +6,8 @@
 
 **/
 
-#include "Cmos.h"
+#include <Library/PlatformInitLib.h>
+#include <Library/DebugLib.h>
 #include "Library/IoLib.h"
 
 /**
@@ -22,7 +23,7 @@
 **/
 UINT8
 EFIAPI
-CmosRead8 (
+PlatformCmosRead8 (
   IN      UINTN  Index
   )
 {
@@ -44,7 +45,7 @@ CmosRead8 (
 **/
 UINT8
 EFIAPI
-CmosWrite8 (
+PlatformCmosWrite8 (
   IN      UINTN  Index,
   IN      UINT8  Value
   )
@@ -52,4 +53,29 @@ CmosWrite8 (
   IoWrite8 (0x70, (UINT8)Index);
   IoWrite8 (0x71, Value);
   return Value;
+}
+
+/**
+   Dump the CMOS content
+ */
+VOID
+EFIAPI
+PlatformDebugDumpCmos (
+  VOID
+  )
+{
+  UINT32  Loop;
+
+  DEBUG ((DEBUG_INFO, "CMOS:\n"));
+
+  for (Loop = 0; Loop < 0x80; Loop++) {
+    if ((Loop % 0x10) == 0) {
+      DEBUG ((DEBUG_INFO, "%02x:", Loop));
+    }
+
+    DEBUG ((DEBUG_INFO, " %02x", PlatformCmosRead8 (Loop)));
+    if ((Loop % 0x10) == 0xf) {
+      DEBUG ((DEBUG_INFO, "\n"));
+    }
+  }
 }
