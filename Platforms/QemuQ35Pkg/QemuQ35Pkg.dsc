@@ -60,6 +60,8 @@
 # Library Class section - list of all Library Classes needed by this Platform.
 #
 ################################################################################
+!include MdePkg/MdeLibs.dsc.inc
+
 [LibraryClasses]
   PcdLib     |MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   TimerLib   |OvmfPkg/Library/AcpiTimerLib/BaseAcpiTimerLib.inf
@@ -136,6 +138,7 @@
   LocalApicLib        |UefiCpuPkg/Library/BaseXApicX2ApicLib/BaseXApicX2ApicLib.inf
   SmbusLib            |MdePkg/Library/BaseSmbusLibNull/BaseSmbusLibNull.inf
   CacheMaintenanceLib |MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
+  MicrocodeLib        |UefiCpuPkg/Library/MicrocodeLib/MicrocodeLib.inf
 
   # File Libraries
   FileExplorerLib   |MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
@@ -207,11 +210,12 @@
   XenPlatformLib  |OvmfPkg/Library/XenPlatformLib/XenPlatformLib.inf
 
   # Crypto Libraries
-  BaseCryptLib |CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
-  OpensslLib   |CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
-  IntrinsicLib |CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-  TlsLib       |CryptoPkg/Library/TlsLib/TlsLib.inf
-  RngLib       |MdePkg/Library/BaseRngLibNull/BaseRngLibNull.inf
+  BaseCryptLib    |CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+  OpensslLib      |CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
+  IntrinsicLib    |CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+  TlsLib          |CryptoPkg/Library/TlsLib/TlsLib.inf
+  RngLib          |MdePkg/Library/BaseRngLibNull/BaseRngLibNull.inf
+  Hash2CryptoLib  |SecurityPkg/Library/BaseHash2CryptoLibNull/BaseHash2CryptoLibNull.inf
 
   # Power/Thermal/Power State Libraries
   MsNVBootReasonLib       |OemPkg/Library/MsNVBootReasonLib/MsNVBootReasonLib.inf # interface on Reboot Reason non volatile variables
@@ -539,6 +543,7 @@
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
   DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/SecPeiDebugAgentLib.inf
 !endif
+  MemEncryptSevLib|OvmfPkg/Library/BaseMemEncryptSevLib/SecMemEncryptSevLib.inf
 
 [LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.DXE_CORE, LibraryClasses.common.SMM_CORE, LibraryClasses.common.DXE_SMM_DRIVER, LibraryClasses.common.UEFI_APPLICATION]
   MemoryProtectionHobLib|MdeModulePkg/Library/DxeSmmMemoryProtectionHobLib/DxeSmmMemoryProtectionHobLib.inf
@@ -885,6 +890,9 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv4PXESupport|0x01
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv6PXESupport|0x01
 
+  # Set ConfidentialComputing defaults
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0
+
 [PcdsDynamicHii]
 !if $(TPM_ENABLE) == TRUE && $(TPM_CONFIG_ENABLE) == TRUE
   gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x0|"1.3"|NV,BS
@@ -985,7 +993,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 
 !if $(ENABLE_SHARED_CRYPTO) == TRUE
   [PcdsFixedAtBuild]
-    !include CryptoPkg/Driver/Packaging/Crypto.pcd.STANDARD.inc.dsc
+    !include CryptoPkg/Driver/Bin/Crypto.pcd.STANDARD.inc.dsc
 !endif
 
 [Components.X64]
@@ -1091,7 +1099,10 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
       gMsGraphicsPkgTokenSpaceGuid.PcdPostBackgroundColoringSkipCount|0
   }
 
-  OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf
+  OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf {
+    <LibraryClasses>
+      NULL|OvmfPkg/Library/BlobVerifierLibNull/BlobVerifierLibNull.inf
+  }
   OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
   OvmfPkg/Virtio10Dxe/Virtio10.inf
   OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
@@ -1159,7 +1170,6 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   #
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
-  OvmfPkg/AcpiTables/AcpiTables.inf
   MdeModulePkg/Universal/Acpi/S3SaveStateDxe/S3SaveStateDxe.inf
   MdeModulePkg/Universal/Acpi/BootScriptExecutorDxe/BootScriptExecutorDxe.inf
   MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf

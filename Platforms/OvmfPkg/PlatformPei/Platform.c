@@ -37,6 +37,7 @@
 #include <IndustryStandard/Q35MchIch9.h>
 #include <IndustryStandard/QemuCpuHotplug.h>
 #include <OvmfPlatforms.h>
+#include <Guid/MemoryProtectionSettings.h> // MU_CHANGE
 
 #include "Platform.h"
 #include "Cmos.h"
