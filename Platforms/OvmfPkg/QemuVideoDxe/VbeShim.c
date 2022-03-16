@@ -72,7 +72,7 @@ InstallVbeShim (
   // MU_CHANGE BEGIN Page 0 will be protected
   // if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & (BIT0|BIT7)) == BIT0) {
   if (TRUE) {
-  // MU_CHANGE END
+    // MU_CHANGE END
     DEBUG ((
       DEBUG_WARN,
       "%a: page 0 protected, not installing VBE shim\n",
@@ -174,6 +174,7 @@ InstallVbeShim (
 
       return;
   }
+
   //
   // low nibble covers 0xC0000 to 0xC3FFF
   // high nibble covers 0xC4000 to 0xC7FFF

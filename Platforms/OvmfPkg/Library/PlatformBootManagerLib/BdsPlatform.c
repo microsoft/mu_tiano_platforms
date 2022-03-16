@@ -1931,10 +1931,9 @@ PlatformBootManagerUnableToBoot (
 VOID
 EFIAPI
 PlatformBootManagerPriorityBoot (
-  UINT16 **BootNext
+  UINT16  **BootNext
   )
 {
-
 }
 
 /**
@@ -1943,10 +1942,9 @@ ProcessBootCompletion
 VOID
 EFIAPI
 PlatformBootManagerProcessBootCompletion (
-  IN EFI_BOOT_MANAGER_LOAD_OPTION *BootOption
+  IN EFI_BOOT_MANAGER_LOAD_OPTION  *BootOption
   )
 {
-
 }
 
 /**   MSCHANGE begin
@@ -1959,7 +1957,6 @@ PlatformBootManagerBdsEntry (
   VOID
   )
 {
-
 }
 
 /**
@@ -1971,7 +1968,6 @@ PlatformBootManagerOnDemandConInConnect (
   VOID
   )
 {
-
 }
 
 // MU_CHANGE END
