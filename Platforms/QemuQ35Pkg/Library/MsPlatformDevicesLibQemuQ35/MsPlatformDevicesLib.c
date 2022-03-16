@@ -31,21 +31,19 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <OvmfPlatforms.h>
 
-
 //
 // Global data
 //
 
-UINT16        mHostBridgeDevId;
+UINT16  mHostBridgeDevId;
 
 //
 // Table of host IRQs matching PCI IRQs A-D
 // (for configuring PCI Interrupt Line register)
 //
-CONST UINT8 PciHostIrqs[] = {
+CONST UINT8  PciHostIrqs[] = {
   0x0a, 0x0a, 0x0b, 0x0b
 };
-
 
 #define PCI_DEVICE_PATH_NODE(Func, Dev) \
   { \
@@ -136,22 +134,21 @@ CONST UINT8 PciHostIrqs[] = {
     END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE, { END_DEVICE_PATH_LENGTH, 0 } \
   }
 
-
-#define PCI_CLASS_SCC          0x07
-#define PCI_SUBCLASS_SERIAL    0x00
-#define PCI_IF_16550           0x02
-#define IS_PCI_16550SERIAL(_p)           IS_CLASS3 (_p, PCI_CLASS_SCC, PCI_SUBCLASS_SERIAL, PCI_IF_16550)
-#define IS_PCI_ISA_PDECODE(_p)        IS_CLASS3 (_p, PCI_CLASS_BRIDGE, PCI_CLASS_BRIDGE_ISA_PDECODE, 0)
+#define PCI_CLASS_SCC        0x07
+#define PCI_SUBCLASS_SERIAL  0x00
+#define PCI_IF_16550         0x02
+#define IS_PCI_16550SERIAL(_p)  IS_CLASS3 (_p, PCI_CLASS_SCC, PCI_SUBCLASS_SERIAL, PCI_IF_16550)
+#define IS_PCI_ISA_PDECODE(_p)  IS_CLASS3 (_p, PCI_CLASS_BRIDGE, PCI_CLASS_BRIDGE_ISA_PDECODE, 0)
 
 //
 // Vendor UART Device Path structure
 //
 #pragma pack (1)
 typedef struct {
-  VENDOR_DEVICE_PATH        VendorHardware;
-  UART_DEVICE_PATH          Uart;
-  VENDOR_DEVICE_PATH        TerminalType;
-  EFI_DEVICE_PATH_PROTOCOL  End;
+  VENDOR_DEVICE_PATH          VendorHardware;
+  UART_DEVICE_PATH            Uart;
+  VENDOR_DEVICE_PATH          TerminalType;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } VENDOR_UART_DEVICE_PATH;
 #pragma pack ()
 //
@@ -159,9 +156,9 @@ typedef struct {
 //
 #pragma pack (1)
 typedef struct {
-  VENDOR_DEVICE_PATH        Vendor;
-  ACPI_ADR_DEVICE_PATH      AcpiAdr;
-  EFI_DEVICE_PATH_PROTOCOL  End;
+  VENDOR_DEVICE_PATH          Vendor;
+  ACPI_ADR_DEVICE_PATH        AcpiAdr;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } VENDOR_RAMFB_DEVICE_PATH;
 #pragma pack ()
 
@@ -170,29 +167,27 @@ typedef struct {
 //
 #pragma pack (1)
 typedef struct {
-  USB_CLASS_DEVICE_PATH    Keyboard;
-  EFI_DEVICE_PATH_PROTOCOL End;
+  USB_CLASS_DEVICE_PATH       Keyboard;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } USB_KEYBOARD_DEVICE_PATH;
 #pragma pack ()
 
-
-ACPI_HID_DEVICE_PATH       gPnpPs2KeyboardDeviceNode  = gPnpPs2Keyboard;
-ACPI_HID_DEVICE_PATH       gPnp16550ComPortDeviceNode = gPnp16550ComPort;
-UART_DEVICE_PATH           gUartDeviceNode            = gUart;
-VENDOR_DEVICE_PATH         gTerminalTypeDeviceNode    = gPcAnsiTerminal;
-
+ACPI_HID_DEVICE_PATH  gPnpPs2KeyboardDeviceNode  = gPnpPs2Keyboard;
+ACPI_HID_DEVICE_PATH  gPnp16550ComPortDeviceNode = gPnp16550ComPort;
+UART_DEVICE_PATH      gUartDeviceNode            = gUart;
+VENDOR_DEVICE_PATH    gTerminalTypeDeviceNode    = gPcAnsiTerminal;
 
 //
 // Debug Agent UART Device Path
 //
-VENDOR_UART_DEVICE_PATH gDebugAgentUartDevicePath = {
+VENDOR_UART_DEVICE_PATH  gDebugAgentUartDevicePath = {
   {
     {
       HARDWARE_DEVICE_PATH,
       HW_VENDOR_DP,
       {
-        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
-        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+        (UINT8)(sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8)((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       }
     },
     EFI_DEBUG_AGENT_GUID,
@@ -202,8 +197,8 @@ VENDOR_UART_DEVICE_PATH gDebugAgentUartDevicePath = {
       MESSAGING_DEVICE_PATH,
       MSG_UART_DP,
       {
-        (UINT8) (sizeof (UART_DEVICE_PATH)),
-        (UINT8) ((sizeof (UART_DEVICE_PATH)) >> 8)
+        (UINT8)(sizeof (UART_DEVICE_PATH)),
+        (UINT8)((sizeof (UART_DEVICE_PATH)) >> 8)
       }
     },
     0,  // Reserved
@@ -216,7 +211,7 @@ VENDOR_UART_DEVICE_PATH gDebugAgentUartDevicePath = {
   gEndEntire
 };
 
-STATIC USB_KEYBOARD_DEVICE_PATH gUsbKeyboardDevicePath = {
+STATIC USB_KEYBOARD_DEVICE_PATH  gUsbKeyboardDevicePath = {
   {
     {
       MESSAGING_DEVICE_PATH,
@@ -235,15 +230,14 @@ STATIC USB_KEYBOARD_DEVICE_PATH gUsbKeyboardDevicePath = {
   gEndEntire
 };
 
-
-STATIC VENDOR_RAMFB_DEVICE_PATH gQemuRamfbDevicePath = {
+STATIC VENDOR_RAMFB_DEVICE_PATH  gQemuRamfbDevicePath = {
   {
     {
       HARDWARE_DEVICE_PATH,
       HW_VENDOR_DP,
       {
-        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
-        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+        (UINT8)(sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8)((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       }
     },
     QEMU_RAMFB_GUID,
@@ -253,8 +247,8 @@ STATIC VENDOR_RAMFB_DEVICE_PATH gQemuRamfbDevicePath = {
       ACPI_DEVICE_PATH,
       ACPI_ADR_DP,
       {
-        (UINT8) (sizeof (ACPI_ADR_DEVICE_PATH)),
-        (UINT8) ((sizeof (ACPI_ADR_DEVICE_PATH)) >> 8)
+        (UINT8)(sizeof (ACPI_ADR_DEVICE_PATH)),
+        (UINT8)((sizeof (ACPI_ADR_DEVICE_PATH)) >> 8)
       }
     },
     ACPI_DISPLAY_ADR (
@@ -272,56 +266,55 @@ STATIC VENDOR_RAMFB_DEVICE_PATH gQemuRamfbDevicePath = {
 };
 
 typedef struct {
-    ACPI_HID_DEVICE_PATH      PciRootBridge;
-    PCI_DEVICE_PATH           PciDevice;
-    ACPI_ADR_DEVICE_PATH      AcpiAdr;
-    EFI_DEVICE_PATH_PROTOCOL  End;
+  ACPI_HID_DEVICE_PATH        PciRootBridge;
+  PCI_DEVICE_PATH             PciDevice;
+  ACPI_ADR_DEVICE_PATH        AcpiAdr;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } PREFERRED_VIDEO_DEVICE;
 
-
-STATIC PREFERRED_VIDEO_DEVICE gPreferredVideo = {
-    gPciRootBridge,
+STATIC PREFERRED_VIDEO_DEVICE  gPreferredVideo = {
+  gPciRootBridge,
+  {
     {
+      HARDWARE_DEVICE_PATH,
+      HW_PCI_DP,
       {
-        HARDWARE_DEVICE_PATH,
-        HW_PCI_DP,
-        {
-          (UINT8) (sizeof (PCI_DEVICE_PATH)),
-          (UINT8) ((sizeof (PCI_DEVICE_PATH)) >> 8),
-        },
+        (UINT8)(sizeof (PCI_DEVICE_PATH)),
+        (UINT8)((sizeof (PCI_DEVICE_PATH)) >> 8),
       },
-      0x00,
-      0x01
     },
+    0x00,
+    0x01
+  },
+  {
     {
+      ACPI_DEVICE_PATH,
+      ACPI_ADR_DP,
       {
-        ACPI_DEVICE_PATH,
-        ACPI_ADR_DP,
-        {
-          (UINT8) (sizeof (ACPI_ADR_DEVICE_PATH)),
-          (UINT8) ((sizeof (ACPI_ADR_DEVICE_PATH)) >> 8)
-        }
-      },
-      ACPI_DISPLAY_ADR (
-        1,                                       // DeviceIdScheme
-        0,                                       // HeadId
-        0,                                       // NonVgaOutput
-        1,                                       // BiosCanDetect
-        0,                                       // VendorInfo
-        ACPI_ADR_DISPLAY_TYPE_EXTERNAL_DIGITAL,  // Type
-        0,                                       // Port
-        0                                        // Index
-        ),
+        (UINT8)(sizeof (ACPI_ADR_DEVICE_PATH)),
+        (UINT8)((sizeof (ACPI_ADR_DEVICE_PATH)) >> 8)
+      }
     },
-    gEndEntire
+    ACPI_DISPLAY_ADR (
+      1,                                         // DeviceIdScheme
+      0,                                         // HeadId
+      0,                                         // NonVgaOutput
+      1,                                         // BiosCanDetect
+      0,                                         // VendorInfo
+      ACPI_ADR_DISPLAY_TYPE_EXTERNAL_DIGITAL,    // Type
+      0,                                         // Port
+      0                                          // Index
+      ),
+  },
+  gEndEntire
 };
 
 //
 // Predefined platform default console device path
 //
-BDS_CONSOLE_CONNECT_ENTRY   gPlatformConsoles[] = {
+BDS_CONSOLE_CONNECT_ENTRY  gPlatformConsoles[] = {
   {
-    (EFI_DEVICE_PATH_PROTOCOL *) &gDebugAgentUartDevicePath,
+    (EFI_DEVICE_PATH_PROTOCOL *)&gDebugAgentUartDevicePath,
     (CONSOLE_OUT | CONSOLE_IN | STD_ERROR)
   },
   {
@@ -343,9 +336,8 @@ BDS_CONSOLE_CONNECT_ENTRY   gPlatformConsoles[] = {
 };
 
 static EFI_DEVICE_PATH_PROTOCOL  *gPlatformConInDeviceList[] = {
-    NULL
+  NULL
 };
-
 
 typedef
 EFI_STATUS
@@ -370,19 +362,19 @@ EFI_STATUS
 
 EFI_STATUS
 GetGopDevicePath (
-   IN  EFI_DEVICE_PATH_PROTOCOL *PciDevicePath,
-   OUT EFI_DEVICE_PATH_PROTOCOL **GopDevicePath
-   )
+  IN  EFI_DEVICE_PATH_PROTOCOL  *PciDevicePath,
+  OUT EFI_DEVICE_PATH_PROTOCOL  **GopDevicePath
+  )
 {
-  UINTN                           Index;
-  EFI_STATUS                      Status;
-  EFI_HANDLE                      PciDeviceHandle;
-  EFI_DEVICE_PATH_PROTOCOL        *TempDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL        *TempPciDevicePath;
-  UINTN                           GopHandleCount;
-  EFI_HANDLE                      *GopHandleBuffer;
+  UINTN                     Index;
+  EFI_STATUS                Status;
+  EFI_HANDLE                PciDeviceHandle;
+  EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *TempPciDevicePath;
+  UINTN                     GopHandleCount;
+  EFI_HANDLE                *GopHandleBuffer;
 
-  if (PciDevicePath == NULL || GopDevicePath == NULL) {
+  if ((PciDevicePath == NULL) || (GopDevicePath == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -421,16 +413,21 @@ GetGopDevicePath (
     // Add all the child handles as possible Console Device
     //
     for (Index = 0; Index < GopHandleCount; Index++) {
-      Status = gBS->HandleProtocol (GopHandleBuffer[Index],
-                      &gEfiDevicePathProtocolGuid, (VOID*)&TempDevicePath);
+      Status = gBS->HandleProtocol (
+                      GopHandleBuffer[Index],
+                      &gEfiDevicePathProtocolGuid,
+                      (VOID *)&TempDevicePath
+                      );
       if (EFI_ERROR (Status)) {
         continue;
       }
+
       if (CompareMem (
             PciDevicePath,
             TempDevicePath,
             GetDevicePathSize (PciDevicePath) - END_DEVICE_PATH_LENGTH
-            ) == 0) {
+            ) == 0)
+      {
         //
         // In current implementation, we only enable one of the child handles
         // as console device, i.e. set one of the child handle's device
@@ -448,12 +445,12 @@ GetGopDevicePath (
         EfiBootManagerUpdateConsoleVariable (ConOutDev, TempDevicePath, NULL);
       }
     }
+
     gBS->FreePool (GopHandleBuffer);
   }
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Add PCI display to ConOut.
@@ -467,7 +464,7 @@ GetGopDevicePath (
 **/
 EFI_STATUS
 PreparePciDisplayDevicePath (
-  IN EFI_HANDLE                DeviceHandle
+  IN EFI_HANDLE  DeviceHandle
   )
 {
   EFI_STATUS                Status;
@@ -476,11 +473,11 @@ PreparePciDisplayDevicePath (
 
   DevicePath    = NULL;
   GopDevicePath = NULL;
-  Status = gBS->HandleProtocol (
-                  DeviceHandle,
-                  &gEfiDevicePathProtocolGuid,
-                  (VOID*)&DevicePath
-                  );
+  Status        = gBS->HandleProtocol (
+                         DeviceHandle,
+                         &gEfiDevicePathProtocolGuid,
+                         (VOID *)&DevicePath
+                         );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -506,26 +503,30 @@ PreparePciDisplayDevicePath (
 **/
 EFI_STATUS
 PreparePciSerialDevicePath (
-  IN EFI_HANDLE                DeviceHandle
+  IN EFI_HANDLE  DeviceHandle
   )
 {
   EFI_STATUS                Status;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
 
   DevicePath = NULL;
-  Status = gBS->HandleProtocol (
-                  DeviceHandle,
-                  &gEfiDevicePathProtocolGuid,
-                  (VOID*)&DevicePath
-                  );
+  Status     = gBS->HandleProtocol (
+                      DeviceHandle,
+                      &gEfiDevicePathProtocolGuid,
+                      (VOID *)&DevicePath
+                      );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  DevicePath = AppendDevicePathNode (DevicePath,
-                 (EFI_DEVICE_PATH_PROTOCOL *)&gUartDeviceNode);
-  DevicePath = AppendDevicePathNode (DevicePath,
-                 (EFI_DEVICE_PATH_PROTOCOL *)&gTerminalTypeDeviceNode);
+  DevicePath = AppendDevicePathNode (
+                 DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gUartDeviceNode
+                 );
+  DevicePath = AppendDevicePathNode (
+                 DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gTerminalTypeDeviceNode
+                 );
 
   EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
   EfiBootManagerUpdateConsoleVariable (ConIn, DevicePath, NULL);
@@ -542,24 +543,24 @@ VisitAllInstancesOfProtocol (
   IN VOID                        *Context
   )
 {
-  EFI_STATUS                Status;
-  UINTN                     HandleCount;
-  EFI_HANDLE                *HandleBuffer;
-  UINTN                     Index;
-  VOID                      *Instance;
+  EFI_STATUS  Status;
+  UINTN       HandleCount;
+  EFI_HANDLE  *HandleBuffer;
+  UINTN       Index;
+  VOID        *Instance;
 
   //
   // Start to check all the PciIo to find all possible device
   //
-  HandleCount = 0;
+  HandleCount  = 0;
   HandleBuffer = NULL;
-  Status = gBS->LocateHandleBuffer (
-                  ByProtocol,
-                  Id,
-                  NULL,
-                  &HandleCount,
-                  &HandleBuffer
-                  );
+  Status       = gBS->LocateHandleBuffer (
+                        ByProtocol,
+                        Id,
+                        NULL,
+                        &HandleCount,
+                        &HandleBuffer
+                        );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -570,11 +571,11 @@ VisitAllInstancesOfProtocol (
       continue;
     }
 
-    Status = (*CallBackFunction) (
-               HandleBuffer[Index],
-               Instance,
-               Context
-               );
+    Status = (*CallBackFunction)(
+  HandleBuffer[Index],
+  Instance,
+  Context
+  );
   }
 
   gBS->FreePool (HandleBuffer);
@@ -590,75 +591,78 @@ VisitingAPciInstance (
   IN VOID        *Context
   )
 {
-  EFI_STATUS                Status;
-  EFI_PCI_IO_PROTOCOL       *PciIo;
-  PCI_TYPE00                Pci;
+  EFI_STATUS           Status;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+  PCI_TYPE00           Pci;
 
-  PciIo = (EFI_PCI_IO_PROTOCOL*) Instance;
+  PciIo = (EFI_PCI_IO_PROTOCOL *)Instance;
 
   //
   // Check for all PCI device
   //
   Status = PciIo->Pci.Read (
-                    PciIo,
-                    EfiPciIoWidthUint32,
-                    0,
-                    sizeof (Pci) / sizeof (UINT32),
-                    &Pci
-                    );
+                        PciIo,
+                        EfiPciIoWidthUint32,
+                        0,
+                        sizeof (Pci) / sizeof (UINT32),
+                        &Pci
+                        );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  return (*(VISIT_PCI_INSTANCE_CALLBACK)(UINTN) Context) (
-           Handle,
-           PciIo,
-           &Pci
-           );
-
+  return (*(VISIT_PCI_INSTANCE_CALLBACK)(UINTN)Context)(
+  Handle,
+  PciIo,
+  &Pci
+  );
 }
-
 
 EFI_STATUS
 VisitAllPciInstances (
-  IN VISIT_PCI_INSTANCE_CALLBACK CallBackFunction
+  IN VISIT_PCI_INSTANCE_CALLBACK  CallBackFunction
   )
 {
   return VisitAllInstancesOfProtocol (
            &gEfiPciIoProtocolGuid,
            VisitingAPciInstance,
-           (VOID*)(UINTN) CallBackFunction
+           (VOID *)(UINTN)CallBackFunction
            );
 }
-
 
 STATIC
 EFI_STATUS
 EFIAPI
 ConnectVirtioPciRng (
-  IN EFI_HANDLE Handle,
-  IN VOID       *Instance,
-  IN VOID       *Context
+  IN EFI_HANDLE  Handle,
+  IN VOID        *Instance,
+  IN VOID        *Context
   )
 {
-  EFI_PCI_IO_PROTOCOL *PciIo;
-  EFI_STATUS          Status;
-  UINT16              VendorId;
-  UINT16              DeviceId;
-  UINT8               RevisionId;
-  BOOLEAN             Virtio10;
-  UINT16              SubsystemId;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+  EFI_STATUS           Status;
+  UINT16               VendorId;
+  UINT16               DeviceId;
+  UINT8                RevisionId;
+  BOOLEAN              Virtio10;
+  UINT16               SubsystemId;
 
   PciIo = Instance;
 
   //
   // Read and check VendorId.
   //
-  Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint16, PCI_VENDOR_ID_OFFSET,
-                        1, &VendorId);
+  Status = PciIo->Pci.Read (
+                        PciIo,
+                        EfiPciIoWidthUint16,
+                        PCI_VENDOR_ID_OFFSET,
+                        1,
+                        &VendorId
+                        );
   if (EFI_ERROR (Status)) {
     goto Error;
   }
+
   if (VendorId != VIRTIO_VENDOR_ID) {
     return EFI_SUCCESS;
   }
@@ -666,13 +670,24 @@ ConnectVirtioPciRng (
   //
   // Read DeviceId and RevisionId.
   //
-  Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint16, PCI_DEVICE_ID_OFFSET,
-                        1, &DeviceId);
+  Status = PciIo->Pci.Read (
+                        PciIo,
+                        EfiPciIoWidthUint16,
+                        PCI_DEVICE_ID_OFFSET,
+                        1,
+                        &DeviceId
+                        );
   if (EFI_ERROR (Status)) {
     goto Error;
   }
-  Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, PCI_REVISION_ID_OFFSET,
-                        1, &RevisionId);
+
+  Status = PciIo->Pci.Read (
+                        PciIo,
+                        EfiPciIoWidthUint8,
+                        PCI_REVISION_ID_OFFSET,
+                        1,
+                        &RevisionId
+                        );
   if (EFI_ERROR (Status)) {
     goto Error;
   }
@@ -684,10 +699,11 @@ ConnectVirtioPciRng (
   // SubsystemId will only play a sanity-check role. Otherwise, DeviceId can
   // only be sanity-checked, and SubsystemId will decide.
   //
-  if (DeviceId == 0x1040 + VIRTIO_SUBSYSTEM_ENTROPY_SOURCE &&
-      RevisionId >= 0x01) {
+  if ((DeviceId == 0x1040 + VIRTIO_SUBSYSTEM_ENTROPY_SOURCE) &&
+      (RevisionId >= 0x01))
+  {
     Virtio10 = TRUE;
-  } else if (DeviceId >= 0x1000 && DeviceId <= 0x103F && RevisionId == 0x00) {
+  } else if ((DeviceId >= 0x1000) && (DeviceId <= 0x103F) && (RevisionId == 0x00)) {
     Virtio10 = FALSE;
   } else {
     return EFI_SUCCESS;
@@ -696,13 +712,20 @@ ConnectVirtioPciRng (
   //
   // Read and check SubsystemId as dictated by Virtio10.
   //
-  Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint16,
-                        PCI_SUBSYSTEM_ID_OFFSET, 1, &SubsystemId);
+  Status = PciIo->Pci.Read (
+                        PciIo,
+                        EfiPciIoWidthUint16,
+                        PCI_SUBSYSTEM_ID_OFFSET,
+                        1,
+                        &SubsystemId
+                        );
   if (EFI_ERROR (Status)) {
     goto Error;
   }
-  if ((Virtio10 && SubsystemId >= 0x40) ||
-      (!Virtio10 && SubsystemId == VIRTIO_SUBSYSTEM_ENTROPY_SOURCE)) {
+
+  if ((Virtio10 && (SubsystemId >= 0x40)) ||
+      (!Virtio10 && (SubsystemId == VIRTIO_SUBSYSTEM_ENTROPY_SOURCE)))
+  {
     Status = gBS->ConnectController (
                     Handle, // ControllerHandle
                     NULL,   // DriverImageHandle -- connect all drivers
@@ -713,13 +736,13 @@ ConnectVirtioPciRng (
       goto Error;
     }
   }
+
   return EFI_SUCCESS;
 
 Error:
   DEBUG ((DEBUG_ERROR, "%a: %r\n", __FUNCTION__, Status));
   return Status;
 }
-
 
 /**
   Add IsaKeyboard to ConIn; add IsaSerial to ConOut, ConIn, ErrOut.
@@ -734,7 +757,7 @@ Error:
 **/
 EFI_STATUS
 PrepareLpcBridgeDevicePath (
-  IN EFI_HANDLE                DeviceHandle
+  IN EFI_HANDLE  DeviceHandle
   )
 {
   EFI_STATUS                Status;
@@ -743,50 +766,59 @@ PrepareLpcBridgeDevicePath (
   CHAR16                    *DevPathStr;
 
   DevicePath = NULL;
-  Status = gBS->HandleProtocol (
-                  DeviceHandle,
-                  &gEfiDevicePathProtocolGuid,
-                  (VOID*)&DevicePath
-                  );
+  Status     = gBS->HandleProtocol (
+                      DeviceHandle,
+                      &gEfiDevicePathProtocolGuid,
+                      (VOID *)&DevicePath
+                      );
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   TempDevicePath = DevicePath;
 
   //
   // Register Keyboard
   //
-  DevicePath = AppendDevicePathNode (DevicePath,
-                 (EFI_DEVICE_PATH_PROTOCOL *)&gPnpPs2KeyboardDeviceNode);
+  DevicePath = AppendDevicePathNode (
+                 DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gPnpPs2KeyboardDeviceNode
+                 );
 
   EfiBootManagerUpdateConsoleVariable (ConIn, DevicePath, NULL);
 
   //
   // Register COM1
   //
-  DevicePath = TempDevicePath;
+  DevicePath                     = TempDevicePath;
   gPnp16550ComPortDeviceNode.UID = 0;
 
-  DevicePath = AppendDevicePathNode (DevicePath,
-                 (EFI_DEVICE_PATH_PROTOCOL *)&gPnp16550ComPortDeviceNode);
-  DevicePath = AppendDevicePathNode (DevicePath,
-                 (EFI_DEVICE_PATH_PROTOCOL *)&gUartDeviceNode);
-  DevicePath = AppendDevicePathNode (DevicePath,
-                 (EFI_DEVICE_PATH_PROTOCOL *)&gTerminalTypeDeviceNode);
+  DevicePath = AppendDevicePathNode (
+                 DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gPnp16550ComPortDeviceNode
+                 );
+  DevicePath = AppendDevicePathNode (
+                 DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gUartDeviceNode
+                 );
+  DevicePath = AppendDevicePathNode (
+                 DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gTerminalTypeDeviceNode
+                 );
 
   //
   // Print Device Path
   //
   DevPathStr = ConvertDevicePathToText (DevicePath, FALSE, FALSE);
   if (DevPathStr != NULL) {
-    DEBUG((
+    DEBUG ((
       DEBUG_INFO,
       "BdsPlatform.c+%d: COM%d DevPath: %s\n",
       __LINE__,
       gPnp16550ComPortDeviceNode.UID + 1,
       DevPathStr
       ));
-    gBS->FreePool(DevPathStr);
+    gBS->FreePool (DevPathStr);
   }
 
   EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
@@ -796,29 +828,35 @@ PrepareLpcBridgeDevicePath (
   //
   // Register COM2
   //
-  DevicePath = TempDevicePath;
+  DevicePath                     = TempDevicePath;
   gPnp16550ComPortDeviceNode.UID = 1;
 
-  DevicePath = AppendDevicePathNode (DevicePath,
-                 (EFI_DEVICE_PATH_PROTOCOL *)&gPnp16550ComPortDeviceNode);
-  DevicePath = AppendDevicePathNode (DevicePath,
-                 (EFI_DEVICE_PATH_PROTOCOL *)&gUartDeviceNode);
-  DevicePath = AppendDevicePathNode (DevicePath,
-                 (EFI_DEVICE_PATH_PROTOCOL *)&gTerminalTypeDeviceNode);
+  DevicePath = AppendDevicePathNode (
+                 DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gPnp16550ComPortDeviceNode
+                 );
+  DevicePath = AppendDevicePathNode (
+                 DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gUartDeviceNode
+                 );
+  DevicePath = AppendDevicePathNode (
+                 DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gTerminalTypeDeviceNode
+                 );
 
   //
   // Print Device Path
   //
   DevPathStr = ConvertDevicePathToText (DevicePath, FALSE, FALSE);
   if (DevPathStr != NULL) {
-    DEBUG((
+    DEBUG ((
       DEBUG_INFO,
       "BdsPlatform.c+%d: COM%d DevPath: %s\n",
       __LINE__,
       gPnp16550ComPortDeviceNode.UID + 1,
       DevPathStr
       ));
-    gBS->FreePool(DevPathStr);
+    gBS->FreePool (DevPathStr);
   }
 
   EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
@@ -827,7 +865,6 @@ PrepareLpcBridgeDevicePath (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Configure PCI Interrupt Line register for applicable devices
@@ -859,15 +896,15 @@ SetPciIntLine (
   Status = EFI_SUCCESS;
 
   if (PciHdr->Device.InterruptPin != 0) {
-
     DevPathNode = DevicePathFromHandle (Handle);
     ASSERT (DevPathNode != NULL);
     DevPath = DevPathNode;
 
     RootBusNumber = 0;
-    if (DevicePathType (DevPathNode) == ACPI_DEVICE_PATH &&
-        DevicePathSubType (DevPathNode) == ACPI_DP &&
-        ((ACPI_HID_DEVICE_PATH *)DevPathNode)->HID == EISA_PNP_ID(0x0A03)) {
+    if ((DevicePathType (DevPathNode) == ACPI_DEVICE_PATH) &&
+        (DevicePathSubType (DevPathNode) == ACPI_DP) &&
+        (((ACPI_HID_DEVICE_PATH *)DevPathNode)->HID == EISA_PNP_ID (0x0A03)))
+    {
       RootBusNumber = ((ACPI_HID_DEVICE_PATH *)DevPathNode)->UID;
     }
 
@@ -875,13 +912,13 @@ SetPciIntLine (
     // Compute index into PciHostIrqs[] table by walking
     // the device path and adding up all device numbers
     //
-    Status = EFI_NOT_FOUND;
+    Status   = EFI_NOT_FOUND;
     RootSlot = 0;
-    Idx = PciHdr->Device.InterruptPin - 1;
+    Idx      = PciHdr->Device.InterruptPin - 1;
     while (!IsDevicePathEnd (DevPathNode)) {
-      if (DevicePathType (DevPathNode) == HARDWARE_DEVICE_PATH &&
-          DevicePathSubType (DevPathNode) == HW_PCI_DP) {
-
+      if ((DevicePathType (DevPathNode) == HARDWARE_DEVICE_PATH) &&
+          (DevicePathSubType (DevPathNode) == HW_PCI_DP))
+      {
         Idx += ((PCI_DEVICE_PATH *)DevPathNode)->Device;
 
         //
@@ -892,18 +929,20 @@ SetPciIntLine (
         // Q35 cases with more than 24 slots on the root bus.
         //
         if (Status != EFI_SUCCESS) {
-          Status = EFI_SUCCESS;
+          Status   = EFI_SUCCESS;
           RootSlot = ((PCI_DEVICE_PATH *)DevPathNode)->Device;
         }
       }
 
       DevPathNode = NextDevicePathNode (DevPathNode);
     }
+
     if (EFI_ERROR (Status)) {
       return Status;
     }
-    if (RootBusNumber == 0 && RootSlot == 0) {
-      DEBUG((
+
+    if ((RootBusNumber == 0) && (RootSlot == 0)) {
+      DEBUG ((
         DEBUG_ERROR,
         "%a: PCI host bridge (00:00.0) should have no interrupts!\n",
         __FUNCTION__
@@ -935,29 +974,39 @@ SetPciIntLine (
           //
           Idx -= RootSlot;
         }
+
         break;
       default:
         ASSERT (FALSE); // should never get here
     }
-    Idx %= ARRAY_SIZE (PciHostIrqs);
+
+    Idx    %= ARRAY_SIZE (PciHostIrqs);
     IrqLine = PciHostIrqs[Idx];
 
     DEBUG_CODE_BEGIN ();
     {
-      CHAR16        *DevPathString;
-      STATIC CHAR16 Fallback[] = L"<failed to convert>";
-      UINTN         Segment, Bus, Device, Function;
+      CHAR16         *DevPathString;
+      STATIC CHAR16  Fallback[] = L"<failed to convert>";
+      UINTN          Segment, Bus, Device, Function;
 
       DevPathString = ConvertDevicePathToText (DevPath, FALSE, FALSE);
       if (DevPathString == NULL) {
         DevPathString = Fallback;
       }
+
       Status = PciIo->GetLocation (PciIo, &Segment, &Bus, &Device, &Function);
       ASSERT_EFI_ERROR (Status);
 
-      DEBUG ((DEBUG_VERBOSE, "%a: [%02x:%02x.%x] %s -> 0x%02x\n", __FUNCTION__,
-        (UINT32)Bus, (UINT32)Device, (UINT32)Function, DevPathString,
-        IrqLine));
+      DEBUG ((
+        DEBUG_VERBOSE,
+        "%a: [%02x:%02x.%x] %s -> 0x%02x\n",
+        __FUNCTION__,
+        (UINT32)Bus,
+        (UINT32)Device,
+        (UINT32)Function,
+        DevPathString,
+        IrqLine
+        ));
 
       if (DevPathString != Fallback) {
         gBS->FreePool (DevPathString);
@@ -969,17 +1018,16 @@ SetPciIntLine (
     // Set PCI Interrupt Line register for this device to PciHostIrqs[Idx]
     //
     Status = PciIo->Pci.Write (
-               PciIo,
-               EfiPciIoWidthUint8,
-               PCI_INT_LINE_OFFSET,
-               1,
-               &IrqLine
-               );
+                          PciIo,
+                          EfiPciIoWidthUint8,
+                          PCI_INT_LINE_OFFSET,
+                          1,
+                          &IrqLine
+                          );
   }
 
   return Status;
 }
-
 
 VOID
 PciAcpiInitialization (
@@ -1023,8 +1071,13 @@ PciAcpiInitialization (
         //
         return;
       }
-      DEBUG ((DEBUG_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
-        __FUNCTION__, mHostBridgeDevId));
+
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Unknown Host Bridge Device ID: 0x%04x\n",
+        __FUNCTION__,
+        mHostBridgeDevId
+        ));
       ASSERT (FALSE);
       return;
   }
@@ -1039,8 +1092,6 @@ PciAcpiInitialization (
   //
   IoOr16 ((PciRead32 (Pmba) & ~BIT0) + 4, BIT0);
 }
-
-
 
 /**
   Do platform specific PCI Device check and add them to
@@ -1063,14 +1114,14 @@ DetectAndPreparePlatformPciDevicePath (
   IN PCI_TYPE00           *Pci
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
   Status = PciIo->Attributes (
-    PciIo,
-    EfiPciIoAttributeOperationEnable,
-    EFI_PCI_DEVICE_ENABLE,
-    NULL
-    );
+                    PciIo,
+                    EfiPciIoAttributeOperationEnable,
+                    EFI_PCI_DEVICE_ENABLE,
+                    NULL
+                    );
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -1081,7 +1132,8 @@ DetectAndPreparePlatformPciDevicePath (
        (Pci->Hdr.VendorId == 0x8086) &&
        (Pci->Hdr.DeviceId == 0x7000)
       )
-     ) {
+      )
+  {
     //
     // Add IsaKeyboard to ConIn,
     // add IsaSerial to ConOut, ConIn, ErrOut
@@ -1090,6 +1142,7 @@ DetectAndPreparePlatformPciDevicePath (
     PrepareLpcBridgeDevicePath (Handle);
     return EFI_SUCCESS;
   }
+
   //
   // Here we decide which Serial device to enable in PCI bus
   //
@@ -1117,8 +1170,6 @@ DetectAndPreparePlatformPciDevicePath (
   return Status;
 }
 
-
-
 /**
 Library function used to provide the platform SD Card device path
 **/
@@ -1126,7 +1177,7 @@ EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
 GetSdCardDevicePath (
   VOID
-)
+  )
 {
   return NULL;
 }
@@ -1140,7 +1191,7 @@ BOOLEAN
 EFIAPI
 PlatformIsDevicePathUsb (
   IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath
-)
+  )
 {
   return FALSE;
 }
@@ -1153,15 +1204,13 @@ EFI_DEVICE_PATH_PROTOCOL **
 EFIAPI
 GetPlatformConnectList (
   VOID
-)
+  )
 {
-
   //
   // Set PCI Interrupt Line registers and ACPI SCI_EN
   //
   PciAcpiInitialization ();
 
-  
   // Since this is the best place to do this, let's connect the VirtioRng
   // This is in BeforeConsole in Qemu, and this is function that's called in Q35 AfterConsole
   // So there might be some slight timing differences between when Rng comes up on Ovmf vs Q35
@@ -1170,8 +1219,6 @@ GetPlatformConnectList (
   // instances on Virtio PCI RNG devices.
   //
   VisitAllInstancesOfProtocol (&gEfiPciIoProtocolGuid, ConnectVirtioPciRng, NULL);
-
-
 
   return NULL;
 }
@@ -1183,7 +1230,7 @@ BDS_CONSOLE_CONNECT_ENTRY *
 EFIAPI
 GetPlatformConsoleList (
   VOID
-)
+  )
 {
   return (BDS_CONSOLE_CONNECT_ENTRY *)&gPlatformConsoles;
 }
@@ -1197,26 +1244,26 @@ EFI_DEVICE_PATH_PROTOCOL **
 EFIAPI
 GetPlatformConnectOnConInList (
   VOID
-)
+  )
 {
-
   return (EFI_DEVICE_PATH_PROTOCOL **)&gPlatformConInDeviceList;
 }
 
 static
 BOOLEAN
 IsVgaHandle (
-  IN EFI_HANDLE Handle
-)
+  IN EFI_HANDLE  Handle
+  )
 {
-  EFI_PCI_IO_PROTOCOL *PciIo;
-  PCI_TYPE00 Pci;
-  EFI_STATUS Status;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+  PCI_TYPE00           Pci;
+  EFI_STATUS           Status;
 
   Status = gBS->HandleProtocol (
                   Handle,
                   &gEfiPciIoProtocolGuid,
-                  (VOID **)&PciIo);
+                  (VOID **)&PciIo
+                  );
 
   if (!EFI_ERROR (Status)) {
     Status = PciIo->Pci.Read (
@@ -1224,11 +1271,12 @@ IsVgaHandle (
                           EfiPciIoWidthUint32,
                           0,
                           sizeof (Pci) / sizeof (UINT32),
-                          &Pci);
+                          &Pci
+                          );
 
     if (!EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_INFO, "  PCI CLASS CODE    = 0x%x\n", Pci.Hdr.ClassCode [2]));
-      DEBUG ((DEBUG_INFO, "  PCI SUBCLASS CODE = 0x%x\n", Pci.Hdr.ClassCode [1]));
+      DEBUG ((DEBUG_INFO, "  PCI CLASS CODE    = 0x%x\n", Pci.Hdr.ClassCode[2]));
+      DEBUG ((DEBUG_INFO, "  PCI SUBCLASS CODE = 0x%x\n", Pci.Hdr.ClassCode[1]));
 
       if (IS_PCI_VGA (&Pci) || IS_PCI_OLD_VGA (&Pci)) {
         DEBUG ((DEBUG_INFO, "  \nPCI VGA Device Found\n"));
@@ -1236,6 +1284,7 @@ IsVgaHandle (
       }
     }
   }
+
   return FALSE;
 }
 
@@ -1248,11 +1297,11 @@ EFI_HANDLE
 EFIAPI
 GetPlatformPreferredConsole (
   OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePath
-)
+  )
 {
   EFI_STATUS                Status;
   EFI_HANDLE                Handle = NULL;
-  EFI_DEVICE_PATH_PROTOCOL *TempDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
 
   // For OVMF
   //
@@ -1264,12 +1313,12 @@ GetPlatformPreferredConsole (
 
   VisitAllPciInstances (DetectAndPreparePlatformPciDevicePath);
 
-  TempDevicePath = (EFI_DEVICE_PATH_PROTOCOL *) &gPreferredVideo;
+  TempDevicePath = (EFI_DEVICE_PATH_PROTOCOL *)&gPreferredVideo;
 
   Status = gBS->LocateDevicePath (&gEfiPciIoProtocolGuid, &TempDevicePath, &Handle);
   if (!EFI_ERROR (Status) && IsDevicePathEnd (TempDevicePath) && IsVgaHandle (Handle)) {
   } else {
-    DEBUG((DEBUG_ERROR,"%a - Unable to locate platform preferred console. Code=%r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a - Unable to locate platform preferred console. Code=%r\n", __FUNCTION__, Status));
     Status = EFI_DEVICE_ERROR;
   }
 
@@ -1284,13 +1333,8 @@ GetPlatformPreferredConsole (
     // NOTE: We may get a device path that contains Controller node in it.
     //
     TempDevicePath = EfiBootManagerGetGopDevicePath (Handle);
-    *DevicePath = TempDevicePath;
+    *DevicePath    = TempDevicePath;
   }
 
   return Handle;
 }
-
-
-
-
-

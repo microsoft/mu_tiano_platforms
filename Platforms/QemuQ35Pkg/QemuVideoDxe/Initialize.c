@@ -9,7 +9,6 @@
 
 #include "Qemu.h"
 
-
 ///
 /// Generic Attribute Controller Register Settings
 ///
@@ -22,33 +21,33 @@ UINT8  AttributeController[21] = {
 ///
 /// Generic Graphics Controller Register Settings
 ///
-UINT8 GraphicsController[9] = {
+UINT8  GraphicsController[9] = {
   0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x05, 0x0F, 0xFF
 };
 
 //
 // 640 x 480 x 256 color @ 60 Hertz
 //
-UINT8 Crtc_640_480_256_60[28] = {
+UINT8  Crtc_640_480_256_60[28] = {
   0x5d, 0x4f, 0x50, 0x82, 0x53, 0x9f, 0x00, 0x3e,
   0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0xe1, 0x83, 0xdf, 0x50, 0x00, 0xe7, 0x04, 0xe3,
   0xff, 0x00, 0x00, 0x22
 };
 
-UINT8 Crtc_640_480_32bpp_60[28] = {
+UINT8  Crtc_640_480_32bpp_60[28] = {
   0x5d, 0x4f, 0x50, 0x82, 0x53, 0x9f, 0x00, 0x3e,
   0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0xe1, 0x83, 0xdf, 0x40, 0x00, 0xe7, 0x04, 0xe3,
   0xff, 0x00, 0x00, 0x32
 };
 
-UINT16 Seq_640_480_256_60[15] = {
+UINT16  Seq_640_480_256_60[15] = {
   0x0100, 0x0101, 0x0f02, 0x0003, 0x0e04, 0x1107, 0x0008, 0x4a0b,
   0x5b0c, 0x450d, 0x7e0e, 0x2b1b, 0x2f1c, 0x301d, 0x331e
 };
 
-UINT16 Seq_640_480_32bpp_60[15] = {
+UINT16  Seq_640_480_32bpp_60[15] = {
   0x0100, 0x0101, 0x0f02, 0x0003, 0x0e04, 0x1907, 0x0008, 0x4a0b,
   0x5b0c, 0x450d, 0x7e0e, 0x2b1b, 0x2f1c, 0x301d, 0x331e
 };
@@ -56,38 +55,38 @@ UINT16 Seq_640_480_32bpp_60[15] = {
 //
 // 800 x 600 x 256 color @ 60 Hertz
 //
-UINT8 Crtc_800_600_256_60[28] = {
+UINT8  Crtc_800_600_256_60[28] = {
   0x7F, 0x63, 0x64, 0x80, 0x6B, 0x1B, 0x72, 0xF0,
   0x00, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x58, 0x8C, 0x57, 0x64, 0x00, 0x5F, 0x91, 0xE3,
   0xFF, 0x00, 0x00, 0x22
 };
 
-UINT8 Crtc_800_600_32bpp_60[28] = {
+UINT8  Crtc_800_600_32bpp_60[28] = {
   0x7F, 0x63, 0x64, 0x80, 0x6B, 0x1B, 0x72, 0xF0,
   0x00, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x58, 0x8C, 0x57, 0x90, 0x00, 0x5F, 0x91, 0xE3,
   0xFF, 0x00, 0x00, 0x32
 };
 
-UINT16 Seq_800_600_256_60[15] = {
+UINT16  Seq_800_600_256_60[15] = {
   0x0100, 0x0101, 0x0f02, 0x0003, 0x0e04, 0x1107, 0x0008, 0x4a0b,
   0x5b0c, 0x450d, 0x510e, 0x2b1b, 0x2f1c, 0x301d, 0x3a1e
 };
 
-UINT16 Seq_800_600_32bpp_60[15] = {
+UINT16  Seq_800_600_32bpp_60[15] = {
   0x0100, 0x0101, 0x0f02, 0x0003, 0x0e04, 0x1907, 0x0008, 0x4a0b,
   0x5b0c, 0x450d, 0x510e, 0x2b1b, 0x2f1c, 0x301d, 0x3a1e
 };
 
-UINT8 Crtc_960_720_32bpp_60[28] = {
+UINT8  Crtc_960_720_32bpp_60[28] = {
   0xA3, 0x77, 0x80, 0x86, 0x85, 0x96, 0x24, 0xFD,
   0x00, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x02, 0x88, 0xCF, 0xe0, 0x00, 0x00, 0x64, 0xE3,
   0xFF, 0x4A, 0x00, 0x32
 };
 
-UINT16 Seq_960_720_32bpp_60[15] = {
+UINT16  Seq_960_720_32bpp_60[15] = {
   0x0100, 0x0101, 0x0f02, 0x0003, 0x0e04, 0x1907, 0x0008, 0x4a0b,
   0x5b0c, 0x450d, 0x760e, 0x2b1b, 0x2f1c, 0x301d, 0x341e
 };
@@ -95,14 +94,14 @@ UINT16 Seq_960_720_32bpp_60[15] = {
 //
 // 1024 x 768 x 256 color @ 60 Hertz
 //
-UINT8 Crtc_1024_768_256_60[28] = {
+UINT8  Crtc_1024_768_256_60[28] = {
   0xA3, 0x7F, 0x80, 0x86, 0x85, 0x96, 0x24, 0xFD,
   0x00, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x02, 0x88, 0xFF, 0x80, 0x00, 0x00, 0x24, 0xE3,
   0xFF, 0x4A, 0x00, 0x22
 };
 
-UINT16 Seq_1024_768_256_60[15] = {
+UINT16  Seq_1024_768_256_60[15] = {
   0x0100, 0x0101, 0x0f02, 0x0003, 0x0e04, 0x1107, 0x0008, 0x4a0b,
   0x5b0c, 0x450d, 0x760e, 0x2b1b, 0x2f1c, 0x301d, 0x341e
 };
@@ -110,26 +109,26 @@ UINT16 Seq_1024_768_256_60[15] = {
 //
 // 1024 x 768 x 24-bit color @ 60 Hertz
 //
-UINT8 Crtc_1024_768_24bpp_60[28] = {
+UINT8  Crtc_1024_768_24bpp_60[28] = {
   0xA3, 0x7F, 0x80, 0x86, 0x85, 0x96, 0x24, 0xFD,
   0x00, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x02, 0x88, 0xFF, 0x80, 0x00, 0x00, 0x24, 0xE3,
   0xFF, 0x4A, 0x00, 0x32
 };
 
-UINT16 Seq_1024_768_24bpp_60[15] = {
+UINT16  Seq_1024_768_24bpp_60[15] = {
   0x0100, 0x0101, 0x0f02, 0x0003, 0x0e04, 0x1507, 0x0008, 0x4a0b,
   0x5b0c, 0x450d, 0x760e, 0x2b1b, 0x2f1c, 0x301d, 0x341e
 };
 
-UINT8 Crtc_1024_768_32bpp_60[28] = {
+UINT8  Crtc_1024_768_32bpp_60[28] = {
   0xA3, 0x7F, 0x80, 0x86, 0x85, 0x96, 0x24, 0xFD,
   0x00, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x02, 0x88, 0xFF, 0xe0, 0x00, 0x00, 0x64, 0xE3,
   0xFF, 0x4A, 0x00, 0x32
 };
 
-UINT16 Seq_1024_768_32bpp_60[15] = {
+UINT16  Seq_1024_768_32bpp_60[15] = {
   0x0100, 0x0101, 0x0f02, 0x0003, 0x0e04, 0x1907, 0x0008, 0x4a0b,
   0x5b0c, 0x450d, 0x760e, 0x2b1b, 0x2f1c, 0x301d, 0x341e
 };
@@ -138,14 +137,14 @@ UINT16 Seq_1024_768_32bpp_60[15] = {
 /// Table of supported video modes
 ///
 QEMU_VIDEO_CIRRUS_MODES  QemuVideoCirrusModes[] = {
-//  {  640, 480, 8, Crtc_640_480_256_60,  Seq_640_480_256_60,  0xe3 },
-//  {  800, 600, 8, Crtc_800_600_256_60,  Seq_800_600_256_60,  0xef },
-  {  640, 480, 32, Crtc_640_480_32bpp_60,  Seq_640_480_32bpp_60,  0xef },
-  {  800, 600, 32, Crtc_800_600_32bpp_60,  Seq_800_600_32bpp_60,  0xef },
-//  { 1024, 768, 8, Crtc_1024_768_256_60, Seq_1024_768_256_60, 0xef }
+  //  {  640, 480, 8, Crtc_640_480_256_60,  Seq_640_480_256_60,  0xe3 },
+  //  {  800, 600, 8, Crtc_800_600_256_60,  Seq_800_600_256_60,  0xef },
+  { 640,  480, 32, Crtc_640_480_32bpp_60,  Seq_640_480_32bpp_60,  0xef },
+  { 800,  600, 32, Crtc_800_600_32bpp_60,  Seq_800_600_32bpp_60,  0xef },
+  //  { 1024, 768, 8, Crtc_1024_768_256_60, Seq_1024_768_256_60, 0xef }
   { 1024, 768, 24, Crtc_1024_768_24bpp_60, Seq_1024_768_24bpp_60, 0xef }
-//  { 1024, 768, 32, Crtc_1024_768_32bpp_60, Seq_1024_768_32bpp_60, 0xef }
-//  { 960, 720, 32, Crtc_960_720_32bpp_60, Seq_1024_768_32bpp_60, 0xef }
+  //  { 1024, 768, 32, Crtc_1024_768_32bpp_60, Seq_1024_768_32bpp_60, 0xef }
+  //  { 960, 720, 32, Crtc_960_720_32bpp_60, Seq_1024_768_32bpp_60, 0xef }
 };
 
 #define QEMU_VIDEO_CIRRUS_MODE_COUNT \
@@ -160,9 +159,9 @@ QemuVideoCirrusModeSetup (
   QEMU_VIDEO_PRIVATE_DATA  *Private
   )
 {
-  UINT32                                 Index;
-  QEMU_VIDEO_MODE_DATA                   *ModeData;
-  QEMU_VIDEO_CIRRUS_MODES                *VideoMode;
+  UINT32                   Index;
+  QEMU_VIDEO_MODE_DATA     *ModeData;
+  QEMU_VIDEO_CIRRUS_MODES  *VideoMode;
 
   //
   // Setup Video Modes
@@ -173,27 +172,29 @@ QemuVideoCirrusModeSetup (
   if (Private->ModeData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  ModeData = Private->ModeData;
+
+  ModeData  = Private->ModeData;
   VideoMode = &QemuVideoCirrusModes[0];
-  for (Index = 0; Index < QEMU_VIDEO_CIRRUS_MODE_COUNT; Index ++) {
-    ModeData->InternalModeIndex = Index;
-    ModeData->HorizontalResolution          = VideoMode->Width;
-    ModeData->VerticalResolution            = VideoMode->Height;
-    ModeData->ColorDepth                    = VideoMode->ColorDepth;
-    DEBUG ((DEBUG_INFO,
+  for (Index = 0; Index < QEMU_VIDEO_CIRRUS_MODE_COUNT; Index++) {
+    ModeData->InternalModeIndex    = Index;
+    ModeData->HorizontalResolution = VideoMode->Width;
+    ModeData->VerticalResolution   = VideoMode->Height;
+    ModeData->ColorDepth           = VideoMode->ColorDepth;
+    DEBUG ((
+      DEBUG_INFO,
       "Adding Mode %d as Cirrus Internal Mode %d: %dx%d, %d-bit\n",
-      (INT32) (ModeData - Private->ModeData),
+      (INT32)(ModeData - Private->ModeData),
       ModeData->InternalModeIndex,
       ModeData->HorizontalResolution,
       ModeData->VerticalResolution,
       ModeData->ColorDepth
       ));
 
-    ModeData ++ ;
-    VideoMode ++;
+    ModeData++;
+    VideoMode++;
   }
+
   Private->MaxMode = ModeData - Private->ModeData;
 
   return EFI_SUCCESS;
 }
-
