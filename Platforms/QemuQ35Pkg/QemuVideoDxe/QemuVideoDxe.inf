@@ -7,7 +7,7 @@
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
-#Override : 00000002 | OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf | 561245684c6a2ce778c1a92a36680d41 | 2022-03-11T23-12-41 | 008b5a0135986dc0170017a1ab37d50f317bbe33
+#Override : 00000002 | OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf | cf4e9e04ca60d175433e0d59e77cfa7c | 2022-03-16T22-32-44 | 474f7c86050ffa5032c82446bf623f997d1036ed
 
 [Defines]
   INF_VERSION                    = 0x00010005
