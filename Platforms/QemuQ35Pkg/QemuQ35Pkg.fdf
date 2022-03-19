@@ -557,6 +557,9 @@ FILE FREEFORM = PCD(gZeroTouchPkgTokenSpaceGuid.PcdZeroTouchCertificateFile) {
   FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdBootFailIndicatorFile ) {
     SECTION RAW = OemPkg/FrontPage/Resources/NoBoot.bmp
   }
+  FILE FREEFORM = PCD(gSetupDataPkgTokenSpaceGuid.PcdConfigPolicyVariableGuid) {
+    SECTION RAW = $(CONF_BIN_FILE)
+  }
 
 ################################################################################
 

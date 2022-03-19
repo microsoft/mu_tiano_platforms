@@ -12,6 +12,7 @@ import glob
 import time
 import xml.etree.ElementTree
 import tempfile
+import uuid
 
 from edk2toolext.environment import shell_environment
 from edk2toolext.environment.uefi_build import UefiBuilder
@@ -19,7 +20,7 @@ from edk2toolext.invocables.edk2_platform_build import BuildSettingsManager
 from edk2toolext.invocables.edk2_setup import SetupSettingsManager, RequiredSubmodule
 from edk2toolext.invocables.edk2_update import UpdateSettingsManager
 from edk2toolext.invocables.edk2_pr_eval import PrEvalSettingsManager
-from edk2toollib.utility_functions import RunCmd
+from edk2toollib.utility_functions import RunCmd, RunPythonScript
 
 
     # ####################################################################################### #
@@ -32,10 +33,9 @@ class CommonPlatform():
     PackagesSupported = ("QemuQ35Pkg",)
     ArchSupported = ("IA32", "X64")
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
-    Scopes = ('qemuq35', 'edk2-build', 'cibuild')
+    Scopes = ('qemuq35', 'edk2-build', 'cibuild', 'setupdata')
     WorkspaceRoot = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     PackagesPath = ("Platforms", "MU_BASECORE", "Common/MU", "Common/MU_TIANO", "Common/MU_OEM_SAMPLE", "Common/PRM")
-
 
     # ####################################################################################### #
     #                         Configuration for Update & Setup                                #
@@ -220,14 +220,22 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         self.env.SetValue("BUILDREPORT_TYPES", "PCD DEPEX FLASH BUILD_FLAGS LIBRARY FIXED_ADDRESS HASH", "Setting build report types")
         # Include the MFCI test cert by default, override on the commandline with "BLD_*_SHIP_MODE=TRUE" if you want the retail MFCI cert
         self.env.SetValue("BLD_*_SHIP_MODE", "FALSE", "Default")
+        self.__SetEsrtGuidVars("CONF_POLICY_GUID", "6E08E434-8E04-47B5-9A77-78A3A24523EA", "Platform Hardcoded")
+        self.env.SetValue("YAML_CONF_FILE", self.mws.join(self.ws, "QemuQ35Pkg", "CfgData", "CfgDataDef.yaml"), "Platform Hardcoded")
+        self.env.SetValue("CONF_DATA_STRUCT_FOLDER", self.mws.join(self.ws, "QemuQ35Pkg", "Include"), "Platform Defined")
+        self.env.SetValue('CONF_REPORT_FOLDER', self.mws.join(self.ws, "QemuQ35Pkg", "CfgData"), "Platform Defined")
+
+        self.env.SetValue("YAML_POLICY_FILE", self.mws.join(self.ws, "QemuQ35Pkg", "PolicyData", "PolicyDataUsb.yaml"), "Platform Hardcoded")
+        self.env.SetValue("POLICY_DATA_STRUCT_FOLDER", self.mws.join(self.ws, "QemuQ35Pkg", "Include"), "Platform Defined")
+        self.env.SetValue('POLICY_REPORT_FOLDER', self.mws.join(self.ws, "QemuQ35Pkg", "PolicyData"), "Platform Defined")
 
         return 0
 
-    def PlatformPreBuild(self):
-        return 0
-
-    def PlatformPostBuild(self):
-        return 0
+    def __SetEsrtGuidVars(self, var_name, guid_str, desc_string):
+        cur_guid = uuid.UUID(guid_str)
+        self.env.SetValue("BLD_*_%s_REGISTRY" % var_name, guid_str, desc_string)
+        self.env.SetValue("BLD_*_%s_BYTES" % var_name, "{" + (",".join(("0x%X" % byte) for byte in cur_guid.bytes_le)) + "}", desc_string)
+        return
 
     def FlashRomImage(self):
         #Make virtual drive - Allow caller to override path otherwise use default
