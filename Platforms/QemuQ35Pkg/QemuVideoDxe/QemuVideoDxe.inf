@@ -39,6 +39,8 @@
   MdeModulePkg/MdeModulePkg.dec
   OvmfPkg/OvmfPkg.dec
   MsGraphicsPkg/MsGraphicsPkg.dec # MU_CHANGE use MsGopOverrideProtocolGuid
+  PolicyServicePkg/PolicyServicePkg.dec
+  QemuQ35Pkg/QemuQ35Pkg.dec
 
 [LibraryClasses]
   BaseMemoryLib
@@ -54,7 +56,11 @@
   UefiDriverEntryPoint
   UefiLib
 
+[Guids]
+  gPolicyDataGFXGuid                            # CONSUMES
+
 [Protocols]
+  gPolicyProtocolGuid                           ## CONSUMES
   gEfiGraphicsOutputProtocolGuid                # PROTOCOL BY_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL BY_START
   gEfiPciIoProtocolGuid                         # PROTOCOL TO_START
@@ -64,3 +70,6 @@
   gMsGraphicsPkgTokenSpaceGuid.PcdMsGopOverrideProtocolGuid   # MU_CHANGE use MsGopOverrideProtocolGuid
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution # MU_CHANGE use pcds to control default resolution
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution   # MU_CHANGE use pcds to control default resolution
+
+[Depex]
+  gPolicyProtocolGuid

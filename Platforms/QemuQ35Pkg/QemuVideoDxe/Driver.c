@@ -10,6 +10,8 @@
 
 #include "Qemu.h"
 #include <IndustryStandard/Acpi.h>
+#include <PolicyDataStructGFX.h>
+#include <Protocol/Policy.h>
 
 EFI_DRIVER_BINDING_PROTOCOL  gQemuVideoDriverBinding = {
   QemuVideoControllerDriverSupported,
@@ -21,6 +23,8 @@ EFI_DRIVER_BINDING_PROTOCOL  gQemuVideoDriverBinding = {
 };
 
 EFI_GUID  *mMsGopOverrideProtocolGuid;   // MU_CHANGE use MsGopOverrideProtocolGuid
+
+GFX_POLICY_DATA  mGfxPolicy[GFX_PORT_MAX_CNT];
 
 QEMU_VIDEO_CARD  gQemuVideoCardList[] = {
   {
@@ -267,16 +271,32 @@ QemuVideoControllerDriverStart (
     goto ClosePciIo;
   }
 
-  //
-  // Set new PCI attributes
-  //
-  Status = Private->PciIo->Attributes (
-                             Private->PciIo,
-                             EfiPciIoAttributeOperationEnable,
-                             EFI_PCI_DEVICE_ENABLE | EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY | SupportedVgaIo,
-                             NULL
-                             );
-  if (EFI_ERROR (Status)) {
+  // This VGA corresponds to the 0th GFX port, so check it out.
+  if (mGfxPolicy[0].Power_State_Port) {
+    //
+    // Set new PCI attributes
+    //
+    Status = Private->PciIo->Attributes (
+                               Private->PciIo,
+                               EfiPciIoAttributeOperationEnable,
+                               EFI_PCI_DEVICE_ENABLE | EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY | SupportedVgaIo,
+                               NULL
+                               );
+    if (EFI_ERROR (Status)) {
+      goto ClosePciIo;
+    }
+  } else {
+    //
+    // Set new PCI attributes
+    //
+    Status = Private->PciIo->Attributes (
+                               Private->PciIo,
+                               EfiPciIoAttributeOperationDisable,
+                               EFI_PCI_DEVICE_ENABLE | EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY | SupportedVgaIo,
+                               NULL
+                               );
+    DEBUG ((DEBUG_INFO, "Done disabling target GFX device %r\n", Status));
+    Status = EFI_UNSUPPORTED;
     goto ClosePciIo;
   }
 
@@ -824,7 +844,10 @@ InitializeQemuVideo (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS       Status;
+  UINT16           PolicySize;
+  UINT64           PolicyAttribute;
+  POLICY_PROTOCOL  *PolicyProtocol;
 
   mMsGopOverrideProtocolGuid = PcdGetPtr (PcdMsGopOverrideProtocolGuid); // MU_CHANGE use MsGopOverrideProtocolGuid
 
@@ -837,6 +860,44 @@ InitializeQemuVideo (
              &gQemuVideoComponentName2
              );
   ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->LocateProtocol (
+                  &gPolicyProtocolGuid,
+                  NULL,
+                  (VOID **)&PolicyProtocol
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "%a: Failed to locate policy protocol - %r!\n", __FUNCTION__, Status));
+    return Status;
+  }
+
+  PolicySize = sizeof (mGfxPolicy);
+  Status     = PolicyProtocol->GetPolicy (
+                                 &gPolicyDataGFXGuid,
+                                 &PolicyAttribute,
+                                 mGfxPolicy,
+                                 &PolicySize
+                                 );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Failed to get USB policy from database - %r!\n", __FUNCTION__, Status));
+    return Status;
+  }
+
+  if (PolicySize != sizeof (mGfxPolicy)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Located USB policy is not valid! Attributes: 0x%llx, has size: %x, expecting %x.\n",
+      __FUNCTION__,
+      PolicyAttribute,
+      PolicySize,
+      sizeof (mGfxPolicy)
+      ));
+    return EFI_COMPROMISED_DATA;
+  }
+
+  if ((PolicyAttribute & POLICY_ATTRIBUTE_FINALIZED) == 0) {
+    DEBUG ((DEBUG_WARN, "%a: Applying platform default configuration (Attribute: %llx)!\n", __FUNCTION__, PolicyAttribute));
+  }
 
   return Status;
 }
