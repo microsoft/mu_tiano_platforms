@@ -1,0 +1,47 @@
+## @file
+# Consumer module for GFX policy and configurations.
+#
+# Copyright (C) Microsoft Corporation. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION         = 0x00010017
+  BASE_NAME           = ConfigDataGfx
+  FILE_GUID           = 21A70D99-5FFE-4190-BCAA-5E6EDDA54951
+  VERSION_STRING      = 1.0
+  MODULE_TYPE         = PEIM
+  ENTRY_POINT         = ConfigDataGfxEntry
+
+[Sources]
+  ConfigDataGfx.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SetupDataPkg/SetupDataPkg.dec
+  PolicyServicePkg/PolicyServicePkg.dec
+  QemuQ35Pkg/QemuQ35Pkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  MemoryAllocationLib
+  ConfigBlobBaseLib
+  PeimEntryPoint
+  PeiServicesLib
+
+[Pcd]
+  gSetupDataPkgTokenSpaceGuid.PcdConfigPolicyVariableGuid
+
+[Guids]
+  gPolicyDataGFXGuid                            # CONSUMES
+
+[Ppis]
+  gEfiPeiReadOnlyVariable2PpiGuid   ## CONSUMES
+  gPeiPolicyPpiGuid                 ## CONSUMES
+
+[Depex]
+  gEfiPeiReadOnlyVariable2PpiGuid AND
+  gPeiPolicyPpiGuid
+
