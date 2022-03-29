@@ -48,7 +48,7 @@
 
 !include NetworkPkg/NetworkDefines.dsc.inc
 
-!include QemuCortexPkg/QemuCortexPkg.dsc.inc
+!include QemuCortexPkg/QemuCortexPkg.inc.dsc
 
 !include MdePkg/MdeLibs.dsc.inc
 
@@ -72,7 +72,8 @@
 
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   BootLogoLib|MdeModulePkg/Library/BootLogoLib/BootLogoLib.inf
-  PlatformBootManagerLib|ArmVirtPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
+  # PlatformBootManagerLib|ArmVirtPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
+  PlatformBootManagerLib|MdeModulePkg/Library/PlatformBootManagerLibNull/PlatformBootManagerLibNull.inf
   PlatformBmPrintScLib|OvmfPkg/Library/PlatformBmPrintScLib/PlatformBmPrintScLib.inf
   CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
   FrameBufferBltLib|MdeModulePkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
@@ -457,10 +458,10 @@
       NULL|MdeModulePkg/Library/BootManagerUiLib/BootManagerUiLib.inf
       NULL|MdeModulePkg/Library/BootMaintenanceManagerUiLib/BootMaintenanceManagerUiLib.inf
   }
-  OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf #{
-  #   <LibraryClasses>
-  #     NULL|OvmfPkg/Library/BlobVerifierLibNull/BlobVerifierLibNull.inf
-  # }
+  OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf {
+    <LibraryClasses>
+      NULL|OvmfPkg/Library/BlobVerifierLibNull/BlobVerifierLibNull.inf
+  }
 
   #
   # Networking stack

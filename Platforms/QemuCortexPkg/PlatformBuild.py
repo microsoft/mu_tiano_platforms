@@ -101,7 +101,9 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
-        return CommonPlatform.Scopes
+        scopes = CommonPlatform.Scopes
+        scopes += ("gcc_aarch64_linux",)
+        return scopes
 
     def FilterPackagesToTest(self, changedFilesList: list, potentialPackagesList: list) -> list:
         ''' Filter other cases that this package should be built
@@ -159,6 +161,12 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         '''  Retrieve command line options from the argparser '''
         if args.build_arch.upper() != "AARCH64":
             raise Exception("Invalid Arch Specified.  Please see comments in PlatformBuild.py::PlatformBuilder::AddCommandLineOptions")
+        
+        shell_environment.GetBuildVars().SetValue(
+            "TARGET_ARCH", args.build_arch.upper(), "From CmdLine")
+
+        shell_environment.GetBuildVars().SetValue(
+            "ACTIVE_PLATFORM", "QemuCortexPkg/QemuCortexPkg.dsc", "From CmdLine")
 
 
     def GetWorkspaceRoot(self):
@@ -171,7 +179,9 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
-        return CommonPlatform.Scopes
+        scopes = CommonPlatform.Scopes
+        scopes += ("gcc_aarch64_linux",)
+        return scopes
 
     def GetName(self):
         ''' Get the name of the repo, platform, or product being build '''
@@ -191,7 +201,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         txt  == plain text file logging
         md   == markdown file logging
         '''
-        return logging.INFO
+        return logging.DEBUG
         return super().GetLoggingLevel(loggerType)
 
     def SetPlatformEnv(self):
@@ -204,12 +214,12 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         # self.env.SetValue("QEMU_HEADLESS", "FALSE", "Default to false")
         # self.env.SetValue("SHUTDOWN_AFTER_RUN", "FALSE", "Default to false")
         # needed to make FV size build report happy
-        self.env.SetValue("BLD_*_BUILDID_STRING", "Unknown", "Default")
-        # Default turn on build reporting.
+        # self.env.SetValue("BLD_*_BUILDID_STRING", "Unknown", "Default")
+        # # Default turn on build reporting.
         self.env.SetValue("BUILDREPORTING", "TRUE", "Enabling build report")
         self.env.SetValue("BUILDREPORT_TYPES", "PCD DEPEX FLASH BUILD_FLAGS LIBRARY FIXED_ADDRESS HASH", "Setting build report types")
         # Include the MFCI test cert by default, override on the commandline with "BLD_*_SHIP_MODE=TRUE" if you want the retail MFCI cert
-        self.env.SetValue("BLD_*_SHIP_MODE", "FALSE", "Default")
+        # self.env.SetValue("BLD_*_SHIP_MODE", "FALSE", "Default")
 
         return 0
 
@@ -220,6 +230,64 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         return 0
 
     def FlashRomImage(self):
+
+        VirtualDrive = os.path.join(self.env.GetValue(
+            "BUILD_OUTPUT_BASE"), "VirtualDrive")
+        os.makedirs(VirtualDrive, exist_ok=True)
+        OutputPath_FV = os.path.join(
+            self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
+        Built_FV = os.path.join(OutputPath_FV, "QEMU_EFI.fd")
+    
+
+        # pad fd to 64mb
+        with open(Built_FV, "ab") as fvfile:
+            fvfile.seek(0, os.SEEK_END)
+            additional = b'\0' * ((64 * 1024 * 1024)-fvfile.tell())
+            fvfile.write(additional)
+
+        # QEMU must be on that path
+
+        # Unique Command and Args parameters per ARCH
+        if (self.env.GetValue("TARGET_ARCH").upper() == "AARCH64"):
+            cmd = "qemu-system-aarch64"
+            args = "-M virt"
+            args += " -cpu cortex-a57"                                          # emulate cpu
+        # elif(self.env.GetValue("TARGET_ARCH").upper() == "ARM"):
+        #     cmd = "qemu-system-arm"
+        #     args = "-M virt"
+        #     args += " -cpu cortex-a15"                                          # emulate cpu
+        else:
+            raise NotImplementedError()
+
+        # Common Args
+        args += " -pflash " + Built_FV                                     # path to fw
+        args += " -m 1024"                                                  # 1gb memory
+        # turn off network
+        args += " -net none"
+        # Serial messages out
+        args += " -serial stdio"
+        # Mount disk with startup.nsh
+        args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
+
+        # Conditional Args
+        # if (self.env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
+        #     args += " -display none"  # no graphics
+
+        # if (self.env.GetValue("MAKE_STARTUP_NSH").upper() == "TRUE"):
+        #     f = open(os.path.join(VirtualDrive, "startup.nsh"), "w")
+        #     f.write("BOOT SUCCESS !!! \n")
+        #     # add commands here
+        #     f.write("reset -s\n")
+        #     f.close()
+
+        ret = RunCmd(cmd, args)
+
+        if ret == 0xc0000005:
+            # for some reason getting a c0000005 on successful return
+            return 0
+
+        return ret
+
         #Make virtual drive - Allow caller to override path otherwise use default
         # startup_nsh = StartUpScriptManager()
         # run_tests = (self.env.GetValue("RUN_TESTS", "FALSE").upper() == "TRUE")
@@ -291,17 +359,17 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         # else:
         #     raise NotImplementedError()
 
-        ret = self.Helper.QemuRun(self.env)
-        if ret != 0:
-            logging.critical("Failed running Qemu")
-            return ret
+        # ret = self.Helper.QemuRun(self.env)
+        # if ret != 0:
+        #     logging.critical("Failed running Qemu")
+        #     return ret
 
-        failures = 0
+        # failures = 0
         # if run_tests and os.name == 'nt':
         #     failures = ut.report_results(VirtualDrive)
 
         # do stuff with unit test results here
-        return failures
+        # return failures
 
 # class UnitTestSupport(object):
 
@@ -440,35 +508,35 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 #         self._lines.append(line.strip())
 #         self._use_fs_finder = True
 
-if __name__ == "__main__":
-    import argparse
-    import sys
-    from edk2toolext.invocables.edk2_update import Edk2Update
-    from edk2toolext.invocables.edk2_setup import Edk2PlatformSetup
-    from edk2toolext.invocables.edk2_platform_build import Edk2PlatformBuild
-    print("Invoking Stuart")
-    print("     ) _     _")
-    print("    ( (^)-~-(^)")
-    print("__,-.\_( 0 0 )__,-.___")
-    print("  'W'   \   /   'W'")
-    print("         >o<")
-    SCRIPT_PATH = os.path.relpath(__file__)
-    parser = argparse.ArgumentParser(add_help=False)
-    parse_group = parser.add_mutually_exclusive_group()
-    parse_group.add_argument("--update", "--UPDATE",
-                             action='store_true', help="Invokes stuart_update")
-    parse_group.add_argument("--setup", "--SETUP",
-                             action='store_true', help="Invokes stuart_setup")
-    args, remaining = parser.parse_known_args()
-    new_args = ["stuart", "-c", SCRIPT_PATH]
-    new_args = new_args + remaining
-    sys.argv = new_args
-    if args.setup:
-        print("Running stuart_setup -c " + SCRIPT_PATH)
-        Edk2PlatformSetup().Invoke()
-    elif args.update:
-        print("Running stuart_update -c " + SCRIPT_PATH)
-        Edk2Update().Invoke()
-    else:
-        print("Running stuart_build -c " + SCRIPT_PATH)
-        Edk2PlatformBuild().Invoke()
+# if __name__ == "__main__":
+#     import argparse
+#     import sys
+#     from edk2toolext.invocables.edk2_update import Edk2Update
+#     from edk2toolext.invocables.edk2_setup import Edk2PlatformSetup
+#     from edk2toolext.invocables.edk2_platform_build import Edk2PlatformBuild
+#     print("Invoking Stuart")
+#     print("     ) _     _")
+#     print("    ( (^)-~-(^)")
+#     print("__,-.\_( 0 0 )__,-.___")
+#     print("  'W'   \   /   'W'")
+#     print("         >o<")
+#     SCRIPT_PATH = os.path.relpath(__file__)
+#     parser = argparse.ArgumentParser(add_help=False)
+#     parse_group = parser.add_mutually_exclusive_group()
+#     parse_group.add_argument("--update", "--UPDATE",
+#                              action='store_true', help="Invokes stuart_update")
+#     parse_group.add_argument("--setup", "--SETUP",
+#                              action='store_true', help="Invokes stuart_setup")
+#     args, remaining = parser.parse_known_args()
+#     new_args = ["stuart", "-c", SCRIPT_PATH]
+#     new_args = new_args + remaining
+#     sys.argv = new_args
+#     if args.setup:
+#         print("Running stuart_setup -c " + SCRIPT_PATH)
+#         Edk2PlatformSetup().Invoke()
+#     elif args.update:
+#         print("Running stuart_update -c " + SCRIPT_PATH)
+#         Edk2Update().Invoke()
+#     else:
+#         print("Running stuart_build -c " + SCRIPT_PATH)
+#         Edk2PlatformBuild().Invoke()

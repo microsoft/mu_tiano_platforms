@@ -84,7 +84,7 @@ FV = FVMAIN_COMPACT
 #
 ################################################################################
 
-!include QemuCortexPkgFvMain.fdf.inc
+!include QemuCortexPkgFvMain.fdf
 
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 16
