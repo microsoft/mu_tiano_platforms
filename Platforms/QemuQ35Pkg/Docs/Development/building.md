@@ -3,7 +3,7 @@
 Steps to setup your environment, compile, and run the QemuQ35Pkg.
 
 This solution for building and running QemuQ35Pkg has only been validated with Windows 10
-with VS2019 and Ubuntu 18.04 with GCC5 toolchain.
+with VS2022 and Ubuntu 18.04 with GCC5 toolchain.
 
 ## Developer environment
 
@@ -52,7 +52,7 @@ On most Linux distros this requires an extra step for mono and nuget support.
     stuart_setup -c Platforms/QemuQ35Pkg/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG>
     ```
 
-    - `TOOL_CHAIN_TAG` being the toolchain you want to build with, currently `VS2017`, `VS2019`, and `GCC5` are
+    - `TOOL_CHAIN_TAG` being the toolchain you want to build with, currently `VS2019`, `VS2022`, and `GCC5` are
       supported values
 
 5. Initialize & Update Dependencies - only as needed when ext_deps change

@@ -3,7 +3,7 @@
 #
 # Platform: QemuQ35
 # OS: Windows
-# Toolchain: VS2019
+# Toolchain: VS2022
 #
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -59,7 +59,7 @@ jobs:
     steps:
     - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
       parameters:
-        tool_chain_tag: VS2019
+        tool_chain_tag: VS2022
         build_pkg: $(package)
         build_target: $(Build.Target)
         build_arch: $(Build.Arch)

@@ -7,7 +7,7 @@ Core CI Build Status:
 =========================== =================== ==================
 Host and Toolchain          Build Status        Test Status
 =========================== =================== ==================
-Windows_VS2019_             |WindowsCiBuild|    |WindowsCiTest|
+Windows_VS2022_             |WindowsCiBuild|    |WindowsCiTest|
 Ubuntu_GCC5_                |UbuntuCiBuild|     |UbuntuCiTest|
 =========================== =================== ==================
 
@@ -16,9 +16,9 @@ Platform Build and Boot Status:
 ============================= =================
 Platform and Toolchain        Status
 ============================= =================
-Q35_VS2019_                   |Q35VsBuild|
+Q35_VS2022_                   |Q35VsBuild|
 Q35_GCC5_                     |Q35GccBuild|
-Ovmf_VS2019_                  |OvmfVsBuild|
+Ovmf_VS2022_                  |OvmfVsBuild|
 Ovmf_GCC5_                    |OvmfGccBuild|
 ============================= =================
 
@@ -165,7 +165,7 @@ Copyright & License
 Upstream License (TianoCore)
 ============================
 
-Copyright (c) 2019, TianoCore and contributors.  All rights reserved.
+Copyright (c) 2022, TianoCore and contributors.  All rights reserved.
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -221,20 +221,20 @@ POSSIBILITY OF SUCH DAMAGE.
 .. This is a bunch of directives to make the README file more readable
 .. ===================================================================
 
-.. _Windows_VS2019: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=58&&branchName=release%2F202202
-.. |WindowsCiBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20CI%20VS2019?branchName=release%2F202202
-.. |WindowsCiTest| image:: https://img.shields.io/azure-devops/tests/projectmu/mu/58.svg
+.. _Windows_VS2022: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=58&&branchName=release%2F20202
+.. |WindowsCiBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20CI%20VS2022?branchName=release%2F202202
+.. |WindowsCiTest|  image:: https://img.shields.io/azure-devops/tests/projectmu/mu/58.svg
 
 .. _Ubuntu_GCC5: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=57&branchName=release%2F202202
 .. |UbuntuCiBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20CI%20Ubuntu%20GCC5?branchName=release%2F202202
-.. |UbuntuCiTest| image:: https://img.shields.io/azure-devops/tests/projectmu/mu/57.svg
+.. |UbuntuCiTest|  image:: https://img.shields.io/azure-devops/tests/projectmu/mu/57.svg
 
-.. _Q35_VS2019: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=59&&branchName=release%2F202202
-.. |Q35VsBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20Q35%20Plat%20CI%20VS2019?branchName=release%2F202202
-.. _Q35_GCC5: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=60&&branchName=release%2F202202
+.. _Q35_VS2022: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=59&&branchName=release%2F202202
+.. |Q35VsBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20Q35%20Plat%20CI%20VS2022?branchName=release%2F202202
+.. _Q35_GCC5:   https://dev.azure.com/projectmu/mu/_build/latest?definitionId=60&&branchName=release%2F202202
 .. |Q35GccBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20Q35%20Plat%20CI%20GCC5?branchName=release%2F202202
 
-.. _Ovmf_VS2019: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=61&&branchName=release%2F202202
-.. |OvmfVsBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20OVMF%20Plat%20CI%20VS2019?branchName=release%2F202202
-.. _Ovmf_GCC5: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=62&&branchName=release%2F202202
+.. _Ovmf_VS2022: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=61&&branchName=release%2F202202
+.. |OvmfVsBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20OVMF%20Plat%20CI%20VS2022?branchName=release%2F202202
+.. _Ovmf_GCC5:   https://dev.azure.com/projectmu/mu/_build/latest?definitionId=62&&branchName=release%2F202202
 .. |OvmfGccBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20OVMF%20Plat%20CI%20GCC5?branchName=release%2F202202

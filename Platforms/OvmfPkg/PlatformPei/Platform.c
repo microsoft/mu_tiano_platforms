@@ -814,6 +814,10 @@ InitializePlatform (
   Settings                                     = (MEMORY_PROTECTION_SETTINGS)MEMORY_PROTECTION_SETTINGS_DEBUG;
   Settings.HeapGuardPolicy.Fields.SmmPageGuard = 0;
   Settings.HeapGuardPolicy.Fields.SmmPoolGuard = 0;
+  // THE /NXCOMPAT DLL flag cannot be set using non MinGW GCC
+ #ifdef __GNUC__
+  Settings.ImageProtectionPolicy.Fields.BlockImagesWithoutNxFlag = 0;
+ #endif
 
   BuildGuidDataHob (
     &gMemoryProtectionSettingsGuid,
