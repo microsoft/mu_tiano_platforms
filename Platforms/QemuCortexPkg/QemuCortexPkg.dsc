@@ -91,7 +91,7 @@
   MemoryTypeInfoSecVarCheckLib   |MdeModulePkg/Library/MemoryTypeInfoSecVarCheckLib/MemoryTypeInfoSecVarCheckLib.inf # MU_CHANGE TCBZ1086
   SecurityLockAuditLib  |MdeModulePkg/Library/SecurityLockAuditDebugMessageLib/SecurityLockAuditDebugMessageLib.inf ##MU_CHANGE
   ResetUtilityLib         |MdeModulePkg/Library/ResetUtilityLib/ResetUtilityLib.inf
-  # HwResetSystemLib           |OvmfPkg/Library/ResetSystemLib/BaseResetSystemLib.inf
+  HwResetSystemLib           |OvmfPkg/Library/ResetSystemLib/BaseResetSystemLib.inf
   FltUsedLib |MdePkg/Library/FltUsedLib/FltUsedLib.inf
 
 !if $(TPM2_ENABLE) == TRUE
@@ -103,6 +103,12 @@
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
   TpmPlatformHierarchyLib|SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLibNull/PeiDxeTpmPlatformHierarchyLib.inf
 !endif
+
+[LibraryClasses.common.DXE_CORE, LibraryClasses.common.DXE_RUNTIME_DRIVER, LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.UEFI_APPLICATION]
+  HwResetSystemLib              |MdeModulePkg/Library/DxeResetSystemLib/DxeResetSystemLib.inf
+
+[LibraryClasses.common.DXE_RUNTIME_DRIVER]
+  HwResetSystemLib|OvmfPkg/Library/ResetSystemLib/DxeResetSystemLib.inf
 
 [LibraryClasses.common.PEIM]
   ArmVirtMemInfoLib|ArmVirtPkg/Library/QemuVirtMemInfoLib/QemuVirtMemInfoPeiLib.inf
@@ -390,7 +396,7 @@
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
-  # MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
+  MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf {
     <LibraryClasses>
       NULL|ArmVirtPkg/Library/ArmVirtPL031FdtClientLib/ArmVirtPL031FdtClientLib.inf

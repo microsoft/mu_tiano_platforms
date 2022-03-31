@@ -9,8 +9,8 @@
 
 [Defines]
   DEC_SPECIFICATION              = 0x00010005
-  PACKAGE_NAME                   = ArmVirtPkg
-  PACKAGE_GUID                   = A0B31216-508E-4025-BEAB-56D836C66F0A
+  PACKAGE_NAME                   = QemuCortexPkg
+  PACKAGE_GUID                   = 9EBD48E1-2370-4B1C-AFF7-811DD22E8BCB
   PACKAGE_VERSION                = 0.1
 
 ################################################################################
