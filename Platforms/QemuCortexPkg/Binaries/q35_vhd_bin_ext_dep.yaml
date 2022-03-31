@@ -1,5 +1,5 @@
 {
-  "scope": "qemuq35",
+  "scope": "qemucortex",
   "type": "nuget",
   "name": "mu-disc-utils-bin",
   "source": "https://api.nuget.org/v3/index.json",

@@ -6,7 +6,7 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
-    "scope": "qemuq35",
+    "scope": "qemucortex",
     "name": "QEMU Runner",
     "module": "QemuRunner"
   }
