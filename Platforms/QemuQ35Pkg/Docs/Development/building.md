@@ -117,6 +117,8 @@ an error occurs. Locally you don't need to set this.
 
 **GDB_SERVER=\<TCP Port\>** Enables the GDB port in the QEMU instance at the provided TCP port.
 
+**SERIAL_PORT=\<Serial Port\>** Enables the specified serial port to be used as console.
+
 ### Passing Build Defines
 
 To pass build defines through *stuart_build*, prepend `BLD_*_` to the define name and pass it on the
