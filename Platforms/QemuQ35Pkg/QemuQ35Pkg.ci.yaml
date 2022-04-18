@@ -37,7 +37,10 @@
             "SourceLevelDebugPkg/SourceLevelDebugPkg.dec",
             "MsGraphicsPkg/MsGraphicsPkg.dec",
             "MsCorePkg/MsCorePkg.dec",
-            "PcBdsPkg/PcBdsPkg.dec"
+            "PcBdsPkg/PcBdsPkg.dec",
+            "PolicyServicePkg/PolicyServicePkg.dec",
+            "SetupDataPkg/SetupDataPkg.dec",
+            "QemuQ35Pkg/QemuQ35Pkg.dec"
 
         ],
         # For host based unit tests
@@ -123,5 +126,11 @@
         ],           # words to extend to the dictionary for this package
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
         "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)
+    },
+
+    "UncrustifyCheck": {
+        "IgnoreFiles": [
+            "**/ConfigData*.h"
+        ]    # Standard Plugin defined paths that should be ignored.
     }
 }
