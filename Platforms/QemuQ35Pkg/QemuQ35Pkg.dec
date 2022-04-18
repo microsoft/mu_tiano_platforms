@@ -24,11 +24,21 @@
   #
   gPolicyDataGFXGuid =  { 0x3a1523c2, 0xbd10, 0x4a5d, { 0xa9, 0x86, 0x40, 0x5b, 0x85, 0x2f, 0xcb, 0xfc } }
 
+  ## Token space GUID for QEMU Q35 package
+  #
+  gQemuQ35PkgTokenSpaceGuid = { 0xb7048716, 0x7d8b, 0x4a86, { 0x84, 0x95, 0x57, 0xa1, 0x76, 0x4f, 0x6e, 0xde } }
+
 [Ppis]
 
 [Protocols]
 
 [PcdsFixedAtBuild]
+  ## This PCD points to the file name GUID of the UI front page carried in this UEFI
+  #  Platform can customize the PCD to point to different application for UI support
+  #  Note that this application will be booted POST ready to boot, thus certain security
+  #  boundary limitations apply.
+  # @Prompt UI Front Page File
+  gQemuQ35PkgTokenSpaceGuid.PcdUIApplicationFile|{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }|VOID*|0x00000001
 
 [PcdsDynamic, PcdsDynamicEx]
 

@@ -25,6 +25,7 @@
   PcBdsPkg/PcBdsPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  QemuQ35Pkg/QemuQ35Pkg.dec
 
 [LibraryClasses]
   BaseMemoryLib
@@ -48,6 +49,7 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile
   gPcBdsPkgTokenSpaceGuid.PcdShellFile
+  gQemuQ35PkgTokenSpaceGuid.PcdUIApplicationFile
 
 [Depex]
   TRUE
