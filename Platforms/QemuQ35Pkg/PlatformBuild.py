@@ -136,7 +136,12 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
     def GetPackagesPath(self):
         ''' Return a list of paths that should be mapped as edk2 PackagesPath '''
-        return CommonPlatform.PackagesPath
+        result = [
+            shell_environment.GetBuildVars().GetValue("FEATURE_CONFIG_PATH", "")
+        ]
+        for a in CommonPlatform.PackagesPath:
+            result.append(a)
+        return result
 
     # ####################################################################################### #
     #                         Actual Configuration for Platform Build                         #
@@ -167,7 +172,12 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 
     def GetPackagesPath(self):
         ''' Return a list of workspace relative paths that should be mapped as edk2 PackagesPath '''
-        return CommonPlatform.PackagesPath
+        result = [
+            shell_environment.GetBuildVars().GetValue("FEATURE_CONFIG_PATH", "")
+        ]
+        for a in CommonPlatform.PackagesPath:
+            result.append(a)
+        return result
 
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
