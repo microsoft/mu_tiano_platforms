@@ -7,8 +7,11 @@
 
 mod pio;
 mod print;
+mod trait_demo;
 
 use r_efi::efi;
+
+use trait_demo::{MyBologna, MySalami};
 
 #[export_name = "efi_main"]
 pub extern "C" fn app_entry(_h: efi::Handle, _st: *mut efi::SystemTable) -> efi::Status {
@@ -22,6 +25,24 @@ pub extern "C" fn app_entry(_h: efi::Handle, _st: *mut efi::SystemTable) -> efi:
     // Leverages pio and print
     println!("\n\n\n======================================== DEMO 1");
     println!("Hello, world!");
+
+    //
+    // DEMO 2
+    //
+    // Leverages trait_demo
+    println!("\n\n\n======================================== DEMO 2");
+    let salami = MySalami {
+        firstname: &"Edna",
+        secondname: &"Krabapple",
+    };
+
+    let bologna = MyBologna {
+        name_the_first: &"Homer",
+        name_the_second: &"Simpson",
+    };
+
+    println!("{:#?}", salami);
+    println!("{:#?}", bologna);
 
     println!("\n\n\nTHANKS FOR ATTENDING!!\n");
 
