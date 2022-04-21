@@ -58,3 +58,28 @@ impl<'a> Debug for MyBologna<'a> {
         Ok(())
     }
 }
+
+//
+// Now let's take a look at the advantages of defining our own traits.
+// As you can see, it doesn't matter what the internal fields are,
+// by providing a trait implementation, we can abstract the differences
+// between the structures and allow common code to access them the same way.
+//
+
+pub trait Tupleize {
+    type Element;
+    fn make_tuple(&self) -> (Self::Element, Self::Element);
+}
+
+impl<'a> Tupleize for MySalami<'a> {
+    type Element = &'a str;
+    fn make_tuple(&self) -> (Self::Element, Self::Element) {
+        (self.firstname, self.secondname)
+    }
+}
+impl<'a> Tupleize for MyBologna<'a> {
+    type Element = &'a str;
+    fn make_tuple(&self) -> (Self::Element, Self::Element) {
+        (self.name_the_first, self.name_the_second)
+    }
+}
