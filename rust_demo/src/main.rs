@@ -5,6 +5,9 @@
 #![cfg_attr(not(test), no_main)]
 #![cfg_attr(not(test), no_std)]
 
+mod pio;
+mod print;
+
 use r_efi::efi;
 
 #[export_name = "efi_main"]
@@ -12,6 +15,15 @@ pub extern "C" fn app_entry(_h: efi::Handle, _st: *mut efi::SystemTable) -> efi:
     // NOTE: First, before anything, we need a panic handler (see below).
     //       There are some ongoing efforts (e.g. https://github.com/Rust-for-Linux)
     //       that are trying to address this requirement, but it's not complete yet.
+
+    //
+    // DEMO 1
+    //
+    // Leverages pio and print
+    println!("\n\n\n======================================== DEMO 1");
+    println!("Hello, world!");
+
+    println!("\n\n\nTHANKS FOR ATTENDING!!\n");
 
     efi::Status::SUCCESS
 }
