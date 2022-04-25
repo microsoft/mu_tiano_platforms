@@ -1015,7 +1015,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 
   # AuthManager provides authentication for DFCI. AuthManagerNull passes out a consistent token to allow the rest
   # of FrontPage to be developed and tested while RngLib or other parts of the authentication process are being developed.
-  DfciPkg/AuthManagerNull/AuthManagerNull.inf
+  DfciPkg/IdentityAndAuthManager/IdentityAndAuthManagerDxe.inf
 
   # Processes ingoing and outgoing DFCI settings requests.
   DfciPkg/DfciManager/DfciManager.inf
@@ -1289,6 +1289,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
       NULL|DfciPkg/Library/DfciAssetTagSettingLib/DfciAssetTagSetting.inf
       DfciSettingPermissionLib|DfciPkg/Library/DfciSettingPermissionLib/DfciSettingPermissionLib.inf
       NULL|PcBdsPkg/Library/MsBootManagerSettingsDxeLib/MsBootManagerSettingsDxeLib.inf
+      NULL|OemPkg/Library/MsSecureBootModeSettingDxeLib/MsSecureBootModeSettingDxeLib.inf
     <PcdsFeatureFlag>
       gDfciPkgTokenSpaceGuid.PcdSettingsManagerInstallProvider|TRUE
   }

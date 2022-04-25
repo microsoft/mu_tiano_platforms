@@ -518,7 +518,7 @@ FILE FREEFORM = PCD(gZeroTouchPkgTokenSpaceGuid.PcdZeroTouchCertificateFile) {
     SECTION RAW = ZeroTouchPkg/Certs/ZeroTouch/ZtdRecovery.cer
 }
 
-  INF DfciPkg/AuthManagerNull/AuthManagerNull.inf
+  INF DfciPkg/IdentityAndAuthManager/IdentityAndAuthManagerDxe.inf
   INF DfciPkg/SettingsManager/SettingsManagerDxe.inf
   INF MsGraphicsPkg/MsUiTheme/Dxe/MsUiThemeProtocol.inf
   INF MsGraphicsPkg/RenderingEngineDxe/RenderingEngineDxe.inf
