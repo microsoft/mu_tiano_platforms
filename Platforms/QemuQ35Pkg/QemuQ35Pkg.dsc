@@ -78,6 +78,7 @@
   DxeServicesLib              |MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
   DxeServicesTableLib         |MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   UefiHiiServicesLib          |MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
+  RegisterFilterLib           |MdePkg/Library/RegisterFilterLibNull/RegisterFilterLibNull.inf
 
   # Math Libraries
   FltUsedLib |MdePkg/Library/FltUsedLib/FltUsedLib.inf
@@ -277,6 +278,10 @@
   MsPlatformDevicesLib |QemuQ35Pkg/Library/MsPlatformDevicesLibQemuQ35/MsPlatformDevicesLib.inf
   DevicePathLib        |MdePkg/Library/UefiDevicePathLibDevicePathProtocol/UefiDevicePathLibDevicePathProtocol.inf
   LoadLinuxLib         |OvmfPkg/Library/LoadLinuxLib/LoadLinuxLib.inf
+
+  # Setup variable libraries
+  ConfigBlobBaseLib    |SetupDataPkg/Library/ConfigBlobBaseLib/ConfigBlobBaseLib.inf
+  ConfigDataLib        |SetupDataPkg/Library/ConfigDataLib/ConfigDataLib.inf
 
   # Network libraries
   NetLib                 |NetworkPkg/Library/DxeNetLib/DxeNetLib.inf
@@ -800,8 +805,8 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerInBootOrder|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformRecoverySupport|FALSE
   gPcBdsPkgTokenSpaceGuid.PcdLowResolutionInternalShell|FALSE
-  # The GUID of Frontpage.inf from MU_OEM_SAMPLE: 4042708A-0F2D-4823-AC60-0D77B3111889
-  gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x8A, 0x70, 0x42, 0x40, 0x2D, 0x0F, 0x23, 0x48, 0xAC, 0x60, 0x0D, 0x77, 0xB3, 0x11, 0x18, 0x89 }
+  # The GUID of SetupDataPkg/ConfApp/ConfApp.inf: E3624086-4FCD-446E-9D07-B6B913792071
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x86, 0x40, 0x62, 0xe3, 0xcd, 0x4f, 0x6e, 0x44, 0x9d, 0x7, 0xb6, 0xb9, 0x13, 0x79, 0x20, 0x71 }
 
 
 [PcdsFixedAtBuild.IA32]
@@ -992,6 +997,9 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTablePei/FirmwarePerformancePei.inf
   OemPkg/DeviceStatePei/DeviceStatePei.inf
   MfciPkg/MfciPei/MfciPei.inf
+
+  PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
+  QemuQ35Pkg/ConfigDataGfx/ConfigDataGfx.inf
 
 !if $(ENABLE_SHARED_CRYPTO) == TRUE
   [PcdsFixedAtBuild]
@@ -1257,6 +1265,15 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
       gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0xFF
   }
 
+  PolicyServicePkg/PolicyService/Dxe/PolicyDxe.inf
+  SetupDataPkg/ConfDataSettingProvider/ConfDataSettingProvider.inf {
+    <PcdsFixedAtBuild>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
+  }
+  SetupDataPkg/ConfApp/ConfApp.inf {
+    <LibraryClasses>
+      JsonLiteParserLib|MsCorePkg/Library/JsonLiteParser/JsonLiteParser.inf
+  }
 
   OvmfPkg/IoMmuDxe/IoMmuDxe.inf
 

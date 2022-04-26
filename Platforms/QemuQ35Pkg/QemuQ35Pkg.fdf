@@ -263,6 +263,9 @@ INF  MsGraphicsPkg/MsUiTheme/Pei/MsUiThemePpi.inf
 INF  MsGraphicsPkg/MsEarlyGraphics/Pei/MsEarlyGraphics.inf
 INF  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTablePei/FirmwarePerformancePei.inf
 
+INF  PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
+INF  QemuQ35Pkg/ConfigDataGfx/ConfigDataGfx.inf
+
 # Shared Crypto
 !if $(ENABLE_SHARED_CRYPTO) == TRUE
   !include CryptoPkg/Driver/Bin/CryptoDriver.BOOTBLOCK.inc.fdf
@@ -407,6 +410,10 @@ INF  OvmfPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
   INF  NetworkPkg/Mtftp6Dxe/Mtftp6Dxe.inf
   INF  NetworkPkg/TcpDxe/TcpDxe.inf
   INF  NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
+
+  INF  PolicyServicePkg/PolicyService/Dxe/PolicyDxe.inf
+  INF  SetupDataPkg/ConfDataSettingProvider/ConfDataSettingProvider.inf
+  INF  SetupDataPkg/ConfApp/ConfApp.inf
 
   INF  NetworkPkg/TlsDxe/TlsDxe.inf
   INF  NetworkPkg/DnsDxe/DnsDxe.inf
