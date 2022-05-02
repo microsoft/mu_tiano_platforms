@@ -303,8 +303,8 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
                 of.write('DEADBEEF\n')
             VirtualDrive.AddFile(text_file_path)
             # openssl genpkey -algorithm RSA -out example.org.key -pkeyopt rsa_keygen_bits:2048 -aes192
-            test_key_path = os.path.join(output_base, "TestPrivateKey.pem")
-            VirtualDrive.AddFile(test_key_path)
+            # test_key_path = os.path.join(output_base, "TestPrivateKey.pem")
+            # VirtualDrive.AddFile(test_key_path)
 
 
         else:
