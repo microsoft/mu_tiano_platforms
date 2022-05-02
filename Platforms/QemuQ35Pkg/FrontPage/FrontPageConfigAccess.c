@@ -31,11 +31,11 @@ IsPostReadyToBoot (
   VOID
   )
 {
-  EFI_STATUS        Status;
-  UINT32            Attributes;
-  PHASE_INDICATOR   Indicator;
-  UINTN             Size = sizeof (Indicator);
-  static BOOLEAN    Result, Initialized = FALSE;
+  EFI_STATUS       Status;
+  UINT32           Attributes;
+  PHASE_INDICATOR  Indicator;
+  UINTN            Size = sizeof (Indicator);
+  static BOOLEAN   Result, Initialized = FALSE;
 
   if (!Initialized) {
     Status = gRT->GetVariable (
@@ -45,7 +45,7 @@ IsPostReadyToBoot (
                     &Size,
                     &Indicator
                     );
-    Result = (!EFI_ERROR (Status) && (Attributes == READY_TO_BOOT_INDICATOR_VAR_ATTR));
+    Result      = (!EFI_ERROR (Status) && (Attributes == READY_TO_BOOT_INDICATOR_VAR_ATTR));
     Initialized = TRUE;
   }
 
@@ -86,7 +86,7 @@ GetFrontPageUiControls (
   Status = mHiiConfigRouting->BlockToConfig (
                                 mHiiConfigRouting,
                                 Request,
-                                (UINT8*)&FrontPageUiControls,
+                                (UINT8 *)&FrontPageUiControls,
                                 sizeof (FrontPageUiControls),
                                 Results,
                                 Progress
@@ -126,10 +126,10 @@ GetFrontPageUiControls (
 EFI_STATUS
 EFIAPI
 ExtractConfig (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  CONST EFI_STRING                       Request,
-  OUT EFI_STRING                             *Progress,
-  OUT EFI_STRING                             *Results
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  CONST EFI_STRING                      Request,
+  OUT EFI_STRING                            *Progress,
+  OUT EFI_STRING                            *Results
   )
 {
   //
@@ -190,9 +190,9 @@ ExtractConfig (
 EFI_STATUS
 EFIAPI
 RouteConfig (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  CONST EFI_STRING                       Configuration,
-  OUT EFI_STRING                             *Progress
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  CONST EFI_STRING                      Configuration,
+  OUT EFI_STRING                            *Progress
   )
 {
   return EFI_NOT_FOUND;

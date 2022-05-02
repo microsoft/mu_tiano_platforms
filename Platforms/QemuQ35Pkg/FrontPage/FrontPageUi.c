@@ -43,29 +43,32 @@
 #include <Settings/DfciSettings.h>
 #include <Settings/FrontPageSettings.h>
 
-extern EFI_HII_HANDLE                       gStringPackHandle;
-extern BOOLEAN                              mResetRequired;
-extern DFCI_SETTING_ACCESS_PROTOCOL         *mSettingAccess;
-extern UINTN                                mAuthToken;
-extern EDKII_VARIABLE_POLICY_PROTOCOL             *mVariablePolicyProtocol;
+extern EFI_HII_HANDLE                  gStringPackHandle;
+extern BOOLEAN                         mResetRequired;
+extern DFCI_SETTING_ACCESS_PROTOCOL    *mSettingAccess;
+extern UINTN                           mAuthToken;
+extern EDKII_VARIABLE_POLICY_PROTOCOL  *mVariablePolicyProtocol;
 
 STATIC
 EFI_STATUS
-SetSystemPassword(
-    IN EFI_IFR_TYPE_VALUE *Value,
-    OUT EFI_BROWSER_ACTION_REQUEST *ActionRequest);
+SetSystemPassword (
+  IN EFI_IFR_TYPE_VALUE           *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST  *ActionRequest
+  );
 
 STATIC
 EFI_STATUS
-HandleInfoPopup(
-    IN EFI_IFR_TYPE_VALUE *Value,
-    OUT EFI_BROWSER_ACTION_REQUEST *ActionRequest);
+HandleInfoPopup (
+  IN EFI_IFR_TYPE_VALUE           *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST  *ActionRequest
+  );
 
 STATIC
 EFI_STATUS
-HandleSecureBootChange(
-    IN EFI_IFR_TYPE_VALUE *Value,
-    OUT EFI_BROWSER_ACTION_REQUEST *ActionRequest);
+HandleSecureBootChange (
+  IN EFI_IFR_TYPE_VALUE           *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST  *ActionRequest
+  );
 
 /**
  * RefreshSecurityForm - Notify browser that the form has changes
@@ -73,70 +76,70 @@ HandleSecureBootChange(
  *
  * @return VOID
  */
-VOID RefreshSecurityForm ( VOID ) {
-    VOID                          *StartOpCodeHandle;
-    VOID                          *EndOpCodeHandle;
-    EFI_IFR_GUID_LABEL            *StartLabel;
-    EFI_IFR_GUID_LABEL            *EndLabel;
-    STATIC UINT8                  NullOpCount = 1;
+VOID
+RefreshSecurityForm (
+  VOID
+  )
+{
+  VOID                *StartOpCodeHandle;
+  VOID                *EndOpCodeHandle;
+  EFI_IFR_GUID_LABEL  *StartLabel;
+  EFI_IFR_GUID_LABEL  *EndLabel;
+  STATIC UINT8        NullOpCount = 1;
 
-    DEBUG(( DEBUG_VERBOSE, "VERBOSE [SFP] %a - Attempting to force Security form refresh.\n", __FUNCTION__ ));
+  DEBUG ((DEBUG_VERBOSE, "VERBOSE [SFP] %a - Attempting to force Security form refresh.\n", __FUNCTION__));
 
-    //
-    // Determine how many NULL opcodes we need.
-    // This is so that the number of opcodes will vary from execution to
-    // execution and force the page CRC to always change.
-    // Can toggle back and forth.
-    //
-    if (1 != NullOpCount)
-    {
-        NullOpCount = 1;
-    }
-    else
-    {
-        NullOpCount = 2;
-    }
+  //
+  // Determine how many NULL opcodes we need.
+  // This is so that the number of opcodes will vary from execution to
+  // execution and force the page CRC to always change.
+  // Can toggle back and forth.
+  //
+  if (1 != NullOpCount) {
+    NullOpCount = 1;
+  } else {
+    NullOpCount = 2;
+  }
 
-    //
-    // Init OpCode Handle and Allocate space for creation of UpdateData Buffer
-    //
-    StartOpCodeHandle = HiiAllocateOpCodeHandle();
-    ASSERT(StartOpCodeHandle != NULL);
+  //
+  // Init OpCode Handle and Allocate space for creation of UpdateData Buffer
+  //
+  StartOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (StartOpCodeHandle != NULL);
 
-    EndOpCodeHandle = HiiAllocateOpCodeHandle();
-    ASSERT(EndOpCodeHandle != NULL);
+  EndOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (EndOpCodeHandle != NULL);
 
-    //
-    // Create Hii Extend Label OpCode as the start opcode
-    //
-    StartLabel = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode(StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof(EFI_IFR_GUID_LABEL));
-    StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  //
+  // Create Hii Extend Label OpCode as the start opcode
+  //
+  StartLabel               = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
 
-    //
-    // Create Hii Extend Label OpCode as the end opcode
-    //
-    EndLabel = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode(EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof(EFI_IFR_GUID_LABEL));
-    EndLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  //
+  // Create Hii Extend Label OpCode as the end opcode
+  //
+  EndLabel               = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  EndLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
 
-    StartLabel->Number     = LABEL_UPDATE_SECURITY_START;
-    EndLabel->Number       = LABEL_UPDATE_SECURITY_END;
+  StartLabel->Number = LABEL_UPDATE_SECURITY_START;
+  EndLabel->Number   = LABEL_UPDATE_SECURITY_END;
 
-    HiiCreateTextOpCode (StartOpCodeHandle,STRING_TOKEN(STR_NULL_STRING),0,0);
-    if (NullOpCount > 1)
-    {
-        HiiCreateTextOpCode (StartOpCodeHandle,STRING_TOKEN(STR_NULL_STRING),0,0);
-    }
+  HiiCreateTextOpCode (StartOpCodeHandle, STRING_TOKEN (STR_NULL_STRING), 0, 0);
+  if (NullOpCount > 1) {
+    HiiCreateTextOpCode (StartOpCodeHandle, STRING_TOKEN (STR_NULL_STRING), 0, 0);
+  }
 
-    HiiUpdateForm(
-        mFrontPagePrivate.HiiHandle,
-        &gMuFrontPageConfigFormSetGuid,
-        FRONT_PAGE_FORM_ID_SECURITY,
-        StartOpCodeHandle,
-        EndOpCodeHandle
-        );
+  HiiUpdateForm (
+    mFrontPagePrivate.HiiHandle,
+    &gMuFrontPageConfigFormSetGuid,
+    FRONT_PAGE_FORM_ID_SECURITY,
+    StartOpCodeHandle,
+    EndOpCodeHandle
+    );
 
-    HiiFreeOpCodeHandle(StartOpCodeHandle);
-    HiiFreeOpCodeHandle(EndOpCodeHandle);
+  HiiFreeOpCodeHandle (StartOpCodeHandle);
+  HiiFreeOpCodeHandle (EndOpCodeHandle);
 }
 
 /**
@@ -148,55 +151,58 @@ VOID RefreshSecurityForm ( VOID ) {
 STATIC
 EFI_STATUS
 HandleRebootToFrontPage (
-  IN  EFI_IFR_TYPE_VALUE                     *Value,
-  OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
+  IN  EFI_IFR_TYPE_VALUE          *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST  *ActionRequest
   )
 {
-    EFI_STATUS  Status;
-    UINT32      Attributes = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE;
-    UINTN       DataSize;
-    UINT64      OsIndications;
+  EFI_STATUS  Status;
+  UINT32      Attributes = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE;
+  UINTN       DataSize;
+  UINT64      OsIndications;
 
-    DEBUG(( DEBUG_INFO, "[%a:%a]\n", gEfiCallerBaseName, __FUNCTION__ ));
+  DEBUG ((DEBUG_INFO, "[%a:%a]\n", gEfiCallerBaseName, __FUNCTION__));
 
-    //
-    // Step 1: Read the current OS indications variable.
-    DataSize = sizeof( OsIndications );
-    Status = gRT->GetVariable( EFI_OS_INDICATIONS_VARIABLE_NAME,
-                               &gEfiGlobalVariableGuid,
-                               &Attributes,
-                               &DataSize,
-                               (VOID*)&OsIndications );
+  //
+  // Step 1: Read the current OS indications variable.
+  DataSize = sizeof (OsIndications);
+  Status   = gRT->GetVariable (
+                    EFI_OS_INDICATIONS_VARIABLE_NAME,
+                    &gEfiGlobalVariableGuid,
+                    &Attributes,
+                    &DataSize,
+                    (VOID *)&OsIndications
+                    );
 
-    //
-    // Step 2: Update OS indications variable to enable the boot to FrontPage.
-    if (!EFI_ERROR( Status ) || Status == EFI_NOT_FOUND)
-    {
-        if (Status == EFI_NOT_FOUND) {
-            OsIndications = EFI_OS_INDICATIONS_BOOT_TO_FW_UI;
-            Attributes = (EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE);
-        } else {
-            OsIndications |= EFI_OS_INDICATIONS_BOOT_TO_FW_UI;
-        }
-        Status = gRT->SetVariable( EFI_OS_INDICATIONS_VARIABLE_NAME,
-                                   &gEfiGlobalVariableGuid,
-                                   Attributes,
-                                   DataSize,
-                                   (VOID*)&OsIndications );
-    }
-
-    //
-    // Step 3: Reboot!
-    if (!EFI_ERROR( Status ))
-    {
-        DEBUG(( DEBUG_INFO, "[%a:%a] Requesting reboot...\n", gEfiCallerBaseName, __FUNCTION__ ));
-        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-        mResetRequired = TRUE;
+  //
+  // Step 2: Update OS indications variable to enable the boot to FrontPage.
+  if (!EFI_ERROR (Status) || (Status == EFI_NOT_FOUND)) {
+    if (Status == EFI_NOT_FOUND) {
+      OsIndications = EFI_OS_INDICATIONS_BOOT_TO_FW_UI;
+      Attributes    = (EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE);
     } else {
-        DEBUG ((DEBUG_ERROR, "[%a:%a] Status = %r\n", gEfiCallerBaseName, __FUNCTION__, Status));
+      OsIndications |= EFI_OS_INDICATIONS_BOOT_TO_FW_UI;
     }
 
-    return Status;
+    Status = gRT->SetVariable (
+                    EFI_OS_INDICATIONS_VARIABLE_NAME,
+                    &gEfiGlobalVariableGuid,
+                    Attributes,
+                    DataSize,
+                    (VOID *)&OsIndications
+                    );
+  }
+
+  //
+  // Step 3: Reboot!
+  if (!EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "[%a:%a] Requesting reboot...\n", gEfiCallerBaseName, __FUNCTION__));
+    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+    mResetRequired = TRUE;
+  } else {
+    DEBUG ((DEBUG_ERROR, "[%a:%a] Status = %r\n", gEfiCallerBaseName, __FUNCTION__, Status));
+  }
+
+  return Status;
 }
 
 /**
@@ -219,226 +225,206 @@ HandleRebootToFrontPage (
 EFI_STATUS
 EFIAPI
 UiCallback (
-           IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-           IN  EFI_BROWSER_ACTION                     Action,
-           IN  EFI_QUESTION_ID                        QuestionId,
-               UINT8                                  Type,
-           IN  EFI_IFR_TYPE_VALUE                     *Value,
-           OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
-           )
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  EFI_BROWSER_ACTION                    Action,
+  IN  EFI_QUESTION_ID                       QuestionId,
+  UINT8                                     Type,
+  IN  EFI_IFR_TYPE_VALUE                    *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST            *ActionRequest
+  )
 {
-    EFI_STATUS    Status = EFI_SUCCESS;
+  EFI_STATUS  Status = EFI_SUCCESS;
 
-    DEBUG ((DEBUG_INFO, "FrontPage:UiCallback() - Question ID=0x%08x Type=0x%04x Action=0x%04x ShortValue=0x%02x\n", QuestionId, Type, Action, *(UINT8*)Value));
+  DEBUG ((DEBUG_INFO, "FrontPage:UiCallback() - Question ID=0x%08x Type=0x%04x Action=0x%04x ShortValue=0x%02x\n", QuestionId, Type, Action, *(UINT8 *)Value));
 
-    //
-    // Sanitize input values.
-    if (Value == NULL || ActionRequest == NULL)
-    {
-        DEBUG ((DEBUG_INFO, "FrontPage:UiCallback - Bailing from invalid input.\n"));
-        return EFI_INVALID_PARAMETER;
-    }
+  //
+  // Sanitize input values.
+  if ((Value == NULL) || (ActionRequest == NULL)) {
+    DEBUG ((DEBUG_INFO, "FrontPage:UiCallback - Bailing from invalid input.\n"));
+    return EFI_INVALID_PARAMETER;
+  }
 
-    //
-    // Filter responses.
-    // NOTE: For now, let's only consider elements that have CHANGED.
-    if (Action != EFI_BROWSER_ACTION_CHANGED)
-    {
-        DEBUG ((DEBUG_INFO, "FrontPage:UiCallback - Bailing from unimportant input.\n"));
-        return EFI_UNSUPPORTED;
-    }
+  //
+  // Filter responses.
+  // NOTE: For now, let's only consider elements that have CHANGED.
+  if (Action != EFI_BROWSER_ACTION_CHANGED) {
+    DEBUG ((DEBUG_INFO, "FrontPage:UiCallback - Bailing from unimportant input.\n"));
+    return EFI_UNSUPPORTED;
+  }
 
-    //
-    // Set a default action request.
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
+  //
+  // Set a default action request.
+  *ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
 
-    //
-    // Handle the specific callback.
-    // We'll record the callback event as mCallbackKey so that other processes can make decisions
-    // on how we exited the run loop (if that occurs).
-    mCallbackKey = QuestionId;
-    switch (mCallbackKey)
-    {
+  //
+  // Handle the specific callback.
+  // We'll record the callback event as mCallbackKey so that other processes can make decisions
+  // on how we exited the run loop (if that occurs).
+  mCallbackKey = QuestionId;
+  switch (mCallbackKey) {
     case FRONT_PAGE_ACTION_SEC_DISPLAY_SB_WHAT_IS:
-        Status = HandleInfoPopup( Value, ActionRequest );
-        break;
+      Status = HandleInfoPopup (Value, ActionRequest);
+      break;
 
     /////////////////////////////////////////////////////////////////////////////
     // SECURITY CALLBACKS
     //
     case FRONT_PAGE_ACTION_SEC_SET_SYSTEM_PASSWORD:
-        Status = SetSystemPassword ( Value, ActionRequest );
-        break;
+      Status = SetSystemPassword (Value, ActionRequest);
+      break;
 
     case FRONT_PAGE_ACTION_SEC_CHANGE_SB_CONFIG:
-        Status = HandleSecureBootChange( Value, ActionRequest );
-        break;
+      Status = HandleSecureBootChange (Value, ActionRequest);
+      break;
     case FRONT_PAGE_ACTION_EXIT_FRONTPAGE:
-        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-        break;
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+      break;
 
     case FRONT_PAGE_ACTION_REBOOT_TO_FRONTPAGE:
-        Status = HandleRebootToFrontPage( Value, ActionRequest );
-        break;
+      Status = HandleRebootToFrontPage (Value, ActionRequest);
+      break;
 
     default:
-        DEBUG ((DEBUG_INFO, "FrontPage:UiCallback - Unknown event passed.\n"));
-        Status = EFI_UNSUPPORTED;
-        mCallbackKey = 0;
-        break;
-    }
+      DEBUG ((DEBUG_INFO, "FrontPage:UiCallback - Unknown event passed.\n"));
+      Status       = EFI_UNSUPPORTED;
+      mCallbackKey = 0;
+      break;
+  }
 
-    return Status;
+  return Status;
 }
 
 STATIC
 EFI_STATUS
-SetSystemPassword (IN  EFI_IFR_TYPE_VALUE           *Value,
-                   OUT EFI_BROWSER_ACTION_REQUEST   *ActionRequest)
+SetSystemPassword (
+  IN  EFI_IFR_TYPE_VALUE          *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST  *ActionRequest
+  )
 {
-    EFI_STATUS      Status          = EFI_SUCCESS;
-    SWM_MB_RESULT   Result          = 0;
-    PW_TEST_BITMAP  PwdValidBitmap  = 0;
-    CHAR16          *pErrorMessage  = (CHAR16*)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_NULL_STRING), NULL);
-    CHAR16          *PasswordBuffer = NULL;    // This will be allocated by PasswordDialog(). Needs to be tracked, wiped, and freed.
-    PASSWORD_HASH   PasswordHash;
-    UINTN           PasswordHashSize;
-    DFCI_SETTING_FLAGS Flags = 0;
+  EFI_STATUS          Status          = EFI_SUCCESS;
+  SWM_MB_RESULT       Result          = 0;
+  PW_TEST_BITMAP      PwdValidBitmap  = 0;
+  CHAR16              *pErrorMessage  = (CHAR16 *)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_NULL_STRING), NULL);
+  CHAR16              *PasswordBuffer = NULL;  // This will be allocated by PasswordDialog(). Needs to be tracked, wiped, and freed.
+  PASSWORD_HASH       PasswordHash;
+  UINTN               PasswordHashSize;
+  DFCI_SETTING_FLAGS  Flags = 0;
 
-    DEBUG((DEBUG_INFO, "INFO: [FP] SetSystemPassword: ENTER\r\n"));
+  DEBUG ((DEBUG_INFO, "INFO: [FP] SetSystemPassword: ENTER\r\n"));
 
+  // Present a dialog to the user for setting the password.
+  //
+  do {
+    Status = SwmDialogsPasswordPrompt (
+               HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ENTER_PWD_TITLEBARTEXT), NULL),                               // Dialog titlebar text.
+               HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_CAPTION), NULL),                                              // Dialog caption text.
+               HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_SET_BODYTEXT), NULL),                                         // Dialog body text.
+               pErrorMessage,
+               SWM_PWD_TYPE_SET_PASSWORD,
+               &Result,
+               &PasswordBuffer
+               );
 
-    // Present a dialog to the user for setting the password.
+    // If the user selects cancel or there's a dialog error, abort.
     //
-    do
-    {
-
-        Status = SwmDialogsPasswordPrompt (HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ENTER_PWD_TITLEBARTEXT), NULL),   // Dialog titlebar text.
-                                           HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_CAPTION), NULL),                  // Dialog caption text.
-                                           HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_SET_BODYTEXT), NULL),             // Dialog body text.
-                                           pErrorMessage,
-                                           SWM_PWD_TYPE_SET_PASSWORD,
-                                           &Result,
-                                           &PasswordBuffer);
-
-
-        // If the user selects cancel or there's a dialog error, abort.
-        //
-        if (EFI_ERROR(Status) || SWM_MB_IDCANCEL == Result)
-        {
-            break;
-        }
-
-        // If the user selects OK, make sure both the password and the confirmation match then set it.
-        //
-        if (SWM_MB_IDOK == Result)
-        {
-            // If the new password string is invalid *and* it's not a null string (clear password), free the password buffer returned by the password dialog and try again.
-            //
-            if (FALSE == PasswordPolicyIsPwStringValid(PasswordBuffer, &PwdValidBitmap) && (PwdValidBitmap & PW_TEST_STRING_NULL) != PW_TEST_STRING_NULL)
-            {
-                // Select an appropriate error message.
-                //
-                if (PwdValidBitmap & PW_TEST_STRING_TOO_SHORT)
-                {
-                    // Password is too short.
-                    //
-                    pErrorMessage  = (CHAR16*)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ERRORMSG_TOOSHORT), NULL);
-                }
-                else if (PwdValidBitmap & PW_TEST_STRING_TOO_LONG)
-                {
-                    // Password is too long.
-                    //
-                    pErrorMessage  = (CHAR16*)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ERRORMSG_TOOLONG), NULL);
-                }
-                else if (PwdValidBitmap & PW_TEST_STRING_INVALID_CHAR)
-                {
-                    // Password contains invalid characters.
-                    //
-                    pErrorMessage  = (CHAR16*)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ERRORMSG_INVALID_CHAR), NULL);
-                }
-                else
-                {
-                    // Some other (non-specific) failure.
-                    //
-                    pErrorMessage  = (CHAR16*)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ERRORMSG_SET_GENFAILURE), NULL);
-                }
-
-                // If password buffer was used, make sure it's freed.
-                //
-                if (NULL != PasswordBuffer)
-                {
-                    ZeroMem ((UINT8*)PasswordBuffer, StrLen (PasswordBuffer) * sizeof(CHAR16) );
-                    FreePool (PasswordBuffer);
-                    PasswordBuffer = NULL;
-                }
-
-                continue;
-            }
-
-            //
-            // Otherwise, try setting the password.  If it fails, free the password buffer and try again.
-            //
-            Status = PasswordPolicyGeneratePasswordHash (NULL, PasswordBuffer, &PasswordHash, &PasswordHashSize);
-
-            if (!EFI_ERROR(Status))
-            {
-                Status = mSettingAccess->Set(mSettingAccess,
-                                             DFCI_SETTING_ID__PASSWORD,
-                                             &mAuthToken,
-                                             DFCI_SETTING_TYPE_PASSWORD,
-                                             PasswordHashSize,
-                                             (VOID *) PasswordHash,
-                                             &Flags);
-                FreePool (PasswordHash);
-            }
-
-            if (EFI_ERROR(Status))
-            {
-
-                // Select an appropriate error message.
-                //
-                if (EFI_SECURITY_VIOLATION == Status)
-                {
-                    // Password authentication error.
-                    //
-                    pErrorMessage  = (CHAR16*)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ERRORMSG_AUTHERROR), NULL);
-                }
-                else
-                {
-                    // Some other (non-specific) failure.
-                    //
-                    pErrorMessage  = (CHAR16*)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ERRORMSG_SET_GENFAILURE), NULL);
-                }
-
-                // If password buffer was used, make sure it's freed.
-                //
-                if (NULL != PasswordBuffer)
-                {
-                    ZeroMem ((UINT8*)PasswordBuffer, StrLen (PasswordBuffer) * sizeof(CHAR16) );
-                    FreePool (PasswordBuffer);
-                    PasswordBuffer = NULL;
-                }
-
-                continue;
-            }
-
-            break;
-        }
-    } while (TRUE);
-
-    // If password buffer was used, make sure it's freed.
-    //
-    if (NULL != PasswordBuffer)
-    {
-        ZeroMem ((UINT8*)PasswordBuffer, StrLen (PasswordBuffer) * sizeof(CHAR16) );
-        FreePool (PasswordBuffer);
-        PasswordBuffer = NULL;
+    if (EFI_ERROR (Status) || (SWM_MB_IDCANCEL == Result)) {
+      break;
     }
 
-    DEBUG((DEBUG_INFO, "INFO: [FP] SetSystemPassword: EXIT\r\n"));
+    // If the user selects OK, make sure both the password and the confirmation match then set it.
+    //
+    if (SWM_MB_IDOK == Result) {
+      // If the new password string is invalid *and* it's not a null string (clear password), free the password buffer returned by the password dialog and try again.
+      //
+      if ((FALSE == PasswordPolicyIsPwStringValid (PasswordBuffer, &PwdValidBitmap)) && ((PwdValidBitmap & PW_TEST_STRING_NULL) != PW_TEST_STRING_NULL)) {
+        // Select an appropriate error message.
+        //
+        if (PwdValidBitmap & PW_TEST_STRING_TOO_SHORT) {
+          // Password is too short.
+          //
+          pErrorMessage = (CHAR16 *)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ERRORMSG_TOOSHORT), NULL);
+        } else if (PwdValidBitmap & PW_TEST_STRING_TOO_LONG) {
+          // Password is too long.
+          //
+          pErrorMessage = (CHAR16 *)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ERRORMSG_TOOLONG), NULL);
+        } else if (PwdValidBitmap & PW_TEST_STRING_INVALID_CHAR) {
+          // Password contains invalid characters.
+          //
+          pErrorMessage = (CHAR16 *)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ERRORMSG_INVALID_CHAR), NULL);
+        } else {
+          // Some other (non-specific) failure.
+          //
+          pErrorMessage = (CHAR16 *)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ERRORMSG_SET_GENFAILURE), NULL);
+        }
 
-    return Status;
+        // If password buffer was used, make sure it's freed.
+        //
+        if (NULL != PasswordBuffer) {
+          ZeroMem ((UINT8 *)PasswordBuffer, StrLen (PasswordBuffer) * sizeof (CHAR16));
+          FreePool (PasswordBuffer);
+          PasswordBuffer = NULL;
+        }
+
+        continue;
+      }
+
+      //
+      // Otherwise, try setting the password.  If it fails, free the password buffer and try again.
+      //
+      Status = PasswordPolicyGeneratePasswordHash (NULL, PasswordBuffer, &PasswordHash, &PasswordHashSize);
+
+      if (!EFI_ERROR (Status)) {
+        Status = mSettingAccess->Set (
+                                   mSettingAccess,
+                                   DFCI_SETTING_ID__PASSWORD,
+                                   &mAuthToken,
+                                   DFCI_SETTING_TYPE_PASSWORD,
+                                   PasswordHashSize,
+                                   (VOID *)PasswordHash,
+                                   &Flags
+                                   );
+        FreePool (PasswordHash);
+      }
+
+      if (EFI_ERROR (Status)) {
+        // Select an appropriate error message.
+        //
+        if (EFI_SECURITY_VIOLATION == Status) {
+          // Password authentication error.
+          //
+          pErrorMessage = (CHAR16 *)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ERRORMSG_AUTHERROR), NULL);
+        } else {
+          // Some other (non-specific) failure.
+          //
+          pErrorMessage = (CHAR16 *)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ERRORMSG_SET_GENFAILURE), NULL);
+        }
+
+        // If password buffer was used, make sure it's freed.
+        //
+        if (NULL != PasswordBuffer) {
+          ZeroMem ((UINT8 *)PasswordBuffer, StrLen (PasswordBuffer) * sizeof (CHAR16));
+          FreePool (PasswordBuffer);
+          PasswordBuffer = NULL;
+        }
+
+        continue;
+      }
+
+      break;
+    }
+  } while (TRUE);
+
+  // If password buffer was used, make sure it's freed.
+  //
+  if (NULL != PasswordBuffer) {
+    ZeroMem ((UINT8 *)PasswordBuffer, StrLen (PasswordBuffer) * sizeof (CHAR16));
+    FreePool (PasswordBuffer);
+    PasswordBuffer = NULL;
+  }
+
+  DEBUG ((DEBUG_INFO, "INFO: [FP] SetSystemPassword: EXIT\r\n"));
+
+  return Status;
 }
 
 /**
@@ -454,58 +440,57 @@ SetSystemPassword (IN  EFI_IFR_TYPE_VALUE           *Value,
 **/
 STATIC
 EFI_STATUS
-HandleInfoPopup(
-              IN  EFI_IFR_TYPE_VALUE                     *Value,
-              OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
-              )
+HandleInfoPopup (
+  IN  EFI_IFR_TYPE_VALUE          *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST  *ActionRequest
+  )
 {
-    EFI_STATUS          Status = EFI_SUCCESS;
-    EFI_STRING_ID       TitleId = 0, MessageId = 0, CaptionId = 0;
-    CHAR16              *TitleBarText = NULL, *InfoMessage = NULL, *CaptionText = NULL;
-    SWM_MB_RESULT       SwmResult;
+  EFI_STATUS     Status = EFI_SUCCESS;
+  EFI_STRING_ID  TitleId = 0, MessageId = 0, CaptionId = 0;
+  CHAR16         *TitleBarText = NULL, *InfoMessage = NULL, *CaptionText = NULL;
+  SWM_MB_RESULT  SwmResult;
 
-    //
-    // First, we need to determine which info message to display.
-    switch (mCallbackKey)
-    {
-        case FRONT_PAGE_ACTION_SEC_DISPLAY_SB_WHAT_IS:
-            TitleId = STRING_TOKEN (STR_SEC_SB_WHAT_IS_TITLE);
-            CaptionId = STRING_TOKEN (STR_SEC_SB_WHAT_IS_LINK);
-            MessageId = STRING_TOKEN (STR_SEC_SB_WHAT_IS_TEXT);
-            break;
+  //
+  // First, we need to determine which info message to display.
+  switch (mCallbackKey) {
+    case FRONT_PAGE_ACTION_SEC_DISPLAY_SB_WHAT_IS:
+      TitleId   = STRING_TOKEN (STR_SEC_SB_WHAT_IS_TITLE);
+      CaptionId = STRING_TOKEN (STR_SEC_SB_WHAT_IS_LINK);
+      MessageId = STRING_TOKEN (STR_SEC_SB_WHAT_IS_TEXT);
+      break;
 
-        default:
-            Status = EFI_NOT_FOUND;
-            break;
+    default:
+      Status = EFI_NOT_FOUND;
+      break;
+  }
+
+  //
+  // Next, attempt to load the string.
+  if (!EFI_ERROR (Status)) {
+    TitleBarText = (CHAR16 *)HiiGetString (mFrontPagePrivate.HiiHandle, TitleId, NULL);
+    CaptionText  = (CHAR16 *)HiiGetString (mFrontPagePrivate.HiiHandle, CaptionId, NULL);
+    InfoMessage  = (CHAR16 *)HiiGetString (mFrontPagePrivate.HiiHandle, MessageId, NULL);
+    if ((NULL == InfoMessage) || (NULL == TitleBarText)) {
+      Status = EFI_NOT_FOUND;
     }
+  }
 
-    //
-    // Next, attempt to load the string.
-    if (!EFI_ERROR( Status ))
-    {
-        TitleBarText = (CHAR16*)HiiGetString (mFrontPagePrivate.HiiHandle, TitleId, NULL);
-        CaptionText = (CHAR16*)HiiGetString (mFrontPagePrivate.HiiHandle, CaptionId, NULL);
-        InfoMessage  = (CHAR16*)HiiGetString (mFrontPagePrivate.HiiHandle, MessageId, NULL);
-        if (NULL == InfoMessage || NULL == TitleBarText)
-        {
-            Status = EFI_NOT_FOUND;
-        }
-    }
+  //
+  // Finally, display the message to the user.
+  if (!EFI_ERROR (Status)) {
+    Status = SwmDialogsMessageBox (
+               TitleBarText,                                // Dialog title bar text.
+               InfoMessage,                                 // Dialog body text.
+               CaptionText,                                 // Dialog caption text.
+               SWM_MB_OK,                                   // Show only Ok button.
+               0,                                           // No timeout
+               &SwmResult
+               );                                           // Return result.
+  }
 
-    //
-    // Finally, display the message to the user.
-    if (!EFI_ERROR( Status ))
-    {
-        Status = SwmDialogsMessageBox (TitleBarText,        // Dialog title bar text.
-                                       InfoMessage,         // Dialog body text.
-                                       CaptionText,         // Dialog caption text.
-                                       SWM_MB_OK,           // Show only Ok button.
-                                       0,                   // No timeout
-                                       &SwmResult);         // Return result.
-    }
-
-    return Status;
+  return Status;
 }
+
 /**
   Handle a request to change the SecureBoot configuration.
 
@@ -516,92 +501,93 @@ HandleInfoPopup(
 STATIC
 EFI_STATUS
 HandleSecureBootChange (
-  IN  EFI_IFR_TYPE_VALUE                     *Value,
-  OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
+  IN  EFI_IFR_TYPE_VALUE          *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST  *ActionRequest
   )
 {
-    EFI_STATUS      Status;
-    CHAR16          *DialogTitleBarText, *DialogCaptionText, *DialogBodyText;
-    CHAR16          *Options[MS_SB_CONFIG_COUNT];
-    SWM_MB_RESULT   SwmResult;
-    UINTN           SelectedIndex;
-    UINT8           IndexSetValue;
-    DFCI_SETTING_FLAGS Flags = 0;
-    UINTN           OptionsCount = MS_SB_CONFIG_COUNT;
+  EFI_STATUS          Status;
+  CHAR16              *DialogTitleBarText, *DialogCaptionText, *DialogBodyText;
+  CHAR16              *Options[MS_SB_CONFIG_COUNT];
+  SWM_MB_RESULT       SwmResult;
+  UINTN               SelectedIndex;
+  UINT8               IndexSetValue;
+  DFCI_SETTING_FLAGS  Flags        = 0;
+  UINTN               OptionsCount = MS_SB_CONFIG_COUNT;
 
+  //
+  // Load UI dialog strings.
+  DialogTitleBarText = (CHAR16 *)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SB_CONFIG_TITLEBARTEXT), NULL);
+  DialogCaptionText  = (CHAR16 *)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SB_CONFIG_CAPTION), NULL);
+  DialogBodyText     = (CHAR16 *)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SB_CONFIG_BODY), NULL);
+
+  //
+  // Load UI option strings.
+  Options[MS_SB_CONFIG_MS_ONLY] = (CHAR16 *)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SEC_SB_MS_ONLY_CONFIG_TEXT), NULL);
+  Options[MS_SB_CONFIG_MS_3P]   = (CHAR16 *)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SEC_SB_MS_PLUS_CONFIG_TEXT), NULL);
+  Options[MS_SB_CONFIG_NONE]    = (CHAR16 *)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_GENERIC_TEXT_NONE), NULL);
+
+  //
+  // Display the dialog to the user.
+  Status = SwmDialogsSelectPrompt (
+             DialogTitleBarText,
+             DialogCaptionText,
+             DialogBodyText,
+             Options,
+             OptionsCount,
+             &SwmResult,
+             &SelectedIndex
+             );
+  DEBUG ((DEBUG_INFO, "INFO [SFP] %a - SingleSelectDialog returning: Status = %r, SwmResult = 0x%X, SelectedIndex = %d\n", __FUNCTION__, Status, (UINTN)SwmResult, SelectedIndex));
+
+  //
+  // If the form was submitted, process the update.
+  if (!EFI_ERROR (Status) && (SWM_MB_IDOK == SwmResult) && !EFI_ERROR (SafeUintnToUint8 (SelectedIndex, &IndexSetValue))) {
+    mVariablePolicyProtocol->DisableVariablePolicy ();
+
+    Status = mSettingAccess->Set (
+                               mSettingAccess,
+                               DFCI_SETTING_ID__SECURE_BOOT_KEYS_ENUM,
+                               &mAuthToken,
+                               DFCI_SETTING_TYPE_SECUREBOOTKEYENUM,
+                               sizeof (IndexSetValue),
+                               &IndexSetValue,
+                               &Flags
+                               );
     //
-    // Load UI dialog strings.
-    DialogTitleBarText  = (CHAR16*)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SB_CONFIG_TITLEBARTEXT), NULL);
-    DialogCaptionText   = (CHAR16*)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SB_CONFIG_CAPTION), NULL);
-    DialogBodyText      = (CHAR16*)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SB_CONFIG_BODY), NULL);
+    // If successful, update the display.
+    if (!EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_INFO, "%a - Successfully changed keys. Updating form browser and requesting restart.\n", __FUNCTION__));
 
-    //
-    // Load UI option strings.
-    Options[MS_SB_CONFIG_MS_ONLY] = (CHAR16*)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SEC_SB_MS_ONLY_CONFIG_TEXT), NULL);
-    Options[MS_SB_CONFIG_MS_3P]   = (CHAR16*)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SEC_SB_MS_PLUS_CONFIG_TEXT), NULL);
-    Options[MS_SB_CONFIG_NONE]    = (CHAR16*)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_GENERIC_TEXT_NONE), NULL);
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
 
-    //
-    // Display the dialog to the user.
-    Status = SwmDialogsSelectPrompt (DialogTitleBarText,
-                                     DialogCaptionText,
-                                     DialogBodyText,
-                                     Options,
-                                     OptionsCount,
-                                     &SwmResult,
-                                     &SelectedIndex);
-    DEBUG(( DEBUG_INFO, "INFO [SFP] %a - SingleSelectDialog returning: Status = %r, SwmResult = 0x%X, SelectedIndex = %d\n", __FUNCTION__, Status, (UINTN)SwmResult, SelectedIndex ));
+      //
+      // Indicate that this change should also trigger a reboot.
+      mResetRequired = TRUE;
 
-    //
-    // If the form was submitted, process the update.
-    if (!EFI_ERROR (Status) && (SWM_MB_IDOK == SwmResult) && !EFI_ERROR ( SafeUintnToUint8( SelectedIndex, &IndexSetValue ) ))
-    {
-        mVariablePolicyProtocol->DisableVariablePolicy ();
-
-        Status = mSettingAccess->Set(mSettingAccess,
-            DFCI_SETTING_ID__SECURE_BOOT_KEYS_ENUM,
-            &mAuthToken,
-            DFCI_SETTING_TYPE_SECUREBOOTKEYENUM,
-            sizeof(IndexSetValue),
-            &IndexSetValue,
-            &Flags);
-        //
-        // If successful, update the display.
-        if (!EFI_ERROR( Status ))
-        {
-            DEBUG(( DEBUG_INFO, "%a - Successfully changed keys. Updating form browser and requesting restart.\n", __FUNCTION__ ));
-            
-            *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
-
-            //
-            // Indicate that this change should also trigger a reboot.
-            mResetRequired = TRUE;
-
-            //
-            // Update the display strings.
-            UpdateSecureBootStatusStrings( TRUE );
-        }
-        else
-        {
-            DEBUG(( DEBUG_ERROR, "ERROR [SFP] %a - Failed to update SecureBoot config! %r\n", __FUNCTION__, Status ));
-            DialogTitleBarText = (CHAR16*)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SB_UPDATE_FAILURE_TITLE), NULL);
-            DialogBodyText = (CHAR16*)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SB_UPDATE_FAILURE), NULL);
-            SwmDialogsMessageBox (DialogTitleBarText,  // Dialog title bar text.
-                                  DialogBodyText,      // Dialog body text.
-                                  L"",                 // Dialog caption text.
-                                  SWM_MB_OK,           // Show Ok button.
-                                  0,                   // No timeout
-                                  &SwmResult);         // Return result.
-        }
+      //
+      // Update the display strings.
+      UpdateSecureBootStatusStrings (TRUE);
+    } else {
+      DEBUG ((DEBUG_ERROR, "ERROR [SFP] %a - Failed to update SecureBoot config! %r\n", __FUNCTION__, Status));
+      DialogTitleBarText = (CHAR16 *)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SB_UPDATE_FAILURE_TITLE), NULL);
+      DialogBodyText     = (CHAR16 *)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SB_UPDATE_FAILURE), NULL);
+      SwmDialogsMessageBox (
+        DialogTitleBarText,                            // Dialog title bar text.
+        DialogBodyText,                                // Dialog body text.
+        L"",                                           // Dialog caption text.
+        SWM_MB_OK,                                     // Show Ok button.
+        0,                                             // No timeout
+        &SwmResult
+        );                                             // Return result.
     }
+  }
 
-    // IMPORTANT NOTE: Until further review, all attempts to set the SecureBoot keys should result in a reboot.
-    //                  This is to account for possible edge cases in the suspension of VariablePolicy enforcement.
-    mResetRequired = TRUE;
+  // IMPORTANT NOTE: Until further review, all attempts to set the SecureBoot keys should result in a reboot.
+  //                  This is to account for possible edge cases in the suspension of VariablePolicy enforcement.
+  mResetRequired = TRUE;
 
-    return Status;
+  return Status;
 }
-
 
 /**
   Determines the current SecureBoot state and updates the status strings accordingly.
@@ -611,60 +597,57 @@ HandleSecureBootChange (
 **/
 VOID
 UpdateSecureBootStatusStrings (
-  BOOLEAN        RefreshScreen
+  BOOLEAN  RefreshScreen
   )
 {
-  BOOLEAN       IsEnabled;
-  UINTN         CurrentConfig;
-  CHAR16        StateString[256];           // This is a somewhat arbitrary limit. Just needs to be large enough to encompass the largest possible string.
-  CHAR16        *PreambleSubstring = NULL;
-  CHAR16        *StateSubstring = NULL;
-  CHAR16        *ConfigSubstring = NULL;
-  CHAR16        *SuffixSubstring = NULL;
+  BOOLEAN  IsEnabled;
+  UINTN    CurrentConfig;
+  CHAR16   StateString[256];                // This is a somewhat arbitrary limit. Just needs to be large enough to encompass the largest possible string.
+  CHAR16   *PreambleSubstring = NULL;
+  CHAR16   *StateSubstring    = NULL;
+  CHAR16   *ConfigSubstring   = NULL;
+  CHAR16   *SuffixSubstring   = NULL;
 
   //
   // No matter what the mode is, we need the preamble.
-  PreambleSubstring = (CHAR16*)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SEC_SB_STATE_PREAMBLE), NULL);
+  PreambleSubstring = (CHAR16 *)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SEC_SB_STATE_PREAMBLE), NULL);
 
   //
   // Determine whether SecureBoot is enabled.
-  IsEnabled = IsSecureBootEnable();
+  IsEnabled = IsSecureBootEnable ();
 
   //
   // If enabled, determine the current config.
-  if (IsEnabled)
-  {
+  if (IsEnabled) {
     // Use the "Enabled" substring.
-    StateSubstring = (CHAR16*)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SEC_SB_STATE_ENABLED), NULL);
-    SuffixSubstring = (CHAR16*)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SEC_SB_KEY_CONFIG_TEXT), NULL);
+    StateSubstring  = (CHAR16 *)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SEC_SB_STATE_ENABLED), NULL);
+    SuffixSubstring = (CHAR16 *)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SEC_SB_KEY_CONFIG_TEXT), NULL);
 
     // Determine the ConfigSubstring.
-    CurrentConfig = GetCurrentSecureBootConfig();
-    if (MS_SB_CONFIG_MS_ONLY == CurrentConfig)
-    {
-        ConfigSubstring = (CHAR16*)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SEC_SB_MS_ONLY_CONFIG_TEXT), NULL);
-    }
-    else if (MS_SB_CONFIG_MS_3P == CurrentConfig)
-    {
-        ConfigSubstring = (CHAR16*)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SEC_SB_MS_PLUS_CONFIG_TEXT), NULL);
-    }
-    else
-    {
-        ConfigSubstring = (CHAR16*)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SEC_SB_CUSTOM_CONFIG_TEXT), NULL);
+    CurrentConfig = GetCurrentSecureBootConfig ();
+    if (MS_SB_CONFIG_MS_ONLY == CurrentConfig) {
+      ConfigSubstring = (CHAR16 *)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SEC_SB_MS_ONLY_CONFIG_TEXT), NULL);
+    } else if (MS_SB_CONFIG_MS_3P == CurrentConfig) {
+      ConfigSubstring = (CHAR16 *)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SEC_SB_MS_PLUS_CONFIG_TEXT), NULL);
+    } else {
+      ConfigSubstring = (CHAR16 *)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SEC_SB_CUSTOM_CONFIG_TEXT), NULL);
     }
 
-    UnicodeSPrint( StateString, sizeof( StateString ), L"%s %s %s %s",
-                 PreambleSubstring,
-                 StateSubstring,
-                 ConfigSubstring,
-                 SuffixSubstring );
+    UnicodeSPrint (
+      StateString,
+      sizeof (StateString),
+      L"%s %s %s %s",
+      PreambleSubstring,
+      StateSubstring,
+      ConfigSubstring,
+      SuffixSubstring
+      );
   }
   //
   // If disabled, just present the state string.
-  else
-  {
-    StateSubstring = (CHAR16*)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SEC_SB_STATE_DISABLED), NULL);
-    UnicodeSPrint( StateString, sizeof( StateString ), L"%s %s", PreambleSubstring, StateSubstring );
+  else {
+    StateSubstring = (CHAR16 *)HiiGetString (mFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_SEC_SB_STATE_DISABLED), NULL);
+    UnicodeSPrint (StateString, sizeof (StateString), L"%s %s", PreambleSubstring, StateSubstring);
   }
 
   //
@@ -673,9 +656,8 @@ UpdateSecureBootStatusStrings (
 
   //
   // And notify the form that it needs to refresh.
-  if (RefreshScreen)
-  {
-      RefreshSecurityForm();
+  if (RefreshScreen) {
+    RefreshSecurityForm ();
   }
 } // UpdateSecureBootStatusStrings()
 
@@ -697,104 +679,100 @@ ChallengeUserPassword (
   UINT8  MaxAttempts
   )
 {
-    EFI_STATUS      Status;
-    SWM_MB_RESULT   SwmResult           = 0;
-    CHAR16          *pErrorMessage      = (CHAR16*)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_NULL_STRING), NULL);
-    CHAR16          *PasswordBuffer     = NULL;    // This will be allocated by PasswordPrompt(). Needs to be tracked, wiped, and freed.
-    BOOLEAN         Result = FALSE, AttemptsExpired = FALSE;
+  EFI_STATUS     Status;
+  SWM_MB_RESULT  SwmResult = 0;
+  CHAR16         *pErrorMessage = (CHAR16 *)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_NULL_STRING), NULL);
+  CHAR16         *PasswordBuffer = NULL;           // This will be allocated by PasswordPrompt(). Needs to be tracked, wiped, and freed.
+  BOOLEAN        Result = FALSE, AttemptsExpired = FALSE;
 
-    // Primary UI loop.
-    // Display prompt. Process results.
-    // This will loop forever if MaxAttempts is 0 and user continues to enter invalid passwords.
+  // Primary UI loop.
+  // Display prompt. Process results.
+  // This will loop forever if MaxAttempts is 0 and user continues to enter invalid passwords.
+  //
+  do {
+    // Present the password dialog to prompt the user.
     //
-    do
-    {
-        // Present the password dialog to prompt the user.
-        //
-        Status = SwmDialogsPasswordPrompt (HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ENTER_PWD_TITLEBARTEXT), NULL),   // Dialog titlebar text.
-                                           HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_CAPTION), NULL),                  // Dialog caption text.
-                                           HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ENTER_BODYTEXT), NULL),           // Dialog body text.
-                                           pErrorMessage,
-                                           SWM_PWD_TYPE_PROMPT_PASSWORD,
-                                           &SwmResult,
-                                           &PasswordBuffer);
+    Status = SwmDialogsPasswordPrompt (
+               HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ENTER_PWD_TITLEBARTEXT), NULL),                               // Dialog titlebar text.
+               HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_CAPTION), NULL),                                              // Dialog caption text.
+               HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ENTER_BODYTEXT), NULL),                                       // Dialog body text.
+               pErrorMessage,
+               SWM_PWD_TYPE_PROMPT_PASSWORD,
+               &SwmResult,
+               &PasswordBuffer
+               );
 
-        // Check for errors and whether the user selected cancel.
-        //
-        if (EFI_ERROR(Status) || SWM_MB_IDCANCEL == SwmResult)
-        {
-            break;  // Return FALSE.
-        }
-
-        // If the user selected "OK", check whether the password provided is valid.
-        //
-        if (SWM_MB_IDOK == SwmResult)
-        {
-            if (GetAuthToken (PasswordBuffer) == EFI_SUCCESS)
-            {
-                // Password authentication successful.  Display the full menu.
-                //
-                Result = TRUE;
-                break;
-            }
-            else
-            {
-                // Password authentication error.  Display error text and ask the user for the password again.
-                //
-                pErrorMessage  = (CHAR16*)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ERRORMSG_AUTHERROR), NULL);
-
-                // If password buffer was used, make sure it's freed.
-                //
-                if (PasswordBuffer)
-                {
-                    ZeroMem ((UINT8*)PasswordBuffer, StrLen (PasswordBuffer) * sizeof(CHAR16) );
-                    FreePool (PasswordBuffer);
-                    PasswordBuffer = NULL;
-                }
-
-                // If MaxAttempts were specified, determine whether we've used our last attempt.
-                //
-                if (0 != MaxAttempts)
-                {
-                    // If we've just used our last attempt, make a note of it and get out of here.
-                    //
-                    if (0 == --MaxAttempts)
-                    {
-                        AttemptsExpired = TRUE;
-                        break;
-                    }
-                }
-            }
-        }
-    } while (TRUE);
-
-    // Handle the case where the attempts have expired.
-    // Inform the user and return FALSE.
+    // Check for errors and whether the user selected cancel.
     //
-    if (TRUE == AttemptsExpired) {
-        DEBUG ((DEBUG_INFO, "FrontPage::%a - Max password attempts elapsed!!\n", __FUNCTION__));
-        Status = SwmDialogsMessageBox ((CHAR16*)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ATTEMPTS_EXPIRED_TITLE), NULL),   // Dialog titlebar text.
-                                       (CHAR16*)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ATTEMPTS_EXPIRED_BODYTEXT), NULL),   // Dialog body text.
-                                       (CHAR16*)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ATTEMPTS_EXPIRED_CAPTION), NULL),    // Dialog caption text.
-                                       SWM_MB_OK,           // Show only Ok button.
-                                       0,                   // No timeout
-                                       &SwmResult);         // Return result.
-        Result = FALSE;
+    if (EFI_ERROR (Status) || (SWM_MB_IDCANCEL == SwmResult)) {
+      break;        // Return FALSE.
     }
 
-    if (Result == TRUE) {
-        // By now the token has been acquired, but let's confirm it's valid
-        if (mAuthToken == DFCI_AUTH_TOKEN_INVALID){
-            Result = FALSE;
-        }
-    }
-    // If password buffer was used, make sure it's freed.
+    // If the user selected "OK", check whether the password provided is valid.
     //
-    if (NULL != PasswordBuffer) {
-        ZeroMem ((UINT8*)PasswordBuffer, StrLen (PasswordBuffer) * sizeof(CHAR16) );
-        FreePool (PasswordBuffer);
-        PasswordBuffer = NULL;
-    }
+    if (SWM_MB_IDOK == SwmResult) {
+      if (GetAuthToken (PasswordBuffer) == EFI_SUCCESS) {
+        // Password authentication successful.  Display the full menu.
+        //
+        Result = TRUE;
+        break;
+      } else {
+        // Password authentication error.  Display error text and ask the user for the password again.
+        //
+        pErrorMessage = (CHAR16 *)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ERRORMSG_AUTHERROR), NULL);
 
-    return Result;
+        // If password buffer was used, make sure it's freed.
+        //
+        if (PasswordBuffer) {
+          ZeroMem ((UINT8 *)PasswordBuffer, StrLen (PasswordBuffer) * sizeof (CHAR16));
+          FreePool (PasswordBuffer);
+          PasswordBuffer = NULL;
+        }
+
+        // If MaxAttempts were specified, determine whether we've used our last attempt.
+        //
+        if (0 != MaxAttempts) {
+          // If we've just used our last attempt, make a note of it and get out of here.
+          //
+          if (0 == --MaxAttempts) {
+            AttemptsExpired = TRUE;
+            break;
+          }
+        }
+      }
+    }
+  } while (TRUE);
+
+  // Handle the case where the attempts have expired.
+  // Inform the user and return FALSE.
+  //
+  if (TRUE == AttemptsExpired) {
+    DEBUG ((DEBUG_INFO, "FrontPage::%a - Max password attempts elapsed!!\n", __FUNCTION__));
+    Status = SwmDialogsMessageBox (
+               (CHAR16 *)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ATTEMPTS_EXPIRED_TITLE), NULL),    // Dialog titlebar text.
+               (CHAR16 *)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ATTEMPTS_EXPIRED_BODYTEXT), NULL), // Dialog body text.
+               (CHAR16 *)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ATTEMPTS_EXPIRED_CAPTION), NULL),  // Dialog caption text.
+               SWM_MB_OK,                                                                                          // Show only Ok button.
+               0,                                                                                                  // No timeout
+               &SwmResult
+               );                                           // Return result.
+    Result = FALSE;
+  }
+
+  if (Result == TRUE) {
+    // By now the token has been acquired, but let's confirm it's valid
+    if (mAuthToken == DFCI_AUTH_TOKEN_INVALID) {
+      Result = FALSE;
+    }
+  }
+
+  // If password buffer was used, make sure it's freed.
+  //
+  if (NULL != PasswordBuffer) {
+    ZeroMem ((UINT8 *)PasswordBuffer, StrLen (PasswordBuffer) * sizeof (CHAR16));
+    FreePool (PasswordBuffer);
+    PasswordBuffer = NULL;
+  }
+
+  return Result;
 } // ChallengeUserPassword()

@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Protocol/FormBrowser2.h>
 #include <Protocol/HiiConfigAccess.h>
-#include "FrontPageVfr.h"  // all shared VFR / C constants here.  
+#include "FrontPageVfr.h"  // all shared VFR / C constants here.
 #include <DfciSystemSettingTypes.h>
 #include <Protocol/DfciSettingAccess.h>
 #include <Library/HiiLib.h>
@@ -24,26 +24,26 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // These are the VFR compiler generated data representing our VFR data.
 //
-extern UINT8    FrontPageVfrBin[];
+extern UINT8  FrontPageVfrBin[];
 
-extern UINTN    mCallbackKey;
+extern UINTN  mCallbackKey;
 
 #define FRONT_PAGE_CALLBACK_DATA_SIGNATURE  SIGNATURE_32 ('F', 'P', 'C', 'B')
 
 typedef struct {
-  UINTN                           Signature;
+  UINTN                             Signature;
 
   //
   // HII relative handles
   //
-  EFI_HII_HANDLE                  HiiHandle;
-  EFI_HANDLE                      DriverHandle;
-  EFI_STRING_ID                   *LanguageToken;
+  EFI_HII_HANDLE                    HiiHandle;
+  EFI_HANDLE                        DriverHandle;
+  EFI_STRING_ID                     *LanguageToken;
 
   //
   // Produced protocols
   //
-  EFI_HII_CONFIG_ACCESS_PROTOCOL  ConfigAccess;
+  EFI_HII_CONFIG_ACCESS_PROTOCOL    ConfigAccess;
 } FRONT_PAGE_CALLBACK_DATA;
 
 extern FRONT_PAGE_CALLBACK_DATA  mFrontPagePrivate;
@@ -73,4 +73,3 @@ GetAuthToken (
   );
 
 #endif // _FRONT_PAGE_H_
-

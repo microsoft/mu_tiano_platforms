@@ -30,14 +30,13 @@
 EFI_STATUS
 EFIAPI
 UiCallback (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  EFI_BROWSER_ACTION                     Action,
-  IN  EFI_QUESTION_ID                        QuestionId,
-      UINT8                                  Type,
-  IN  EFI_IFR_TYPE_VALUE                     *Value,
-  OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  EFI_BROWSER_ACTION                    Action,
+  IN  EFI_QUESTION_ID                       QuestionId,
+  UINT8                                     Type,
+  IN  EFI_IFR_TYPE_VALUE                    *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST            *ActionRequest
   );
-
 
 /**
   Determines the current SecureBoot state and updates the status strings accordingly.
@@ -47,7 +46,7 @@ UiCallback (
 **/
 VOID
 UpdateSecureBootStatusStrings (
-  BOOLEAN        RefreshScreen
+  BOOLEAN  RefreshScreen
   );
 
 /**
@@ -67,4 +66,5 @@ BOOLEAN
 ChallengeUserPassword (
   UINT8  MaxAttempts
   );
+
 #endif // _FRONT_PAGE_UI_H_
