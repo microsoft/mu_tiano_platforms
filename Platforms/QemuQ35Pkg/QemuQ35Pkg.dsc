@@ -1300,7 +1300,6 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
     #Platform should add all it settings libs here
     <LibraryClasses>
       NULL|ZeroTouchPkg/Library/ZeroTouchSettings/ZeroTouchSettings.inf
-      NULL|OemPkg/Library/MsSecureBootModeSettingDxeLib/MsSecureBootModeSettingDxeLib.inf
       NULL|DfciPkg/Library/DfciSettingsLib/DfciSettingsLib.inf
       #NULL|DfciPkg/Library/DfciPasswordProvider/DfciPasswordProvider.inf
       NULL|DfciPkg/Library/DfciVirtualizationSettings/DfciVirtualizationSettings.inf
