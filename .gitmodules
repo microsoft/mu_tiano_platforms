@@ -20,4 +20,4 @@
 	branch = PlatformRuntimeMechanism
 [submodule "SBManage"]
 	path = SBManage
-	url = https://brbarkel@dev.azure.com/brbarkel/Rust/_git/secure-boot-manager
+	url = https://github.com/corthon/secure_boot_manager.git
