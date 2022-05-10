@@ -42,8 +42,10 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
         rs = []
 
         # intentionally declare this one with recursive false to avoid overhead
-        rs.append(RequiredSubmodule(
-            "CryptoPkg/Library/OpensslLib/openssl", False))
+        # MU_CHANGE start - remove OpenSSL
+        #rs.append(RequiredSubmodule(
+        #    "CryptoPkg/Library/OpensslLib/openssl", False))
+        # MU_CHANGE end - remove OpenSSL
 
         # To avoid maintenance of this file for every new submodule
         # lets just parse the .gitmodules and add each if not already in list.
@@ -112,6 +114,9 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
         dsc = CommonPlatform.GetDscName(",".join(self.ActualArchitectures))
         return (f"OvmfPkg/{dsc}", {})
 
+    def GetPackagesPath(self): # MU_CHANGE - use packages path
+        ''' Return a list of paths that should be mapped as edk2 PackagesPath ''' # MU_CHANGE - use packages path
+        return CommonPlatform.PackagesPath # MU_CHANGE - use packages path
 
     # ####################################################################################### #
     #                         Actual Configuration for Platform Build                         #
@@ -140,7 +145,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 
     def GetPackagesPath(self):
         ''' Return a list of workspace relative paths that should be mapped as edk2 PackagesPath '''
-        return ()
+        return CommonPlatform.PackagesPath # MU_CHANGE - use packages path
 
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''

@@ -35,6 +35,7 @@
   PcdLib
   PciCf8Lib
   PciExpressLib
+  UefiBootServicesTableLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
