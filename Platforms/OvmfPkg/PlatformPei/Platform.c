@@ -37,7 +37,8 @@
 #include <IndustryStandard/Q35MchIch9.h>
 #include <IndustryStandard/QemuCpuHotplug.h>
 #include <OvmfPlatforms.h>
-#include <Guid/MemoryProtectionSettings.h> // MU_CHANGE
+#include <Guid/DxeMemoryProtectionSettings.h> // MU_CHANGE
+#include <Guid/MmMemoryProtectionSettings.h>  // MU_CHANGE
 
 #include "Platform.h"
 #include "Cmos.h"
@@ -809,21 +810,32 @@ InitializePlatform (
 {
   EFI_STATUS  Status;
   // MU_CHANGE START
-  MEMORY_PROTECTION_SETTINGS  Settings;
+  DXE_MEMORY_PROTECTION_SETTINGS  DxeSettings;
+  MM_MEMORY_PROTECTION_SETTINGS   MmSettings;
 
-  Settings                                     = (MEMORY_PROTECTION_SETTINGS)MEMORY_PROTECTION_SETTINGS_DEBUG;
-  Settings.HeapGuardPolicy.Fields.SmmPageGuard = 0;
-  Settings.HeapGuardPolicy.Fields.SmmPoolGuard = 0;
+  DxeSettings = (DXE_MEMORY_PROTECTION_SETTINGS)DXE_MEMORY_PROTECTION_SETTINGS_DEBUG;
+  MmSettings  = (MM_MEMORY_PROTECTION_SETTINGS)MM_MEMORY_PROTECTION_SETTINGS_DEBUG;
+
+  MmSettings.HeapGuardPolicy.Fields.MmPageGuard                    = 0;
+  MmSettings.HeapGuardPolicy.Fields.MmPoolGuard                    = 0;
+  DxeSettings.ImageProtectionPolicy.Fields.ProtectImageFromUnknown = 1;
   // THE /NXCOMPAT DLL flag cannot be set using non MinGW GCC
  #ifdef __GNUC__
-  Settings.ImageProtectionPolicy.Fields.BlockImagesWithoutNxFlag = 0;
+  DxeSettings.ImageProtectionPolicy.Fields.BlockImagesWithoutNxFlag = 0;
  #endif
 
   BuildGuidDataHob (
-    &gMemoryProtectionSettingsGuid,
-    &Settings,
-    sizeof (Settings)
+    &gDxeMemoryProtectionSettingsGuid,
+    &DxeSettings,
+    sizeof (DxeSettings)
     );
+
+  BuildGuidDataHob (
+    &gMmMemoryProtectionSettingsGuid,
+    &MmSettings,
+    sizeof (MmSettings)
+    );
+
   // MU_CHANGE END
   DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
 

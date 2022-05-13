@@ -46,7 +46,8 @@
 [Guids]
   gEfiMemoryTypeInformationGuid
   gFdtHobGuid
-  gMemoryProtectionSettingsGuid # MU_CHANGE
+  gDxeMemoryProtectionSettingsGuid # MU_CHANGE
+  gMmMemoryProtectionSettingsGuid # MU_CHANGE
 
 [LibraryClasses]
   BaseLib
