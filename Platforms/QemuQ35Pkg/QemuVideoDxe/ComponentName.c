@@ -181,7 +181,7 @@ QemuVideoComponentNameGetControllerName (
   }
 
   //
-  // Make sure this driver is currently managing ControllHandle
+  // Make sure this driver is currently managing ControllerHandle
   //
   Status = EfiTestManagedDevice (
              ControllerHandle,
