@@ -211,7 +211,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         self.env.SetValue("TARGET_ARCH", "AARCH64", "Platform Hardcoded")
         # self.env.SetValue("EMPTY_DRIVE", "FALSE", "Default to false")
         # self.env.SetValue("RUN_TESTS", "FALSE", "Default to false")
-        # self.env.SetValue("QEMU_HEADLESS", "FALSE", "Default to false")
+        self.env.SetValue("QEMU_HEADLESS", "FALSE", "Default to false")
         # self.env.SetValue("SHUTDOWN_AFTER_RUN", "FALSE", "Default to false")
         # needed to make FV size build report happy
         # self.env.SetValue("BLD_*_BUILDID_STRING", "Unknown", "Default")
@@ -270,8 +270,8 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
 
         # Conditional Args
-        # if (self.env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
-        #     args += " -display none"  # no graphics
+        if (self.env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
+            args += " -display none"  # no graphics
 
         # if (self.env.GetValue("MAKE_STARTUP_NSH").upper() == "TRUE"):
         #     f = open(os.path.join(VirtualDrive, "startup.nsh"), "w")
