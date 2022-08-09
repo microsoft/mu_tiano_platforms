@@ -102,7 +102,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
         scopes = CommonPlatform.Scopes
-        scopes += ("gcc_aarch64_linux",)
+        # scopes += ("gcc_aarch64_linux",) # BEEBE TODO
         return scopes
 
     def FilterPackagesToTest(self, changedFilesList: list, potentialPackagesList: list) -> list:
@@ -180,7 +180,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
         scopes = CommonPlatform.Scopes
-        scopes += ("gcc_aarch64_linux",)
+        # scopes += ("gcc_aarch64_linux",)
         return scopes
 
     def GetName(self):
