@@ -268,10 +268,11 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         args += " -serial stdio"
         # Mount disk with startup.nsh
         args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
-
         # Conditional Args
         if (self.env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
             args += " -display none"  # no graphics
+        else:
+            args += " -device cirrus-vga"
 
         # if (self.env.GetValue("MAKE_STARTUP_NSH").upper() == "TRUE"):
         #     f = open(os.path.join(VirtualDrive, "startup.nsh"), "w")

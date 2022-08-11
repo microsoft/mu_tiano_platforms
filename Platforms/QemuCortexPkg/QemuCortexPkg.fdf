@@ -111,6 +111,8 @@ READ_LOCK_STATUS   = TRUE
   INF ArmPkg/Drivers/CpuPei/CpuPei.inf
   INF MdeModulePkg/Universal/PCD/Pei/Pcd.inf
   INF MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
+  INF MsGraphicsPkg/MsUiTheme/Pei/MsUiThemePpi.inf
+  INF MsGraphicsPkg/MsEarlyGraphics/Pei/MsEarlyGraphics.inf
   INF MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
 !if $(TPM2_ENABLE) == TRUE

@@ -100,15 +100,26 @@ READ_LOCK_STATUS   = TRUE
   INF OvmfPkg/VirtioRngDxe/VirtioRng.inf
 
   INF ShellPkg/Application/Shell/Shell.inf
+  FILE APPLICATION=PCD(gPcBdsPkgTokenSpaceGuid.PcdShellFile) {
+    SECTION PE32=$(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/AARCH64/Shell.efi
+    SECTION UI= "EdkShell"
+  }
   INF ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
   INF ShellPkg/DynamicCommand/HttpDynamicCommand/HttpDynamicCommand.inf
   INF OvmfPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
+
+  INF MsGraphicsPkg/SimpleWindowManagerDxe/SimpleWindowManagerDxe.inf
+  INF MsGraphicsPkg/RenderingEngineDxe/RenderingEngineDxe.inf
+  INF MsGraphicsPkg/OnScreenKeyboardDxe/OnScreenKeyboardDxe.inf
+  INF MsGraphicsPkg/MsUiTheme/Dxe/MsUiThemeProtocol.inf
+  INF MsGraphicsPkg/DisplayEngineDxe/DisplayEngineDxe.inf
+  INF QemuQ35Pkg/QemuVideoDxe/QemuVideoDxe.inf
 
   #
   # Bds
   #
   INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
-  INF MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
+  # INF MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
   INF MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
   INF MdeModulePkg/Universal/DriverHealthManagerDxe/DriverHealthManagerDxe.inf
   INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
@@ -167,8 +178,8 @@ READ_LOCK_STATUS   = TRUE
   # Video support
   #
   INF OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
-  INF OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
-  INF OvmfPkg/PlatformDxe/Platform.inf
+  # INF OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
+  # INF OvmfPkg/PlatformDxe/Platform.inf
 
   #
   # USB Support

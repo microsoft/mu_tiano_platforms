@@ -381,7 +381,10 @@ InitializeQemuRamfb (
     Status = EFI_OUT_OF_RESOURCES;
     goto FreeRamfbHandle;
   }
-
+  DEBUG ((
+      DEBUG_INFO,
+      "Ramfb: install GOP DevicePath!! TROLOL\n"
+      ));
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mGopHandle,
                   &gEfiDevicePathProtocolGuid,
