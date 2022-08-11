@@ -272,7 +272,8 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         if (self.env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
             args += " -display none"  # no graphics
         else:
-            args += " -device cirrus-vga"
+            # args += " -device cirrus-vga"
+            args += " -device virtio-gpu-pci"
 
         # if (self.env.GetValue("MAKE_STARTUP_NSH").upper() == "TRUE"):
         #     f = open(os.path.join(VirtualDrive, "startup.nsh"), "w")

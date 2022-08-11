@@ -194,6 +194,8 @@
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRequireIommu|FALSE # don't require IOMMU
+
   gArmVirtTokenSpaceGuid.PcdTpm2SupportEnabled|$(TPM2_ENABLE)
 
 [PcdsFixedAtBuild.common]
@@ -594,8 +596,8 @@
   # Video support
   #
   OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
-  # OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
-  # OvmfPkg/PlatformDxe/Platform.inf
+  OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
+  OvmfPkg/PlatformDxe/Platform.inf
 
   #
   # USB Support
