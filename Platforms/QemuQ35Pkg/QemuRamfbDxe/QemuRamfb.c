@@ -383,7 +383,7 @@ InitializeQemuRamfb (
   }
   DEBUG ((
       DEBUG_INFO,
-      "Ramfb: install GOP DevicePath!! TROLOL\n"
+      "Ramfb install GOP\n"
       ));
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mGopHandle,
