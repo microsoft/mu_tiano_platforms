@@ -222,7 +222,7 @@ POSSIBILITY OF SUCH DAMAGE.
 .. ===================================================================
 
 .. _Windows_VS2022: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=58&&branchName=release%2F20202
-.. |WindowsCiBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20CI%20VS2022?branchName=release%2F202202
+.. |WindowsCiBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20CI%20VS?branchName=release%2F202202
 .. |WindowsCiTest|  image:: https://img.shields.io/azure-devops/tests/projectmu/mu/58.svg
 
 .. _Ubuntu_GCC5: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=57&branchName=release%2F202202
@@ -230,7 +230,7 @@ POSSIBILITY OF SUCH DAMAGE.
 .. |UbuntuCiTest|  image:: https://img.shields.io/azure-devops/tests/projectmu/mu/57.svg
 
 .. _Q35_VS2022: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=59&&branchName=release%2F202202
-.. |Q35VsBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20Q35%20Plat%20CI%20VS2022?branchName=release%2F202202
+.. |Q35VsBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20Q35%20Plat%20CI%20VS?branchName=release%2F202202
 .. _Q35_GCC5:   https://dev.azure.com/projectmu/mu/_build/latest?definitionId=60&&branchName=release%2F202202
 .. |Q35GccBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20Q35%20Plat%20CI%20GCC5?branchName=release%2F202202
 
