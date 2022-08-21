@@ -56,8 +56,13 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             logging.critical("Virtual Drive Path Invalid")
 
         args += " -machine q35,smm=on" #,accel=(tcg|kvm)"
-        args += " -m 2048"
-        args += " -cpu qemu64,+rdrand" # most compatible x64 CPU model + RDRAND support (not included by default)
+        if env.GetValue("PATH_TO_OS") is not None:
+            # Potentially dealing with big daddy, give it more juice...
+            args += " -m 8192"
+            args += " -hda " + env.GetValue("PATH_TO_OS")
+        else:
+            args += " -m 2048"
+        args += " -cpu qemu64,+rdrand,umip,+smep" # most compatible x64 CPU model + RDRAND + UMIP + SMEP support (not included by default)
         #args += " -smp ..."
         args += " -global driver=cfi.pflash01,property=secure,value=on"
         args += " -drive if=pflash,format=raw,unit=0,file=" + \
@@ -85,7 +90,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         # write ConOut messages to telnet localhost port
         serial_port = env.GetValue("SERIAL_PORT")
         if serial_port != None:
-            args += " -serial telnet:localhost:" + serial_port + ",server,nowait"
+            args += " -serial tcp:127.0.0.1:" + serial_port + ",server,nowait"
 
         # Run QEMU
         #ret = QemuRunner.RunCmd(executable, args,  thread_target=QemuRunner.QemuCmdReader)
