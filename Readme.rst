@@ -18,8 +18,6 @@ Platform and Toolchain        Status
 ============================= =================
 Q35_VS2022_                   |Q35VsBuild|
 Q35_GCC5_                     |Q35GccBuild|
-Ovmf_VS2022_                  |OvmfVsBuild|
-Ovmf_GCC5_                    |OvmfGccBuild|
 ============================= =================
 
 This repository is part of Project Mu.  Please see Project Mu for details https://microsoft.github.io/mu
@@ -233,8 +231,3 @@ POSSIBILITY OF SUCH DAMAGE.
 .. |Q35VsBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20Q35%20Plat%20CI%20VS?branchName=release%2F202202
 .. _Q35_GCC5:   https://dev.azure.com/projectmu/mu/_build/latest?definitionId=60&&branchName=release%2F202202
 .. |Q35GccBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20Q35%20Plat%20CI%20GCC5?branchName=release%2F202202
-
-.. _Ovmf_VS2022: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=61&&branchName=release%2F202202
-.. |OvmfVsBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20OVMF%20Plat%20CI%20VS2022?branchName=release%2F202202
-.. _Ovmf_GCC5:   https://dev.azure.com/projectmu/mu/_build/latest?definitionId=62&&branchName=release%2F202202
-.. |OvmfGccBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20OVMF%20Plat%20CI%20GCC5?branchName=release%2F202202
