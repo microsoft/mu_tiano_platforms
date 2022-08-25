@@ -1337,7 +1337,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   # UefiTestingPkg/FunctionalSystemTests/HeapGuardTest/Smm/HeapGuardTestSmm.inf
   # UefiTestingPkg/FunctionalSystemTests/HeapGuardTest/App/HeapGuardTestApp.inf
   # UefiTestingPkg/FunctionalSystemTests/VarPolicyUnitTestApp/VarPolicyUnitTestApp.inf
-  CryptoPkg/Test/UnitTest/Library/BaseCryptLib/TestBaseCryptLibShell.inf {
+  CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf {
     <PcdsPatchableInModule>
       #Turn off Halt on Assert and Print Assert so that libraries can
       #be tested in more of a release mode environment
