@@ -54,12 +54,12 @@ STATIC CONST MMIO64_PREFERENCE  mConfiguration = {
   {
     ACPI_ADDRESS_SPACE_DESCRIPTOR,                 // Desc
     (UINT16)(                                      // Len
-                                                   sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) -
-                                                   OFFSET_OF (
-                                                     EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR,
-                                                     ResType
-                                                     )
-                                                   ),
+      sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) -
+      OFFSET_OF (
+        EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR,
+        ResType
+        )
+      ),
     ACPI_ADDRESS_SPACE_TYPE_MEM,                   // ResType
     0,                                             // GenFlag
     0,                                             // SpecificFlag
