@@ -8,6 +8,15 @@
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
+
+resources:
+  repositories:
+    - repository: mu_devops
+      type: github
+      endpoint: microsoft
+      name: microsoft/mu_devops
+      ref: main
+
 trigger:
 - release/*
 pr:
@@ -57,17 +66,16 @@ jobs:
       vmImage: $(vm_image)
 
     steps:
-    - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
+    - template: Steps/BuildPlatform.yml@mu_devops
       parameters:
-        tool_chain_tag: VS2022
-        build_pkg: $(package)
-        build_target: $(Build.Target)
         build_arch: $(Build.Arch)
         build_file: $(Build.File)
         build_flags: $(Build.Flags)
-        run_flags: $(Run.Flags)
+        build_pkg: $(package)
+        build_target: $(Build.Target)
         extra_install_step:
         - powershell: choco install qemu --version=2020.08.14; Write-Host "##vso[task.prependpath]c:\Program Files\qemu"
           displayName: Install QEMU and Set QEMU on path # friendly name displayed in the UI
           condition: and(gt(variables.pkg_count, 0), succeeded())
-
+        run_flags: $(Run.Flags)
+        tool_chain_tag: VS2022
