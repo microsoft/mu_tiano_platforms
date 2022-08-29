@@ -31,10 +31,8 @@
   PeimEntryPoint
   PeiServicesLib
 
-[Pcd]
-  gSetupDataPkgTokenSpaceGuid.PcdConfigPolicyVariableGuid
-
 [Guids]
+  gSetupConfigPolicyVariableGuid                # CONSUMES
   gPolicyDataGFXGuid                            # CONSUMES
 
 [Ppis]

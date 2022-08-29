@@ -1,0 +1,45 @@
+<ConfigSchema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="configschema.xsd">
+
+  <!-- Enum values are declared separately from the knobs.
+       The same Enum can be used as the 'enumtype' of any number of EnumKnobs -->
+  <Enums>
+    <Enum name="OPTION_MODE" help="Modes of the option">
+      <Value name="FIRST" value="0" help="First mode" />
+      <Value name="SECOND" value="1" help="Second mode" />
+      <Value name="THIRD" value="2" help="Third mode" />
+    </Enum>
+  </Enums>
+
+  <Structs>
+    <Struct name="simple_t" help="Simple struct">
+      <Member name="value" count="2" type="uint32_t" />
+    </Struct>
+    <Struct name="child_t" help="Embedded struct">
+      <Member name="data" type="uint8_t" count="5" help="Bytes" />
+      <Member name="mode" type="OPTION_MODE" />
+    </Struct>
+    <Struct name="sample_t" help="Sample struct">
+      <Member name="counter" type="uint32_t" help="Number value" />
+      <Member name="children" type="child_t" count="2" help="Child data" />
+    </Struct>
+  </Structs>
+
+  <!-- namespace indicates the GUID namespace the values are stored in -->
+  <Knobs namespace="{FE3ED49F-B173-41ED-9076-356661D46A42}">
+    <!-- Example knobs of different types -->
+
+    <Knob name="COMPLEX_KNOB1a" type="child_t" default="{{1,2,3, 4,5 },FIRST }" help="Complex knob" />
+    
+    <Knob name="COMPLEX_KNOB1b" type="child_t" default="{{1,2,3, 4,5 },SECOND }" help="Complex type" />
+
+    <Knob name="COMPLEX_KNOB2" type="sample_t" default="{2,{{{1,2,3, 4,5 },FIRST },{{6,7,8, 9,10 },SECOND }}}" help="Complex type" />
+
+    <Knob name="INTEGER_KNOB" type="uint32_t" default="100" help="Integer type" />
+    <Knob name="BOOLEAN_KNOB" type="bool" default="true" help="Boolean type" />
+    <Knob name="DOUBLE_KNOB" type="double" default="3.1415926" help="Double type" />
+    <Knob name="FLOAT_KNOB" type="float" default="1.414" help="Float type" />
+
+  </Knobs>
+
+</ConfigSchema>

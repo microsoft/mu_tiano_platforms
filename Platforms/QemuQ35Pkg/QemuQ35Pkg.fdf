@@ -564,8 +564,11 @@ FILE FREEFORM = PCD(gZeroTouchPkgTokenSpaceGuid.PcdZeroTouchCertificateFile) {
   FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdBootFailIndicatorFile ) {
     SECTION RAW = OemPkg/FrontPage/Resources/NoBoot.bmp
   }
-  FILE FREEFORM = PCD(gSetupDataPkgTokenSpaceGuid.PcdConfigPolicyVariableGuid) {
+  FILE FREEFORM = gQemuQ35PkgGenericProfileGuid {
     SECTION RAW = $(CONF_BIN_FILE)
+  }
+  FILE FREEFORM = PCD(gDfciPkgTokenSpaceGuid.PcdUnsignedPermissionsFile) {
+        SECTION RAW = QemuQ35Pkg/UnsignedPermissions.xml
   }
 
 ################################################################################

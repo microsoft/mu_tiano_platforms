@@ -210,7 +210,7 @@ ConfigDataGfxEntry (
   Status   = VarPpi->GetVariable (
                        VarPpi,
                        UniName,
-                       PcdGetPtr (PcdConfigPolicyVariableGuid),
+                       &gSetupConfigPolicyVariableGuid,
                        &Attr,
                        &DataSize,
                        NULL
@@ -225,7 +225,7 @@ ConfigDataGfxEntry (
   Status   = VarPpi->GetVariable (
                        VarPpi,
                        UniName,
-                       PcdGetPtr (PcdConfigPolicyVariableGuid),
+                       &gSetupConfigPolicyVariableGuid,
                        &Attr,
                        &DataSize,
                        ConfData

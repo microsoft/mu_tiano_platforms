@@ -285,6 +285,7 @@
   # Setup variable libraries
   ConfigBlobBaseLib    |SetupDataPkg/Library/ConfigBlobBaseLib/ConfigBlobBaseLib.inf
   ConfigDataLib        |SetupDataPkg/Library/ConfigDataLib/ConfigDataLib.inf
+  ConfigVariableListLib|SetupDataPkg/Library/ConfigVariableListLib/ConfigVariableListLib.inf
 
   # Network libraries
   NetLib                 |NetworkPkg/Library/DxeNetLib/DxeNetLib.inf
@@ -802,7 +803,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugLoadImageMethod|0x2
 !endif
 
-  gSetupDataPkgTokenSpaceGuid.PcdConfigPolicyVariableGuid             | $(CONF_POLICY_GUID_BYTES)
+  gDfciPkgTokenSpaceGuid.PcdUnsignedListFormatAllow|FALSE
 
 [PcdsFixedAtBuild.common]
   # a PCD that controls the enumeration and connection of ConIn's. When true, ConIn is only connected once a console input is requests
@@ -911,6 +912,10 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 
   # Set ConfidentialComputing defaults
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0
+
+[PcdsDynamicExDefault]
+  # Default this to gQemuQ35PkgGenericProfileGuid
+  gSetupDataPkgTokenSpaceGuid.PcdSetupConfigActiveProfileFile|{ 0xb5, 0x06, 0x3c, 0xa5, 0x9f, 0x66, 0x5f, 0x4b, 0x93, 0x86, 0x47, 0x12, 0x12, 0xf5, 0x41, 0xdb }
 
 [PcdsDynamicHii]
 !if $(TPM_ENABLE) == TRUE && $(TPM_CONFIG_ENABLE) == TRUE
