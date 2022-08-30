@@ -78,4 +78,8 @@ where the `<port number>` is the number you set when [launching QEMU](#Boot-to-O
 Launch terminal application such as Putty or Tera Term to connect to `<port number>` you set when [launching QEMU](#Boot-to-OS)
 at `127.0.0.1` through raw TCP/IP protocol.
 
-Note that one needs to release this console in order for the KD to attach.
+Note:
+
+- One needs to release this console in order for the KD to attach.
+- Some terminal software would enable "local line editing" for raw connection, this needs to be turned off to prevent garbage
+keystrokes.
