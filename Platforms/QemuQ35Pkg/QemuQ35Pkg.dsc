@@ -286,6 +286,7 @@
   ConfigBlobBaseLib    |SetupDataPkg/Library/ConfigBlobBaseLib/ConfigBlobBaseLib.inf
   ConfigDataLib        |SetupDataPkg/Library/ConfigDataLib/ConfigDataLib.inf
   ConfigVariableListLib|SetupDataPkg/Library/ConfigVariableListLib/ConfigVariableListLib.inf
+  ConfigSystemModeLib  |QemuQ35Pkg/Library/ConfigSystemModeLibQ35/ConfigSystemModeLib.inf
 
   # Network libraries
   NetLib                 |NetworkPkg/Library/DxeNetLib/DxeNetLib.inf
@@ -599,6 +600,7 @@
   QemuFwCfgLib               |OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
   BaseCryptLib               |CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
   PcdDatabaseLoaderLib       |MdeModulePkg/Library/PcdDatabaseLoaderLib/Pei/PcdDatabaseLoaderLibPei.inf
+  OemMfciLib                 |OemPkg/Library/OemMfciLib/OemMfciLibPei.inf
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
   DebugAgentLib              |SourceLevelDebugPkg/Library/DebugAgent/SecPeiDebugAgentLib.inf
 !endif
@@ -637,6 +639,8 @@
   TimerLib |OvmfPkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
   RngLib   |MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf # MU_CHANGE use timer lib as the source of random
   PciLib   |OvmfPkg/Library/DxePciLibI440FxQ35/DxePciLibI440FxQ35.inf
+
+  OemMfciLib  |OemPkg/Library/OemMfciLib/OemMfciLibDxe.inf
 
 [LibraryClasses.common.DXE_CORE]
   HobLib                  |MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
@@ -915,7 +919,10 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 
 [PcdsDynamicExDefault]
   # Default this to gQemuQ35PkgGenericProfileGuid
-  gSetupDataPkgTokenSpaceGuid.PcdSetupConfigActiveProfileFile|{ 0xb5, 0x06, 0x3c, 0xa5, 0x9f, 0x66, 0x5f, 0x4b, 0x93, 0x86, 0x47, 0x12, 0x12, 0xf5, 0x41, 0xdb }
+  gSetupDataPkgTokenSpaceGuid.PcdSetupConfigActiveProfileFile|{GUID("A53C06B5-669F-4B5F-9386-471212F541DB")}
+
+  # Default this to gQemuQ35PkgDfciUnsignedXmlGuid
+  gDfciPkgTokenSpaceGuid.PcdUnsignedPermissionsFile|{GUID("62CF29AD-FEEE-4930-B71B-4806C787C6AA")}
 
 [PcdsDynamicHii]
 !if $(TPM_ENABLE) == TRUE && $(TPM_CONFIG_ENABLE) == TRUE
@@ -1015,6 +1022,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   OemPkg/DeviceStatePei/DeviceStatePei.inf
   MfciPkg/MfciPei/MfciPei.inf
 
+  SetupDataPkg/ConfDfciUnsignedListInit/ConfDfciUnsignedListInit.inf
   PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
   QemuQ35Pkg/ConfigDataGfx/ConfigDataGfx.inf
 
