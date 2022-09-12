@@ -29,10 +29,11 @@
   # Defines for default states.  These can be changed on the command line.
   # -D FLAG=VALUE
   #
-  DEFINE SOURCE_DEBUG_ENABLE     = FALSE
-  DEFINE TPM_ENABLE              = FALSE
-  DEFINE TPM_CONFIG_ENABLE       = FALSE
-  DEFINE OPT_INTO_MFCI_PRE_PRODUCTION = TRUE
+  DEFINE SOURCE_DEBUG_ENABLE            = FALSE
+  DEFINE TPM_ENABLE                     = FALSE
+  DEFINE TPM_CONFIG_ENABLE              = FALSE
+  DEFINE OPT_INTO_MFCI_PRE_PRODUCTION   = TRUE
+  DEFINE BUILD_UNIT_TESTS               = TRUE
 
   # Configure Shared Crypto
   !ifndef ENABLE_SHARED_CRYPTO # by default true
@@ -740,6 +741,10 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache|FALSE
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdRequireIommu|FALSE # don't require IOMMU
+  
+  !if $(BUILD_UNIT_TESTS) == TRUE
+    gUefiCpuPkgTokenSpaceGuid.PcdSmmExceptionTestModeSupport|TRUE
+  !endif
 
 [PcdsPatchableInModule]
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
@@ -916,6 +921,11 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 
   # Set ConfidentialComputing defaults
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0
+
+  # Add DEVICE_STATE_UNIT_TEST_MODE to the device state bitmask if BUILD_UNIT_TESTS=TRUE (default)
+  !if $(BUILD_UNIT_TESTS) == TRUE
+    gEfiMdeModulePkgTokenSpaceGuid.PcdDeviceStateBitmask|0x20
+  !endif
 
 [PcdsDynamicExDefault]
   # Default this to gQemuQ35PkgGenericProfileGuid
@@ -1346,31 +1356,36 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
 
   ## Unit Tests
-  # UefiTestingPkg/FunctionalSystemTests/SmmPagingProtectionsTest/Smm/SmmPagingProtectionsTestSmm.inf
-  # UefiTestingPkg/FunctionalSystemTests/HeapGuardTest/Smm/HeapGuardTestSmm.inf
-  # UefiTestingPkg/FunctionalSystemTests/HeapGuardTest/App/HeapGuardTestApp.inf
-  # UefiTestingPkg/FunctionalSystemTests/VarPolicyUnitTestApp/VarPolicyUnitTestApp.inf
-  CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf {
-    <PcdsPatchableInModule>
-      #Turn off Halt on Assert and Print Assert so that libraries can
-      #be tested in more of a release mode environment
-      gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
-  }
+  !if $(BUILD_UNIT_TESTS) == TRUE
+    UefiTestingPkg/FunctionalSystemTests/SmmPagingProtectionsTest/Smm/SmmPagingProtectionsTestSmm.inf
+    UefiTestingPkg/FunctionalSystemTests/MemoryProtectionTest/Smm/MemoryProtectionTestSmm.inf
+    UefiTestingPkg/FunctionalSystemTests/MemoryProtectionTest/App/MemoryProtectionTestApp.inf
+    UefiTestingPkg/AuditTests/PagingAudit/UEFI/SmmPagingAuditDriver.inf
+    UefiTestingPkg/AuditTests/PagingAudit/UEFI/SmmPagingAuditTestApp.inf
+    UefiTestingPkg/AuditTests/PagingAudit/UEFI/DxePagingAuditDriver.inf
+    UefiTestingPkg/AuditTests/PagingAudit/UEFI/DxePagingAuditTestApp.inf
+    # UefiTestingPkg/FunctionalSystemTests/VarPolicyUnitTestApp/VarPolicyUnitTestApp.inf
+    CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf {
+      <PcdsPatchableInModule>
+        #Turn off Halt on Assert and Print Assert so that libraries can
+        #be tested in more of a release mode environment
+        gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
+    }
 
-  MsCorePkg/UnitTests/JsonTest/JsonTestApp.inf
-  XmlSupportPkg/Test/UnitTest/XmlTreeLib/XmlTreeLibUnitTestApp.inf
-  XmlSupportPkg/Test/UnitTest/XmlTreeQueryLib/XmlTreeQueryLibUnitTestApp.inf {
-    <PcdsPatchableInModule>
-      #Turn off Halt on Assert and Print Assert so that libraries can
-      #be tested in more of a release mode environment
-      gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
-  }
+    MsCorePkg/UnitTests/JsonTest/JsonTestApp.inf
+    XmlSupportPkg/Test/UnitTest/XmlTreeLib/XmlTreeLibUnitTestApp.inf
+    XmlSupportPkg/Test/UnitTest/XmlTreeQueryLib/XmlTreeQueryLibUnitTestApp.inf {
+      <PcdsPatchableInModule>
+        #Turn off Halt on Assert and Print Assert so that libraries can
+        #be tested in more of a release mode environment
+        gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
+    }
 
-  # MemMap and MAT Test
-  UefiTestingPkg/FunctionalSystemTests/MemmapAndMatTestApp/MemmapAndMatTestApp.inf
-  # MorLock v1 and v2 Test
-  # this fails on QEMU - UefiTestingPkg/FunctionalSystemTests/MorLockTestApp/MorLockTestApp.inf
-
+    # MemMap and MAT Test
+    UefiTestingPkg/FunctionalSystemTests/MemmapAndMatTestApp/MemmapAndMatTestApp.inf
+    # MorLock v1 and v2 Test
+    # this fails on QEMU - UefiTestingPkg/FunctionalSystemTests/MorLockTestApp/MorLockTestApp.inf
+  !endif
   #########################################
   # SMM Phase modules
   #########################################

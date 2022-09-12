@@ -502,7 +502,9 @@ INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
 
 !if $(BUILD_UNIT_TESTS) == TRUE
 INF  UefiTestingPkg/FunctionalSystemTests/SmmPagingProtectionsTest/Smm/SmmPagingProtectionsTestSmm.inf
-INF  UefiTestingPkg/FunctionalSystemTests/HeapGuardTest/Smm/HeapGuardTestSmm.inf
+INF  UefiTestingPkg/FunctionalSystemTests/MemoryProtectionTest/Smm/MemoryProtectionTestSmm.inf
+INF  UefiTestingPkg/AuditTests/PagingAudit/UEFI/SmmPagingAuditDriver.inf
+INF  UefiTestingPkg/AuditTests/PagingAudit/UEFI/DxePagingAuditDriver.inf
 !endif
 
 # PRM Configuration Driver
