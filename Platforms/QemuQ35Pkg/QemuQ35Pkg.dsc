@@ -284,10 +284,11 @@
   LoadLinuxLib         |OvmfPkg/Library/LoadLinuxLib/LoadLinuxLib.inf
 
   # Setup variable libraries
-  ConfigBlobBaseLib    |SetupDataPkg/Library/ConfigBlobBaseLib/ConfigBlobBaseLib.inf
-  ConfigDataLib        |SetupDataPkg/Library/ConfigDataLib/ConfigDataLib.inf
-  ConfigVariableListLib|SetupDataPkg/Library/ConfigVariableListLib/ConfigVariableListLib.inf
-  ConfigSystemModeLib  |QemuQ35Pkg/Library/ConfigSystemModeLibQ35/ConfigSystemModeLib.inf
+  ConfigBlobBaseLib         |SetupDataPkg/Library/ConfigBlobBaseLib/ConfigBlobBaseLib.inf
+  ConfigDataLib             |SetupDataPkg/Library/ConfigDataLib/ConfigDataLib.inf
+  ConfigVariableListLib     |SetupDataPkg/Library/ConfigVariableListLib/ConfigVariableListLib.inf
+  ConfigSystemModeLib       |QemuQ35Pkg/Library/ConfigSystemModeLibQ35/ConfigSystemModeLib.inf
+  ActiveProfileSelectorLib  |SetupDataPkg/Library/ActiveProfileSelectorLibNull/ActiveProfileSelectorLibNull.inf
 
   # Network libraries
   NetLib                 |NetworkPkg/Library/DxeNetLib/DxeNetLib.inf
@@ -814,6 +815,11 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 
   gDfciPkgTokenSpaceGuid.PcdUnsignedListFormatAllow|FALSE
 
+  ## List of valid Profile GUIDs
+  ## gQemuQ35PkgProfile1Guid, gQemuQ35PkgProfile2Guid, and gQemuQ35PkgProfile3Guid are supported.
+  ## gSetupDataPkgGenericProfileGuid is defaulted to in case retrieved GUID is not in this list
+  gSetupDataPkgTokenSpaceGuid.PcdConfigurationProfileList|{ GUID("E34D00D0-6A10-44BE-B46C-BEE6302C6287"), GUID("848F7E93-C957-4797-8A11-F301ED9B2048"), GUID("454CFA58-6423-4F50-8B2B-744BDECE876A") }
+
 [PcdsFixedAtBuild.common]
   # a PCD that controls the enumeration and connection of ConIn's. When true, ConIn is only connected once a console input is requests
   gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand|TRUE
@@ -928,8 +934,8 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   !endif
 
 [PcdsDynamicExDefault]
-  # Default this to gQemuQ35PkgGenericProfileGuid
-  gSetupDataPkgTokenSpaceGuid.PcdSetupConfigActiveProfileFile|{GUID("A53C06B5-669F-4B5F-9386-471212F541DB")}
+  # Default this to gSetupDataPkgGenericProfileGuid
+  gSetupDataPkgTokenSpaceGuid.PcdSetupConfigActiveProfileFile|{ GUID("8464A6FF-A984-4899-A375-3DC1DB3D4227") }
 
   # Default this to gQemuQ35PkgDfciUnsignedXmlGuid
   gDfciPkgTokenSpaceGuid.PcdUnsignedPermissionsFile|{GUID("62CF29AD-FEEE-4930-B71B-4806C787C6AA")}
@@ -1064,6 +1070,10 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 
   # Processes ingoing and outgoing DFCI settings requests.
   DfciPkg/DfciManager/DfciManager.inf
+
+  # Profile Enforcement
+  SetupDataPkg/ConfProfileMgrDxe/ConfProfileMgrDxe.inf
+
 !if $(ENABLE_SHARED_CRYPTO) == TRUE
   DEFINE DXE_CRYPTO_DRIVER_FILE_GUID = 254e0f83-c675-4578-bc16-d44111c34e00
   CryptoPkg/Driver/CryptoDxe.inf {
