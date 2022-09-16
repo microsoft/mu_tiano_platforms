@@ -9,6 +9,6 @@
   "name": "FEATURE_CONFIG",
   "var_name": "FEATURE_CONFIG_PATH",
   "source": "https://github.com/microsoft/mu_feature_config.git",
-  "version": "94258c3baf5abe80a99f4228cda3b56c2bc6bf2c",
+  "version": "87f694b13a75765fe8e0d49b74280d447e4abf38",
   "flags": ["set_build_var"]
 }

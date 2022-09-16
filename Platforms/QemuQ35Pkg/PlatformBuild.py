@@ -218,13 +218,9 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         self.env.SetValue("BLD_*_SHIP_MODE", "FALSE", "Default")
         self.__SetEsrtGuidVars("CONF_POLICY_GUID", "6E08E434-8E04-47B5-9A77-78A3A24523EA", "Platform Hardcoded")
         self.env.SetValue("YAML_CONF_FILE", self.mws.join(self.ws, "QemuQ35Pkg", "CfgData", "CfgDataDef.yaml"), "Platform Hardcoded")
-        self.env.SetValue("XML_CONF_FILE", self.mws.join(self.ws, "QemuQ35Pkg", "CfgData", "CfgSchema.xml"), "Platform Hardcoded")
         self.env.SetValue("DELTA_CONF_POLICY", self.mws.join(self.ws, "QemuQ35Pkg", "CfgData", "Profile1.dlt") + ";" +\
                           self.mws.join(self.ws, "QemuQ35Pkg", "CfgData", "Profile2.dlt") + ";" +\
                           self.mws.join(self.ws, "QemuQ35Pkg", "CfgData", "Profile3.dlt"), "Platform Hardcoded")
-        self.env.SetValue("CSV_CONF_POLICY", self.mws.join(self.ws, "QemuQ35Pkg", "CfgData", "Profile1.csv") + ";"+\
-                          self.mws.join(self.ws, "QemuQ35Pkg", "CfgData", "Profile2.csv") + ";" +\
-                          self.mws.join(self.ws, "QemuQ35Pkg", "CfgData", "Profile3.csv"), "Platform Hardcoded")
         self.env.SetValue("CONF_DATA_STRUCT_FOLDER", self.mws.join(self.ws, "QemuQ35Pkg", "Include"), "Platform Defined")
         self.env.SetValue('CONF_REPORT_FOLDER', self.mws.join(self.ws, "QemuQ35Pkg", "CfgData"), "Platform Defined")
 

@@ -1,8 +1,0 @@
-Knob,Value,Help
-COMPLEX_KNOB1a,"{{2,3,5,4,5},FIRST}",Complex knob
-COMPLEX_KNOB1b,"{{3,3,2,4,5},SECOND}",Complex type
-COMPLEX_KNOB2,"{3,{{{1,2,2,1,4},FIRST},{{5,7,8,9,10},SECOND}}}",Complex type
-INTEGER_KNOB,678,Integer type
-BOOLEAN_KNOB,false,Boolean type
-DOUBLE_KNOB,45.98887,Double type
-FLOAT_KNOB,44.560001373291016,Float type
