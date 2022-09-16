@@ -863,6 +863,11 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   gUefiOvmfPkgTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel|0x0E20
   gMsGraphicsPkgTokenSpaceGuid.PcdMsGopOverrideProtocolGuid|{0xF5, 0x3B, 0x5E, 0xAA, 0x8A, 0x81, 0x2D, 0x41, 0xA1, 0x8E, 0xD8, 0x79, 0x3B, 0xA0, 0x3A, 0x5C}
 
+  # QEMU does not support SMRR, adding the PCD override to skip corresponding audit tests
+  !if $(BUILD_UNIT_TESTS) == TRUE
+    gUefiTestingPkgTokenSpaceGuid.PcdPlatformSmrrUnsupported|TRUE
+  !endif
+
 ################################################################################
 #
 # Pcd Dynamic Section - list of all EDK II PCD Entries defined by this Platform
