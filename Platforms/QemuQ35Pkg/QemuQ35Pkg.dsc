@@ -64,12 +64,13 @@
 !include MdePkg/MdeLibs.dsc.inc
 
 [LibraryClasses]
-  PcdLib     |MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-  TimerLib   |OvmfPkg/Library/AcpiTimerLib/BaseAcpiTimerLib.inf
-  PrintLib   |MdePkg/Library/BasePrintLib/BasePrintLib.inf
-  BaseLib    |MdePkg/Library/BaseLib/BaseLib.inf
-  UefiLib    |MdePkg/Library/UefiLib/UefiLib.inf
-  HiiLib     |MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
+  PcdLib          |MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+  TimerLib        |OvmfPkg/Library/AcpiTimerLib/BaseAcpiTimerLib.inf
+  PrintLib        |MdePkg/Library/BasePrintLib/BasePrintLib.inf
+  BaseLib         |MdePkg/Library/BaseLib/BaseLib.inf
+  UefiLib         |MdePkg/Library/UefiLib/UefiLib.inf
+  HiiLib          |MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
+  ResetSystemLib  |OvmfPkg/Library/ResetSystemLib/BaseResetSystemLib.inf
 
   # Services tables/Entry points
   UefiBootServicesTableLib    |MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
@@ -193,8 +194,8 @@
   MemoryTypeInformationChangeLib |MdeModulePkg/Library/MemoryTypeInformationChangeLibNull/MemoryTypeInformationChangeLibNull.inf
   MtrrLib                        |UefiCpuPkg/Library/MtrrLib/MtrrLib.inf # Memory Type Range Register (https://en.wikipedia.org/wiki/Memory_type_range_register)
   MmUnblockMemoryLib             |MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
-  DxeMemoryProtectionHobLib         |MdeModulePkg/Library/MemoryProtectionHobLibNull/DxeMemoryProtectionHobLibNull.inf
-  MemoryProtectionExceptionLib   |MsCorePkg/Library/MemoryProtectionExceptionLibCmos/MemoryProtectionExceptionLibCmos.inf
+  DxeMemoryProtectionHobLib      |MdeModulePkg/Library/MemoryProtectionHobLibNull/DxeMemoryProtectionHobLibNull.inf
+  ExceptionPersistenceLib        |MsCorePkg/Library/ExceptionPersistenceLibCmos/ExceptionPersistenceLibCmos.inf
 
   # Variable Libraries
   VariablePolicyLib         |MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLib.inf
@@ -1379,6 +1380,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
     UefiTestingPkg/AuditTests/PagingAudit/UEFI/SmmPagingAuditTestApp.inf
     UefiTestingPkg/AuditTests/PagingAudit/UEFI/DxePagingAuditDriver.inf
     UefiTestingPkg/AuditTests/PagingAudit/UEFI/DxePagingAuditTestApp.inf
+    UefiTestingPkg/FunctionalSystemTests/ExceptionPersistenceTestApp/ExceptionPersistenceTestApp.inf
     # UefiTestingPkg/FunctionalSystemTests/VarPolicyUnitTestApp/VarPolicyUnitTestApp.inf
     CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf {
       <PcdsPatchableInModule>
