@@ -1,1 +1,1 @@
-python ../../../FEATURE_CONFIG_extdep/FEATURE_CONFIG/SetupDataPkg/Tools/ConfigEditor.py CfgDataDef.yaml CfgSchema.xml
+python ../../../FEATURE_CONFIG_extdep/FEATURE_CONFIG/SetupDataPkg/Tools/ConfigEditor.py CfgDataDef.yaml

@@ -35,7 +35,7 @@ class CommonPlatform():
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
     Scopes = ('qemuq35', 'edk2-build', 'cibuild', 'setupdata')
     WorkspaceRoot = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    PackagesPath = ("Platforms", "MU_BASECORE", "Common/MU", "Common/MU_TIANO", "Common/MU_OEM_SAMPLE", "FEATURE_CONFIG_extdep/FEATURE_CONFIG")
+    PackagesPath = ("Platforms", "MU_BASECORE", "Common/MU", "Common/MU_TIANO", "Common/MU_OEM_SAMPLE")
 
     # ####################################################################################### #
     #                         Configuration for Update & Setup                                #
@@ -136,7 +136,9 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
     def GetPackagesPath(self):
         ''' Return a list of paths that should be mapped as edk2 PackagesPath '''
-        result = []
+        result = [
+            shell_environment.GetBuildVars().GetValue("FEATURE_CONFIG_PATH", "")
+        ]
         for a in CommonPlatform.PackagesPath:
             result.append(a)
         return result
@@ -170,7 +172,9 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 
     def GetPackagesPath(self):
         ''' Return a list of workspace relative paths that should be mapped as edk2 PackagesPath '''
-        result = []
+        result = [
+            shell_environment.GetBuildVars().GetValue("FEATURE_CONFIG_PATH", "")
+        ]
         for a in CommonPlatform.PackagesPath:
             result.append(a)
         return result
