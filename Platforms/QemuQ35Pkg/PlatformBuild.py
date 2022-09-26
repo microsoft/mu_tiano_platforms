@@ -137,7 +137,8 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
     def GetPackagesPath(self):
         ''' Return a list of paths that should be mapped as edk2 PackagesPath '''
         result = [
-            shell_environment.GetBuildVars().GetValue("FEATURE_CONFIG_PATH", "")
+            shell_environment.GetBuildVars().GetValue("FEATURE_CONFIG_PATH", ""),
+            shell_environment.GetBuildVars().GetValue("FEATURE_MM_SUPV_PATH", "")
         ]
         for a in CommonPlatform.PackagesPath:
             result.append(a)
@@ -173,7 +174,8 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
     def GetPackagesPath(self):
         ''' Return a list of workspace relative paths that should be mapped as edk2 PackagesPath '''
         result = [
-            shell_environment.GetBuildVars().GetValue("FEATURE_CONFIG_PATH", "")
+            shell_environment.GetBuildVars().GetValue("FEATURE_CONFIG_PATH", ""),
+            shell_environment.GetBuildVars().GetValue("FEATURE_MM_SUPV_PATH", "")
         ]
         for a in CommonPlatform.PackagesPath:
             result.append(a)
