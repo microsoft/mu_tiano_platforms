@@ -34,7 +34,7 @@ class CommonPlatform():
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
     Scopes = ('qemucortex', 'edk2-build', 'cibuild')
     WorkspaceRoot = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    PackagesPath = ("Platforms", "MU_BASECORE", "Common/MU", "Common/MU_TIANO", "Common/MU_OEM_SAMPLE", "Common/PRM", "Common/MU_TIANO_ARM")
+    PackagesPath = ("Platforms", "MU_BASECORE", "Common/MU", "Common/MU_TIANO", "Common/MU_OEM_SAMPLE", "Common/MU_TIANO_ARM")
 
 
     # ####################################################################################### #
@@ -510,35 +510,35 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 #         self._lines.append(line.strip())
 #         self._use_fs_finder = True
 
-# if __name__ == "__main__":
-#     import argparse
-#     import sys
-#     from edk2toolext.invocables.edk2_update import Edk2Update
-#     from edk2toolext.invocables.edk2_setup import Edk2PlatformSetup
-#     from edk2toolext.invocables.edk2_platform_build import Edk2PlatformBuild
-#     print("Invoking Stuart")
-#     print("     ) _     _")
-#     print("    ( (^)-~-(^)")
-#     print("__,-.\_( 0 0 )__,-.___")
-#     print("  'W'   \   /   'W'")
-#     print("         >o<")
-#     SCRIPT_PATH = os.path.relpath(__file__)
-#     parser = argparse.ArgumentParser(add_help=False)
-#     parse_group = parser.add_mutually_exclusive_group()
-#     parse_group.add_argument("--update", "--UPDATE",
-#                              action='store_true', help="Invokes stuart_update")
-#     parse_group.add_argument("--setup", "--SETUP",
-#                              action='store_true', help="Invokes stuart_setup")
-#     args, remaining = parser.parse_known_args()
-#     new_args = ["stuart", "-c", SCRIPT_PATH]
-#     new_args = new_args + remaining
-#     sys.argv = new_args
-#     if args.setup:
-#         print("Running stuart_setup -c " + SCRIPT_PATH)
-#         Edk2PlatformSetup().Invoke()
-#     elif args.update:
-#         print("Running stuart_update -c " + SCRIPT_PATH)
-#         Edk2Update().Invoke()
-#     else:
-#         print("Running stuart_build -c " + SCRIPT_PATH)
-#         Edk2PlatformBuild().Invoke()
+if __name__ == "__main__":
+    import argparse
+    import sys
+    from edk2toolext.invocables.edk2_update import Edk2Update
+    from edk2toolext.invocables.edk2_setup import Edk2PlatformSetup
+    from edk2toolext.invocables.edk2_platform_build import Edk2PlatformBuild
+    print("Invoking Stuart")
+    print("     ) _     _")
+    print("    ( (^)-~-(^)")
+    print("__,-.\_( 0 0 )__,-.___")
+    print("  'W'   \   /   'W'")
+    print("         >o<")
+    SCRIPT_PATH = os.path.relpath(__file__)
+    parser = argparse.ArgumentParser(add_help=False)
+    parse_group = parser.add_mutually_exclusive_group()
+    parse_group.add_argument("--update", "--UPDATE",
+                             action='store_true', help="Invokes stuart_update")
+    parse_group.add_argument("--setup", "--SETUP",
+                             action='store_true', help="Invokes stuart_setup")
+    args, remaining = parser.parse_known_args()
+    new_args = ["stuart", "-c", SCRIPT_PATH]
+    new_args = new_args + remaining
+    sys.argv = new_args
+    if args.setup:
+        print("Running stuart_setup -c " + SCRIPT_PATH)
+        Edk2PlatformSetup().Invoke()
+    elif args.update:
+        print("Running stuart_update -c " + SCRIPT_PATH)
+        Edk2Update().Invoke()
+    else:
+        print("Running stuart_build -c " + SCRIPT_PATH)
+        Edk2PlatformBuild().Invoke()
