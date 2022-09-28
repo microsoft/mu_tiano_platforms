@@ -32,7 +32,7 @@ class CommonPlatform():
     PackagesSupported = ("QemuCortexPkg",)
     ArchSupported = ("AARCH64")
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
-    Scopes = ('qemucortex', 'AARCH64-Gcc', 'edk2-build', 'cibuild')
+    Scopes = ('qemucortex', 'gcc_aarch64_linux', 'edk2-build', 'cibuild')
     WorkspaceRoot = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     PackagesPath = ("Platforms", "MU_BASECORE", "Common/MU", "Common/MU_TIANO", "Common/MU_OEM_SAMPLE", "Common/MU_TIANO_ARM")
 
