@@ -32,7 +32,7 @@ class CommonPlatform():
     PackagesSupported = ("QemuCortexPkg",)
     ArchSupported = ("AARCH64")
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
-    Scopes = ('qemucortex', 'edk2-build', 'cibuild')
+    Scopes = ('qemucortex', 'AARCH64-Gcc', 'edk2-build', 'cibuild')
     WorkspaceRoot = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     PackagesPath = ("Platforms", "MU_BASECORE", "Common/MU", "Common/MU_TIANO", "Common/MU_OEM_SAMPLE", "Common/MU_TIANO_ARM")
 
@@ -209,6 +209,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         self.env.SetValue("PRODUCT_NAME", "QemuCortex", "Platform Hardcoded")
         self.env.SetValue("ACTIVE_PLATFORM", "QemuCortexPkg/QemuCortexPkg.dsc", "Platform Hardcoded")
         self.env.SetValue("TARGET_ARCH", "AARCH64", "Platform Hardcoded")
+        self.env.SetValue("TOOL_CHAIN_TAG", "GCC5", "set default to gcc5")
         # self.env.SetValue("EMPTY_DRIVE", "FALSE", "Default to false")
         # self.env.SetValue("RUN_TESTS", "FALSE", "Default to false")
         self.env.SetValue("QEMU_HEADLESS", "FALSE", "Default to false")
