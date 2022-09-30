@@ -1,10 +1,9 @@
 ## @file
-#Override : 00000002 | Temp/Library/PlatformDebugLibIoPort/PlatformRomDebugLibIoPort.inf | c7c69a379cd95d92cb4356184e03117c | 2022-09-30T17-39-39 | b0edf02a681119f74dfd80629ae78e8ef3b0b114
 #  Instance of Debug Library for the QEMU debug console port.
 #  It uses Print Library to produce formatted output strings.
 #
 #  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
-#  Copyright (c) 2017, Red Hat, Inc.<BR>
+#  Copyright (c) 2012, Red Hat, Inc.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -13,12 +12,12 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = PlatformRomDebugLibIoPort
-  FILE_GUID                      = 288a0da9-f379-4470-8838-c7f559f02dfe # MU_CHANGE
+  BASE_NAME                      = PlatformDebugLibIoPort
+  FILE_GUID                      = DF934DA3-CD31-49FE-AF50-B3C87C79325F
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = DebugLib|SEC
-  CONSTRUCTOR                    = PlatformRomDebugLibIoPortConstructor
+  LIBRARY_CLASS                  = DebugLib|PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER SMM_CORE DXE_SMM_DRIVER UEFI_DRIVER UEFI_APPLICATION
+  CONSTRUCTOR                    = PlatformDebugLibIoPortConstructor
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 EBC
@@ -27,8 +26,8 @@
 [Sources]
   DebugIoPortQemu.c
   DebugLib.c
+  DebugLibDetect.c
   DebugLibDetect.h
-  DebugLibDetectRom.c
 
 [Packages]
   MdePkg/MdePkg.dec

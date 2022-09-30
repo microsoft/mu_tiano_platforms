@@ -1,10 +1,8 @@
 ## @file
-#Override : 00000002 | Temp/Library/PlatformDebugLibIoPort/PlatformRomDebugLibIoPort.inf | c7c69a379cd95d92cb4356184e03117c | 2022-09-30T17-39-39 | b0edf02a681119f74dfd80629ae78e8ef3b0b114
-#  Instance of Debug Library for the QEMU debug console port.
+#  Instance of Debug Library for an hypervisor debug console port.
 #  It uses Print Library to produce formatted output strings.
 #
-#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
-#  Copyright (c) 2017, Red Hat, Inc.<BR>
+#  Copyright (c) 2020, Citrix Systems, Inc.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -13,11 +11,11 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = PlatformRomDebugLibIoPort
-  FILE_GUID                      = 288a0da9-f379-4470-8838-c7f559f02dfe # MU_CHANGE
+  BASE_NAME                      = PlatformRomDebugLibIoPortNocheck
+  FILE_GUID                      = 92AEB68E-C2CF-466E-9AB2-3F5E713F7DE6
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = DebugLib|SEC
+  LIBRARY_CLASS                  = DebugLib
   CONSTRUCTOR                    = PlatformRomDebugLibIoPortConstructor
 
 #
@@ -25,7 +23,7 @@
 #
 
 [Sources]
-  DebugIoPortQemu.c
+  DebugIoPortNocheck.c
   DebugLib.c
   DebugLibDetect.h
   DebugLibDetectRom.c
@@ -43,7 +41,7 @@
   DebugPrintErrorLevelLib
 
 [Pcd]
-  gUefiTempTokenSpaceGuid.PcdDebugIoPort                ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdDebugIoPort                ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue        ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask            ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdFixedDebugPrintErrorLevel    ## CONSUMES

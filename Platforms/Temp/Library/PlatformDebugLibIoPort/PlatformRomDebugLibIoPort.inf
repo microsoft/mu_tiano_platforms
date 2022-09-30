@@ -1,5 +1,4 @@
 ## @file
-#Override : 00000002 | Temp/Library/PlatformDebugLibIoPort/PlatformRomDebugLibIoPort.inf | c7c69a379cd95d92cb4356184e03117c | 2022-09-30T17-39-39 | b0edf02a681119f74dfd80629ae78e8ef3b0b114
 #  Instance of Debug Library for the QEMU debug console port.
 #  It uses Print Library to produce formatted output strings.
 #
@@ -14,7 +13,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PlatformRomDebugLibIoPort
-  FILE_GUID                      = 288a0da9-f379-4470-8838-c7f559f02dfe # MU_CHANGE
+  FILE_GUID                      = CEB0D9D3-328F-4C24-8C02-28FA1986AE1B
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = DebugLib|SEC

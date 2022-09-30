@@ -15,6 +15,100 @@
   PACKAGE_GUID                   = 1d83e55c-13bb-4fee-8e1d-5692c535ebed
   PACKAGE_VERSION                = 0.1
 
+[Includes]
+  Include
+  #Csm/Include
+
+[LibraryClasses]
+  ##  @libraryclass  Access bhyve's firmware control interface.
+  #BhyveFwCtlLib|Include/Library/BhyveFwCtlLib.h
+
+  ##  @libraryclass  Verify blobs read from the VMM
+  #BlobVerifierLib|Include/Library/BlobVerifierLib.h
+
+  ##  @libraryclass  Loads and boots a Linux kernel image
+  #
+  #LoadLinuxLib|Include/Library/LoadLinuxLib.h
+
+  ##  @libraryclass  Declares helper functions for Secure Encrypted
+  #                  Virtualization (SEV) guests.
+  MemEncryptSevLib|Include/Library/MemEncryptSevLib.h
+
+  ##  @libraryclass  Save and restore variables using a file
+  #
+  #NvVarsFileLib|Include/Library/NvVarsFileLib.h
+
+  ##  @libraryclass  Provides services to work with PCI capabilities in PCI
+  #                  config space.
+  #PciCapLib|Include/Library/PciCapLib.h
+
+  ##  @libraryclass  Layered on top of PciCapLib, allows clients to plug an
+  #                  EFI_PCI_IO_PROTOCOL backend into PciCapLib, for config
+  #                  space access.
+  #PciCapPciIoLib|Include/Library/PciCapPciIoLib.h
+
+  ##  @libraryclass  Layered on top of PciCapLib, allows clients to plug a
+  #                  PciSegmentLib backend into PciCapLib, for config space
+  #                  access.
+  #PciCapPciSegmentLib|Include/Library/PciCapPciSegmentLib.h
+
+  ##  @libraryclass  Provide common utility functions to PciHostBridgeLib
+  #                  instances in ArmVirtPkg and OvmfPkg.
+  #PciHostBridgeUtilityLib|Include/Library/PciHostBridgeUtilityLib.h
+
+  ##  @libraryclass  Register a status code handler for printing the Boot
+  #                  Manager's LoadImage() and StartImage() preparations, and
+  #                  return codes, to the UEFI console.
+  #PlatformBmPrintScLib|Include/Library/PlatformBmPrintScLib.h
+
+  ##  @libraryclass  Customize FVB2 protocol member functions for a platform.
+  #PlatformFvbLib|Include/Library/PlatformFvbLib.h
+
+  ##  @libraryclass  Access QEMU's firmware configuration interface
+  #
+  QemuFwCfgLib|Include/Library/QemuFwCfgLib.h
+
+  ##  @libraryclass  S3 support for QEMU fw_cfg
+  #
+  QemuFwCfgS3Lib|Include/Library/QemuFwCfgS3Lib.h
+
+  ##  @libraryclass  Parse the contents of named fw_cfg files as simple
+  #                  (scalar) data types.
+  #QemuFwCfgSimpleParserLib|Include/Library/QemuFwCfgSimpleParserLib.h
+
+  ##  @libraryclass  Rewrite the BootOrder NvVar based on QEMU's "bootorder"
+  #                  fw_cfg file.
+  #
+  #QemuBootOrderLib|Include/Library/QemuBootOrderLib.h
+
+  ##  @libraryclass  Load a kernel image and command line passed to QEMU via
+  #                  the command line
+  #
+  #QemuLoadImageLib|Include/Library/QemuLoadImageLib.h
+
+  ##  @libraryclass  Serialize (and deserialize) variables
+  #
+  #SerializeVariablesLib|Include/Library/SerializeVariablesLib.h
+
+  ##  @libraryclass  Declares utility functions for virtio device drivers.
+  #VirtioLib|Include/Library/VirtioLib.h
+
+  ##  @libraryclass  Install Virtio Device Protocol instances on virtio-mmio
+  #                  transports.
+  #VirtioMmioDeviceLib|Include/Library/VirtioMmioDeviceLib.h
+
+  ##  @libraryclass  Invoke Xen hypercalls
+  #
+  #XenHypercallLib|Include/Library/XenHypercallLib.h
+
+  ##  @libraryclass  Manage XenBus device path and I/O handles
+  #
+  #XenIoMmioLib|Include/Library/XenIoMmioLib.h
+
+  ##  @libraryclass  Get information about Xen
+  #
+  #XenPlatformLib|Include/Library/XenPlatformLib.h
+
 [Guids]
   gUefiTempTokenSpaceGuid            = {0x93bb96af, 0xb9f2, 0x4eb8, {0x94, 0x62, 0xe0, 0xba, 0x74, 0x56, 0x42, 0x36}}
   gEfiXenInfoGuid                       = {0xd3b46f3b, 0xd441, 0x1244, {0x9a, 0x12, 0x0, 0x12, 0x27, 0x3f, 0xc1, 0x4d}}

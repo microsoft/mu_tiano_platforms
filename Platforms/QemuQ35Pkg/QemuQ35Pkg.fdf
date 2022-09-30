@@ -162,7 +162,7 @@ gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress|gUefiTempTokenSpace
 gUefiTempTokenSpaceGuid.PcdOvmfSecPeiTempRamBase|gUefiTempTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
 
 0x020000|0x0E0000
-gUefiTempPkgTokenSpaceGuid.PcdTempPeiMemFvBase|gUefiTempTokenSpaceGuid.PcdOvmfPeiMemFvSize
+gUefiTempTokenSpaceGuid.PcdOvmfPeiMemFvBase|gUefiTempTokenSpaceGuid.PcdOvmfPeiMemFvSize
 FV = PEIFV
 
 0x100000|0xC00000
