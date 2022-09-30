@@ -2,7 +2,7 @@
 
 **QemuQ35Pkg...**
 
-- Is a derivative of OvmfPkg.
+- Is a derivative of Temp.
 - Will not support Legacy BIOS or CSM.
 - WIll not support S3 sleep functionality.
 - Has a 32-bit PEI phase and a 64-bit DXE phase.

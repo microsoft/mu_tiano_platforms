@@ -1,0 +1,145 @@
+## @file
+#  Platform PEI driver
+#
+#  This module provides platform specific function to detect boot mode.
+#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformPei
+  FILE_GUID                      = 222c386d-5abc-4fb4-b124-fbb82488acf4
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializePlatform
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  AmdSev.c
+  ClearCache.c
+  Cmos.c
+  Cmos.h
+  FeatureControl.c
+  Fv.c
+  MemDetect.c
+  MemTypeInfo.c
+  Platform.c
+  Platform.h
+
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  Temp/Temp.dec
+
+[Guids]
+  gEfiMemoryTypeInformationGuid
+  gFdtHobGuid
+  gDxeMemoryProtectionSettingsGuid # MU_CHANGE
+  gMmMemoryProtectionSettingsGuid # MU_CHANGE
+
+[LibraryClasses]
+  BaseLib
+  CacheMaintenanceLib
+  DebugLib
+  HobLib
+  IoLib
+  PciLib
+  ResourcePublicationLib
+  PeiServicesLib
+  PeiServicesTablePointerLib
+  PeimEntryPoint
+  QemuFwCfgLib
+  QemuFwCfgS3Lib
+  QemuFwCfgSimpleParserLib
+  MtrrLib
+  MemEncryptSevLib
+  PcdLib
+  VmgExitLib
+
+[Pcd]
+  gUefiTempTokenSpaceGuid.PcdOvmfPeiMemFvBase
+  gUefiTempTokenSpaceGuid.PcdOvmfPeiMemFvSize
+  gUefiTempTokenSpaceGuid.PcdOvmfDxeMemFvBase
+  gUefiTempTokenSpaceGuid.PcdOvmfDxeMemFvSize
+  gUefiTempTokenSpaceGuid.PcdOvmfSecPeiTempRamBase
+  gUefiTempTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
+  gUefiTempTokenSpaceGuid.PcdOvmfSecPageTablesBase
+  gUefiTempTokenSpaceGuid.PcdOvmfSecPageTablesSize
+  gUefiTempTokenSpaceGuid.PcdOvmfSecGhcbPageTableBase
+  gUefiTempTokenSpaceGuid.PcdOvmfSecGhcbPageTableSize
+  gUefiTempTokenSpaceGuid.PcdOvmfSecGhcbBase
+  gUefiTempTokenSpaceGuid.PcdOvmfSecGhcbSize
+  gUefiTempTokenSpaceGuid.PcdOvmfLockBoxStorageBase
+  gUefiTempTokenSpaceGuid.PcdOvmfLockBoxStorageSize
+  gUefiTempTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
+  gUefiTempTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+  gUefiTempTokenSpaceGuid.PcdPciIoBase
+  gUefiTempTokenSpaceGuid.PcdPciIoSize
+  gUefiTempTokenSpaceGuid.PcdPciMmio32Base
+  gUefiTempTokenSpaceGuid.PcdPciMmio32Size
+  gUefiTempTokenSpaceGuid.PcdPciMmio64Base
+  gUefiTempTokenSpaceGuid.PcdPciMmio64Size
+  gUefiTempTokenSpaceGuid.PcdOvmfDecompressionScratchEnd
+  gUefiTempTokenSpaceGuid.PcdQ35TsegMbytes
+  gUefiTempTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase
+  gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable
+  # gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack MU_CHANGE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask
+  gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbSize
+  gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuBootLogicalProcessorNumber
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
+  gUefiCpuPkgTokenSpaceGuid.PcdGhcbHypervisorFeatures
+
+[FixedPcd]
+  gUefiTempTokenSpaceGuid.PcdOvmfCpuidBase
+  gUefiTempTokenSpaceGuid.PcdOvmfCpuidSize
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData
+  gUefiTempTokenSpaceGuid.PcdOvmfSecGhcbBackupBase
+  gUefiTempTokenSpaceGuid.PcdOvmfSecGhcbBackupSize
+  gUefiTempTokenSpaceGuid.PcdOvmfWorkAreaBase
+  gUefiTempTokenSpaceGuid.PcdOvmfWorkAreaSize
+  gUefiTempTokenSpaceGuid.PcdOvmfSnpSecretsBase
+  gUefiTempTokenSpaceGuid.PcdOvmfSnpSecretsSize
+
+[FeaturePcd]
+  gUefiTempTokenSpaceGuid.PcdCsmEnable
+  gUefiTempTokenSpaceGuid.PcdSmmSmramRequire
+
+[Ppis]
+  gEfiPeiMasterBootModePpiGuid
+  gEfiPeiMpServicesPpiGuid
+  gEfiPeiReadOnlyVariable2PpiGuid
+
+[Depex]
+  TRUE
+

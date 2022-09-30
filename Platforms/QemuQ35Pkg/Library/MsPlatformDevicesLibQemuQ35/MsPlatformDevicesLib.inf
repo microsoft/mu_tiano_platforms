@@ -25,7 +25,7 @@
   PcBdsPkg/PcBdsPkg.dec
   MsCorePkg/MsCorePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  OvmfPkg/OvmfPkg.dec
+  Temp/Temp.dec
   SourceLevelDebugPkg/SourceLevelDebugPkg.dec
 
 [LibraryClasses]
@@ -42,4 +42,4 @@
   gRootBridgesConnectedEventGroupGuid
 
 [Pcd]
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+  gUefiTempTokenSpaceGuid.PcdOvmfHostBridgePciDevId

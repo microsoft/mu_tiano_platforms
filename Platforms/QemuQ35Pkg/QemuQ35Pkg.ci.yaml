@@ -28,7 +28,7 @@
         "AcceptableDependencies": [
             "MdePkg/MdePkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
-            "OvmfPkg/OvmfPkg.dec",
+            "Temp/Temp.dec",
             "NetworkPkg/NetworkPkg.dec",
             "SecurityPkg/SecurityPkg.dec",
             "UefiCpuPkg/UefiCpuPkg.dec",
