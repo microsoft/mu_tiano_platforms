@@ -1,5 +1,4 @@
 ## @file
-#Override : 00000002 | Temp/Library/PlatformDebugLibIoPort/PlatformRomDebugLibIoPort.inf | c7c69a379cd95d92cb4356184e03117c | 2022-09-30T17-39-39 | b0edf02a681119f74dfd80629ae78e8ef3b0b114
 #  Instance of Debug Library for the QEMU debug console port.
 #  It uses Print Library to produce formatted output strings.
 #
@@ -32,7 +31,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  Temp/Temp.dec
+  QemuQ35Pkg/QemuQ35Pkg.dec
 
 [LibraryClasses]
   BaseMemoryLib
@@ -43,7 +42,7 @@
   DebugPrintErrorLevelLib
 
 [Pcd]
-  gUefiTempTokenSpaceGuid.PcdDebugIoPort                ## CONSUMES
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdDebugIoPort             ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue        ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask            ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdFixedDebugPrintErrorLevel    ## CONSUMES

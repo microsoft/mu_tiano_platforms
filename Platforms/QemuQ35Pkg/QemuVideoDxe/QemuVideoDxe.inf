@@ -7,7 +7,6 @@
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
-#Override : 00000002 | Temp/QemuVideoDxe/QemuVideoDxe.inf | 12ebd52d52d2860dfc1f0f762b5097fd | 2022-09-30T17-46-06 | b0edf02a681119f74dfd80629ae78e8ef3b0b114
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -37,7 +36,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  Temp/Temp.dec
+  QemuQ35Pkg/QemuQ35Pkg.dec
   MsGraphicsPkg/MsGraphicsPkg.dec # MU_CHANGE use MsGopOverrideProtocolGuid
   PolicyServicePkg/PolicyServicePkg.dec
   QemuQ35Pkg/QemuQ35Pkg.dec
@@ -66,7 +65,7 @@
   gEfiPciIoProtocolGuid                         # PROTOCOL TO_START
 
 [Pcd]
-  gUefiTempTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
   gMsGraphicsPkgTokenSpaceGuid.PcdMsGopOverrideProtocolGuid   # MU_CHANGE use MsGopOverrideProtocolGuid
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution # MU_CHANGE use pcds to control default resolution
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution   # MU_CHANGE use pcds to control default resolution

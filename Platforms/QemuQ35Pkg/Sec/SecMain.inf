@@ -1,0 +1,82 @@
+## @file
+#  SEC Driver
+#
+#  Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecMain
+  FILE_GUID                      = df1ccef6-f301-4a63-9661-fc6030dcc880
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SecMain
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  SecMain.c
+  AmdSev.c
+  AmdSev.h
+
+[Sources.IA32]
+  Ia32/SecEntry.nasm
+
+[Sources.X64]
+  X64/SecEntry.nasm
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  QemuQ35Pkg/QemuQ35Pkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  PeiServicesLib
+  PcdLib
+  UefiCpuLib
+  DebugAgentLib
+  IoLib
+  PeCoffLib
+  PeCoffGetEntryPointLib
+  PeCoffExtraActionLib
+  ExtractGuidedSectionLib
+  LocalApicLib
+  MemEncryptSevLib
+  CpuExceptionHandlerLib
+
+[Ppis]
+  gEfiTemporaryRamSupportPpiGuid                # PPI ALWAYS_PRODUCED
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfPeiMemFvBase
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfPeiMemFvSize
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfDxeMemFvBase
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecGhcbBase
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecGhcbSize
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecPageTablesBase
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecPeiQemuQ35PkgRamBase
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecPeiQemuQ35PkgRamSize
+  gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfDecompressionScratchEnd
+  gEfiMdeModulePkgTokenSpaceGuid.PcdInitValueInTempStack
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfConfidentialComputingWorkAreaHeader
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfWorkAreaBase
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecValidatedStart
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecValidatedEnd
+
+[FeaturePcd]
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdSmmSmramRequire

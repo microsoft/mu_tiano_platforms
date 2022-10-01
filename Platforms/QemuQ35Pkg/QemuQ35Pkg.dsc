@@ -65,12 +65,12 @@
 
 [LibraryClasses]
   PcdLib          |MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-  TimerLib        |Temp/Library/AcpiTimerLib/BaseAcpiTimerLib.inf
+  TimerLib        |QemuQ35Pkg/Library/AcpiTimerLib/BaseAcpiTimerLib.inf
   PrintLib        |MdePkg/Library/BasePrintLib/BasePrintLib.inf
   BaseLib         |MdePkg/Library/BaseLib/BaseLib.inf
   UefiLib         |MdePkg/Library/UefiLib/UefiLib.inf
   HiiLib          |MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
-  ResetSystemLib  |Temp/Library/ResetSystemLib/BaseResetSystemLib.inf
+  ResetSystemLib  |QemuQ35Pkg/Library/ResetSystemLib/BaseResetSystemLib.inf
 
   # Services tables/Entry points
   UefiBootServicesTableLib    |MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
@@ -147,7 +147,7 @@
   # File Libraries
   FileExplorerLib   |MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
   FileHandleLib     |MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
-  NvVarsFileLib     |Temp/Library/NvVarsFileLib/NvVarsFileLib.inf
+  NvVarsFileLib     |QemuQ35Pkg/Library/NvVarsFileLib/NvVarsFileLib.inf
   UefiDecompressLib |MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
 
   # Capsule/Versioning Libraries
@@ -163,14 +163,14 @@
   PciExpressLib       |MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
   PciLib              |MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
   PciSegmentLib       |MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
-  PciCapLib           |Temp/Library/BasePciCapLib/BasePciCapLib.inf
-  PciCapPciSegmentLib |Temp/Library/BasePciCapPciSegmentLib/BasePciCapPciSegmentLib.inf
-  PciCapPciIoLib      |Temp/Library/UefiPciCapPciIoLib/UefiPciCapPciIoLib.inf
+  PciCapLib           |QemuQ35Pkg/Library/BasePciCapLib/BasePciCapLib.inf
+  PciCapPciSegmentLib |QemuQ35Pkg/Library/BasePciCapPciSegmentLib/BasePciCapPciSegmentLib.inf
+  PciCapPciIoLib      |QemuQ35Pkg/Library/UefiPciCapPciIoLib/UefiPciCapPciIoLib.inf
 
   # IO Libraries
   IoLib         |MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsicSev.inf
   SerialPortLib |PcAtChipsetPkg/Library/SerialIoLib/SerialIoLib.inf
-  VirtioLib     |Temp/Library/VirtioLib/VirtioLib.inf
+  VirtioLib     |QemuQ35Pkg/Library/VirtioLib/VirtioLib.inf
 
   # USB Libraries
   UefiUsbLib |MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
@@ -179,8 +179,8 @@
   SecurityManagementLib |MdeModulePkg/Library/DxeSecurityManagementLib/DxeSecurityManagementLib.inf
   BaseBinSecurityLib    |MdePkg/Library/BaseBinSecurityLibNull/BaseBinSecurityLibNull.inf
   SecurityLockAuditLib  |MdeModulePkg/Library/SecurityLockAuditDebugMessageLib/SecurityLockAuditDebugMessageLib.inf ##MU_CHANGE
-  LockBoxLib            |Temp/Library/LockBoxLib/LockBoxBaseLib.inf
-  PlatformSecureLib     |Temp/Library/PlatformSecureLib/PlatformSecureLib.inf
+  LockBoxLib            |QemuQ35Pkg/Library/LockBoxLib/LockBoxBaseLib.inf
+  PlatformSecureLib     |QemuQ35Pkg/Library/PlatformSecureLib/PlatformSecureLib.inf
   PasswordStoreLib      |MsCorePkg/Library/PasswordStoreLibNull/PasswordStoreLibNull.inf
   PasswordPolicyLib     |OemPkg/Library/PasswordPolicyLib/PasswordPolicyLib.inf
   SecureBootVariableLib |SecurityPkg/Library/SecureBootVariableLib/SecureBootVariableLib.inf
@@ -190,7 +190,7 @@
 
   # Memory Libraries
   BaseMemoryLib                  |MdePkg/Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
-  MemEncryptSevLib               |Temp/Library/BaseMemEncryptSevLib/DxeMemEncryptSevLib.inf
+  MemEncryptSevLib               |QemuQ35Pkg/Library/BaseMemEncryptSevLib/DxeMemEncryptSevLib.inf
   MemoryTypeInfoSecVarCheckLib   |MdeModulePkg/Library/MemoryTypeInfoSecVarCheckLib/MemoryTypeInfoSecVarCheckLib.inf # MU_CHANGE TCBZ1086
   MemoryTypeInformationChangeLib |MdeModulePkg/Library/MemoryTypeInformationChangeLibNull/MemoryTypeInformationChangeLibNull.inf
   MtrrLib                        |UefiCpuPkg/Library/MtrrLib/MtrrLib.inf # Memory Type Range Register (https://en.wikipedia.org/wiki/Memory_type_range_register)
@@ -203,7 +203,7 @@
   VariablePolicyHelperLib   |MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
   AuthVariableLib           |SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf
   VarCheckLib               |MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
-  SerializeVariablesLib     |Temp/Library/SerializeVariablesLib/SerializeVariablesLib.inf
+  SerializeVariablesLib     |QemuQ35Pkg/Library/SerializeVariablesLib/SerializeVariablesLib.inf
   VariableFlashInfoLib      |MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
 
   # Unit Test Libs
@@ -213,8 +213,8 @@
   UnitTestResultReportLib |XmlSupportPkg/Library/UnitTestResultReportJUnitFormatLib/UnitTestResultReportLib.inf
 
   # Xen Libraries
-  XenHypercallLib |Temp/Library/XenHypercallLib/XenHypercallLib.inf
-  XenPlatformLib  |Temp/Library/XenPlatformLib/XenPlatformLib.inf
+  XenHypercallLib |QemuQ35Pkg/Library/XenHypercallLib/XenHypercallLib.inf
+  XenPlatformLib  |QemuQ35Pkg/Library/XenPlatformLib/XenPlatformLib.inf
 
   # Crypto Libraries
   BaseCryptLib    |CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
@@ -240,9 +240,9 @@
   Tpm2DeviceLib           |SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg2.inf
   Tcg2PpVendorLib         |SecurityPkg/Library/Tcg2PpVendorLibNull/Tcg2PpVendorLibNull.inf
   TpmMeasurementLib       |MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
-  Tcg2PhysicalPresenceLib |Temp/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2PhysicalPresenceLib.inf
+  Tcg2PhysicalPresenceLib |QemuQ35Pkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2PhysicalPresenceLib.inf
 !if $(TPM_ENABLE) == TRUE
-  Tcg2PhysicalPresenceLib |Temp/Library/Tcg2PhysicalPresenceLibQemu/DxeTcg2PhysicalPresenceLib.inf
+  Tcg2PhysicalPresenceLib |QemuQ35Pkg/Library/Tcg2PhysicalPresenceLibQemu/DxeTcg2PhysicalPresenceLib.inf
   TpmMeasurementLib       |SecurityPkg/Library/DxeTpmMeasurementLib/DxeTpmMeasurementLib.inf
   Tpm2DebugLib            |SecurityPkg/Library/Tpm2DebugLib/Tpm2DebugLibSimple.inf
 !endif
@@ -276,14 +276,14 @@
   JsonLiteParserLib |MsCorePkg/Library/JsonLiteParser/JsonLiteParser.inf
 
   # Qemu specific libraries
-  QemuFwCfgLib             |Temp/Library/QemuFwCfgLib/QemuFwCfgDxeLib.inf
-  QemuFwCfgSimpleParserLib |Temp/Library/QemuFwCfgSimpleParserLib/QemuFwCfgSimpleParserLib.inf
+  QemuFwCfgLib             |QemuQ35Pkg/Library/QemuFwCfgLib/QemuFwCfgDxeLib.inf
+  QemuFwCfgSimpleParserLib |QemuQ35Pkg/Library/QemuFwCfgSimpleParserLib/QemuFwCfgSimpleParserLib.inf
   VmgExitLib               |UefiCpuPkg/Library/VmgExitLibNull/VmgExitLibNull.inf
 
   # Platform devices path libraries
   MsPlatformDevicesLib |QemuQ35Pkg/Library/MsPlatformDevicesLibQemuQ35/MsPlatformDevicesLib.inf
   DevicePathLib        |MdePkg/Library/UefiDevicePathLibDevicePathProtocol/UefiDevicePathLibDevicePathProtocol.inf
-  LoadLinuxLib         |Temp/Library/LoadLinuxLib/LoadLinuxLib.inf
+  LoadLinuxLib         |QemuQ35Pkg/Library/LoadLinuxLib/LoadLinuxLib.inf
 
   # Setup variable libraries
   ConfigBlobBaseLib         |SetupDataPkg/Library/ConfigBlobBaseLib/ConfigBlobBaseLib.inf
@@ -540,8 +540,8 @@
 # SEC Libraries
 #########################################
 [LibraryClasses.common.SEC]
-  TimerLib                   |Temp/Library/AcpiTimerLib/BaseRomAcpiTimerLib.inf
-  QemuFwCfgLib               |Temp/Library/QemuFwCfgLib/QemuFwCfgSecLib.inf
+  TimerLib                   |QemuQ35Pkg/Library/AcpiTimerLib/BaseRomAcpiTimerLib.inf
+  QemuFwCfgLib               |QemuQ35Pkg/Library/QemuFwCfgLib/QemuFwCfgSecLib.inf
   HobLib                     |MdePkg/Library/PeiHobLib/PeiHobLib.inf
   PeiServicesLib             |MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   PeiServicesTablePointerLib |MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
@@ -557,7 +557,7 @@
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
   DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/SecPeiDebugAgentLib.inf
 !endif
-  MemEncryptSevLib|Temp/Library/BaseMemEncryptSevLib/SecMemEncryptSevLib.inf
+  MemEncryptSevLib|QemuQ35Pkg/Library/BaseMemEncryptSevLib/SecMemEncryptSevLib.inf
 
 [LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.DXE_CORE, LibraryClasses.common.UEFI_APPLICATION]
   DxeMemoryProtectionHobLib|MdeModulePkg/Library/MemoryProtectionHobLib/DxeMemoryProtectionHobLib.inf
@@ -583,14 +583,14 @@
 !else
   DebugLib                   |QemuQ35Pkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
 !endif
-  MemEncryptSevLib           |Temp/Library/BaseMemEncryptSevLib/PeiMemEncryptSevLib.inf
+  MemEncryptSevLib           |QemuQ35Pkg/Library/BaseMemEncryptSevLib/PeiMemEncryptSevLib.inf
 
 [LibraryClasses.common.PEI_CORE]
   PeiCoreEntryPoint |MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
 
 [LibraryClasses.common.PEIM]
   ResetSystemLib             |MdeModulePkg/Library/PeiResetSystemLib/PeiResetSystemLib.inf
-  HwResetSystemLib           |Temp/Library/ResetSystemLib/BaseResetSystemLib.inf
+  HwResetSystemLib           |QemuQ35Pkg/Library/ResetSystemLib/BaseResetSystemLib.inf
   PeimEntryPoint             |MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
   MsPlatformEarlyGraphicsLib |MsGraphicsPkg/Library/MsEarlyGraphicsLibNull/Pei/MsEarlyGraphicsLibNull.inf
   MsUiThemeLib               |MsGraphicsPkg/Library/MsUiThemeLib/Pei/MsUiThemeLib.inf
@@ -599,9 +599,9 @@
   ExtractGuidedSectionLib    |MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
   CpuExceptionHandlerLib     |UefiCpuPkg/Library/CpuExceptionHandlerLib/PeiCpuExceptionHandlerLib.inf
   MpInitLib                  |UefiCpuPkg/Library/MpInitLib/PeiMpInitLib.inf
-  QemuFwCfgS3Lib             |Temp/Library/QemuFwCfgS3Lib/PeiQemuFwCfgS3LibFwCfg.inf
+  QemuFwCfgS3Lib             |QemuQ35Pkg/Library/QemuFwCfgS3Lib/PeiQemuFwCfgS3LibFwCfg.inf
   PcdLib                     |MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
-  QemuFwCfgLib               |Temp/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
+  QemuFwCfgLib               |QemuQ35Pkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
   BaseCryptLib               |CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
   PcdDatabaseLoaderLib       |MdeModulePkg/Library/PcdDatabaseLoaderLib/Pei/PcdDatabaseLoaderLibPei.inf
   OemMfciLib                 |OemPkg/Library/OemMfciLib/OemMfciLibPei.inf
@@ -612,7 +612,7 @@
   Tpm12DeviceLib             |SecurityPkg/Library/Tpm12DeviceLibDTpm/Tpm12DeviceLibDTpm.inf
   Tpm2DeviceLib              |SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
   SourceDebugEnabledLib      |SourceLevelDebugPkg/Library/SourceDebugEnabled/SourceDebugEnabledLib.inf
-  Tcg2PreUefiEventLogLib     |SecurityPkg/Library/TempPreUefiEventLogLib/TempPreUefiEventLogLib.inf ## BRET - Do we have a null instance
+  Tcg2PreUefiEventLogLib     |SecurityPkg/Library/QemuQ35PkgPreUefiEventLogLib/QemuQ35PkgPreUefiEventLogLib.inf ## BRET - Do we have a null instance
 !endif
 
 
@@ -631,7 +631,7 @@
   MemoryAllocationLib           |MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   CpuExceptionHandlerLib        |UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
   ReportStatusCodeLib           |MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
-  QemuFwCfgS3Lib                |Temp/Library/QemuFwCfgS3Lib/DxeQemuFwCfgS3LibFwCfg.inf
+  QemuFwCfgS3Lib                |QemuQ35Pkg/Library/QemuFwCfgS3Lib/DxeQemuFwCfgS3LibFwCfg.inf
   !ifdef $(DEBUG_ON_SERIAL_PORT)
     DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
   !else
@@ -640,9 +640,9 @@
 
 # Non DXE Core but everything else
 [LibraryClasses.common.DXE_RUNTIME_DRIVER, LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.UEFI_APPLICATION]
-  TimerLib |Temp/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
+  TimerLib |QemuQ35Pkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
   RngLib   |MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf # MU_CHANGE use timer lib as the source of random
-  PciLib   |Temp/Library/DxePciLibI440FxQ35/DxePciLibI440FxQ35.inf
+  PciLib   |QemuQ35Pkg/Library/DxePciLibI440FxQ35/DxePciLibI440FxQ35.inf
 
   OemMfciLib  |OemPkg/Library/OemMfciLib/OemMfciLibDxe.inf
 
@@ -657,8 +657,8 @@
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   ReportStatusCodeLib|MdeModulePkg/Library/RuntimeDxeReportStatusCodeLib/RuntimeDxeReportStatusCodeLib.inf
-  ResetSystemLib|Temp/Library/ResetSystemLib/DxeResetSystemLib.inf
-  HwResetSystemLib|Temp/Library/ResetSystemLib/DxeResetSystemLib.inf
+  ResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
+  HwResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
 
@@ -670,10 +670,10 @@
 
 [LibraryClasses.common.DXE_DRIVER]
   PlatformBootManagerLib|MsCorePkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
-  PlatformBmPrintScLib|Temp/Library/PlatformBmPrintScLib/PlatformBmPrintScLib.inf
-  QemuBootOrderLib|Temp/Library/QemuBootOrderLib/QemuBootOrderLib.inf
+  PlatformBmPrintScLib|QemuQ35Pkg/Library/PlatformBmPrintScLib/PlatformBmPrintScLib.inf
+  QemuBootOrderLib|QemuQ35Pkg/Library/QemuBootOrderLib/QemuBootOrderLib.inf
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxDxeLib.inf
-  QemuLoadImageLib|Temp/Library/GenericQemuLoadImageLib/GenericQemuLoadImageLib.inf
+  QemuLoadImageLib|QemuQ35Pkg/Library/GenericQemuLoadImageLib/GenericQemuLoadImageLib.inf
   MpInitLib|UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
   UpdateFacsHardwareSignatureLib|PcBdsPkg/Library/UpdateFacsHardwareSignatureLib/UpdateFacsHardwareSignatureLib.inf
   PcdDatabaseLoaderLib|MdeModulePkg/Library/PcdDatabaseLoaderLib/Dxe/PcdDatabaseLoaderLibDxe.inf
@@ -689,13 +689,13 @@
 # SMM Libraries
 #########################################
 [LibraryClasses.common.SMM_CORE, LibraryClasses.common.DXE_SMM_DRIVER]
-  ResetSystemLib|Temp/Library/ResetSystemLib/DxeResetSystemLib.inf
-  HwResetSystemLib|Temp/Library/ResetSystemLib/DxeResetSystemLib.inf
+  ResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
+  HwResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/SmmReportStatusCodeLib/SmmReportStatusCodeLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
-  PciLib|Temp/Library/DxePciLibI440FxQ35/DxePciLibI440FxQ35.inf
+  PciLib|QemuQ35Pkg/Library/DxePciLibI440FxQ35/DxePciLibI440FxQ35.inf
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
-  TimerLib|Temp/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
+  TimerLib|QemuQ35Pkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
 
   !ifdef $(DEBUG_ON_SERIAL_PORT)
     DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
@@ -740,7 +740,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|TRUE
 
   #gUefiTempTokenSpaceGuid.PcdSmmSmramRequire|TRUE
-  gUefiTempTokenSpaceGuid.PcdSmmSmramRequire|TRUE
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdSmmSmramRequire|TRUE
   gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugSupport|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache|FALSE
 
@@ -864,7 +864,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 
   # IRQs 5, 9, 10, 11 are level-triggered
   #gUefiTempTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel|0x0E20
-  gUefiTempTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel|0x0E20
+  gUefiQemuQ35PkgTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel|0x0E20
 
   gMsGraphicsPkgTokenSpaceGuid.PcdMsGopOverrideProtocolGuid|{0xF5, 0x3B, 0x5E, 0xAA, 0x8A, 0x81, 0x2D, 0x41, 0xA1, 0x8E, 0xD8, 0x79, 0x3B, 0xA0, 0x3A, 0x5C}
 
@@ -892,14 +892,14 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|768
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable|FALSE
   #gUefiTempTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0
-  gUefiTempTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0
-  #gUefiTempTokenSpaceGuid.PcdPciIoBase|0x0
-  gUefiTempTokenSpaceGuid.PcdPciIoBase|0x0
-  gUefiTempTokenSpaceGuid.PcdPciIoSize|0x0
-  gUefiTempTokenSpaceGuid.PcdPciMmio32Base|0x0
-  gUefiTempTokenSpaceGuid.PcdPciMmio32Size|0x0
-  gUefiTempTokenSpaceGuid.PcdPciMmio64Base|0x0
-  gUefiTempTokenSpaceGuid.PcdPciMmio64Size|0x800000000
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0
+  #gUefiQemuQ35PkgTokenSpaceGuid.PcdPciIoBase|0x0
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdPciIoBase|0x0
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdPciIoSize|0x0
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdPciMmio32Base|0x0
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdPciMmio32Size|0x0
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdPciMmio64Base|0x0
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdPciMmio64Size|0x800000000
 
 
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0
@@ -910,7 +910,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0208
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0
-  gUefiTempTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
 
   # UefiCpuPkg PCDs related to initial AP bringup and general AP management.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber|64
@@ -920,8 +920,8 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask|0x0
 
 
-  gUefiTempTokenSpaceGuid.PcdQ35TsegMbytes|8
-  gUefiTempTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase|FALSE
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdQ35TsegMbytes|8
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase|FALSE
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode|0x01
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout|100000
 
@@ -972,12 +972,12 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 ################################################################################
 
 [Components.IA32]
-  Temp/ResetVector/ResetVector.inf
+  QemuQ35Pkg/ResetVector/ResetVector.inf
 
   #########################################
   # SEC Phase modules
   #########################################
-  Temp/Sec/SecMain.inf {
+  QemuQ35Pkg/Sec/SecMain.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   }
@@ -1000,7 +1000,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   }
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
-  Temp/PlatformPei/PlatformPei.inf
+  QemuQ35Pkg/PlatformPei/PlatformPei.inf
   UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf {
     <LibraryClasses>
 
@@ -1010,12 +1010,12 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 
   MdeModulePkg/Universal/FaultTolerantWritePei/FaultTolerantWritePei.inf
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
-  Temp/SmmAccess/SmmAccessPei.inf
+  QemuQ35Pkg/SmmAccess/SmmAccessPei.inf
 
   UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 
 !if $(TPM_ENABLE) == TRUE
-  Temp/Tcg/Tcg2Config/Tcg2ConfigPei.inf
+  QemuQ35Pkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
   SecurityPkg/Tcg/TcgPei/TcgPei.inf
   SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf {
     <LibraryClasses>
@@ -1138,20 +1138,20 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 
   MdeModulePkg/Universal/SmmCommunicationBufferDxe/SmmCommunicationBufferDxe.inf
 
-  Temp/8259InterruptControllerDxe/8259.inf
+  QemuQ35Pkg/8259InterruptControllerDxe/8259.inf
   UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
   UefiCpuPkg/CpuDxe/CpuDxe.inf {
     <LibraryClasses>
     NULL|MsCorePkg/Library/MemoryProtectionExceptionHandlerLib/MemoryProtectionExceptionHandlerLib.inf
   }
-  Temp/8254TimerDxe/8254Timer.inf
-  Temp/IncompatiblePciDeviceSupportDxe/IncompatiblePciDeviceSupport.inf
-  Temp/PciHotPlugInitDxe/PciHotPlugInit.inf
+  QemuQ35Pkg/8254TimerDxe/8254Timer.inf
+  QemuQ35Pkg/IncompatiblePciDeviceSupportDxe/IncompatiblePciDeviceSupport.inf
+  QemuQ35Pkg/PciHotPlugInitDxe/PciHotPlugInit.inf
   MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf {
     <LibraryClasses>
-      PciHostBridgeLib|Temp/Library/PciHostBridgeLib/PciHostBridgeLib.inf
-      PciHostBridgeUtilityLib|Temp/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf
-      NULL|Temp/Library/PlatformHasIoMmuLib/PlatformHasIoMmuLib.inf
+      PciHostBridgeLib|QemuQ35Pkg/Library/PciHostBridgeLib/PciHostBridgeLib.inf
+      PciHostBridgeUtilityLib|QemuQ35Pkg/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf
+      NULL|QemuQ35Pkg/Library/PlatformHasIoMmuLib/PlatformHasIoMmuLib.inf
   }
   MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf {
     <LibraryClasses>
@@ -1166,15 +1166,15 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
       gMsGraphicsPkgTokenSpaceGuid.PcdPostBackgroundColoringSkipCount|0
   }
 
-  Temp/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf {
+  QemuQ35Pkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf {
     <LibraryClasses>
-      NULL|Temp/Library/BlobVerifierLibNull/BlobVerifierLibNull.inf
+      NULL|QemuQ35Pkg/Library/BlobVerifierLibNull/BlobVerifierLibNull.inf
   }
-  Temp/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
-  Temp/Virtio10Dxe/Virtio10.inf
-  Temp/VirtioBlkDxe/VirtioBlk.inf
-  Temp/VirtioScsiDxe/VirtioScsi.inf
-  Temp/VirtioRngDxe/VirtioRng.inf
+  QemuQ35Pkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
+  QemuQ35Pkg/Virtio10Dxe/Virtio10.inf
+  QemuQ35Pkg/VirtioBlkDxe/VirtioBlk.inf
+  QemuQ35Pkg/VirtioScsiDxe/VirtioScsi.inf
+  QemuQ35Pkg/VirtioRngDxe/VirtioRng.inf
 
   # Rng Protocol producer
   SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
@@ -1203,7 +1203,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
   MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
   MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
-  Temp/SataControllerDxe/SataControllerDxe.inf
+  QemuQ35Pkg/SataControllerDxe/SataControllerDxe.inf
   MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
   MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
   MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
@@ -1214,12 +1214,12 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   QemuQ35Pkg/QemuVideoDxe/QemuVideoDxe.inf
 
 
-  Temp/QemuRamfbDxe/QemuRamfbDxe.inf
+  QemuQ35Pkg/QemuRamfbDxe/QemuRamfbDxe.inf
 
   #
   # ISA Support
   #
-  Temp/SioBusDxe/SioBusDxe.inf
+  QemuQ35Pkg/SioBusDxe/SioBusDxe.inf
   MdeModulePkg/Bus/Pci/PciSioSerialDxe/PciSioSerialDxe.inf
   MdeModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2KeyboardDxe.inf
 
@@ -1228,15 +1228,15 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   #
   MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf {
     <LibraryClasses>
-      NULL|Temp/Library/SmbiosVersionLib/DetectSmbiosVersionLib.inf
+      NULL|QemuQ35Pkg/Library/SmbiosVersionLib/DetectSmbiosVersionLib.inf
   }
-  Temp/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
+  QemuQ35Pkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
 
   #
   # ACPI Support
   #
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
-  Temp/AcpiPlatformDxe/AcpiPlatformDxe.inf
+  QemuQ35Pkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
   MdeModulePkg/Universal/Acpi/S3SaveStateDxe/S3SaveStateDxe.inf
   MdeModulePkg/Universal/Acpi/BootScriptExecutorDxe/BootScriptExecutorDxe.inf
   MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
@@ -1274,10 +1274,10 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   NetworkPkg/HttpUtilitiesDxe/HttpUtilitiesDxe.inf
   NetworkPkg/HttpBootDxe/HttpBootDxe.inf
 
-  Temp/VirtioNetDxe/VirtioNet.inf
+  QemuQ35Pkg/VirtioNetDxe/VirtioNet.inf
   NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf {
     <LibraryClasses>
-      NULL|Temp/Library/PxeBcPcdProducerLib/PxeBcPcdProducerLib.inf
+      NULL|QemuQ35Pkg/Library/PxeBcPcdProducerLib/PxeBcPcdProducerLib.inf
   }
   #
   # Usb Support
@@ -1293,7 +1293,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
     <PcdsFixedAtBuild>
       gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
   }
-  Temp/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf {
+  QemuQ35Pkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf {
     <PcdsFixedAtBuild>
       gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
   }
@@ -1332,9 +1332,9 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
       JsonLiteParserLib|MsCorePkg/Library/JsonLiteParser/JsonLiteParser.inf
   }
 
-  Temp/IoMmuDxe/IoMmuDxe.inf
+  QemuQ35Pkg/IoMmuDxe/IoMmuDxe.inf
 
-  Temp/CpuS3DataDxe/CpuS3DataDxe.inf
+  QemuQ35Pkg/CpuS3DataDxe/CpuS3DataDxe.inf
 
   AdvLoggerPkg/AdvancedFileLogger/AdvancedFileLogger.inf
   MsCorePkg/Universal/StatusCodeHandler/Serial/Dxe/SerialStatusCodeHandlerDxe.inf
@@ -1433,18 +1433,18 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   }
   UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf {
     <LibraryClasses>
-      SmmCpuPlatformHookLib|Temp/Library/SmmCpuPlatformHookLibQemu/SmmCpuPlatformHookLibQemu.inf
-      SmmCpuFeaturesLib|Temp/Library/SmmCpuFeaturesLib/SmmCpuFeaturesLib.inf
+      SmmCpuPlatformHookLib|QemuQ35Pkg/Library/SmmCpuPlatformHookLibQemu/SmmCpuPlatformHookLibQemu.inf
+      SmmCpuFeaturesLib|QemuQ35Pkg/Library/SmmCpuFeaturesLib/SmmCpuFeaturesLib.inf
   }
 
-  Temp/SmmAccess/SmmAccess2Dxe.inf
-  Temp/SmmControl2Dxe/SmmControl2Dxe.inf
+  QemuQ35Pkg/SmmAccess/SmmAccess2Dxe.inf
+  QemuQ35Pkg/SmmControl2Dxe/SmmControl2Dxe.inf
 
 
   #
   # Variable driver stack (SMM)
   #
-  Temp/QemuFlashFvbServicesRuntimeDxe/FvbServicesSmm.inf
+  QemuQ35Pkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesSmm.inf
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteSmm.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmm.inf {
     <LibraryClasses>
