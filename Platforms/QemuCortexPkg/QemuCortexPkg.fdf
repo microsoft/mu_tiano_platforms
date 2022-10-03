@@ -28,6 +28,37 @@
   DEFINE FVMAIN_COMPACT_SIZE  = 0x2ff000
 !endif
 
+[FD.SECURE_FLASH0]
+BaseAddress   = 0x00000000
+Size          = 0x00300000
+ErasePolarity = 1
+BlockSize     = 0x00001000
+NumBlocks     = 0x300
+
+################################################################################
+#
+# Following are lists of FD Region layout which correspond to the locations of different
+# images within the flash device.
+#
+# Regions must be defined in ascending order and may not overlap.
+#
+# A Layout Region start with a eight digit hex offset (leading "0x" required) followed by
+# the pipe "|" character, followed by the size of the region, also in hex with the leading
+# "0x" characters. Like:
+# Offset|Size
+# PcdOffsetCName|PcdSizeCName
+# RegionType <FV, DATA, or FILE>
+#
+################################################################################
+## Place for Trusted Firmware
+# flash0 is secure so we put here the BL1
+0x00000000|0x00008000
+FILE = /home/test/arm-trusted-firmware/build/qemu_sbsa/debug/bl1.bin
+
+# and FIP (BL2 + BL31)
+0x00008000|0x002D0000
+FILE = /home/test/arm-trusted-firmware/build/qemu_sbsa/debug/fip.bin
+
 [FD.QEMU_EFI]
 BaseAddress   = 0x00000000|gArmTokenSpaceGuid.PcdFdBaseAddress  # QEMU assigns 0 - 0x8000000 for a BootROM
 Size          = $(FD_SIZE)|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the FLASH Device

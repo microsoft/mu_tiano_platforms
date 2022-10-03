@@ -243,7 +243,13 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         # pad fd to 64mb
         with open(Built_FV, "ab") as fvfile:
             fvfile.seek(0, os.SEEK_END)
-            additional = b'\0' * ((64 * 1024 * 1024)-fvfile.tell())
+            additional = b'\0' * ((256 * 1024 * 1024)-fvfile.tell())
+            fvfile.write(additional)
+
+        bl3 = os.path.join(OutputPath_FV, "SECURE_FLASH0.fd")
+        with open(bl3, "ab") as fvfile:
+            fvfile.seek(0, os.SEEK_END)
+            additional = b'\0' * ((256 * 1024 * 1024)-fvfile.tell())
             fvfile.write(additional)
 
         # QEMU must be on that path
@@ -251,7 +257,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         # Unique Command and Args parameters per ARCH
         if (self.env.GetValue("TARGET_ARCH").upper() == "AARCH64"):
             cmd = "qemu-system-aarch64"
-            args = "-M virt"
+            args = "-M sbsa-ref"
             args += " -cpu cortex-a57"                                          # emulate cpu
         # elif(self.env.GetValue("TARGET_ARCH").upper() == "ARM"):
         #     cmd = "qemu-system-arm"
@@ -261,6 +267,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             raise NotImplementedError()
 
         # Common Args
+        args += " -pflash " + bl3
         args += " -pflash " + Built_FV                                     # path to fw
         args += " -m 1024"                                                  # 1gb memory
         # turn off network
