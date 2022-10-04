@@ -256,9 +256,9 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 
         # Unique Command and Args parameters per ARCH
         if (self.env.GetValue("TARGET_ARCH").upper() == "AARCH64"):
-            cmd = "qemu-system-aarch64"
+            cmd = "/home/test/qemu-7.1.0/build/qemu-system-aarch64"
             args = "-M sbsa-ref"
-            args += " -cpu cortex-a57"                                          # emulate cpu
+            args += " -cpu cortex-a57  -gdb tcp::5555"                                          # emulate cpu
         # elif(self.env.GetValue("TARGET_ARCH").upper() == "ARM"):
         #     cmd = "qemu-system-arm"
         #     args = "-M virt"

@@ -13,7 +13,7 @@
 #
 ################################################################################
 [Defines]
-  PLATFORM_NAME                  = Q
+  PLATFORM_NAME                  = QemuCortexPkg
   PLATFORM_GUID                  = 37d7e986-f7e9-45c2-8067-e371421a626c
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
@@ -209,7 +209,7 @@
   gArmTokenSpaceGuid.PcdVFPEnabled|1
 !endif
 
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x4007c000
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x1000007c000
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x4000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800
@@ -232,7 +232,8 @@
   #
 
   ## PL011 - Serial Terminal
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|38400
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60000000
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200
 
   ## Default Terminal Type
   ## 0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8, 4-TTYTERM
@@ -311,12 +312,11 @@
   #
   # ARM General Interrupt Controller
   #
-  gArmTokenSpaceGuid.PcdGicDistributorBase|0x0
-  gArmTokenSpaceGuid.PcdGicRedistributorsBase|0x0
-  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x0
+  gArmTokenSpaceGuid.PcdGicDistributorBase|0x40060000
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase|0x40080000
 
   ## PL031 RealTimeClock
-  gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x0
+  gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x60010000
 
   # set PcdPciExpressBaseAddress to MAX_UINT64, which signifies that this
   # PCD and PcdPciDisableBusEnumeration above have not been assigned yet

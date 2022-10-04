@@ -60,49 +60,77 @@ FILE = /home/test/arm-trusted-firmware/build/qemu_sbsa/debug/bl1.bin
 FILE = /home/test/arm-trusted-firmware/build/qemu_sbsa/debug/fip.bin
 
 [FD.QEMU_EFI]
-BaseAddress   = 0x00000000|gArmTokenSpaceGuid.PcdFdBaseAddress  # QEMU assigns 0 - 0x8000000 for a BootROM
-Size          = $(FD_SIZE)|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the FLASH Device
+BaseAddress   = 0x10000000|gArmTokenSpaceGuid.PcdFdBaseAddress
+Size          = 0x002C0000|gArmTokenSpaceGuid.PcdFdSize
 ErasePolarity = 1
 
 # This one is tricky, it must be: BlockSize * NumBlocks = Size
 BlockSize     = 0x00001000
-NumBlocks     = $(FD_NUM_BLOCKS)
+NumBlocks     = 0x2C0
 
-################################################################################
-#
-# Following are lists of FD Region layout which correspond to the locations of different
-# images within the flash device.
-#
-# Regions must be defined in ascending order and may not overlap.
-#
-# A Layout Region start with a eight digit hex offset (leading "0x" required) followed by
-# the pipe "|" character, followed by the size of the region, also in hex with the leading
-# "0x" characters. Like:
-# Offset|Size
-# PcdOffsetCName|PcdSizeCName
-# RegionType <FV, DATA, or FILE>
-#
-################################################################################
-
-#
-# UEFI has trouble dealing with FVs that reside at physical address 0x0.
-# So instead, put a hardcoded 'jump to 0x1000' at offset 0x0, and put the
-# real FV at offset 0x1000
-#
-0x00000000|0x00001000
-DATA = {
-!if $(ARCH) == AARCH64
-  0x00, 0x04, 0x00, 0x14   # 'b 0x1000' in AArch64 ASM
-!else
-  0xfe, 0x03, 0x00, 0xea   # 'b 0x1000' in AArch32 ASM
-!endif
-}
-
-0x00001000|$(FVMAIN_COMPACT_SIZE)
+## Place for EFI (BL33)
+# This offset (if any as it is 0x0 currently) + BaseAddress (0x10000000) must be set in PRELOADED_BL33_BASE at ATF
+0x00000000|0x00200000
 gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = FVMAIN_COMPACT
 
-!include VarStore.fdf.inc
+## Place for Variables. They share flash1 with EFI
+# Must be aligned to Flash Block size 0x40000
+0x00200000|0x00040000
+gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+#NV_VARIABLE_STORE
+DATA = {
+  ## This is the EFI_FIRMWARE_VOLUME_HEADER
+  # ZeroVector []
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  # FileSystemGuid: gEfiSystemNvDataFvGuid         =
+  #   { 0xFFF12B8D, 0x7696, 0x4C8B,
+  #     { 0xA9, 0x85, 0x27, 0x47, 0x07, 0x5B, 0x4F, 0x50 }}
+  0x8D, 0x2B, 0xF1, 0xFF, 0x96, 0x76, 0x8B, 0x4C,
+  0xA9, 0x85, 0x27, 0x47, 0x07, 0x5B, 0x4F, 0x50,
+  # FvLength: 0xC0000
+  0x00, 0x00, 0x0C, 0x00, 0x00, 0x00, 0x00, 0x00,
+  # Signature "_FVH"       # Attributes
+  0x5f, 0x46, 0x56, 0x48, 0xff, 0xfe, 0x04, 0x00,
+  # HeaderLength # CheckSum # ExtHeaderOffset #Reserved #Revision
+  0x48, 0x00, 0x28, 0x09, 0x00, 0x00, 0x00, 0x02,
+  # Blockmap[0]: 0x3 Blocks * 0x40000 Bytes / Block
+  0x3, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00,
+  # Blockmap[1]: End
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  ## This is the VARIABLE_STORE_HEADER
+  # It is compatible with SECURE_BOOT_ENABLE == FALSE as well.
+  # Signature: gEfiAuthenticatedVariableGuid =
+  #   { 0xaaf32c78, 0x947b, 0x439a,
+  #     { 0xa1, 0x80, 0x2e, 0x14, 0x4e, 0xc3, 0x77, 0x92 }}
+  0x78, 0x2c, 0xf3, 0xaa, 0x7b, 0x94, 0x9a, 0x43,
+  0xa1, 0x80, 0x2e, 0x14, 0x4e, 0xc3, 0x77, 0x92,
+  # Size: 0x40000 (gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize) -
+  #         0x48 (size of EFI_FIRMWARE_VOLUME_HEADER) = 0x3ffb8
+  # This can speed up the Variable Dispatch a bit.
+  0xB8, 0xFF, 0x03, 0x00,
+  # FORMATTED: 0x5A #HEALTHY: 0xFE #Reserved: UINT16 #Reserved1: UINT32
+  0x5A, 0xFE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+}
+
+0x00240000|0x00040000
+gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+#NV_FTW_WORKING
+DATA = {
+  # EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER->Signature = gEdkiiWorkingBlockSignatureGuid         =
+  #  { 0x9e58292b, 0x7c68, 0x497d, { 0xa0, 0xce, 0x65,  0x0, 0xfd, 0x9f, 0x1b, 0x95 }}
+  0x2b, 0x29, 0x58, 0x9e, 0x68, 0x7c, 0x7d, 0x49,
+  0xa0, 0xce, 0x65,  0x0, 0xfd, 0x9f, 0x1b, 0x95,
+  # Crc:UINT32            #WorkingBlockValid:1, WorkingBlockInvalid:1, Reserved
+  0x5b, 0xe7, 0xc6, 0x86, 0xFE, 0xFF, 0xFF, 0xFF,
+  # WriteQueueSize: UINT64
+  0xE0, 0xFF, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00
+}
+
+0x00280000|0x00040000
+gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+#NV_FTW_SPARE
 
 ################################################################################
 #
@@ -158,4 +186,4 @@ READ_LOCK_STATUS   = TRUE
     }
   }
 
-!include QemuCortexRules.fdf.inc
+!include ArmVirtPkg/ArmVirtRules.fdf.inc

@@ -16,7 +16,7 @@
 #
 ################################################################################
 [Defines]
-  PLATFORM_NAME                  = Q
+  PLATFORM_NAME                  = QemuCortexMMStandalone
   PLATFORM_GUID                  = 37d7e986-f7e9-45c2-8067-e371421a626c
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
@@ -133,7 +133,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x0f
 
   ## PL011 - Serial Terminal
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x2A410000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60000000
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200
 
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x2
