@@ -171,6 +171,8 @@
   IoLib         |MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsicSev.inf
   SerialPortLib |PcAtChipsetPkg/Library/SerialIoLib/SerialIoLib.inf
   VirtioLib     |QemuQ35Pkg/Library/VirtioLib/VirtioLib.inf
+  TdxLib        |MdePkg/Library/TdxLib/TdxLib.inf
+  CcProbeLib    |MdePkg/Library/CcProbeLibNull/CcProbeLibNull.inf
 
   # USB Libraries
   UefiUsbLib |MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
