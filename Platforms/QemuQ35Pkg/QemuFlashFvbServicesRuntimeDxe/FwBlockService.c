@@ -1,6 +1,7 @@
 /**@file
 
   Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -27,9 +28,9 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
-#include <Library/DxeServicesTableLib.h>
+// #include <Library/DxeServicesTableLib.h> // MU_CHANGE: Removed unused inclusion
 #include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
+// #include <Library/UefiBootServicesTableLib.h> // MU_CHANGE: Removed unused inclusion
 
 #include "FwBlockService.h"
 #include "QemuFlash.h"
@@ -39,7 +40,7 @@
 
 ESAL_FWB_GLOBAL  *mFvbModuleGlobal;
 
-FV_MEMMAP_DEVICE_PATH  mFvMemmapDevicePathQemuQ35Pkglate = {
+FV_MEMMAP_DEVICE_PATH  mFvMemmapDevicePathTemplate = {
   {
     {
       HARDWARE_DEVICE_PATH,
@@ -63,7 +64,7 @@ FV_MEMMAP_DEVICE_PATH  mFvMemmapDevicePathQemuQ35Pkglate = {
   }
 };
 
-FV_PIWG_DEVICE_PATH  mFvPIWGDevicePathQemuQ35Pkglate = {
+FV_PIWG_DEVICE_PATH  mFvPIWGDevicePathTemplate = {
   {
     {
       MEDIA_DEVICE_PATH,
@@ -85,7 +86,7 @@ FV_PIWG_DEVICE_PATH  mFvPIWGDevicePathQemuQ35Pkglate = {
   }
 };
 
-EFI_FW_VOL_BLOCK_DEVICE  mFvbDeviceQemuQ35Pkglate = {
+EFI_FW_VOL_BLOCK_DEVICE  mFvbDeviceTemplate = {
   FVB_DEVICE_SIGNATURE,
   NULL,
   0,
@@ -725,7 +726,7 @@ FvbProtocolWrite (
     when *NumBytes of data have been written, or when a block boundary is
     reached.  *NumBytes is updated to reflect the actual number of bytes
     written. The write operation does not include erase. This routine will
-    atQemuQ35Pkgt to write only the specified bytes. If the writes do not stick,
+    attempt to write only the specified bytes. If the writes do not stick,
     it will return an error.
 
   Arguments:
@@ -739,7 +740,7 @@ FvbProtocolWrite (
 
   Returns:
     EFI_SUCCESS           - The firmware volume was written successfully
-    EFI_BAD_BUFFER_SIZE   - Write atQemuQ35Pkgted across a LBA boundary. On output,
+    EFI_BAD_BUFFER_SIZE   - Write attempted across a LBA boundary. On output,
                             NumBytes contains the total number of bytes
                             actually written
     EFI_ACCESS_DENIED     - The firmware volume is in the WriteDisabled state
@@ -775,7 +776,7 @@ FvbProtocolRead (
     when *NumBytes of data have been read, or when a block boundary is
     reached.  *NumBytes is updated to reflect the actual number of bytes
     written. The write operation does not include erase. This routine will
-    atQemuQ35Pkgt to write only the specified bytes. If the writes do not stick,
+    attempt to write only the specified bytes. If the writes do not stick,
     it will return an error.
 
   Arguments:
@@ -789,7 +790,7 @@ FvbProtocolRead (
   Returns:
     EFI_SUCCESS           - The firmware volume was read successfully and
                             contents are in Buffer
-    EFI_BAD_BUFFER_SIZE   - Read atQemuQ35Pkgted across a LBA boundary. On output,
+    EFI_BAD_BUFFER_SIZE   - Read attempted across a LBA boundary. On output,
                             NumBytes contains the total number of bytes
                             returned in Buffer
     EFI_ACCESS_DENIED     - The firmware volume is in the ReadDisabled state
@@ -976,7 +977,6 @@ FvbInitialize (
   EFI_PHYSICAL_ADDRESS        BaseAddress;
   UINTN                       Length;
   UINTN                       NumOfBlocks;
-  RETURN_STATUS               PcdStatus;
 
   if (EFI_ERROR (QemuFlashInitialize ())) {
     //
@@ -1073,7 +1073,7 @@ FvbInitialize (
   FvbDevice = AllocateRuntimePool (sizeof (EFI_FW_VOL_BLOCK_DEVICE));
   ASSERT (FvbDevice != NULL);
 
-  CopyMem (FvbDevice, &mFvbDeviceQemuQ35Pkglate, sizeof (EFI_FW_VOL_BLOCK_DEVICE));
+  CopyMem (FvbDevice, &mFvbDeviceTemplate, sizeof (EFI_FW_VOL_BLOCK_DEVICE));
 
   FvbDevice->Instance = mFvbModuleGlobal->NumFv;
   mFvbModuleGlobal->NumFv++;
@@ -1089,7 +1089,7 @@ FvbInitialize (
     //
     FvMemmapDevicePath = AllocateCopyPool (
                            sizeof (FV_MEMMAP_DEVICE_PATH),
-                           &mFvMemmapDevicePathQemuQ35Pkglate
+                           &mFvMemmapDevicePathTemplate
                            );
     FvMemmapDevicePath->MemMapDevPath.StartingAddress = BaseAddress;
     FvMemmapDevicePath->MemMapDevPath.EndingAddress   =
@@ -1100,7 +1100,7 @@ FvbInitialize (
 
     FvPiwgDevicePath = AllocateCopyPool (
                          sizeof (FV_PIWG_DEVICE_PATH),
-                         &mFvPIWGDevicePathQemuQ35Pkglate
+                         &mFvPIWGDevicePathTemplate
                          );
     CopyGuid (
       &FvPiwgDevicePath->FvDevPath.FvName,
@@ -1129,7 +1129,8 @@ FvbInitialize (
   //
   InstallVirtualAddressChangeHandler ();
 
-  PcdStatus = PcdSetBoolS (PcdOvmfFlashVariablesEnable, TRUE);
-  ASSERT_RETURN_ERROR (PcdStatus);
+  // MU_CHANGE: Abstract dynamic PCD set to support Standalone MM
+  UpdateQemuFlashVariablesEnable ();
+
   return EFI_SUCCESS;
 }
