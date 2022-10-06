@@ -18,6 +18,7 @@
 **/
 
 #include <Guid/AcpiS3Context.h>
+#include <Guid/MmramMemoryReserve.h> // MU_CHANGE: Added support for Standalone MM mode
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
@@ -401,6 +402,19 @@ SmmAccessPeiEntryPoint (
     }
   }
   DEBUG_CODE_END ();
+
+  // MU_CHANGE Starts: Added support for Standalone MM mode
+  if (FeaturePcdGet (PcdStandaloneMmEnable)) {
+    EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MMRamDesc;
+
+    MMRamDesc = (EFI_MMRAM_HOB_DESCRIPTOR_BLOCK *)BuildGuidHob (&gEfiMmPeiMmramMemoryReserveGuid, sizeof (EFI_MMRAM_HOB_DESCRIPTOR_BLOCK) + SmramMapSize - sizeof (EFI_MMRAM_DESCRIPTOR));
+    if (MMRamDesc != NULL) {
+      MMRamDesc->NumberOfMmReservedRegions = (UINT32)SmramMapSize / sizeof SmramMap[0];
+      CopyMem (MMRamDesc->Descriptor, SmramMap, SmramMapSize);
+    }
+  }
+
+  // MU_CHANGE Ends
 
   GuidHob = BuildGuidHob (
               &gEfiAcpiVariableGuid,
