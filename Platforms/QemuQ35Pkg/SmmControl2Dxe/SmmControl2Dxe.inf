@@ -67,6 +67,7 @@
 
 [FeaturePcd]
   gUefiQemuQ35PkgTokenSpaceGuid.PcdSmmSmramRequire
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdStandaloneMmEnable  # MU_CHANGE: Added support for Standalone MM
 
 [Depex]
   TRUE
