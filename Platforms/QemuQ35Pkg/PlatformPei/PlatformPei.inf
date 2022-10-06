@@ -130,6 +130,8 @@
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfWorkAreaSize
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSnpSecretsBase
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSnpSecretsSize
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfFdBaseAddress   # MU_CHANGE: Report flash region as MMIO hob
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfFirmwareFdSize  # MU_CHANGE: Report flash region as MMIO hob
 
 [FeaturePcd]
   gUefiQemuQ35PkgTokenSpaceGuid.PcdCsmEnable

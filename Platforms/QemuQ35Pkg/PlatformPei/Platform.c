@@ -227,12 +227,8 @@ MemMapInitialization (
     // is most definitely not RAM; so, as an exception, cover it with
     // uncacheable reserved memory right here.
     //
-    AddReservedMemoryBaseSizeHob (PciExBarBase, SIZE_256MB, FALSE);
-    BuildMemoryAllocationHob (
-      PciExBarBase,
-      SIZE_256MB,
-      EfiReservedMemoryType
-      );
+    // MU_CHANGE: Report the PCIe regions as MMIO to support usage in Standalone MM
+    AddIoMemoryBaseSizeHob (PciExBarBase, SIZE_256MB);
   }
 
   AddIoMemoryBaseSizeHob (PcdGet32 (PcdCpuLocalApicBaseAddress), SIZE_1MB);
@@ -245,6 +241,21 @@ MemMapInitialization (
     PciIoBase = 0x6000;
     PciIoSize = 0xA000;
     ASSERT ((ICH9_PMBASE_VALUE & 0xF000) < PciIoBase);
+  }
+
+  // MU_CHANGE: Report the flash region as MMIO to support usage in Standalone MM
+  if (FeaturePcdGet (PcdSmmSmramRequire)) {
+    //
+    // Flash range should be marked as MMIO ranges for this platform
+    //
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: Claim MMIO region for flash. Base=0x%Lx Size=0x%Lx\n",
+      __FUNCTION__,
+      PcdGet32 (PcdOvmfFdBaseAddress),
+      PcdGet32 (PcdOvmfFirmwareFdSize)
+      ));
+    AddIoMemoryBaseSizeHob (PcdGet32 (PcdOvmfFdBaseAddress), PcdGet32 (PcdOvmfFirmwareFdSize));
   }
 
   //
@@ -433,18 +444,14 @@ MiscInitialization (
     case 0xffff: /* microvm */
       DEBUG ((DEBUG_INFO, "%a: microvm\n", __FUNCTION__));
       MicrovmInitialization ();
-      PcdStatus = PcdSet16S (
-                    PcdOvmfHostBridgePciDevId,
-                    MICROVM_PSEUDO_DEVICE_ID
-                    );
+      // MU_CHANGE: Remove dynamic PCD set to support usage in Standalone MM
+      PcdStatus = EFI_UNSUPPORTED;
       ASSERT_RETURN_ERROR (PcdStatus);
       return;
     case CLOUDHV_DEVICE_ID:
       DEBUG ((DEBUG_INFO, "%a: Cloud Hypervisor host bridge\n", __FUNCTION__));
-      PcdStatus = PcdSet16S (
-                    PcdOvmfHostBridgePciDevId,
-                    CLOUDHV_DEVICE_ID
-                    );
+      // MU_CHANGE: Remove dynamic PCD set to support usage in Standalone MM
+      PcdStatus = EFI_UNSUPPORTED;
       ASSERT_RETURN_ERROR (PcdStatus);
       return;
     default:
@@ -458,7 +465,8 @@ MiscInitialization (
       return;
   }
 
-  PcdStatus = PcdSet16S (PcdOvmfHostBridgePciDevId, mHostBridgeDevId);
+  // MU_CHANGE: Remove dynamic PCD set to support usage in Standalone MM
+  PcdStatus = (PcdGet16 (PcdOvmfHostBridgePciDevId) != mHostBridgeDevId) ? EFI_UNSUPPORTED : EFI_SUCCESS;
   ASSERT_RETURN_ERROR (PcdStatus);
 
   //
@@ -544,7 +552,8 @@ ReserveEmuVariableNvStore (
     VariableStore,
     (2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize)) / 1024
     ));
-  PcdStatus = PcdSet64S (PcdEmuVariableNvStoreReserved, VariableStore);
+  // MU_CHANGE: Remove dynamic PCD set to support usage in Standalone MM
+  PcdStatus = (PcdGet64 (PcdEmuVariableNvStoreReserved) != VariableStore) ? EFI_UNSUPPORTED : EFI_SUCCESS;
   ASSERT_RETURN_ERROR (PcdStatus);
 }
 
@@ -788,7 +797,8 @@ MaxCpuCountInitialization (
 
   PcdStatus = PcdSet32S (PcdCpuBootLogicalProcessorNumber, BootCpuCount);
   ASSERT_RETURN_ERROR (PcdStatus);
-  PcdStatus = PcdSet32S (PcdCpuMaxLogicalProcessorNumber, mMaxCpuCount);
+  // MU_CHANGE: Remove dynamic PCD set to support usage in Standalone MM
+  PcdStatus = (PcdGet32 (PcdCpuMaxLogicalProcessorNumber) >= mMaxCpuCount) ? EFI_SUCCESS : EFI_UNSUPPORTED;
   ASSERT_RETURN_ERROR (PcdStatus);
 }
 
@@ -816,8 +826,8 @@ InitializePlatform (
   DxeSettings = (DXE_MEMORY_PROTECTION_SETTINGS)DXE_MEMORY_PROTECTION_SETTINGS_DEBUG;
   MmSettings  = (MM_MEMORY_PROTECTION_SETTINGS)MM_MEMORY_PROTECTION_SETTINGS_DEBUG;
 
-  MmSettings.HeapGuardPolicy.Fields.MmPageGuard                    = 0;
-  MmSettings.HeapGuardPolicy.Fields.MmPoolGuard                    = 0;
+  MmSettings.HeapGuardPolicy.Fields.MmPageGuard                    = 1;
+  MmSettings.HeapGuardPolicy.Fields.MmPoolGuard                    = 1;
   DxeSettings.ImageProtectionPolicy.Fields.ProtectImageFromUnknown = 1;
   // THE /NXCOMPAT DLL flag cannot be set using non MinGW GCC
  #ifdef __GNUC__
