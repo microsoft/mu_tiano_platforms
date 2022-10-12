@@ -8,8 +8,18 @@
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
+
+resources:
+  repositories:
+    - repository: mu_devops
+      type: github
+      endpoint: microsoft
+      name: microsoft/mu_devops
+      ref: main
+
 trigger:
 - release/*
+
 pr:
 - release/*
 
@@ -56,7 +66,7 @@ jobs:
       vmImage: $(vm_image)
 
     steps:
-    - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
+    - template: Steps/BuildPlatform.yml@mu_devops
       parameters:
         tool_chain_tag: GCC5
         build_pkg: $(package)
