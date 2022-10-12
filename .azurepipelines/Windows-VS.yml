@@ -4,17 +4,31 @@
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
-# MU_CHANGE BEGIN
+
+resources:
+  repositories:
+    - repository: mu_devops
+      type: github
+      endpoint: microsoft
+      name: microsoft/mu_devops
+      ref: main
+
 trigger: none
 
 pr:
 - dev/*
 - release/*
-# MU_CHANGE END
 
 jobs:
-- template: templates/pr-gate-build-job.yml
+- template: Jobs/PrGate.yml@mu_devops
   parameters:
-    tool_chain_tag: 'VS2022'
-    vm_image: 'windows-2022'
-    arch_list: "IA32,X64"
+    arch_list: IA32,X64
+    do_ci_build: true
+    do_ci_setup: false
+    do_non_ci_build: false
+    do_non_ci_setup: true
+    do_pr_eval: true
+    packages: QemuQ35Pkg
+    target_list: NO-TARGET
+    tool_chain_tag: VS2022
+    vm_image: windows-2022
