@@ -108,19 +108,25 @@
   HobLib|StandaloneMmPkg/Library/StandaloneMmHobLib/StandaloneMmHobLib.inf
   MmServicesTableLib|MdePkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
   MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
-!if $(SECURE_STORAGE_ENABLE) == TRUE
   AuthVariableLib|SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-  NorFlashPlatformLib|Platform/ARM/SgiPkg/Library/NorFlashLib/StandaloneMmNorFlashLib.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   RngLib|MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
   PlatformSecureLib|SecurityPkg/Library/PlatformSecureLibNull/PlatformSecureLibNull.inf
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
   TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
+  # TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
+
+!if $(SECURE_STORAGE_ENABLE) == TRUE
+  NorFlashPlatformLib|Platform/ARM/SgiPkg/Library/NorFlashLib/StandaloneMmNorFlashLib.inf
 !endif
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
+  AdvLoggerAccessLib|AdvLoggerPkg/Library/AdvLoggerMmAccessLib/AdvLoggerMmAccessLib.inf
+  MemoryTypeInfoSecVarCheckLib|MdeModulePkg/Library/MemoryTypeInfoSecVarCheckLib/MemoryTypeInfoSecVarCheckLib.inf
+  SecurityLockAuditLib|MdeModulePkg/Library/SecurityLockAuditDebugMessageLib/SecurityLockAuditDebugMessageLib.inf
+  FltUsedLib|MdePkg/Library/FltUsedLib/FltUsedLib.inf
 
 ################################################################################
 #
@@ -143,6 +149,13 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800
   gEfiSecurityPkgTokenSpaceGuid.PcdUserPhysicalPresence|TRUE
 !endif
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0x01000000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0x00040000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0x01040000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize|0x00040000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0x01080000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize|0x00040000
 
 ###################################################################################################
 #
@@ -170,8 +183,6 @@
 
 [Components.AARCH64]
   ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
-!if $(SECURE_STORAGE_ENABLE) == TRUE
-  ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashStandaloneMm.inf
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteStandaloneMm.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStandaloneMm.inf {
     <LibraryClasses>
@@ -182,6 +193,8 @@
       VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLib.inf
       VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
   }
+!if $(SECURE_STORAGE_ENABLE) == TRUE
+  ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashStandaloneMm.inf
 !endif
 
 ###################################################################################################
@@ -194,5 +207,5 @@
 #
 ###################################################################################################
 [BuildOptions.AARCH64]
-  GCC:*_*_*_CC_FLAGS = -mstrict-align -march=armv8-a+nofp -D DISABLE_NEW_DEPRECATED_INTERFACES
+  GCC:*_*_*_CC_FLAGS = -mstrict-align -march=armv8-a -D DISABLE_NEW_DEPRECATED_INTERFACES
   GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000

@@ -30,10 +30,10 @@
 
 [FD.SECURE_FLASH0]
 BaseAddress   = 0x00000000
-Size          = 0x00300000
+Size          = 0x01100000
 ErasePolarity = 1
 BlockSize     = 0x00001000
-NumBlocks     = 0x300
+NumBlocks     = 0x1100
 
 ################################################################################
 #
@@ -59,24 +59,9 @@ FILE = /home/test/arm-trusted-firmware/build/qemu_sbsa/debug/bl1.bin
 0x00008000|0x002D0000
 FILE = /home/test/arm-trusted-firmware/build/qemu_sbsa/debug/fip.bin
 
-[FD.QEMU_EFI]
-BaseAddress   = 0x10000000|gArmTokenSpaceGuid.PcdFdBaseAddress
-Size          = 0x002C0000|gArmTokenSpaceGuid.PcdFdSize
-ErasePolarity = 1
-
-# This one is tricky, it must be: BlockSize * NumBlocks = Size
-BlockSize     = 0x00001000
-NumBlocks     = 0x2C0
-
-## Place for EFI (BL33)
-# This offset (if any as it is 0x0 currently) + BaseAddress (0x10000000) must be set in PRELOADED_BL33_BASE at ATF
-0x00000000|0x00200000
-gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
-FV = FVMAIN_COMPACT
-
 ## Place for Variables. They share flash1 with EFI
 # Must be aligned to Flash Block size 0x40000
-0x00200000|0x00040000
+0x01000000|0x00040000
 gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
 #NV_VARIABLE_STORE
 DATA = {
@@ -114,7 +99,7 @@ DATA = {
   0x5A, 0xFE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 }
 
-0x00240000|0x00040000
+0x01040000|0x00040000
 gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
 #NV_FTW_WORKING
 DATA = {
@@ -128,9 +113,24 @@ DATA = {
   0xE0, 0xFF, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00
 }
 
-0x00280000|0x00040000
+0x01080000|0x00040000
 gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
 #NV_FTW_SPARE
+
+[FD.QEMU_EFI]
+BaseAddress   = 0x10000000|gArmTokenSpaceGuid.PcdFdBaseAddress
+Size          = 0x002C0000|gArmTokenSpaceGuid.PcdFdSize
+ErasePolarity = 1
+
+# This one is tricky, it must be: BlockSize * NumBlocks = Size
+BlockSize     = 0x00001000
+NumBlocks     = 0x2C0
+
+## Place for EFI (BL33)
+# This offset (if any as it is 0x0 currently) + BaseAddress (0x10000000) must be set in PRELOADED_BL33_BASE at ATF
+0x00000000|0x00200000
+gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
+FV = FVMAIN_COMPACT
 
 ################################################################################
 #
