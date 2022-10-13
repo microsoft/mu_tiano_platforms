@@ -231,7 +231,7 @@ CalculateBestUdmaMode (
   DeviceUDmaMode = IdentifyData->AtaData.ultra_dma_mode;
   DEBUG ((DEBUG_INFO, "CalculateBestUdmaMode: DeviceUDmaMode = %x\n", DeviceUDmaMode));
   DeviceUDmaMode &= 0x3f;
-  QemuQ35PkgMode        = 0;          // initialize it to UDMA-0
+  QemuQ35PkgMode  = 0;                // initialize it to UDMA-0
 
   while ((DeviceUDmaMode >>= 1) != 0) {
     QemuQ35PkgMode++;

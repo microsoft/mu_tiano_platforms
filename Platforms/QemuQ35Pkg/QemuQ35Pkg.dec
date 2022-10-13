@@ -18,9 +18,30 @@
   Include
 
 [LibraryClasses]
+  ##  @libraryclass  Verify blobs read from the VMM
+  BlobVerifierLib|Include/Library/BlobVerifierLib.h
+
   ##  @libraryclass  Declares helper functions for Secure Encrypted
   #                  Virtualization (SEV) guests.
   MemEncryptSevLib|Include/Library/MemEncryptSevLib.h
+
+  ##  @libraryclass  Provides services to work with PCI capabilities in PCI
+  #                  config space.
+  PciCapLib|Include/Library/PciCapLib.h
+
+  ##  @libraryclass  Layered on top of PciCapLib, allows clients to plug an
+  #                  EFI_PCI_IO_PROTOCOL backend into PciCapLib, for config
+  #                  space access.
+  PciCapPciIoLib|Include/Library/PciCapPciIoLib.h
+
+  ##  @libraryclass  Layered on top of PciCapLib, allows clients to plug a
+  #                  PciSegmentLib backend into PciCapLib, for config space
+  #                  access.
+  PciCapPciSegmentLib|Include/Library/PciCapPciSegmentLib.h
+
+  ##  @libraryclass  Provide common utility functions to PciHostBridgeLib
+  #                  instances in ArmVirtPkg and OvmfPkg.
+  PciHostBridgeUtilityLib|Include/Library/PciHostBridgeUtilityLib.h
 
   ##  @libraryclass  Access QEMU's firmware configuration interface
   #
@@ -29,6 +50,17 @@
   ##  @libraryclass  S3 support for QEMU fw_cfg
   #
   QemuFwCfgS3Lib|Include/Library/QemuFwCfgS3Lib.h
+
+  ##  @libraryclass  Parse the contents of named fw_cfg files as simple
+  #                  (scalar) data types.
+  QemuFwCfgSimpleParserLib|Include/Library/QemuFwCfgSimpleParserLib.h
+
+  ##  @libraryclass  Declares utility functions for virtio device drivers.
+  VirtioLib|Include/Library/VirtioLib.h
+
+  ##  @libraryclass  Get information about Xen
+  #
+  XenPlatformLib|Include/Library/XenPlatformLib.h
 
 [Guids]
   ## Policy GUID for GFX policy data
@@ -96,7 +128,7 @@
   #  boundary limitations apply.
   # @Prompt UI Front Page File
   gQemuQ35PkgTokenSpaceGuid.PcdUIApplicationFile|{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }|VOID*|0x00000001
-  
+
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfPeiMemFvBase|0x0|UINT32|0
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfPeiMemFvSize|0x0|UINT32|1
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfDxeMemFvBase|0x0|UINT32|0x15

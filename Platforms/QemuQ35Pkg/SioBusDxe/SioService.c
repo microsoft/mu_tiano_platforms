@@ -302,10 +302,10 @@ SioCreateChildDevice (
   //
   mAcpiDeviceNodeQemuQ35Pkglate.HID = mDevicesInfo[DeviceIndex].Hid;
   mAcpiDeviceNodeQemuQ35Pkglate.UID = mDevicesInfo[DeviceIndex].Uid;
-  SioDevice->DevicePath       = AppendDevicePathNode (
-                                  ParentDevicePath,
-                                  (EFI_DEVICE_PATH_PROTOCOL *)&mAcpiDeviceNodeQemuQ35Pkglate
-                                  );
+  SioDevice->DevicePath             = AppendDevicePathNode (
+                                        ParentDevicePath,
+                                        (EFI_DEVICE_PATH_PROTOCOL *)&mAcpiDeviceNodeQemuQ35Pkglate
+                                        );
   if (SioDevice->DevicePath == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;

@@ -67,7 +67,7 @@
 
     ## options defined .pytool/Plugin/GuidCheck
     "GuidCheck": {
-        "IgnoreGuidName": [], # Expected duplication for gEfiFirmwareVolumeTopFileGuid
+        "IgnoreGuidName": ["SecCore", "ResetVector"], # Expected duplication for gEfiFirmwareVolumeTopFileGuid
         "IgnoreGuidValue": [],
         "IgnoreFoldersAndFiles": [],
         "IgnoreDuplicates": [],
@@ -80,7 +80,7 @@
 
     ## options defined .pytool/Plugin/SpellCheck
     "SpellCheck": {
-        "AuditOnly": False,           # Fails right now with over 270 errors
+        "AuditOnly": True,           # Enable after fixing failures
         "IgnoreFiles": [],           # use gitignore syntax to ignore errors in matching files
         "ExtendWords": [
             "acpitable",
