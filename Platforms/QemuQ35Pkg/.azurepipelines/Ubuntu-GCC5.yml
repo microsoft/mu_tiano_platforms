@@ -18,10 +18,12 @@ resources:
       ref: main
 
 trigger:
-- release/*
+- main
+- release/202202
 
 pr:
-- release/*
+- main
+- release/202202
 
 jobs:
   - job: Platform_CI

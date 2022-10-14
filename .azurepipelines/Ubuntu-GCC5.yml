@@ -17,8 +17,8 @@ resources:
 trigger: none
 
 pr:
-- dev/*
-- release/*
+- main
+- release/202202
 
 jobs:
 - template: Jobs/PrGate.yml@mu_devops
