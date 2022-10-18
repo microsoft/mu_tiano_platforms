@@ -113,6 +113,7 @@
   UiRectangleLib|MsGraphicsPkg/Library/BaseUiRectangleLib/BaseUiRectangleLib.inf
   DeviceStateLib|MdeModulePkg/Library/DeviceStateLib/DeviceStateLib.inf
   XenPlatformLib|OvmfPkg/Library/XenPlatformLib/XenPlatformLib.inf
+  MmUnblockMemoryLib|MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
 
   # Math Libraries
   FltUsedLib |MdePkg/Library/FltUsedLib/FltUsedLib.inf
@@ -250,6 +251,12 @@
   # ARM Virtual Architectural Timer -- fetch frequency from QEMU (TCG) or KVM
   #
   gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|0
+
+  #
+  # MM Communicate
+  #
+  gArmTokenSpaceGuid.PcdMmBufferBase|0x1003FE00000
+  gArmTokenSpaceGuid.PcdMmBufferSize|0x200000
 
   #
   # Network Pcds
@@ -429,13 +436,7 @@
   #
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
-  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
-    <LibraryClasses>
-      NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
-      NULL|EmbeddedPkg/Library/NvVarStoreFormattedLib/NvVarStoreFormattedLib.inf
-      # don't use unaligned CopyMem () on the UEFI varstore NOR flash region
-      BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
-  }
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
 !if $(SECURE_BOOT_ENABLE) == TRUE
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
     <LibraryClasses>
@@ -637,4 +638,12 @@
   OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf {
     <LibraryClasses>
       NULL|OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
+  }
+
+  #
+  # Standalone MM drivers in non-secure world
+  #
+  ArmPkg/Drivers/MmCommunicationDxe/MmCommunication.inf {
+    <LibraryClasses>
+      NULL|StandaloneMmPkg/Library/VariableMmDependency/VariableMmDependency.inf
   }
