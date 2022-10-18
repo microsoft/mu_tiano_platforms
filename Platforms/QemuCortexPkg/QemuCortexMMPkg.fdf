@@ -51,9 +51,7 @@ READ_LOCK_STATUS   = TRUE
   INF StandaloneMmPkg/Core/StandaloneMmCore.inf
   INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteStandaloneMm.inf
   INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStandaloneMm.inf
-!if $(SECURE_STORAGE_ENABLE) == TRUE
   INF ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashStandaloneMm.inf
-!endif
   INF ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
 
 ################################################################################
