@@ -333,8 +333,6 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         args += " -m 1024"                                                  # 1gb memory
         # turn off network
         args += " -net none"
-        # Serial messages out
-        args += " -serial stdio"
         # Mount disk with startup.nsh
         args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
         # Conditional Args
@@ -350,6 +348,15 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         #     # add commands here
         #     f.write("reset -s\n")
         #     f.close()
+
+        # write ConOut messages to telnet localhost port
+        serial_port = self.env.GetValue("SERIAL_PORT")
+        if serial_port != None:
+            args += " -serial tcp:127.0.0.1:" + serial_port + ",server"
+            args += " -serial tcp:127.0.0.1:" + str(int(serial_port, 0) + 1) + ",server"
+        else:
+            # Serial messages out
+            args += " -serial stdio"
 
         ret = RunCmd(cmd, args)
 
