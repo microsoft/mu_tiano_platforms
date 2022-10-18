@@ -34,7 +34,7 @@ class CommonPlatform():
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
     Scopes = ('qemucortex', 'gcc_aarch64_linux', 'edk2-build', 'cibuild')
     WorkspaceRoot = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    PackagesPath = ("Platforms", "MU_BASECORE", "Common/MU", "Common/MU_TIANO", "Common/MU_OEM_SAMPLE", "Common/MU_TIANO_ARM")
+    PackagesPath = ("Platforms", "MU_BASECORE", "Common/MU", "Common/MU_TIANO", "Common/MU_OEM_SAMPLE", "Common/MU_TIANO_ARM", "Common/TFA")
 
 
     # ####################################################################################### #
@@ -147,6 +147,16 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
     def __init__(self):
         UefiBuilder.__init__(self)
 
+    def CleanTree(self, RemoveConfTemplateFilesToo=False):
+        # Add a step to clean up BL31 as well, if asked
+        cmd = "make"
+        args = "distclean"
+        ret = RunCmd(cmd, args, workingdir= os.path.join (self.GetWorkspaceRoot (), "Common/TFA"))
+        if ret != 0:
+            return ret
+
+        return super().CleanTree(RemoveConfTemplateFilesToo)
+
     def AddCommandLineOptions(self, parserObj):
         ''' Add command line options to the argparser '''
 
@@ -228,6 +238,21 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         return 0
 
     def PlatformPostBuild(self):
+        # Add a post build step to build BL31 and assemble the FD files
+        cmd = "make"
+        args = "CROSS_COMPILE=" + shell_environment.GetEnvironment().get_shell_var("GCC5_AARCH64_PREFIX")
+        args += " PLAT=qemu_sbsa"
+        args += " ARCH=aarch64"
+        args += " DEBUG=1 SPM_MM=1 EL3_EXCEPTION_HANDLING=1"
+        # KQ: TODO Need to put MM fd file here dynamically
+        args += " BL32=/home/test/mu_tiano_platforms/Build/QemuCortexMMStandalone-AARCH64/DEBUG_GCC5/FV/BL32_AP_MM.fd"
+        args += " all fip"
+        ret = RunCmd(cmd, args, workingdir= os.path.join (self.GetWorkspaceRoot (), "Common/TFA"))
+        if ret != 0:
+            return ret
+
+        # Now that BL31 is built with BL32 supplied, patch BL1 and BL31 built fip.bin into the SECURE_FLASH0.fd
+        # KQ: TODO Need some more work here
         return 0
 
     def FlashRomImage(self):
