@@ -119,9 +119,7 @@
   VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
   # TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
 
-!if $(SECURE_STORAGE_ENABLE) == TRUE
-  NorFlashPlatformLib|Platform/ARM/SgiPkg/Library/NorFlashLib/StandaloneMmNorFlashLib.inf
-!endif
+  NorFlashPlatformLib|QemuCortexPkg/Library/SbsaQemuNorFlashLib/SbsaQemuNorFlashLib.inf
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
   AdvLoggerAccessLib|AdvLoggerPkg/Library/AdvLoggerMmAccessLib/AdvLoggerMmAccessLib.inf
   MemoryTypeInfoSecVarCheckLib|MdeModulePkg/Library/MemoryTypeInfoSecVarCheckLib/MemoryTypeInfoSecVarCheckLib.inf
@@ -133,6 +131,9 @@
 # Pcd Section - list of all EDK II PCD Entries defined by this Platform
 #
 ################################################################################
+[PcdsFeatureFlag]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache|FALSE
+
 [PcdsFixedAtBuild]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x800000CF
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0xff
@@ -193,9 +194,7 @@
       VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLib.inf
       VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
   }
-!if $(SECURE_STORAGE_ENABLE) == TRUE
   ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashStandaloneMm.inf
-!endif
 
 ###################################################################################################
 #
