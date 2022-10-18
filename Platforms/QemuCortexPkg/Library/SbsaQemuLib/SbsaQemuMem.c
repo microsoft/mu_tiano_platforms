@@ -75,7 +75,8 @@ SbsaQemuLibConstructor (
 
   // Make sure the start of DRAM matches our expectation
   ASSERT (FixedPcdGet64 (PcdSystemMemoryBase) == NewBase);
-  PcdStatus = PcdSet64S (PcdSystemMemorySize, NewSize);
+  // TODO: This is carved out by the BL31 during DT build up.
+  PcdStatus = PcdSet64S (PcdSystemMemorySize, NewSize - PcdGet64 (PcdMmBufferSize));
   ASSERT_RETURN_ERROR (PcdStatus);
 
   return RETURN_SUCCESS;
