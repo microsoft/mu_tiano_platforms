@@ -1,0 +1,30 @@
+## @file
+# Test module for QEMU cortex package.
+#
+# Copyright (C) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION         = 0x00010017
+  BASE_NAME           = Test
+  FILE_GUID           = 43CF131D-D49A-4C77-817D-9BB63921D9CF
+  VERSION_STRING      = 1.0
+  MODULE_TYPE         = DXE_DRIVER
+  ENTRY_POINT         = TestEntry
+
+[Sources]
+  Test.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  QemuCortexPkg/QemuCortexPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  UefiDriverEntryPoint
+
+[Depex]
+  TRUE
+

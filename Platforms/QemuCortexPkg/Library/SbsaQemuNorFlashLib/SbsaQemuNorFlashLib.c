@@ -22,10 +22,10 @@ NorFlashPlatformInitialization (
 
 NOR_FLASH_DESCRIPTION mNorFlashDevice =
 {
- 0,
- FixedPcdGet64(PcdFlashNvStorageVariableBase),
- FixedPcdGet32(PcdFlashNvStorageVariableSize),
- QEMU_NOR_BLOCK_SIZE
+  FixedPcdGet64(PcdFlashNvStorageBase),
+  FixedPcdGet64(PcdFlashNvStorageBase),
+  FixedPcdGet32(PcdFlashNvStorageSize),
+  QEMU_NOR_BLOCK_SIZE
 };
 
 EFI_STATUS
