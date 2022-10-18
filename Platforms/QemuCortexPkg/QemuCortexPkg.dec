@@ -1,0 +1,37 @@
+#/** @file
+#
+#  Copyright (c) 2014, Linaro Limited. All rights reserved.
+#  Copyright (c) 2020, ARM Limited. All rights reserved.
+#  Copyright (c) Microsoft Corporation.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = QemuCortexPkg
+  PACKAGE_GUID                   = 9EBD48E1-2370-4B1C-AFF7-811DD22E8BCB
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes]
+
+[Guids]
+  gQeumCortexPkgTokenSpaceGuid  = { 0x549288f7, 0x4281, 0x4f08, { 0x8f, 0x9e, 0x89, 0xe8, 0xd2, 0xf1, 0x8f, 0x2b } }
+
+[PcdsFixedAtBuild]
+  ##
+  # This is the physical address of the flash allocated for NV storage, including
+  # fault tolerance working and spare copies.
+  #
+  gQeumCortexPkgTokenSpaceGuid.PcdFlashNvStorageBase|0x0|UINT64|0x00000001
+  gQeumCortexPkgTokenSpaceGuid.PcdFlashNvStorageSize|0x0|UINT64|0x00000002
