@@ -28,6 +28,28 @@
   DEFINE FVMAIN_COMPACT_SIZE  = 0x2ff000
 !endif
 
+#===================================================================================
+  # SECURE_FLASH0 Layout
+#===================================================================================
+  DEFINE SECURE_FLASH_REGION_BL1_OFFSET                               = 0x00000000
+  DEFINE SECURE_FLASH_REGION_BL1_SIZE                                 = 0x00008000
+#===================================================================================
+  DEFINE SECURE_FLASH_REGION_FIP_OFFSET                               = 0x00008000
+  DEFINE SECURE_FLASH_REGION_FIP_SIZE                                 = 0x002D0000
+#===================================================================================
+  # Unused bytes offset                                                 0x002D8000
+  # Unused bytes size                                                   0x00D28000
+#===================================================================================
+  DEFINE SECURE_FLASH_NVSTORAGE_OFFSET                                = 0x01000000
+  DEFINE SECURE_FLASH_NVSTORAGE_SIZE                                  = 0x00080000 # This has to be 512k ??
+    DEFINE SECURE_FLASH_NVSTORAGE_SUBREGION_NV_VARIABLE_STORE_OFFSET  = 0x01000000 # TODO
+    DEFINE SECURE_FLASH_NVSTORAGE_SUBREGION_NV_VARIABLE_STORE_SIZE    = 0x0003C000 # TODO
+    DEFINE SECURE_FLASH_NVSTORAGE_SUBREGION_NV_FTW_WORKING_OFFSET     = 0x01040000 # TODO
+    DEFINE SECURE_FLASH_NVSTORAGE_SUBREGION_NV_FTW_WORKING_SIZE       = 0x00004000 # TODO
+    DEFINE SECURE_FLASH_NVSTORAGE_SUBREGION_NV_FTW_SPARE_OFFSET       = 0x01080000 # TODO
+    DEFINE SECURE_FLASH_NVSTORAGE_SUBREGION_NV_FTW_SPARE_SIZE         = 0x00040000 # TODO
+#===================================================================================
+
 [FD.SECURE_FLASH0]
 BaseAddress   = 0x00000000
 Size          = 0x01100000
@@ -50,18 +72,21 @@ NumBlocks     = 0x1100
 # RegionType <FV, DATA, or FILE>
 #
 ################################################################################
-## Place for Trusted Firmware
+
+## Placeholder for Trusted Firmware
 # flash0 is secure so we put here the BL1
-0x00000000|0x00008000
-FILE = /home/test/arm-trusted-firmware/build/qemu_sbsa/debug/bl1.bin
+$(SECURE_FLASH_REGION_BL1_OFFSET)|$(SECURE_FLASH_REGION_BL1_SIZE)
+# Build script post build step will eventually patch this region as:
+# FILE = Common/TFA/build/qemu_sbsa/debug/fip.bin
 
 # and FIP (BL2 + BL31)
-0x00008000|0x002D0000
-FILE = /home/test/arm-trusted-firmware/build/qemu_sbsa/debug/fip.bin
+$(SECURE_FLASH_REGION_FIP_OFFSET)|$(SECURE_FLASH_REGION_FIP_SIZE)
+# Build script post build step will eventually patch this region as:
+# FILE = Common/TFA/build/qemu_sbsa/debug/fip.bin
 
 ## Place for Variables. They share flash1 with EFI
 # Must be aligned to Flash Block size 0x40000
-0x01000000|0x00040000
+$(SECURE_FLASH_NVSTORAGE_SUBREGION_NV_VARIABLE_STORE_OFFSET)|0x00040000
 gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
 #NV_VARIABLE_STORE
 DATA = {
@@ -99,7 +124,7 @@ DATA = {
   0x5A, 0xFE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 }
 
-0x01040000|0x00040000
+$(SECURE_FLASH_NVSTORAGE_SUBREGION_NV_FTW_WORKING_OFFSET)|0x00040000
 gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
 #NV_FTW_WORKING
 DATA = {
@@ -113,9 +138,21 @@ DATA = {
   0xE0, 0xFF, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00
 }
 
-0x01080000|0x00040000
+$(SECURE_FLASH_NVSTORAGE_SUBREGION_NV_FTW_SPARE_OFFSET)|$(SECURE_FLASH_NVSTORAGE_SUBREGION_NV_FTW_SPARE_SIZE)
 gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
 #NV_FTW_SPARE
+
+[FD.BL32_AP_MM]
+BaseAddress   = 0x20002000|gArmTokenSpaceGuid.PcdFdBaseAddress  # UEFI in DRAM + 128MB.
+Size          = 0x00e00000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the device (64MiB).
+ErasePolarity = 1
+
+BlockSize     = 0x00001000
+NumBlocks     = 0x0e00
+
+0x00000000|0x00280000
+gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
+FV = FV_STANDALONE_MM_COMPACT
 
 [FD.QEMU_EFI]
 BaseAddress   = 0x10000000|gArmTokenSpaceGuid.PcdFdBaseAddress
@@ -381,4 +418,69 @@ READ_LOCK_STATUS   = TRUE
     }
   }
 
+[FV.FV_STANDALONE_MM_COMPACT]
+FvAlignment        = 16
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+  INF StandaloneMmPkg/Core/StandaloneMmCore.inf
+  INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteStandaloneMm.inf
+  INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStandaloneMm.inf
+  INF ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashStandaloneMm.inf
+  INF ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
+
+################################################################################
+#
+# Rules are use with the [FV] section's module INF type to define
+# how an FFS file is created for a given INF file. The following Rule are the default
+# rules for the different module type. User can add the customized rules to define the
+# content of the FFS file.
+#
+################################################################################
+
+
+############################################################################
+# Example of a DXE_DRIVER FFS file with a Checksum encapsulation section   #
+############################################################################
+#
+#[Rule.Common.DXE_DRIVER]
+#  FILE DRIVER = $(NAMED_GUID) {
+#    DXE_DEPEX    DXE_DEPEX               Optional $(INF_OUTPUT)/$(MODULE_NAME).depex
+#    COMPRESS PI_STD {
+#      GUIDED {
+#        PE32     PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
+#        UI       STRING="$(MODULE_NAME)" Optional
+#        VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+#      }
+#    }
+#  }
+#
+############################################################################
+
 !include ArmVirtPkg/ArmVirtRules.fdf.inc
+
+[Rule.Common.MM_CORE_STANDALONE]
+  FILE SEC = $(NAMED_GUID) RELOCS_STRIPPED FIXED {
+    PE32  PE32 Align = Auto             $(INF_OUTPUT)/$(MODULE_NAME).efi
+  }
+
+[Rule.Common.MM_STANDALONE]
+  FILE MM_STANDALONE = $(NAMED_GUID) {
+    SMM_DEPEX SMM_DEPEX Optional       $(INF_OUTPUT)/$(MODULE_NAME).depex
+    PE32      PE32                     $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI        STRING="$(MODULE_NAME)" Optional
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }

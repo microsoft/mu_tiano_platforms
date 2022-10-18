@@ -223,6 +223,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         # self.env.SetValue("EMPTY_DRIVE", "FALSE", "Default to false")
         # self.env.SetValue("RUN_TESTS", "FALSE", "Default to false")
         self.env.SetValue("QEMU_HEADLESS", "FALSE", "Default to false")
+        self.env.SetValue("QEMU_PLATFORM", "qemu_sbsa", "Platform Hardcoded")
         # self.env.SetValue("SHUTDOWN_AFTER_RUN", "FALSE", "Default to false")
         # needed to make FV size build report happy
         # self.env.SetValue("BLD_*_BUILDID_STRING", "Unknown", "Default")
@@ -237,22 +238,57 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
     def PlatformPreBuild(self):
         return 0
 
+    #
+    # Copy a file into the designated region of target FD.
+    #
+    def PatchRegion(self, fdfile, mainStart, size, srcfile):
+        with open(fdfile, "r+b") as fd, open(srcfile, "rb") as src:
+            fd.seek(mainStart)
+            patchImage = src.read(size)
+            fd.seek(mainStart)
+            fd.write(patchImage)
+        return 0
+
     def PlatformPostBuild(self):
         # Add a post build step to build BL31 and assemble the FD files
+        op_fv = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
+
+        logging.info("Building TF-A")
         cmd = "make"
         args = "CROSS_COMPILE=" + shell_environment.GetEnvironment().get_shell_var("GCC5_AARCH64_PREFIX")
-        args += " PLAT=qemu_sbsa"
-        args += " ARCH=aarch64"
-        args += " DEBUG=1 SPM_MM=1 EL3_EXCEPTION_HANDLING=1"
-        # KQ: TODO Need to put MM fd file here dynamically
-        args += " BL32=/home/test/mu_tiano_platforms/Build/QemuCortexMMStandalone-AARCH64/DEBUG_GCC5/FV/BL32_AP_MM.fd"
+        args += " PLAT=" + self.env.GetValue("QEMU_PLATFORM").lower()
+        args += " ARCH=" + self.env.GetValue("TARGET_ARCH").lower()
+        args += " DEBUG=" + str(1 if self.env.GetValue("TARGET").lower() == 'debug' else 0)
+        args += " SPM_MM=1 EL3_EXCEPTION_HANDLING=1"
+        args += " BL32=" + os.path.join(op_fv, "BL32_AP_MM.fd")
         args += " all fip"
         ret = RunCmd(cmd, args, workingdir= os.path.join (self.GetWorkspaceRoot (), "Common/TFA"))
         if ret != 0:
             return ret
 
         # Now that BL31 is built with BL32 supplied, patch BL1 and BL31 built fip.bin into the SECURE_FLASH0.fd
-        # KQ: TODO Need some more work here
+        op_tfa = os.path.join (
+            self.GetWorkspaceRoot (),
+            "Common/TFA", "build",
+            self.env.GetValue("QEMU_PLATFORM").lower(),
+            self.env.GetValue("TARGET").lower())
+
+        logging.info("Patching BL1 region")
+        print (self.env.GetValue("SECURE_FLASH_REGION_BL1_OFFSET"))
+        self.PatchRegion(
+            os.path.join(op_fv, "SECURE_FLASH0.fd"),
+            int(self.env.GetValue("SECURE_FLASH_REGION_BL1_OFFSET"), 16),
+            int( self.env.GetValue("SECURE_FLASH_REGION_BL1_SIZE"), 16),
+            os.path.join(op_tfa, "bl1.bin"),
+            )
+
+        logging.info("Patching FIP region")
+        self.PatchRegion(
+            os.path.join(op_fv, "SECURE_FLASH0.fd"),
+            int(self.env.GetValue("SECURE_FLASH_REGION_FIP_OFFSET"), 16),
+            int( self.env.GetValue("SECURE_FLASH_REGION_FIP_SIZE"), 16),
+            os.path.join(op_tfa, "fip.bin")
+            )
         return 0
 
     def FlashRomImage(self):
