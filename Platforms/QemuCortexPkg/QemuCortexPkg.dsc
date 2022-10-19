@@ -54,7 +54,8 @@
 
 [LibraryClasses.common]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
-  ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
+  ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf # BEEBE TODO?
+  MmuLib|ArmPkg/Library/MmuLib/BaseMmuLib.inf
 
   # Virtio Support
   VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
@@ -77,7 +78,7 @@
   FrameBufferBltLib|MdeModulePkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
   QemuBootOrderLib|OvmfPkg/Library/QemuBootOrderLib/QemuBootOrderLib.inf
   FileExplorerLib|MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
-  PciPcdProducerLib|ArmVirtPkg/Library/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
+  PciPcdProducerLib|OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
   PciSegmentLib|MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
   PciHostBridgeLib|OvmfPkg/Fdt/FdtPciHostBridgeLib/FdtPciHostBridgeLib.inf
   PciHostBridgeUtilityLib|OvmfPkg/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf
@@ -263,7 +264,7 @@
   # PCD and PcdPciDisableBusEnumeration above have not been assigned yet
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xFFFFFFFFFFFFFFFF
 
-  gArmTokenSpaceGuid.PcdPciIoTranslation|0x0
+  gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation|0x0
 
   #
   # Set video resolution for boot options and for text setup.
@@ -419,9 +420,9 @@
   #
   # Platform Driver
   #
-  ArmVirtPkg/VirtioFdtDxe/VirtioFdtDxe.inf
-  ArmVirtPkg/FdtClientDxe/FdtClientDxe.inf
-  ArmVirtPkg/HighMemDxe/HighMemDxe.inf
+  OvmfPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf
+  EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
+  OvmfPkg/Fdt/HighMemDxe/HighMemDxe.inf
   OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
   OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
   OvmfPkg/VirtioNetDxe/VirtioNet.inf
@@ -503,12 +504,12 @@
   #
   ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf {
     <LibraryClasses>
-      NULL|ArmVirtPkg/Library/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
+      NULL|OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
   }
   MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
   MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf {
     <LibraryClasses>
-      NULL|ArmVirtPkg/Library/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
+      NULL|OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
   }
   OvmfPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
   OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
@@ -557,7 +558,7 @@
   ArmVirtPkg/PlatformHasAcpiDtDxe/PlatformHasAcpiDtDxe.inf
 [Components.AARCH64]
   MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
-  OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf {
+  OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf {
     <LibraryClasses>
-      NULL|ArmVirtPkg/Library/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
+      NULL|OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
   }

@@ -40,8 +40,8 @@ READ_LOCK_STATUS   = TRUE
 
   INF MdeModulePkg/Core/Dxe/DxeMain.inf
   INF MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
-  INF ArmVirtPkg/VirtioFdtDxe/VirtioFdtDxe.inf
-  INF ArmVirtPkg/FdtClientDxe/FdtClientDxe.inf
+  INF OvmfPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf
+  INF EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
   INF OvmfPkg/Fdt/HighMemDxe/HighMemDxe.inf
 
   #
@@ -145,7 +145,7 @@ READ_LOCK_STATUS   = TRUE
 !if $(ARCH) == AARCH64
   INF MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   INF MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
-  INF OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf
+  # INF OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
 
   #
   # EBC support
