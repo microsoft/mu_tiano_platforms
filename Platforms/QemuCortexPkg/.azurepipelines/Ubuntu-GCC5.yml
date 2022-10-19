@@ -1,0 +1,74 @@
+## @file
+# Azure Pipeline build file for building a platform.
+#
+# Platform: QemuQ35
+# OS: Ubuntu
+# Toolchain: GCC5
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+trigger:
+- release/*
+pr:
+- release/*
+
+jobs:
+  - job: Platform_CI
+    variables:
+      package: 'QemuQ35Pkg'
+      vm_image: 'ubuntu-18.04'
+      should_run: true
+      run_flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE"
+
+    #Use matrix to speed up the build process
+    strategy:
+        matrix:
+
+          QemuQ35_DEBUG:
+            Build.File: "Platforms/$(package)/PlatformBuild.py"
+            Build.Arch: "IA32,X64"
+            Build.Flags: ""
+            Build.Target: "DEBUG"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+
+          QemuQ35_RELEASE:
+            Build.File: "Platforms/$(package)/PlatformBuild.py"
+            Build.Arch: "IA32,X64"
+            Build.Flags: ""
+            Build.Target: "RELEASE"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+
+          # NOOPT build too big to fit in FVs
+          #QemuQ35_NOOPT:
+          #  Build.File: "Platforms/$(package)/PlatformBuild.py"
+          #  Build.Arch: "IA32,X64"
+          #  Build.Flags: ""
+          #  Build.Target: "NOOPT"
+          #  Run.Flags: $(run_flags)
+          #  Run: $(should_run)
+    workspace:
+      clean: all
+
+    pool:
+      vmImage: $(vm_image)
+
+    steps:
+    - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
+      parameters:
+        tool_chain_tag: GCC5
+        build_pkg: $(package)
+        build_target: $(Build.Target)
+        build_arch: $(Build.Arch)
+        build_file: $(Build.File)
+        build_flags: $(Build.Flags)
+        run_flags: $(Run.Flags)
+        extra_install_step:
+        - bash: sudo apt-get update
+          displayName: Update Apt
+          condition: and(gt(variables.pkg_count, 0), succeeded())
+        - bash: sudo apt-get install gcc g++ make uuid-dev qemu
+          displayName: Install Packages
+          condition: and(gt(variables.pkg_count, 0), succeeded())
