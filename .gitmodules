@@ -18,3 +18,7 @@
 	path = Common/MU_TIANO_ARM
 	url = https://github.com/microsoft/mu_silicon_arm_tiano.git
 	branch = release/202208
+[submodule "Common/TFA"]
+	path = Common/TFA
+	url = https://github.com/kuqin12/arm-trusted-firmware.git
+	branch = master
