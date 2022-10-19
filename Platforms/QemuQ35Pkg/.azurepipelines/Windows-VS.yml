@@ -15,7 +15,7 @@ resources:
       type: github
       endpoint: microsoft
       name: microsoft/mu_devops
-      ref: personal/cfernald/additional_artifacts
+      ref: main
 
 trigger:
 - main
