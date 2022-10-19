@@ -44,7 +44,7 @@
   #  DEBUG_VERBOSE   0x00400000  // Detailed debug messages that may
   #                              // significantly impact boot performance
   #  DEBUG_ERROR     0x80000000  // Error
-  DEFINE DEBUG_PRINT_ERROR_LEVEL = 0x80480246
+  DEFINE DEBUG_PRINT_ERROR_LEVEL = 0x80080246
 
 !if $(TARGET) != NOOPT
   DEFINE FD_SIZE_IN_MB    = 2
@@ -197,14 +197,14 @@
   # PCI Libraries
   PciLib|MdePkg/Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
   PciExpressLib|MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
-  PciCapLib|OvmfPkg/Library/BasePciCapLib/BasePciCapLib.inf
-  PciCapPciSegmentLib|OvmfPkg/Library/BasePciCapPciSegmentLib/BasePciCapPciSegmentLib.inf
-  PciCapPciIoLib|OvmfPkg/Library/UefiPciCapPciIoLib/UefiPciCapPciIoLib.inf
+  PciCapLib|QemuQ35Pkg/Library/BasePciCapLib/BasePciCapLib.inf
+  PciCapPciSegmentLib|QemuQ35Pkg/Library/BasePciCapPciSegmentLib/BasePciCapPciSegmentLib.inf
+  PciCapPciIoLib|QemuQ35Pkg/Library/UefiPciCapPciIoLib/UefiPciCapPciIoLib.inf
 
   # USB Libraries
   UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
 
-  XenIoMmioLib|OvmfPkg/Library/XenIoMmioLib/XenIoMmioLib.inf
+  XenIoMmioLib|QemuCortexPkg/Library/XenIoMmioLib/XenIoMmioLib.inf
 
   #
   # CryptoPkg libraries needed by multiple firmware features
@@ -227,7 +227,7 @@
   SecureBootVariableProvisionLib|SecurityPkg/Library/SecureBootVariableProvisionLib/SecureBootVariableProvisionLib.inf
 
   # re-use the UserPhysicalPresent() dummy implementation from the ovmf tree
-  PlatformSecureLib|OvmfPkg/Library/PlatformSecureLib/PlatformSecureLib.inf
+  PlatformSecureLib|QemuCortexPkg/Library/PlatformSecureLib/PlatformSecureLib.inf
 !else
   AuthVariableLib|MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
 !endif
@@ -245,12 +245,12 @@
   ArmSvcLib|ArmPkg/Library/ArmSvcLib/ArmSvcLib.inf
 
   # Virtio Support
-  VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
-  VirtioMmioDeviceLib|OvmfPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
-  QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgLibMmio.inf
-  QemuFwCfgS3Lib|OvmfPkg/Library/QemuFwCfgS3Lib/BaseQemuFwCfgS3LibNull.inf
-  QemuFwCfgSimpleParserLib|OvmfPkg/Library/QemuFwCfgSimpleParserLib/QemuFwCfgSimpleParserLib.inf
-  QemuLoadImageLib|OvmfPkg/Library/GenericQemuLoadImageLib/GenericQemuLoadImageLib.inf
+  VirtioLib|QemuQ35Pkg/Library/VirtioLib/VirtioLib.inf
+  VirtioMmioDeviceLib|QemuCortexPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
+  QemuFwCfgLib|QemuQ35Pkg/Library/QemuFwCfgLib/QemuFwCfgLibMmio.inf
+  QemuFwCfgS3Lib|QemuQ35Pkg/Library/QemuFwCfgS3Lib/BaseQemuFwCfgS3LibNull.inf
+  QemuFwCfgSimpleParserLib|QemuQ35Pkg/Library/QemuFwCfgSimpleParserLib/QemuFwCfgSimpleParserLib.inf
+  QemuLoadImageLib|QemuQ35Pkg/Library/GenericQemuLoadImageLib/GenericQemuLoadImageLib.inf
 
   ArmPlatformLib|ArmPlatformPkg/Library/ArmPlatformLibNull/ArmPlatformLibNull.inf
 
@@ -260,20 +260,22 @@
   BootLogoLib|MdeModulePkg/Library/BootLogoLib/BootLogoLib.inf
   # PlatformBootManagerLib|QemuCortexPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   PlatformBootManagerLib|MsCorePkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
-  PlatformBmPrintScLib|OvmfPkg/Library/PlatformBmPrintScLib/PlatformBmPrintScLib.inf
+  PlatformBmPrintScLib|QemuQ35Pkg/Library/PlatformBmPrintScLib/PlatformBmPrintScLib.inf
   CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
   FrameBufferBltLib|MdeModulePkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
-  QemuBootOrderLib|OvmfPkg/Library/QemuBootOrderLib/QemuBootOrderLib.inf
+  QemuBootOrderLib|QemuQ35Pkg/Library/QemuBootOrderLib/QemuBootOrderLib.inf
   FileExplorerLib|MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
-  PciPcdProducerLib|OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
+  PciPcdProducerLib|QemuCortexPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
   PciSegmentLib|MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
-  PciHostBridgeLib|OvmfPkg/Fdt/FdtPciHostBridgeLib/FdtPciHostBridgeLib.inf
-  PciHostBridgeUtilityLib|OvmfPkg/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf
+  PciHostBridgeLib|QemuCortexPkg/Fdt/FdtPciHostBridgeLib/FdtPciHostBridgeLib.inf
+  PciHostBridgeUtilityLib|QemuQ35Pkg/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf
 
   # BEEBE ADDED
   MemoryTypeInformationChangeLib|MdeModulePkg/Library/MemoryTypeInformationChangeLibNull/MemoryTypeInformationChangeLibNull.inf
   BaseBinSecurityLib|MdePkg/Library/BaseBinSecurityLibNull/BaseBinSecurityLibNull.inf
-  MemoryProtectionHobLib|MdeModulePkg/Library/MemoryProtectionHobLibNull/MemoryProtectionHobLibNull.inf
+  DxeMemoryProtectionHobLib|MdeModulePkg/Library/MemoryProtectionHobLibNull/DxeMemoryProtectionHobLibNull.inf
+  MmMemoryProtectionHobLib|MdeModulePkg/Library/MemoryProtectionHobLibNull/MmMemoryProtectionHobLibNull.inf
+  VariableFlashInfoLib|MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
   MemoryTypeInfoSecVarCheckLib|MdeModulePkg/Library/MemoryTypeInfoSecVarCheckLib/MemoryTypeInfoSecVarCheckLib.inf
   SecurityLockAuditLib|MdeModulePkg/Library/SecurityLockAuditDebugMessageLib/SecurityLockAuditDebugMessageLib.inf
   ResetUtilityLib|MdeModulePkg/Library/ResetUtilityLib/ResetUtilityLib.inf
@@ -298,7 +300,7 @@
   BootGraphicsProviderLib|OemPkg/Library/BootGraphicsProviderLib/BootGraphicsProviderLib.inf
   UiRectangleLib|MsGraphicsPkg/Library/BaseUiRectangleLib/BaseUiRectangleLib.inf
   DeviceStateLib|MdeModulePkg/Library/DeviceStateLib/DeviceStateLib.inf
-  XenPlatformLib|OvmfPkg/Library/XenPlatformLib/XenPlatformLib.inf
+  XenPlatformLib|QemuQ35Pkg/Library/XenPlatformLib/XenPlatformLib.inf
   MmUnblockMemoryLib|MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
 
   # Math Libraries
@@ -326,7 +328,7 @@
 
 !if $(TPM2_ENABLE) == TRUE
   Tpm2CommandLib|SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
-  Tcg2PhysicalPresenceLib|OvmfPkg/Library/Tcg2PhysicalPresenceLibQemu/DxeTcg2PhysicalPresenceLib.inf
+  Tcg2PhysicalPresenceLib|QemuQ35Pkg/Library/Tcg2PhysicalPresenceLibQemu/DxeTcg2PhysicalPresenceLib.inf
   TpmMeasurementLib|SecurityPkg/Library/DxeTpmMeasurementLib/DxeTpmMeasurementLib.inf
   TpmPlatformHierarchyLib|SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLib/PeiDxeTpmPlatformHierarchyLib.inf
 !else
@@ -481,8 +483,8 @@
 ################################################################################
 
 [PcdsFeatureFlag.common]
-  gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE
-  gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderMmioTranslation|TRUE
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdQemuBootOrderMmioTranslation|TRUE
 
   ## If TRUE, Graphics Output Protocol will be installed on virtual handle created by ConsplitterDxe.
   #  It could be set FALSE to save size.
@@ -663,7 +665,7 @@
 [PcdsDynamicDefault.common]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
 
-  ## If TRUE, OvmfPkg/AcpiPlatformDxe will not wait for PCI
+  ## If TRUE, QemuQ35Pkg/AcpiPlatformDxe will not wait for PCI
   #  enumeration to complete before installing ACPI tables.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|TRUE
 
@@ -708,7 +710,7 @@
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0300
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0
-  gUefiOvmfPkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
 
   #
   # IPv4 and IPv6 PXE Boot support.
@@ -759,7 +761,7 @@
     <LibraryClasses>
       ResetSystemLib|ArmVirtPkg/Library/ArmVirtPsciResetSystemPeiLib/ArmVirtPsciResetSystemPeiLib.inf
   }
-  OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
+  QemuQ35Pkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
   SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf {
     <LibraryClasses>
       HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCryptoRouterPei.inf
@@ -771,7 +773,8 @@
   }
 !endif
 
-  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf {
+  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+  MsCorePkg/Core/GuidedSectionExtractPeim/GuidedSectionExtract.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   }
@@ -804,7 +807,6 @@
 !endif
   }
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
-  OvmfPkg/EnrollDefaultKeys/EnrollDefaultKeys.inf
 !else
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 !endif
@@ -834,13 +836,13 @@
   #
   # Platform Driver
   #
-  OvmfPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf
+  QemuCortexPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf
   EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
-  OvmfPkg/Fdt/HighMemDxe/HighMemDxe.inf
-  OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
-  OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
-  OvmfPkg/VirtioNetDxe/VirtioNet.inf
-  OvmfPkg/VirtioRngDxe/VirtioRng.inf
+  QemuCortexPkg/Fdt/HighMemDxe/HighMemDxe.inf
+  QemuQ35Pkg/VirtioBlkDxe/VirtioBlk.inf
+  QemuQ35Pkg/VirtioScsiDxe/VirtioScsi.inf
+  QemuQ35Pkg/VirtioNetDxe/VirtioNet.inf
+  QemuQ35Pkg/VirtioRngDxe/VirtioRng.inf
 
   #
   # FAT filesystem + GPT/MBR partitioning + UDF filesystem + virtio-fs
@@ -850,7 +852,7 @@
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
   FatPkg/EnhancedFatDxe/Fat.inf
   MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
-  OvmfPkg/VirtioFsDxe/VirtioFsDxe.inf
+  QemuCortexPkg/VirtioFsDxe/VirtioFsDxe.inf
 
   #
   # Bds
@@ -880,7 +882,6 @@
   # Produces FORM DISPLAY ENGINE protocol. Handles input, displays strings.
   MsGraphicsPkg/DisplayEngineDxe/DisplayEngineDxe.inf
   QemuQ35Pkg/QemuVideoDxe/QemuVideoDxe.inf
-  QemuCortexPkg/Test/Test.inf
   # BEEBE ADDED END
   # MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
@@ -893,9 +894,9 @@
       NULL|MdeModulePkg/Library/BootManagerUiLib/BootManagerUiLib.inf
       NULL|MdeModulePkg/Library/BootMaintenanceManagerUiLib/BootMaintenanceManagerUiLib.inf
   }
-  OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf {
+  QemuQ35Pkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf {
     <LibraryClasses>
-      NULL|OvmfPkg/Library/BlobVerifierLibNull/BlobVerifierLibNull.inf
+      NULL|QemuQ35Pkg/Library/BlobVerifierLibNull/BlobVerifierLibNull.inf
   }
 
   #
@@ -905,13 +906,13 @@
 
   NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf {
     <LibraryClasses>
-      NULL|OvmfPkg/Library/PxeBcPcdProducerLib/PxeBcPcdProducerLib.inf
+      NULL|QemuQ35Pkg/Library/PxeBcPcdProducerLib/PxeBcPcdProducerLib.inf
   }
 
 !if $(NETWORK_TLS_ENABLE) == TRUE
   NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf {
     <LibraryClasses>
-      NULL|OvmfPkg/Library/TlsAuthConfigLib/TlsAuthConfigLib.inf
+      NULL|QemuCortexPkg/Library/TlsAuthConfigLib/TlsAuthConfigLib.inf
   }
 !endif
 
@@ -931,32 +932,32 @@
   #
   MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf {
     <LibraryClasses>
-      NULL|OvmfPkg/Library/SmbiosVersionLib/DetectSmbiosVersionLib.inf
+      NULL|QemuQ35Pkg/Library/SmbiosVersionLib/DetectSmbiosVersionLib.inf
   }
-  OvmfPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
+  QemuQ35Pkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
 
   #
   # PCI support
   #
   ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf {
     <LibraryClasses>
-      NULL|OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
+      NULL|QemuCortexPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
   }
   MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
   MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf {
     <LibraryClasses>
-      NULL|OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
+      NULL|QemuCortexPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
   }
-  OvmfPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
-  OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
-  OvmfPkg/Virtio10Dxe/Virtio10.inf
+  QemuQ35Pkg/PciHotPlugInitDxe/PciHotPlugInit.inf
+  QemuQ35Pkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
+  QemuQ35Pkg/Virtio10Dxe/Virtio10.inf
 
   #
   # Video support
   #
-  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
-  OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
-  OvmfPkg/PlatformDxe/Platform.inf
+  QemuQ35Pkg/QemuRamfbDxe/QemuRamfbDxe.inf
+  QemuCortexPkg/VirtioGpuDxe/VirtioGpu.inf
+  QemuCortexPkg/PlatformDxe/Platform.inf
 
   #
   # USB Support
@@ -1005,7 +1006,7 @@
     <PcdsFixedAtBuild>
       gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
   }
-  OvmfPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf {
+  QemuQ35Pkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf {
     <PcdsFixedAtBuild>
       gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
   }
@@ -1041,9 +1042,9 @@
   ArmVirtPkg/PlatformHasAcpiDtDxe/PlatformHasAcpiDtDxe.inf
 [Components.AARCH64]
   MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
-  OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf {
+  QemuQ35Pkg/AcpiPlatformDxe/AcpiPlatformDxe.inf {
     <LibraryClasses>
-      NULL|OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
+      NULL|QemuCortexPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
   }
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf {
     <LibraryClasses>
@@ -1066,9 +1067,15 @@
   #
   # Standalone MM modules in secure world
   #
-  StandaloneMmPkg/Core/StandaloneMmCore.inf
+  StandaloneMmPkg/Core/StandaloneMmCore.inf {
+    <PcdsFixedAtBuild>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
+  }
 
-  ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
+  ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf {
+    <PcdsFixedAtBuild>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
+  }
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteStandaloneMm.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStandaloneMm.inf {
     <LibraryClasses>
