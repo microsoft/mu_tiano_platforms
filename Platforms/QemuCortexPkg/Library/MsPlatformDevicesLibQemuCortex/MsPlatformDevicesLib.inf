@@ -25,7 +25,7 @@
   PcBdsPkg/PcBdsPkg.dec
   MsCorePkg/MsCorePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  OvmfPkg/OvmfPkg.dec
+  QemuQ35Pkg/QemuQ35Pkg.dec
   SourceLevelDebugPkg/SourceLevelDebugPkg.dec
 
 [LibraryClasses]
@@ -42,4 +42,4 @@
   gRootBridgesConnectedEventGroupGuid
 
 [Pcd]
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
