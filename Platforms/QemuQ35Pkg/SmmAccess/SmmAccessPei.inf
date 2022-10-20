@@ -35,9 +35,11 @@
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   QemuQ35Pkg/QemuQ35Pkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec # MU_CHANGE: Added support for Standalone MM mode
 
 [Guids]
   gEfiAcpiVariableGuid
+  gEfiMmPeiMmramMemoryReserveGuid # MU_CHANGE: Added support for Standalone MM mode
 
 [LibraryClasses]
   BaseLib
@@ -52,6 +54,7 @@
 
 [FeaturePcd]
   gUefiQemuQ35PkgTokenSpaceGuid.PcdSmmSmramRequire
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdStandaloneMmEnable  # MU_CHANGE: Added support for Standalone MM mode
 
 [Pcd]
   gUefiQemuQ35PkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase

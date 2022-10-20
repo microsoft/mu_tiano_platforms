@@ -196,18 +196,26 @@ SmmControl2DxeEntryPoint (
   mSmiEnable = PmBase + ICH9_PMBASE_OFS_SMI_EN;
 
   //
-  // If APMC_EN is pre-set in SMI_EN, that's QEMU's way to tell us that SMI
-  // support is not available. (For example due to KVM lacking it.) Otherwise,
+  // If APMC_EN is pre-set in SMI_EN, that's either QEMU's way to tell us that
+  // SMI support is not available, or this is already done in PEI. Otherwise,
   // this bit is clear after each reset.
   //
   SmiEnableVal = IoRead32 (mSmiEnable);
   if ((SmiEnableVal & ICH9_SMI_EN_APMC_EN) != 0) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: this Q35 implementation lacks SMI\n",
-      __FUNCTION__
-      ));
-    goto FatalError;
+    // MU_CHANGE Starts: Added extra check to support Standalone MM launching in PEI
+    if (FeaturePcdGet (PcdStandaloneMmEnable) && ((SmiEnableVal & ICH9_SMI_EN_GBL_SMI_EN) == 0)) {
+      //
+      // This platform does seems to have enabled nor support SMI
+      //
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: this Q35 implementation lacks SMI\n",
+        __FUNCTION__
+        ));
+      goto FatalError;
+    }
+
+    // MU_CHANGE Ends
   }
 
   //

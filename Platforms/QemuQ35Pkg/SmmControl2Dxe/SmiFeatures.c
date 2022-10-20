@@ -186,8 +186,9 @@ NegotiateSmiFeatures (
     // PiSmmCpuDxeSmm. Effectively, restore the UefiCpuPkg defaults, from which
     // the original QEMU behavior (i.e., unicast SMI) used to differ.
     //
-    if (RETURN_ERROR (PcdSet64S (PcdCpuSmmApSyncTimeout, 1000000)) ||
-        RETURN_ERROR (PcdSet8S (PcdCpuSmmSyncMode, 0x00)))
+    // MU_CHANGE Starts: Removed Dynamic PCD change to support Standalone MM
+    if ((PcdGet64 (PcdCpuSmmApSyncTimeout) != 1000000) ||
+        (PcdGet8 (PcdCpuSmmSyncMode) != 0x00))
     {
       DEBUG ((
         DEBUG_ERROR,
@@ -196,6 +197,8 @@ NegotiateSmiFeatures (
         ));
       goto FatalError;
     }
+
+    // MU_CHANGE Ends
 
     DEBUG ((DEBUG_INFO, "%a: using SMI broadcast\n", __FUNCTION__));
   }
