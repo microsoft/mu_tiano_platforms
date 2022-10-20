@@ -63,7 +63,8 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         else:
             args += " -m 2048"
         args += " -cpu qemu64,+rdrand,umip,+smep" # most compatible x64 CPU model + RDRAND + UMIP + SMEP support (not included by default)
-        #args += " -smp ..."
+        if env.GetBuildValue ("QEMU_CORE_NUM") is not None:
+          args += " -smp " + env.GetBuildValue ("QEMU_CORE_NUM")
         args += " -global driver=cfi.pflash01,property=secure,value=on"
         args += " -drive if=pflash,format=raw,unit=0,file=" + \
             os.path.join(OutputPath_FV, "QEMUQ35_CODE.fd") + ",readonly=on"

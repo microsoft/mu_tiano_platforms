@@ -19,7 +19,7 @@
   FILE_GUID                      = 5360bff6-3911-4495-ae3c-b02ff004b585
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PciLib|DXE_DRIVER DXE_RUNTIME_DRIVER SMM_CORE DXE_SMM_DRIVER UEFI_DRIVER UEFI_APPLICATION
+  LIBRARY_CLASS                  = PciLib|DXE_DRIVER DXE_RUNTIME_DRIVER SMM_CORE DXE_SMM_DRIVER UEFI_DRIVER UEFI_APPLICATION MM_STANDALONE
   CONSTRUCTOR                    = InitializeConfigAccessMethod
 
 #  VALID_ARCHITECTURES           = IA32 X64
@@ -35,7 +35,6 @@
   PcdLib
   PciCf8Lib
   PciExpressLib
-  UefiBootServicesTableLib
 
 [Pcd]
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId

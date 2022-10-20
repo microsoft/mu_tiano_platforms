@@ -84,3 +84,5 @@ jobs:
         - bash: sudo apt-get install gcc g++ make uuid-dev qemu
           displayName: Install Packages
           condition: and(gt(variables.pkg_count, 0), succeeded())
+        extra_artifacts: |
+          **/QEMUQ35_*.fd
