@@ -27,8 +27,9 @@ jobs:
       package: 'QemuQ35Pkg'
       should_run: true
       run_flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE"
+      container_image: 'ghcr.io/tianocore/containers/fedora-35-test:ddf6315'
 
-    #Use matrix to speed up the build process
+    # Use matrix to speed up the build process
     strategy:
         matrix:
 
@@ -62,6 +63,8 @@ jobs:
     pool:
       vmImage: $(vm_image)
 
+    container: $(container_image)
+
     steps:
     - template: Steps/BuildPlatform.yml@mu_devops
       parameters:
@@ -72,6 +75,7 @@ jobs:
         build_file: $(Build.File)
         build_flags: $(Build.Flags)
         run_flags: $(Run.Flags)
+<<<<<<< HEAD
         extra_install_step:
         - bash: sudo apt-get update
           displayName: Update Apt
@@ -79,5 +83,7 @@ jobs:
         - bash: sudo apt-get install gcc g++ make uuid-dev qemu-kvm qemu
           displayName: Install Packages
           condition: and(gt(variables.pkg_count, 0), succeeded())
+=======
+>>>>>>> a21b547b (Move platform build to using tianocore test container)
         extra_artifacts: |
           **/QEMUQ35_*.fd
