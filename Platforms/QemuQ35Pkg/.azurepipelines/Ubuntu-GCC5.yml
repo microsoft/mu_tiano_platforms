@@ -63,7 +63,7 @@ jobs:
     pool:
       vmImage: $(vm_image)
 
-    container: $(container_image)
+    container: ghcr.io/tianocore/containers/fedora-35-test:ddf6315
 
     steps:
     - template: Steps/BuildPlatform.yml@mu_devops
