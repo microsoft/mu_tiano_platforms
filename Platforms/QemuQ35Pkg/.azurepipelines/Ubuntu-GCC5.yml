@@ -76,7 +76,7 @@ jobs:
         - bash: sudo apt-get update
           displayName: Update Apt
           condition: and(gt(variables.pkg_count, 0), succeeded())
-        - bash: sudo apt-get install gcc g++ make uuid-dev qemu
+        - bash: sudo apt-get install gcc g++ make uuid-dev qemu-kvm qemu
           displayName: Install Packages
           condition: and(gt(variables.pkg_count, 0), succeeded())
         extra_artifacts: |
