@@ -25,7 +25,6 @@ jobs:
   - job: Platform_CI
     variables:
       package: 'QemuQ35Pkg'
-      vm_image: $(vm_image)
       should_run: true
       run_flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE"
 
