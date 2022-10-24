@@ -317,20 +317,16 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 
         # Unique Command and Args parameters per ARCH
         if (self.env.GetValue("TARGET_ARCH").upper() == "AARCH64"):
-            cmd = "/home/test/qemu-7.1.0/build/qemu-system-aarch64"
+            cmd = "qemu-system-aarch64"
             args = "-M sbsa-ref"
-            args += " -cpu cortex-a57  -gdb tcp::5555"                                          # emulate cpu
-        # elif(self.env.GetValue("TARGET_ARCH").upper() == "ARM"):
-        #     cmd = "qemu-system-arm"
-        #     args = "-M virt"
-        #     args += " -cpu cortex-a15"                                          # emulate cpu
+            args += " -cpu cortex-a57"                                              # emulate cpu
         else:
             raise NotImplementedError()
 
         # Common Args
         
         args += f" -drive if=pflash,format=raw,unit=0,file={bl3}"                   # path to tfa + s_mm
-        args += f" -drive if=pflash,format=raw,unit=0,file={Built_FV},readonly=on"  # path to uefi
+        args += f" -drive if=pflash,format=raw,unit=1,file={Built_FV},readonly=on"  # path to uefi
         args += " -m 1024"                                                          # 1gb memory
         # turn off network
         args += " -net none"
