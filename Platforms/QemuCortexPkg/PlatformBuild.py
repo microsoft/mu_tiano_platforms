@@ -164,8 +164,8 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         # checked for correctness but is never uses as this platform only supports a single set of
         # architectures.
         parserObj.add_argument('-a', "--arch", dest="build_arch", type=str, default="AARCH64",
-            help="Optional - CSV of architecture to build.  IA32,X64 will use IA32 for PEI and "
-            "X64 for DXE and is the only valid option for this platform.") # BEEBE TODO
+            help="Optional - CSV of architecture to build.  AARCH64 is used for PEI and "
+            "DXE and is the only valid option for this platform.")
 
     def RetrieveCommandLineOptions(self, args):
         '''  Retrieve command line options from the argparser '''
@@ -289,19 +289,9 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             int( self.env.GetValue("SECURE_FLASH_REGION_FIP_SIZE"), 16),
             os.path.join(op_tfa, "fip.bin")
             )
-        return 0
 
-    def FlashRomImage(self):
-
-        VirtualDrive = os.path.join(self.env.GetValue(
-            "BUILD_OUTPUT_BASE"), "VirtualDrive")
-        os.makedirs(VirtualDrive, exist_ok=True)
-        OutputPath_FV = os.path.join(
-            self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
+        # Pad both fd to 256mb, as required by QEMU
         Built_FV = os.path.join(OutputPath_FV, "QEMU_EFI.fd")
-    
-
-        # pad fd to 64mb
         with open(Built_FV, "ab") as fvfile:
             fvfile.seek(0, os.SEEK_END)
             additional = b'\0' * ((256 * 1024 * 1024)-fvfile.tell())
@@ -313,275 +303,216 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             additional = b'\0' * ((256 * 1024 * 1024)-fvfile.tell())
             fvfile.write(additional)
 
-        # QEMU must be on that path
+        return 0
 
-        # Unique Command and Args parameters per ARCH
-        if (self.env.GetValue("TARGET_ARCH").upper() == "AARCH64"):
-            cmd = "qemu-system-aarch64"
-            args = "-M sbsa-ref"
-            args += " -cpu cortex-a57"                                              # emulate cpu
-        else:
-            raise NotImplementedError()
-
-        # Common Args
-        
-        args += f" -drive if=pflash,format=raw,unit=0,file={bl3}"                   # path to tfa + s_mm
-        args += f" -drive if=pflash,format=raw,unit=1,file={Built_FV},readonly=on"  # path to uefi
-        args += " -m 1024"                                                          # 1gb memory
-        # turn off network
-        args += " -net none"
-        # Mount disk with startup.nsh
-        args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
-        # Conditional Args
-        if (self.env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
-            args += " -display none"  # no graphics
-        else:
-            args += " -vga cirrus"
-            # args += " -device virtio-gpu-pci"
-
-        # if (self.env.GetValue("MAKE_STARTUP_NSH").upper() == "TRUE"):
-        #     f = open(os.path.join(VirtualDrive, "startup.nsh"), "w")
-        #     f.write("BOOT SUCCESS !!! \n")
-        #     # add commands here
-        #     f.write("reset -s\n")
-        #     f.close()
-
-        # write ConOut messages to telnet localhost port
-        serial_port = self.env.GetValue("SERIAL_PORT")
-        if serial_port != None:
-            args += " -serial tcp:127.0.0.1:" + serial_port + ",server"
-            args += " -serial tcp:127.0.0.1:" + str(int(serial_port, 0) + 1) + ",server"
-        else:
-            # Serial messages out
-            args += " -serial stdio"
-
-        ret = RunCmd(cmd, args)
-
-        if ret == 0xc0000005:
-            # for some reason getting a c0000005 on successful return
-            return 0
-
-        return ret
-
+    def FlashRomImage(self):
         #Make virtual drive - Allow caller to override path otherwise use default
-        # startup_nsh = StartUpScriptManager()
-        # run_tests = (self.env.GetValue("RUN_TESTS", "FALSE").upper() == "TRUE")
-        # output_base = self.env.GetValue("BUILD_OUTPUT_BASE")
-        # shutdown_after_run = (self.env.GetValue("SHUTDOWN_AFTER_RUN", "FALSE").upper() == "TRUE")
-        # empty_drive = (self.env.GetValue("EMPTY_DRIVE", "FALSE").upper() == "TRUE")
+        startup_nsh = StartUpScriptManager()
+        run_tests = (self.env.GetValue("RUN_TESTS", "FALSE").upper() == "TRUE")
+        output_base = self.env.GetValue("BUILD_OUTPUT_BASE")
+        shutdown_after_run = (self.env.GetValue("SHUTDOWN_AFTER_RUN", "FALSE").upper() == "TRUE")
+        empty_drive = (self.env.GetValue("EMPTY_DRIVE", "FALSE").upper() == "TRUE")
 
-        # if os.name == 'nt':
-            # VirtualDrivePath = self.env.GetValue("VIRTUAL_DRIVE_PATH", os.path.join(output_base, "VirtualDrive.vhd"))
-            # VirtualDrive = VirtualDriveManager(VirtualDrivePath, self.env)
-            # self.env.SetValue("VIRTUAL_DRIVE_PATH", VirtualDrivePath, "Set Virtual Drive path in case not set")
-            # ut = UnitTestSupport(os.path.join(output_base, "X64"))
+        if os.name == 'nt':
+            VirtualDrivePath = self.env.GetValue("VIRTUAL_DRIVE_PATH", os.path.join(output_base, "VirtualDrive.vhd"))
+            VirtualDrive = VirtualDriveManager(VirtualDrivePath, self.env)
+            self.env.SetValue("VIRTUAL_DRIVE_PATH", VirtualDrivePath, "Set Virtual Drive path in case not set")
+            ut = UnitTestSupport(os.path.join(output_base, "AARCH64"))
 
-            # if empty_drive and os.path.isfile(VirtualDrivePath):
-            #         os.remove(VirtualDrivePath)
+            if empty_drive and os.path.isfile(VirtualDrivePath):
+                    os.remove(VirtualDrivePath)
 
-            # if not os.path.isfile(VirtualDrivePath):
-            #     VirtualDrive.MakeDrive()
+            if not os.path.isfile(VirtualDrivePath):
+                VirtualDrive.MakeDrive()
 
-            # test_regex = self.env.GetValue("TEST_REGEX", "")
+            test_regex = self.env.GetValue("TEST_REGEX", "")
 
-            # if test_regex != "":
-            #     ut.set_test_regex(test_regex)
-            #     ut.find_tests()
-            #     ut.copy_tests_to_virtual_drive(VirtualDrive)
+            if test_regex != "":
+                ut.set_test_regex(test_regex)
+                ut.find_tests()
+                ut.copy_tests_to_virtual_drive(VirtualDrive)
 
-            # if run_tests:
-            #     if test_regex == "":
-            #         logging.warning("No tests specified using TEST_REGEX flag but RUN_TESTS is TRUE")
-            #     elif not empty_drive:
-            #         logging.info("EMPTY_DRIVE=FALSE. This could impact your test results")
+            if run_tests:
+                if test_regex == "":
+                    logging.warning("No tests specified using TEST_REGEX flag but RUN_TESTS is TRUE")
+                elif not empty_drive:
+                    logging.info("EMPTY_DRIVE=FALSE. This could impact your test results")
 
-            #     if not shutdown_after_run:
-            #         logging.info("SHUTDOWN_AFTER_RUN=FALSE (default). XML test results will not be \
-            #             displayed until after the QEMU instance ends")
-            #     ut.write_tests_to_startup_nsh(startup_nsh)
+                if not shutdown_after_run:
+                    logging.info("SHUTDOWN_AFTER_RUN=FALSE (default). XML test results will not be \
+                        displayed until after the QEMU instance ends")
+                ut.write_tests_to_startup_nsh(startup_nsh)
 
-            # nshpath = os.path.join(output_base, "startup.nsh")
-            # startup_nsh.WriteOut(nshpath, shutdown_after_run)
+            nshpath = os.path.join(output_base, "startup.nsh")
+            startup_nsh.WriteOut(nshpath, shutdown_after_run)
 
-            # VirtualDrive.AddFile(nshpath)
+            VirtualDrive.AddFile(nshpath)
 
-        # else:
-        #     VirtualDrivePath = self.env.GetValue("VIRTUAL_DRIVE_PATH", os.path.join(output_base, "VirtualDrive"))
-        #     logging.warning("Linux currently isn't supported for the virtual drive. Falling back to an older method")
+        else:
+            VirtualDrivePath = self.env.GetValue("VIRTUAL_DRIVE_PATH", os.path.join(output_base, "VirtualDrive"))
+            logging.warning("Linux currently isn't supported for the virtual drive. Falling back to an older method")
 
-        #     if run_tests:
-        #         logging.critical("Linux doesn't support running unit tests due to lack of VHD support")
+            if run_tests:
+                logging.critical("Linux doesn't support running unit tests due to lack of VHD support")
 
-        #     if os.path.exists(VirtualDrivePath) and empty_drive:
-        #         shutil.rmtree(VirtualDrivePath)
+            if os.path.exists(VirtualDrivePath) and empty_drive:
+                shutil.rmtree(VirtualDrivePath)
 
-        #     if not os.path.exists(VirtualDrivePath):
-        #         os.makedirs(VirtualDrivePath)
+            if not os.path.exists(VirtualDrivePath):
+                os.makedirs(VirtualDrivePath)
 
-        #     nshpath = os.path.join(VirtualDrivePath, "startup.nsh")
-        #     self.env.SetValue("VIRTUAL_DRIVE_PATH", VirtualDrivePath, "Set Virtual Drive path in case not set")
-        #     startup_nsh.WriteOut(nshpath, shutdown_after_run)
+            nshpath = os.path.join(VirtualDrivePath, "startup.nsh")
+            self.env.SetValue("VIRTUAL_DRIVE_PATH", VirtualDrivePath, "Set Virtual Drive path in case not set")
+            startup_nsh.WriteOut(nshpath, shutdown_after_run)
 
-        # # Unique Command and Args parameters per ARCH
-        # if (self.env.GetValue("TARGET_ARCH").upper() == "AARCH64"):
-        #     cmd = "qemu-system-aarch64"
-        #     args = "-M virt"
-        #     args += " -cpu cortex-a57"                                          # emulate cpu
-        # elif(self.env.GetValue("TARGET_ARCH").upper() == "ARM"):
-        #     cmd = "qemu-system-arm"
-        #     args = "-M virt"
-        #     args += " -cpu cortex-a15"                                          # emulate cpu
-        # else:
-        #     raise NotImplementedError()
+        ret = self.Helper.QemuRun(self.env)
+        if ret != 0:
+            logging.critical("Failed running Qemu")
+            return ret
 
-        # ret = self.Helper.QemuRun(self.env)
-        # if ret != 0:
-        #     logging.critical("Failed running Qemu")
-        #     return ret
-
-        # failures = 0
-        # if run_tests and os.name == 'nt':
-        #     failures = ut.report_results(VirtualDrive)
+        failures = 0
+        if run_tests and os.name == 'nt':
+            failures = ut.report_results(VirtualDrive)
 
         # do stuff with unit test results here
-        # return failures
+        return failures
 
-# class UnitTestSupport(object):
+class UnitTestSupport(object):
 
-#     def __init__(self, host_efi_build_output_path: os.PathLike):
-#         self.test_list = []
-#         self._globlist = []
-#         self.host_efi_path = host_efi_build_output_path
+    def __init__(self, host_efi_build_output_path: os.PathLike):
+        self.test_list = []
+        self._globlist = []
+        self.host_efi_path = host_efi_build_output_path
 
-#     def set_test_regex(self, csv_string):
-#         self._globlist = csv_string.split(",")
+    def set_test_regex(self, csv_string):
+        self._globlist = csv_string.split(",")
 
-#     def find_tests(self):
-#         test_list = []
-#         for globpattern in self._globlist:
-#             test_list.extend(glob.glob(os.path.join(self.host_efi_path, globpattern)))
-#         self.test_list = list(dict.fromkeys(test_list))
+    def find_tests(self):
+        test_list = []
+        for globpattern in self._globlist:
+            test_list.extend(glob.glob(os.path.join(self.host_efi_path, globpattern)))
+        self.test_list = list(dict.fromkeys(test_list))
 
-#     def copy_tests_to_virtual_drive(self, virtualdrive):
-#         for test in self.test_list:
-#             virtualdrive.AddFile(test)
+    def copy_tests_to_virtual_drive(self, virtualdrive):
+        for test in self.test_list:
+            virtualdrive.AddFile(test)
 
-#     def write_tests_to_startup_nsh(self,nshfile):
-#         for test in self.test_list:
-#             nshfile.AddLine(os.path.basename(test))
+    def write_tests_to_startup_nsh(self,nshfile):
+        for test in self.test_list:
+            nshfile.AddLine(os.path.basename(test))
 
-#     def report_results(self, virtualdrive) -> int:
-#         from html import unescape
+    def report_results(self, virtualdrive) -> int:
+        from html import unescape
 
-#         report_folder_path = os.path.join(os.path.dirname(virtualdrive.path_to_vhd), "unit_test_results")
-#         os.makedirs(report_folder_path, exist_ok=True)
-#         #now parse the xml for errors
-#         failure_count = 0
-#         logging.info("UnitTest Completed")
-#         for unit_test in self.test_list:
-#             xml_result_file = os.path.basename(unit_test)[:-4] + "_JUNIT.XML"
-#             output_xml_file = os.path.join(report_folder_path, xml_result_file)
-#             try:
-#                 data = virtualdrive.GetFileContent(xml_result_file, output_xml_file)
-#             except:
-#                 logging.error(f"unit test ({unit_test}) produced no result file")
-#                 failure_count += 1
-#                 continue
+        report_folder_path = os.path.join(os.path.dirname(virtualdrive.path_to_vhd), "unit_test_results")
+        os.makedirs(report_folder_path, exist_ok=True)
+        #now parse the xml for errors
+        failure_count = 0
+        logging.info("UnitTest Completed")
+        for unit_test in self.test_list:
+            xml_result_file = os.path.basename(unit_test)[:-4] + "_JUNIT.XML"
+            output_xml_file = os.path.join(report_folder_path, xml_result_file)
+            try:
+                data = virtualdrive.GetFileContent(xml_result_file, output_xml_file)
+            except:
+                logging.error(f"unit test ({unit_test}) produced no result file")
+                failure_count += 1
+                continue
 
-#             logging.info('\n' + os.path.basename(unit_test) + "\n  Full Log: " + output_xml_file)
+            logging.info('\n' + os.path.basename(unit_test) + "\n  Full Log: " + output_xml_file)
 
-#             try:
-#                 root = xml.etree.ElementTree.fromstring(data)
-#                 for suite in root:
-#                     logging.info(" ")
-#                     for case in suite:
-#                         logging.info('\t\t' + case.attrib['classname'] + " - ")
-#                         caseresult = "\t\t\tPASS"
-#                         level = logging.INFO
-#                         for result in case:
-#                             if result.tag == 'failure':
-#                                 failure_count += 1
-#                                 level = logging.ERROR
-#                                 caseresult = "\t\tFAIL" + " - " + unescape(result.attrib['message'])
-#                         logging.log( level, caseresult)
-#             except Exception as ex:
-#                 logging.error("Exception trying to read xml." + str(ex))
-#                 failure_count += 1
-#         return failure_count
+            try:
+                root = xml.etree.ElementTree.fromstring(data)
+                for suite in root:
+                    logging.info(" ")
+                    for case in suite:
+                        logging.info('\t\t' + case.attrib['classname'] + " - ")
+                        caseresult = "\t\t\tPASS"
+                        level = logging.INFO
+                        for result in case:
+                            if result.tag == 'failure':
+                                failure_count += 1
+                                level = logging.ERROR
+                                caseresult = "\t\tFAIL" + " - " + unescape(result.attrib['message'])
+                        logging.log( level, caseresult)
+            except Exception as ex:
+                logging.error("Exception trying to read xml." + str(ex))
+                failure_count += 1
+        return failure_count
 
-# class VirtualDriveManager(object):
+class VirtualDriveManager(object):
 
-#     def __init__(self, vhd_path:os.PathLike, env:object):
-#         self.path_to_vhd = os.path.abspath(vhd_path)
-#         self._env = env
+    def __init__(self, vhd_path:os.PathLike, env:object):
+        self.path_to_vhd = os.path.abspath(vhd_path)
+        self._env = env
 
-#     def MakeDrive(self, size: int=60):
-#         ret = RunCmd("VHDCreate", f'-sz {size}MB {self.path_to_vhd}')
-#         if ret != 0:
-#             logging.error("Failed to create VHD")
-#             return ret
+    def MakeDrive(self, size: int=60):
+        ret = RunCmd("VHDCreate", f'-sz {size}MB {self.path_to_vhd}')
+        if ret != 0:
+            logging.error("Failed to create VHD")
+            return ret
 
-#         ret = RunCmd("DiskFormat", f"-ft fat -ptt bios {self.path_to_vhd}")
-#         if ret != 0:
-#             logging.error("Failed to format VHD")
-#             return ret
-#         return ret
+        ret = RunCmd("DiskFormat", f"-ft fat -ptt bios {self.path_to_vhd}")
+        if ret != 0:
+            logging.error("Failed to format VHD")
+            return ret
+        return ret
 
-#     def AddFile(self, HostFilePath:os.PathLike):
-#         file_name = os.path.basename(HostFilePath)
-#         ret = RunCmd("FileInsert", f"{HostFilePath} {file_name} {self.path_to_vhd}")
-#         return ret
+    def AddFile(self, HostFilePath:os.PathLike):
+        file_name = os.path.basename(HostFilePath)
+        ret = RunCmd("FileInsert", f"{HostFilePath} {file_name} {self.path_to_vhd}")
+        return ret
 
-#     def GetFileContent(self, VirtualFilePath, HostFilePath: os.PathLike=None):
-#         temp_extract_path = HostFilePath
-#         if temp_extract_path == None:
-#             temp_extract_path = tempfile.mktemp()
-#         logging.info(f"Extracting {VirtualFilePath} to {temp_extract_path}")
-#         ret = self.ExtractFile(VirtualFilePath, temp_extract_path)
-#         if ret != 0:
-#             raise FileNotFoundError(VirtualFilePath)
-#         with open(temp_extract_path, "rb") as f:
-#             return f.read()
+    def GetFileContent(self, VirtualFilePath, HostFilePath: os.PathLike=None):
+        temp_extract_path = HostFilePath
+        if temp_extract_path == None:
+            temp_extract_path = tempfile.mktemp()
+        logging.info(f"Extracting {VirtualFilePath} to {temp_extract_path}")
+        ret = self.ExtractFile(VirtualFilePath, temp_extract_path)
+        if ret != 0:
+            raise FileNotFoundError(VirtualFilePath)
+        with open(temp_extract_path, "rb") as f:
+            return f.read()
 
-#     def ExtractFile(self, VirtualFilePath, HostFilePath:os.PathLike):
-#         ret = RunCmd("FileExtract", f"{VirtualFilePath} {HostFilePath} {self.path_to_vhd}")
-#         return ret
+    def ExtractFile(self, VirtualFilePath, HostFilePath:os.PathLike):
+        ret = RunCmd("FileExtract", f"{VirtualFilePath} {HostFilePath} {self.path_to_vhd}")
+        return ret
 
 
-# class StartUpScriptManager(object):
+class StartUpScriptManager(object):
 
-#     FS_FINDER_SCRIPT = r'''
-# #!/bin/nsh
-# echo -off
-# for %a run (0 10)
-#     if exist fs%a:\{first_file} then
-#         fs%a:
-#         goto FOUND_IT
-#     endif
-# endfor
+    FS_FINDER_SCRIPT = r'''
+#!/bin/nsh
+echo -off
+for %a run (0 10)
+    if exist fs%a:\{first_file} then
+        fs%a:
+        goto FOUND_IT
+    endif
+endfor
 
-# :FOUND_IT
-# '''
+:FOUND_IT
+'''
 
-#     def __init__(self):
-#         self._use_fs_finder = False
-#         self._lines = []
+    def __init__(self):
+        self._use_fs_finder = False
+        self._lines = []
 
-#     def WriteOut(self, host_file_path, shutdown:bool):
-#         with open(host_file_path, "w") as nsh:
-#             if self._use_fs_finder:
-#                 this_file = os.path.basename(host_file_path)
-#                 nsh.write(StartUpScriptManager.FS_FINDER_SCRIPT.format(first_file=this_file))
+    def WriteOut(self, host_file_path, shutdown:bool):
+        with open(host_file_path, "w") as nsh:
+            if self._use_fs_finder:
+                this_file = os.path.basename(host_file_path)
+                nsh.write(StartUpScriptManager.FS_FINDER_SCRIPT.format(first_file=this_file))
 
-#             for l in self._lines:
-#                 nsh.write(l + "\n")
+            for l in self._lines:
+                nsh.write(l + "\n")
 
-#             if shutdown:
-#                 nsh.write("reset -s\n")
+            if shutdown:
+                nsh.write("reset -s\n")
 
-#     def AddLine(self, line):
-#         self._lines.append(line.strip())
-#         self._use_fs_finder = True
+    def AddLine(self, line):
+        self._lines.append(line.strip())
+        self._use_fs_finder = True
 
 if __name__ == "__main__":
     import argparse

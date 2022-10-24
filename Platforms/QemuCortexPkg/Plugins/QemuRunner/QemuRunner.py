@@ -40,41 +40,38 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         executable = "qemu-system-aarch64"
 
         # write messages to stdio
-        args = "-debugcon stdio"
-        # debug messages out thru virtual io port
-        args += " -global isa-debugcon.iobase=0x402"
-        # Turn off S3 support
-        args += " -global ICH9-LPC.disable_s3=1"
+        args = "-serial stdio"
         # turn off network
         args += " -net none"
-        # # Mount disk with startup.nsh
-        # if os.path.isfile(VirtualDrive):
-        #     args += f" -hdd {VirtualDrive}"
-        # elif os.path.isdir(VirtualDrive):
-        #     args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
-        # else:
-        #     logging.critical("Virtual Drive Path Invalid")
+        # Mount disk with startup.nsh
+        if os.path.isfile(VirtualDrive):
+            args += f" -hdd {VirtualDrive}"
+        elif os.path.isdir(VirtualDrive):
+            args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
+        else:
+            logging.critical("Virtual Drive Path Invalid")
 
-        args += " -machine q35,smm=on" #,accel=(tcg|kvm)"
-        args += " -m 2048"
-        args += " -cpu cortex-a57,+rdrand" # + RDRAND support (not included by default)
+        args += " -M sbsa-ref" #,accel=(tcg|kvm)"
+        args += " -m 1024"
+        args += " -cpu cortex-a57"
         #args += " -smp ..."
-        args += " -global driver=cfi.pflash01,property=secure,value=on"
+        # args += " -global driver=cfi.pflash01,property=secure,value=on"
         args += " -drive if=pflash,format=raw,unit=0,file=" + \
-            os.path.join(OutputPath_FV, "QEMUCORTEX_CODE.fd") + ",readonly=on"
+            os.path.join(OutputPath_FV, "SECURE_FLASH0.fd")
         args += " -drive if=pflash,format=raw,unit=1,file=" + \
-            os.path.join(OutputPath_FV, "QEMUCORTEX_VARS.fd")
+            os.path.join(OutputPath_FV, "QEMU_EFI.fd") + ",readonly=on"
 
         # Add XHCI USB controller and mouse
-        args += " -device qemu-xhci,id=usb"
-        args += " -device usb-mouse,id=input0,bus=usb.0,port=1"  # add a usb mouse
+        # args += " -device qemu-xhci,id=usb"
+        # args += " -device usb-mouse,id=input0,bus=usb.0,port=1"  # add a usb mouse
         #args += " -device usb-kbd,id=input1,bus=usb.0,port=2"    # add a usb keyboar
-        args += " -smbios type=0,vendor=Palindrome,uefi=on -smbios type=1,manufacturer=Palindrome,product=MuQemuQ35,serial=42-42-42-42"
+        # args += " -smbios type=0,vendor=Palindrome,uefi=on -smbios type=1,manufacturer=Palindrome,product=MuQemuQ35,serial=42-42-42-42"
 
         if (env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
             args += " -display none"  # no graphics
         else:
             args += " -vga cirrus" #std is what the default is
+            # args += " -device virtio-gpu-pci"
 
         # Check for gdb server setting
         gdb_port = env.GetValue("GDB_SERVER")
