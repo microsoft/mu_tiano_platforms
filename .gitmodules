@@ -1,6 +1,6 @@
 [submodule "MU_BASECORE"]
 	path = MU_BASECORE
-	url = https://dev.azure.com/windowspartners/MSCoreUEFI/_git/mu_basecore
+	url = https://github.com/microsoft/mu_basecore.git
 	branch = release/202208
 [submodule "Common/MU_TIANO"]
 	path = Common/MU_TIANO
