@@ -13,9 +13,9 @@ resources:
   repositories:
     - repository: mu_devops
       type: github
-      endpoint: microsoft
-      name: microsoft/mu_devops
-      ref: main
+      endpoint: cfernald
+      name: cfernald/mu_devops
+      ref: platform_container
 
 variables:
 - group: architectures-x86-64
@@ -77,5 +77,6 @@ jobs:
         build_file: $(Build.File)
         build_flags: $(Build.Flags)
         run_flags: $(Run.Flags)
+        install_tools: false
         extra_artifacts: |
           **/QEMUQ35_*.fd
