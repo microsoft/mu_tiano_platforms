@@ -101,9 +101,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
-        scopes = CommonPlatform.Scopes
-        # scopes += ("gcc_aarch64_linux",) # BEEBE TODO
-        return scopes
+        return CommonPlatform.Scopes
 
     def FilterPackagesToTest(self, changedFilesList: list, potentialPackagesList: list) -> list:
         ''' Filter other cases that this package should be built
@@ -189,9 +187,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
-        scopes = CommonPlatform.Scopes
-        # scopes += ("gcc_aarch64_linux",)
-        return scopes
+        return CommonPlatform.Scopes
 
     def GetName(self):
         ''' Get the name of the repo, platform, or product being build '''
