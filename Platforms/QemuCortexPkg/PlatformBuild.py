@@ -34,7 +34,7 @@ class CommonPlatform():
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
     Scopes = ('qemucortex', 'gcc_aarch64_linux', 'edk2-build', 'cibuild')
     WorkspaceRoot = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    PackagesPath = ("Platforms", "MU_BASECORE", "Common/MU", "Common/MU_TIANO", "Common/MU_OEM_SAMPLE", "Silicon/Arm/MU_TIANO_ARM", "Silicon/Arm/TFA")
+    PackagesPath = ("Platforms", "MU_BASECORE", "Common/MU", "Common/MU_TIANO", "Common/MU_OEM_SAMPLE", "Silicon/Arm/MU_TIANO", "Silicon/Arm/TFA")
 
 
     # ####################################################################################### #
@@ -151,7 +151,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         # Add a step to clean up BL31 as well, if asked
         cmd = "make"
         args = "distclean"
-        ret = RunCmd(cmd, args, workingdir= os.path.join (self.GetWorkspaceRoot (), "Common/TFA"))
+        ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_TFA_PATH"))
         if ret != 0:
             return ret
 
@@ -230,6 +230,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         # # Default turn on build reporting.
         self.env.SetValue("BUILDREPORTING", "TRUE", "Enabling build report")
         self.env.SetValue("BUILDREPORT_TYPES", "PCD DEPEX FLASH BUILD_FLAGS LIBRARY FIXED_ADDRESS HASH", "Setting build report types")
+        self.env.SetValue("ARM_TFA_PATH", os.path.join (self.GetWorkspaceRoot (), "Silicon/Arm/TFA"), "Platform hardcoded")
         # Include the MFCI test cert by default, override on the commandline with "BLD_*_SHIP_MODE=TRUE" if you want the retail MFCI cert
         # self.env.SetValue("BLD_*_SHIP_MODE", "FALSE", "Default")
 
@@ -262,14 +263,13 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         args += " SPM_MM=1 EL3_EXCEPTION_HANDLING=1"
         args += " BL32=" + os.path.join(op_fv, "BL32_AP_MM.fd")
         args += " all fip"
-        ret = RunCmd(cmd, args, workingdir= os.path.join (self.GetWorkspaceRoot (), "Common/TFA"))
+        ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_TFA_PATH"))
         if ret != 0:
             return ret
 
         # Now that BL31 is built with BL32 supplied, patch BL1 and BL31 built fip.bin into the SECURE_FLASH0.fd
         op_tfa = os.path.join (
-            self.GetWorkspaceRoot (),
-            "Common/TFA", "build",
+            self.env.GetValue("ARM_TFA_PATH"), "build",
             self.env.GetValue("QEMU_PLATFORM").lower(),
             self.env.GetValue("TARGET").lower())
 
@@ -291,6 +291,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             )
 
         # Pad both fd to 256mb, as required by QEMU
+        OutputPath_FV = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
         Built_FV = os.path.join(OutputPath_FV, "QEMU_EFI.fd")
         with open(Built_FV, "ab") as fvfile:
             fvfile.seek(0, os.SEEK_END)
