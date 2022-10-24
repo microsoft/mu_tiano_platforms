@@ -328,9 +328,10 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             raise NotImplementedError()
 
         # Common Args
-        args += " -pflash " + bl3
-        args += " -pflash " + Built_FV                                     # path to fw
-        args += " -m 1024"                                                  # 1gb memory
+        
+        args += f" -drive if=pflash,format=raw,unit=0,file={bl3}"                   # path to tfa + s_mm
+        args += f" -drive if=pflash,format=raw,unit=0,file={Built_FV},readonly=on"  # path to uefi
+        args += " -m 1024"                                                          # 1gb memory
         # turn off network
         args += " -net none"
         # Mount disk with startup.nsh
@@ -339,8 +340,8 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         if (self.env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
             args += " -display none"  # no graphics
         else:
-            # args += " -device cirrus-vga"
-            args += " -device virtio-gpu-pci"
+            args += " -vga cirrus"
+            # args += " -device virtio-gpu-pci"
 
         # if (self.env.GetValue("MAKE_STARTUP_NSH").upper() == "TRUE"):
         #     f = open(os.path.join(VirtualDrive, "startup.nsh"), "w")
