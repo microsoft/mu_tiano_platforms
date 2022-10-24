@@ -39,10 +39,8 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         # Check if QEMU is on the path, if not find it
         executable = "qemu-system-aarch64"
 
-        # write messages to stdio
-        args = "-serial stdio"
         # turn off network
-        args += " -net none"
+        args = "-net none"
         # Mount disk with startup.nsh
         if os.path.isfile(VirtualDrive):
             args += f" -hdd {VirtualDrive}"
@@ -62,10 +60,10 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             os.path.join(OutputPath_FV, "QEMU_EFI.fd") + ",readonly=on"
 
         # Add XHCI USB controller and mouse
-        # args += " -device qemu-xhci,id=usb"
-        # args += " -device usb-mouse,id=input0,bus=usb.0,port=1"  # add a usb mouse
+        args += " -device qemu-xhci,id=usb"
+        args += " -device usb-mouse,id=input0,bus=usb.0,port=1"  # add a usb mouse
         #args += " -device usb-kbd,id=input1,bus=usb.0,port=2"    # add a usb keyboar
-        # args += " -smbios type=0,vendor=Palindrome,uefi=on -smbios type=1,manufacturer=Palindrome,product=MuQemuQ35,serial=42-42-42-42"
+        args += " -smbios type=0,vendor=Palindrome,uefi=on -smbios type=1,manufacturer=Palindrome,product=MuQemuQ35,serial=42-42-42-42"
 
         if (env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
             args += " -display none"  # no graphics
@@ -78,6 +76,14 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         if (gdb_port != None):
             logging.log(logging.INFO, "Enabling GDB server at port tcp::" + gdb_port + ".")
             args += " -gdb tcp::" + gdb_port
+
+        # write ConOut messages to telnet localhost port
+        serial_port = env.GetValue("SERIAL_PORT")
+        if serial_port != None:
+            args += " -serial tcp:127.0.0.1:" + serial_port + ",server"
+        else:
+            # write messages to stdio
+            args += " -serial stdio"
 
         # Run QEMU
         #ret = QemuRunner.RunCmd(executable, args,  thread_target=QemuRunner.QemuCmdReader)
