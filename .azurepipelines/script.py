@@ -1,3 +1,4 @@
+from github import Github
 from edk2toollib.utility_functions import RunCmd
 import argparse
 import os
@@ -11,10 +12,15 @@ def main():
     args = parser.parse_args()
     token = args.token
     
+    # github = Github(token)
+
     managed_repos = [
-        #{"name": "mu_basecore", "url": "https://github.com/Javagedes/mu_basecore", "branch": "release/202202"},
-        {"name": "mu_tiano_platforms", "url": "https://github.com/Javagedes/mu_tiano_platforms", "branch":"release/202202"}
+        {"name": "mu_basecore", "url": "https://github.com/Javagedes/mu_basecore", "branch": "release/202202"},
+        {"name": "mu_tiano_platforms", "url": "https://github.com/Javagedes/mu_tiano_platforms.git", "branch":"release/202202"}
     ]
+
+    RunCmd('git', 'config --global user.name "Azure Devops')
+    RunCmd('git', 'config --global user.email "joey.vagedes@gmail.com')
 
     branch = 'subtree/github/update'
     path = os.path.join(os.getcwd(), 'src')
@@ -38,7 +44,8 @@ def main():
         print(ret)
 
         # push the branch
-        params = f'-c http.extraheader="AUTHORIZATION: bearer {token}" push origin {branch}'
+        # TODO: Does not like the current way of pushing
+        params = f'push https://{token}@github.com/Javagedes/mu_tiano_platforms.git {branch}'
         ret = RunCmd('git', params, workingdir=repo_path)
         print(ret)
 
