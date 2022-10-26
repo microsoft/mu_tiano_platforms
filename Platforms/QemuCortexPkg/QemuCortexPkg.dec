@@ -43,6 +43,10 @@
   gQeumCortexPkgTokenSpaceGuid.PcdFlashNvStorageBase|0x0|UINT64|0x00000001
   gQeumCortexPkgTokenSpaceGuid.PcdFlashNvStorageSize|0x0|UINT64|0x00000002
 
+  # Non discoverable devices Pcds
+  gQeumCortexPkgTokenSpaceGuid.PcdPlatformAhciBase|0|UINT64|0x00000001
+  gQeumCortexPkgTokenSpaceGuid.PcdPlatformAhciSize|0x10000|UINT32|0x00000002
+
 [PcdsDynamic, PcdsDynamicEx]
   ## This PCD tracks where PcdVideo{Horizontal,Vertical}Resolution
   #  values are coming from.

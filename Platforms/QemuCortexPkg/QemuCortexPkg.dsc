@@ -145,6 +145,8 @@
   TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
 !endif
 
+  NonDiscoverableDeviceRegistrationLib|MdeModulePkg/Library/NonDiscoverableDeviceRegistrationLib/NonDiscoverableDeviceRegistrationLib.inf
+
   #
   # It is not possible to prevent the ARM compiler from inserting calls to intrinsic functions.
   # This library provides the instrinsic functions such a compiler may generate calls to.
@@ -168,7 +170,6 @@
 
   PlatformPeiLib|ArmPlatformPkg/PlatformPei/PlatformPeiLib.inf
   MemoryInitPeiLib|ArmPlatformPkg/MemoryInitPei/MemoryInitPeiLib.inf
-  ResetSystemLib|ArmPkg/Library/ArmSmcPsciResetSystemLib/ArmSmcPsciResetSystemLib.inf
 
   # ARM PL031 RTC Driver
   RealTimeClockLib|ArmPlatformPkg/Library/PL031RealTimeClockLib/PL031RealTimeClockLib.inf
@@ -265,9 +266,8 @@
   FrameBufferBltLib|MdeModulePkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
   QemuBootOrderLib|QemuQ35Pkg/Library/QemuBootOrderLib/QemuBootOrderLib.inf
   FileExplorerLib|MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
-  PciPcdProducerLib|QemuCortexPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
   PciSegmentLib|MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
-  PciHostBridgeLib|QemuCortexPkg/Fdt/FdtPciHostBridgeLib/FdtPciHostBridgeLib.inf
+  PciHostBridgeLib|QemuCortexPkg/Library/SbsaQemuPciHostBridgeLib/SbsaQemuPciHostBridgeLib.inf
   PciHostBridgeUtilityLib|QemuQ35Pkg/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf
 
   # BEEBE ADDED
@@ -302,6 +302,7 @@
   DeviceStateLib|MdeModulePkg/Library/DeviceStateLib/DeviceStateLib.inf
   XenPlatformLib|QemuQ35Pkg/Library/XenPlatformLib/XenPlatformLib.inf
   MmUnblockMemoryLib|MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
+  ResetSystemLib|MdeModulePkg/Library/DxeResetSystemLib/DxeResetSystemLib.inf
 
   # Math Libraries
   FltUsedLib |MdePkg/Library/FltUsedLib/FltUsedLib.inf
@@ -377,6 +378,7 @@
   OemHookStatusCodeLib|MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
+  ResetSystemLib|MdeModulePkg/Library/PeiResetSystemLib/PeiResetSystemLib.inf
 
   PeiServicesTablePointerLib|ArmPkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
   ArmVirtMemInfoLib|ArmVirtPkg/Library/QemuVirtMemInfoLib/QemuVirtMemInfoPeiLib.inf
@@ -389,7 +391,6 @@
 
 !if $(TPM2_ENABLE) == TRUE
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
-  # ResetSystemLib|MdeModulePkg/Library/PeiResetSystemLib/PeiResetSystemLib.inf
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
 !endif
 
@@ -419,6 +420,7 @@
   DebugLib|MdePkg/Library/DxeRuntimeDebugLibSerialPort/DxeRuntimeDebugLibSerialPort.inf
 !endif
   VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
+  ResetSystemLib|MdeModulePkg/Library/RuntimeResetSystemLib/RuntimeResetSystemLib.inf
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
@@ -619,6 +621,36 @@
   gArmTokenSpaceGuid.PcdMmBufferSize|0x200000
 
   #
+  # PLDA PCI Root Complex
+  #
+  # ECAM size == 0x10000000
+  gArmTokenSpaceGuid.PcdPciBusMin|0
+  gArmTokenSpaceGuid.PcdPciBusMax|255
+  gArmTokenSpaceGuid.PcdPciIoBase|0x0
+  gArmTokenSpaceGuid.PcdPciIoSize|0x00010000
+  # gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPciIoLimit|0x0000ffff
+  gArmTokenSpaceGuid.PcdPciMmio32Base|0x80000000
+  gArmTokenSpaceGuid.PcdPciMmio32Size|0x70000000
+  # gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPciMmio32Limit|0xEFFFFFFF
+  gArmTokenSpaceGuid.PcdPciMmio64Base|0x100000000
+  gArmTokenSpaceGuid.PcdPciMmio64Size|0xFF00000000
+  # gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPciMmio64Limit|0xFFFFFFFFFF
+
+  # set PcdPciExpressBaseAddress to MAX_UINT64, which signifies that this
+  # PCD and PcdPciDisableBusEnumeration have not been assigned yet
+  # TODO: PcdPciExpressBaseAddress set to max_uint64
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xf0000000
+  # gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPciExpressBarSize|0x10000000
+  # gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPciExpressBarLimit|0xFFFFFFFF
+
+  gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation|0x7fff0000
+  gEfiMdePkgTokenSpaceGuid.PcdPciMmio32Translation|0x0
+  gEfiMdePkgTokenSpaceGuid.PcdPciMmio64Translation|0x0
+  ## If TRUE, OvmfPkg/AcpiPlatformDxe will not wait for PCI
+  #  enumeration to complete before installing ACPI tables.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|FALSE
+
+  #
   # Network Pcds
   #
 !include NetworkPkg/NetworkPcds.dsc.inc
@@ -628,6 +660,10 @@
 
   # initial location of the device tree blob passed by QEMU -- base of DRAM
   gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress|0x10000000000
+
+  # Non discoverable devices (AHCI,EHCI)
+  gQeumCortexPkgTokenSpaceGuid.PcdPlatformAhciBase|0x60100000
+  gQeumCortexPkgTokenSpaceGuid.PcdPlatformAhciSize|0x00010000
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x21, 0xaa, 0x2c, 0x46, 0x14, 0x76, 0x03, 0x45, 0x83, 0x6e, 0x8a, 0xb6, 0xf4, 0x66, 0x23, 0x31 }
@@ -665,10 +701,6 @@
 [PcdsDynamicDefault.common]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
 
-  ## If TRUE, QemuQ35Pkg/AcpiPlatformDxe will not wait for PCI
-  #  enumeration to complete before installing ACPI tables.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|TRUE
-
   # System Memory Size -- 1 MB initially, actual size will be fetched from DT
   gArmTokenSpaceGuid.PcdSystemMemorySize|0x08000000
 
@@ -689,12 +721,6 @@
 
   ## PL031 RealTimeClock
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x60010000
-
-  # set PcdPciExpressBaseAddress to MAX_UINT64, which signifies that this
-  # PCD and PcdPciDisableBusEnumeration above have not been assigned yet
-  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xFFFFFFFFFFFFFFFF
-
-  gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation|0x0
 
   #
   # Set video resolution for boot options and for text setup.
@@ -757,10 +783,7 @@
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
 
 !if $(TPM2_ENABLE) == TRUE
-  MdeModulePkg/Universal/ResetSystemPei/ResetSystemPei.inf {
-    <LibraryClasses>
-      ResetSystemLib|ArmVirtPkg/Library/ArmVirtPsciResetSystemPeiLib/ArmVirtPsciResetSystemPeiLib.inf
-  }
+  MdeModulePkg/Universal/ResetSystemPei/ResetSystemPei.inf
   QemuQ35Pkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
   SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf {
     <LibraryClasses>
@@ -922,6 +945,11 @@
   MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
   MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
 
+  # IDE/AHCI Support
+  QemuQ35Pkg/SataControllerDxe/SataControllerDxe.inf
+  MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
+  MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
+
   #
   # NVME Driver
   #
@@ -939,15 +967,9 @@
   #
   # PCI support
   #
-  ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf {
-    <LibraryClasses>
-      NULL|QemuCortexPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
-  }
+  ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
   MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
-  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf {
-    <LibraryClasses>
-      NULL|QemuCortexPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
-  }
+  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
   QemuQ35Pkg/PciHotPlugInitDxe/PciHotPlugInit.inf
   QemuQ35Pkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
   QemuQ35Pkg/Virtio10Dxe/Virtio10.inf
@@ -1029,27 +1051,23 @@
       HandleParsingLib|ShellPkg/Library/UefiHandleParsingLib/UefiHandleParsingLib.inf
       PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
       BcfgCommandLib|ShellPkg/Library/UefiShellBcfgCommandLib/UefiShellBcfgCommandLib.inf
+      ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
 
     <PcdsFixedAtBuild>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0xFF
       gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
       gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|8000
   }
-
+  Platforms/QemuCortexPkg/SbsaQemuPlatformDxe/SbsaQemuPlatformDxe.inf
+  MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
   #
   # ACPI Support
   #
   ArmVirtPkg/PlatformHasAcpiDtDxe/PlatformHasAcpiDtDxe.inf
 [Components.AARCH64]
   MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
-  QemuQ35Pkg/AcpiPlatformDxe/AcpiPlatformDxe.inf {
-    <LibraryClasses>
-      NULL|QemuCortexPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
-  }
-  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf {
-    <LibraryClasses>
-      NULL|EmbeddedPkg/Library/PlatformHasAcpiLib/PlatformHasAcpiLib.inf
-  }
+  MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
+  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
 
   #
   # Standalone MM drivers in non-secure world
