@@ -42,7 +42,7 @@ Automatically generated PR
     # Uses git (GitPython) for managing git commands
     # Uses github (PyGithub) for interfacing with github
     for repo in managed_repos:
-        logging.info(f'Starting update for {repo["name"]}')
+        print(f'Starting update for {repo["name"]}')
         create_pr = False
         
         # Clone the repository
@@ -52,28 +52,27 @@ Automatically generated PR
         # Checkout the branch if it exists, or create one if it does not.
         # If branch exists, assume PR has been created already and we just 
         # need to update the commit.
-        logging.info('Checking out subtree branch')
+        print('Checking out subtree branch')
         branch = [b for b in r.branches if b.name == head]
-        if not branch:
-            logging.info('Branch did not exist; creating new branch')
+        if len(branch) == 0:
+            print('Branch did not exist; creating new branch')
             create_pr = True
             branch = r.create_head(head)
+        else:
+            branch = branch[0]
         branch.checkout()
 
-        if not create_pr:
-            logging.info("Branch already existed; pulling ")
-
-        logging.info('Updating the subtree')
+        print('Updating the subtree')
         # Update the subtree, adds the commits to branch so no need to run commit command
         r.git.subtree('pull', '--prefix', '.github/', 'https://github.com/Javagedes/mu_common_github', 'master', '--squash')
 
         # Push the commit
-        logging.info("Pushing the commit")
-        r.git.push(f'https://{user}:{token}@{repo["url"].lstrip("https://")}', branch.name)
+        print("Pushing the commit")
+        r.git.push(f'https://{user}:{token}@{repo["url"].lstrip("https://")}', branch.name, "--force")
 
         # Create PR
         if create_pr:
-            logging.info("Branch did not exist; creating new PR")
+            print("Branch did not exist; creating new PR")
             github_repo = g.get_repo(f'{repo["url"].lstrip("https:://github.com/").rstrip(".git")}')
             github_repo.create_pull(title="Update .github subtree", body = pr_body, head = head, base = repo["base"])
 
