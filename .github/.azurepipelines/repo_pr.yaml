@@ -1,0 +1,16 @@
+## @file
+# Azure Pipeline to create PR to update subtree on completed commit
+#
+# Copyright (c) Microsoft Corporation
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+
+trigger:
+  branches:
+    include:
+    - master
+steps:
+  - task: PythonScript@0
+    inputs:
+      scriptSource: 'filePath'
+      scriptPath: .azurepipelines/script.py
+      arguments: '-T $(Github.Token) -U $(Github.User)'
