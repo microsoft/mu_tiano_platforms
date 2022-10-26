@@ -2,6 +2,7 @@ from github import Github
 from git import Repo
 import argparse
 import os
+import logging
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Creates a PR in each repo that uses this as a subtree.")
@@ -41,28 +42,38 @@ Automatically generated PR
     # Uses git (GitPython) for managing git commands
     # Uses github (PyGithub) for interfacing with github
     for repo in managed_repos:
-        create_pr = True
+        logging.info(f'Starting update for {repo["name"]}')
+        create_pr = False
         
         # Clone the repository
+        logging.info(f'cloning {repo["name"]}')
         r = Repo.clone_from(repo["url"], os.path.join(path, repo["name"]))
         
         # Checkout the branch if it exists, or create one if it does not.
         # If branch exists, assume PR has been created already and we just 
         # need to update the commit.
+        logging.info('Checking out subtree branch')
         branch = [b for b in r.branches if b.name == head]
         if not branch:
-            create_pr = False
+            logging.info('Branch did not exist; creating new branch')
+            create_pr = True
             branch = r.create_head(head)
         branch.checkout()
 
+        if not create_pr:
+            logging.info("Branch already existed; pulling ")
+
+        logging.info('Updating the subtree')
         # Update the subtree, adds the commits to branch so no need to run commit command
         r.git.subtree('pull', '--prefix', '.github/', 'https://github.com/Javagedes/mu_common_github', 'master', '--squash')
 
         # Push the commit
+        logging.info("Pushing the commit")
         r.git.push(f'https://{user}:{token}@{repo["url"].lstrip("https://")}', branch.name)
 
         # Create PR
         if create_pr:
+            logging.info("Branch did not exist; creating new PR")
             github_repo = g.get_repo(f'{repo["url"].lstrip("https:://github.com/").rstrip(".git")}')
             github_repo.create_pull(title="Update .github subtree", body = pr_body, head = head, base = repo["base"])
 
