@@ -8,7 +8,11 @@ trigger:
   branches:
     include:
     - master
-  
+resources:
+  repository: mu_basecore
+  type: github
+  name: Javagedes/mu_basecore
+  ref: release/202208
 parameters:
 - name: BranchName
   type: string
@@ -35,4 +39,8 @@ steps:
     displayName: 'Create Pull Request'
     inputs:
       repoType: 'GitHub'
-      repositorySelector: 
+      githubEndPoint: 'Javagedes'
+      githubRepository: $(repository)
+      sourceBranch: '$(parameters.BranchName)'
+      targetBranch: 'release/202208'
+      title: '.github: Update Subtree'
