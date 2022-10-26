@@ -2,7 +2,6 @@ from github import Github
 from git import Repo
 import argparse
 import os
-import logging
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Creates a PR in each repo that uses this as a subtree.")
