@@ -64,14 +64,11 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         # Add XHCI USB controller and mouse
         args += " -device qemu-xhci,id=usb"
         args += " -device usb-mouse,id=input0,bus=usb.0,port=1"  # add a usb mouse
-        #args += " -device usb-kbd,id=input1,bus=usb.0,port=2"    # add a usb keyboar
+        args += " -device usb-kbd,id=input1,bus=usb.0,port=2"    # add a usb keyboar
         args += " -smbios type=0,vendor=Palindrome,uefi=on -smbios type=1,manufacturer=Palindrome,product=MuQemuQ35,serial=42-42-42-42"
 
         if (env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
             args += " -display none"  # no graphics
-        else:
-            args += " -device cirrus-vga" #std is what the default is
-            # args += " -device virtio-gpu-pci"
 
         # Check for gdb server setting
         gdb_port = env.GetValue("GDB_SERVER")
