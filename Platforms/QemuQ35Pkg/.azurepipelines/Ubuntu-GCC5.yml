@@ -3,7 +3,7 @@
 #
 # Platform: QemuQ35
 # OS: Ubuntu
-# Toolchain: GCC5
+# Toolchain: GCC
 #
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -17,19 +17,14 @@ resources:
       name: microsoft/mu_devops
       ref: main
 
-trigger:
-- main
-- release/202202
-
-pr:
-- main
-- release/202202
+variables:
+- group: architectures-x86-64
+- group: tool-chain-ubuntu-gcc
 
 jobs:
   - job: Platform_CI
     variables:
       package: 'QemuQ35Pkg'
-      vm_image: 'ubuntu-18.04'
       should_run: true
       run_flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE"
 
@@ -39,7 +34,7 @@ jobs:
 
           QemuQ35_DEBUG:
             Build.File: "Platforms/$(package)/PlatformBuild.py"
-            Build.Arch: "IA32,X64"
+            Build.Arch: $(arch_list)
             Build.Flags: ""
             Build.Target: "DEBUG"
             Run.Flags: $(run_flags)
@@ -47,7 +42,7 @@ jobs:
 
           QemuQ35_RELEASE:
             Build.File: "Platforms/$(package)/PlatformBuild.py"
-            Build.Arch: "IA32,X64"
+            Build.Arch: $(arch_list)
             Build.Flags: ""
             Build.Target: "RELEASE"
             Run.Flags: $(run_flags)
@@ -56,7 +51,7 @@ jobs:
           # NOOPT build too big to fit in FVs
           #QemuQ35_NOOPT:
           #  Build.File: "Platforms/$(package)/PlatformBuild.py"
-          #  Build.Arch: "IA32,X64"
+          #  Build.Arch: $(arch_list)
           #  Build.Flags: ""
           #  Build.Target: "NOOPT"
           #  Run.Flags: $(run_flags)
@@ -70,7 +65,7 @@ jobs:
     steps:
     - template: Steps/BuildPlatform.yml@mu_devops
       parameters:
-        tool_chain_tag: GCC5
+        tool_chain_tag: $(tool_chain_tag)
         build_pkg: $(package)
         build_target: $(Build.Target)
         build_arch: $(Build.Arch)
@@ -81,6 +76,8 @@ jobs:
         - bash: sudo apt-get update
           displayName: Update Apt
           condition: and(gt(variables.pkg_count, 0), succeeded())
-        - bash: sudo apt-get install gcc g++ make uuid-dev qemu
+        - bash: sudo apt-get install gcc g++ make uuid-dev qemu-kvm qemu
           displayName: Install Packages
           condition: and(gt(variables.pkg_count, 0), succeeded())
+        extra_artifacts: |
+          **/QEMUQ35_*.fd

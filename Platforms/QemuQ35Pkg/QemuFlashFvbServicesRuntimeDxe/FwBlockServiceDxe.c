@@ -4,6 +4,7 @@
 
   Copyright (C) 2015, Red Hat, Inc.
   Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -242,5 +243,17 @@ SetPcdFlashNvStorageBaseAddresses (
                 PcdFlashNvStorageFtwSpareBase,
                 PcdGet32 (PcdOvmfFlashNvStorageFtwSpareBase)
                 );
+  ASSERT_RETURN_ERROR (PcdStatus);
+}
+
+// MU_CHANGE: Abstract dynamic PCD set to support Standalone MM
+VOID
+UpdateQemuFlashVariablesEnable (
+  VOID
+  )
+{
+  RETURN_STATUS  PcdStatus;
+
+  PcdStatus = PcdSetBoolS (PcdOvmfFlashVariablesEnable, TRUE);
   ASSERT_RETURN_ERROR (PcdStatus);
 }

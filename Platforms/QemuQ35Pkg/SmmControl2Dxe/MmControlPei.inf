@@ -1,6 +1,6 @@
 ## @file
-# A DXE_RUNTIME_DRIVER providing synchronous SMI activations via the
-# EFI_SMM_CONTROL2_PROTOCOL.
+# A PEIM providing synchronous SMI activations via the
+# EFI_PEI_MM_CONTROL_PPI.
 #
 # We expect the PEI phase to have covered the following:
 # - ensure that the underlying QEMU machine type be Q35
@@ -12,6 +12,7 @@
 # configuring it.
 #
 # Copyright (C) 2013, 2015, Red Hat, Inc.
+# Copyright (c) Microsoft Corporation.
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -19,12 +20,11 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = SmmControl2Dxe
-  FILE_GUID                      = 1206F7CA-A475-4624-A83E-E6FC9BB38E49
-  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  BASE_NAME                      = MmControlPei
+  FILE_GUID                      = A0DBE438-701C-44AF-AB4A-25545B86B565
+  MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  PI_SPECIFICATION_VERSION       = 0x00010400
-  ENTRY_POINT                    = SmmControl2DxeEntryPoint
+  ENTRY_POINT                    = MmControlPeiEntryPoint
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -35,11 +35,10 @@
 [Sources]
   SmiFeatures.h
   SmiFeatures.c
-  SmmControl2Dxe.c
+  MmControlPei.c
 
 [Packages]
   MdePkg/MdePkg.dec
-  MdeModulePkg/MdeModulePkg.dec
   QemuQ35Pkg/QemuQ35Pkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
@@ -53,21 +52,18 @@
   PciLib
   QemuFwCfgLib
   QemuFwCfgS3Lib
-  UefiBootServicesTableLib
-  UefiDriverEntryPoint
+  PeimEntryPoint
 
-[Protocols]
-  gEfiS3SaveStateProtocolGuid   ## SOMETIMES_CONSUMES
-  gEfiSmmControl2ProtocolGuid   ## PRODUCES
+[Ppis]
+  gEfiPeiMmControlPpiGuid     ## PRODUCES
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout ## SOMETIMES_PRODUCES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode      ## SOMETIMES_PRODUCES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable
 
 [FeaturePcd]
   gUefiQemuQ35PkgTokenSpaceGuid.PcdSmmSmramRequire
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdStandaloneMmEnable  # MU_CHANGE: Added support for Standalone MM
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdStandaloneMmEnable
 
 [Depex]
   TRUE

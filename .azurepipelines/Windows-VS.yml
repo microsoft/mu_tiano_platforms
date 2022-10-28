@@ -13,16 +13,14 @@ resources:
       name: microsoft/mu_devops
       ref: main
 
-trigger: none
-
-pr:
-- main
-- release/202202
+variables:
+- group: architectures-x86-64
+- group: tool-chain-windows-visual-studio-latest
 
 jobs:
 - template: Jobs/PrGate.yml@mu_devops
   parameters:
-    arch_list: IA32,X64
+    arch_list: $(arch_list)
     do_ci_build: true
     do_ci_setup: false
     do_non_ci_build: false
@@ -30,5 +28,5 @@ jobs:
     do_pr_eval: true
     packages: QemuQ35Pkg
     target_list: NO-TARGET
-    tool_chain_tag: VS2022
-    vm_image: windows-2022
+    tool_chain_tag: $(tool_chain_tag)
+    vm_image: $(vm_image)

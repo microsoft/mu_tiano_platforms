@@ -1,6 +1,7 @@
 /**@file
 
   Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -191,6 +192,11 @@ MarkIoMemoryRangeForRuntimeAccess (
 
 VOID
 SetPcdFlashNvStorageBaseAddresses (
+  VOID
+  );
+
+VOID
+UpdateQemuFlashVariablesEnable (
   VOID
   );
 

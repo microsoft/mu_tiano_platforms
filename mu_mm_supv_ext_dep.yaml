@@ -1,0 +1,14 @@
+
+#
+# This external dependency pulls MU_BASECORE for the Config feature package CI.
+# This should not be pulled when consuming this package as a dependency.
+#
+{
+  "scope": "global",
+  "type": "git",
+  "name": "FEATURE_MM_SUPV",
+  "var_name": "FEATURE_MM_SUPV_PATH",
+  "source": "https://github.com/microsoft/mu_feature_mm_supv.git",
+  "version": "78665ab7eae020610426af25ee7e44361e8246e5",
+  "flags": ["set_build_var"]
+}

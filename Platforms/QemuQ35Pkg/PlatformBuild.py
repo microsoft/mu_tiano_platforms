@@ -137,7 +137,8 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
     def GetPackagesPath(self):
         ''' Return a list of paths that should be mapped as edk2 PackagesPath '''
         result = [
-            shell_environment.GetBuildVars().GetValue("FEATURE_CONFIG_PATH", "")
+            shell_environment.GetBuildVars().GetValue("FEATURE_CONFIG_PATH", ""),
+            shell_environment.GetBuildVars().GetValue("FEATURE_MM_SUPV_PATH", "")
         ]
         for a in CommonPlatform.PackagesPath:
             result.append(a)
@@ -173,7 +174,8 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
     def GetPackagesPath(self):
         ''' Return a list of workspace relative paths that should be mapped as edk2 PackagesPath '''
         result = [
-            shell_environment.GetBuildVars().GetValue("FEATURE_CONFIG_PATH", "")
+            shell_environment.GetBuildVars().GetValue("FEATURE_CONFIG_PATH", ""),
+            shell_environment.GetBuildVars().GetValue("FEATURE_MM_SUPV_PATH", "")
         ]
         for a in CommonPlatform.PackagesPath:
             result.append(a)
@@ -218,6 +220,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         # Default turn on build reporting.
         self.env.SetValue("BUILDREPORTING", "TRUE", "Enabling build report")
         self.env.SetValue("BUILDREPORT_TYPES", "PCD DEPEX FLASH BUILD_FLAGS LIBRARY FIXED_ADDRESS HASH", "Setting build report types")
+        self.env.SetValue("BLD_*_QEMU_CORE_NUM", "2", "Default")
         # Include the MFCI test cert by default, override on the commandline with "BLD_*_SHIP_MODE=TRUE" if you want the retail MFCI cert
         self.env.SetValue("BLD_*_SHIP_MODE", "FALSE", "Default")
         self.__SetEsrtGuidVars("CONF_POLICY_GUID", "6E08E434-8E04-47B5-9A77-78A3A24523EA", "Platform Hardcoded")
@@ -233,6 +236,20 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         self.env.SetValue('POLICY_REPORT_FOLDER', self.mws.join(self.ws, "QemuQ35Pkg", "PolicyData"), "Platform Defined")
 
         return 0
+
+    def PlatformPreBuild(self):
+        # Here we build the secure policy blob for build system to use and add into the targeted FV
+        policy_example_dir = self.mws.join(self.mws.WORKSPACE, "MmSupervisorPkg", "SupervisorPolicyTools", "MmIsolationPoliciesExample.xml")
+        output_dir = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "Policy")
+        if (not os.path.isdir(output_dir)):
+            os.makedirs (output_dir)
+        output_name = os.path.join(output_dir, "secure_policy.bin")
+
+        ret = self.Helper.MakeSupervisorPolicy(xml_file_path=policy_example_dir, output_binary_path=output_name)
+        if(ret != 0):
+            raise Exception("SupervisorPolicyMaker Failed: Errorcode %d" % ret)
+        self.env.SetValue("BLD_*_POLICY_BIN_PATH", output_name, "Set generated secure policy path")
+        return ret
 
     def __SetEsrtGuidVars(self, var_name, guid_str, desc_string):
         cur_guid = uuid.UUID(guid_str)

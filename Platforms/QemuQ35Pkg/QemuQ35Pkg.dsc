@@ -34,6 +34,7 @@
   DEFINE TPM_CONFIG_ENABLE              = FALSE
   DEFINE OPT_INTO_MFCI_PRE_PRODUCTION   = TRUE
   DEFINE BUILD_UNIT_TESTS               = TRUE
+  DEFINE PEI_MM_IPL_ENABLED             = TRUE
 
   # Configure Shared Crypto
   !ifndef ENABLE_SHARED_CRYPTO # by default true
@@ -106,7 +107,7 @@
 !endif
 
   # Whea Libraries
-  MsWheaEarlyStorageLib |MsWheaPkg/Library/MsWheaEarlyStorageLibNull/MsWheaEarlyStorageLibNull.inf
+  MsWheaEarlyStorageLib |MsWheaPkg/Library/MsWheaEarlyStorageLib/MsWheaEarlyStorageLib.inf
   MuTelemetryHelperLib  |MsWheaPkg/Library/MuTelemetryHelperLib/MuTelemetryHelperLib.inf
 
   # Boot and Boot Policy
@@ -151,7 +152,8 @@
   UefiDecompressLib |MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
 
   # Capsule/Versioning Libraries
-  CapsuleLib       |MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
+  DisplayUpdateProgressLib |MdeModulePkg/Library/DisplayUpdateProgressLibText/DisplayUpdateProgressLibText.inf
+  CapsulePersistLib |MdeModulePkg/Library/CapsulePersistLibNull/CapsulePersistLibNull.inf
   MuUefiVersionLib |OemPkg/Library/MuUefiVersionLib/MuUefiVersionLib.inf
 
   # Sorter helper Libraries
@@ -617,6 +619,13 @@
   Tcg2PreUefiEventLogLib     |SecurityPkg/Library/QemuQ35PkgPreUefiEventLogLib/QemuQ35PkgPreUefiEventLogLib.inf ## BRET - Do we have a null instance
 !endif
 
+[LibraryClasses.X64.PEIM]
+!ifdef $(DEBUG_ON_SERIAL_PORT)
+  DebugLib                   |MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+!else
+  DebugLib                   |QemuQ35Pkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
+!endif
+  CpuExceptionHandlerLib     |UefiCpuPkg/Library/CpuExceptionHandlerLib/SecPeiCpuExceptionHandlerLib.inf
 
 #########################################
 # DXE Libraries
@@ -634,6 +643,7 @@
   CpuExceptionHandlerLib        |UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
   ReportStatusCodeLib           |MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   QemuFwCfgS3Lib                |QemuQ35Pkg/Library/QemuFwCfgS3Lib/DxeQemuFwCfgS3LibFwCfg.inf
+  MmUnblockMemoryLib            |MmSupervisorPkg/Library/MmSupervisorUnblockMemoryLib/MmSupervisorUnblockMemoryLibDxe.inf
   !ifdef $(DEBUG_ON_SERIAL_PORT)
     DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
   !else
@@ -663,6 +673,7 @@
   HwResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
+  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeRuntimeCapsuleLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_DRIVER]
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
@@ -679,6 +690,7 @@
   MpInitLib|UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
   UpdateFacsHardwareSignatureLib|PcBdsPkg/Library/UpdateFacsHardwareSignatureLib/UpdateFacsHardwareSignatureLib.inf
   PcdDatabaseLoaderLib|MdeModulePkg/Library/PcdDatabaseLoaderLib/Dxe/PcdDatabaseLoaderLibDxe.inf
+  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeCapsuleLib.inf
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
   DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/DxeDebugAgentLib.inf
 !endif
@@ -727,6 +739,59 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   SmmMemLib|MdePkg/Library/SmmMemLib/SmmMemLib.inf
   SmmServicesTableLib|MdeModulePkg/Library/PiSmmCoreSmmServicesTableLib/PiSmmCoreSmmServicesTableLib.inf
 
+[LibraryClasses.common.MM_CORE_STANDALONE]
+!ifdef $(DEBUG_ON_SERIAL_PORT)
+  DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+!else
+  DebugLib|QemuQ35Pkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
+!endif
+  TimerLib|QemuQ35Pkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
+  ExtractGuidedSectionLib|MdePkg/Library/BaseExtractGuidedSectionLib/BaseExtractGuidedSectionLib.inf
+  FvLib|StandaloneMmPkg/Library/FvLib/FvLib.inf
+  HobLib|StandaloneMmPkg/Library/StandaloneMmCoreHobLib/StandaloneMmCoreHobLib.inf
+  MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmCoreMemoryAllocationLib/StandaloneMmCoreMemoryAllocationLib.inf
+  MemLib|MmSupervisorPkg/Library/MmSupervisorMemLib/MmSupervisorCoreMemLib.inf
+  ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
+  StandaloneMmCoreEntryPoint|StandaloneMmPkg/Library/StandaloneMmCoreEntryPoint/StandaloneMmCoreEntryPoint.inf
+  SmmCpuFeaturesLib|QemuQ35Pkg/Library/SmmCpuFeaturesLib/StandaloneMmCpuFeaturesLib.inf
+  SmmCpuPlatformHookLib|QemuQ35Pkg/Library/SmmCpuPlatformHookLibQemu/SmmCpuPlatformHookLibQemu.inf
+  CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/SmmCpuExceptionHandlerLib.inf
+  DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibStandaloneMm.inf
+  SortLib|MdeModulePkg/Library/BaseSortLib/BaseSortLib.inf
+  SmmPolicyGateLib|MmSupervisorPkg/Library/SmmPolicyGateLib/SmmPolicyGateLib.inf
+  HwResetSystemLib|PcAtChipsetPkg/Library/ResetSystemLib/ResetSystemLib.inf
+  IhvSmmSaveStateSupervisionLib|MmSupervisorPkg/Library/IhvMmSaveStateSupervisionLib/IhvMmSaveStateSupervisionLib.inf
+
+[LibraryClasses.common.MM_STANDALONE]
+!ifdef $(DEBUG_ON_SERIAL_PORT)
+  DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+!else
+  DebugLib|QemuQ35Pkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
+!endif
+  TimerLib|QemuQ35Pkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
+  MmServicesTableLib|MmSupervisorPkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
+  MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
+  HobLib|MmSupervisorPkg/Library/StandaloneMmHobLibSyscall/StandaloneMmHobLibSyscall.inf
+  MemLib|MmSupervisorPkg/Library/MmSupervisorMemLib/MmSupervisorMemLibSyscall.inf
+  LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxStandaloneMmLib.inf
+  CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/SmmCpuExceptionHandlerLib.inf
+  ReportStatusCodeLib|MdeModulePkg/Library/SmmReportStatusCodeLib/StandaloneMmReportStatusCodeLib.inf
+  HwResetSystemLib|PcAtChipsetPkg/Library/ResetSystemLib/ResetSystemLib.inf
+  StandaloneMmDriverEntryPoint|MmSupervisorPkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
+  # TODO: ShareCrypto support
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+  IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+  AdvLoggerAccessLib|MdeModulePkg/Library/AdvLoggerAccessLibNull/AdvLoggerAccessLib.inf
+  DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibStandaloneMm.inf
+  RngLib|MdePkg/Library/BaseRngLibNull/BaseRngLibNull.inf
+  PciLib|QemuQ35Pkg/Library/DxePciLibI440FxQ35/DxePciLibI440FxQ35.inf
+
+  BaseLib|MmSupervisorPkg/Library/BaseLibSysCall/BaseLib.inf
+  IoLib|MmSupervisorPkg/Library/BaseIoLibIntrinsicSysCall/BaseIoLibIntrinsic.inf
+  SysCallLib|MmSupervisorPkg/Library/SysCallLib/SysCallLib.inf
+  CpuLib|MmSupervisorPkg/Library/BaseCpuLibSysCall/BaseCpuLib.inf
+
 ################################################################################
 #
 # Pcd Section - list of all EDK II PCD Entries defined by this Platform.
@@ -743,13 +808,14 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 
   #gUefiTempTokenSpaceGuid.PcdSmmSmramRequire|TRUE
   gUefiQemuQ35PkgTokenSpaceGuid.PcdSmmSmramRequire|TRUE
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdStandaloneMmEnable|TRUE
   gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugSupport|FALSE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache|FALSE
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdRequireIommu|FALSE # don't require IOMMU
   
   !if $(BUILD_UNIT_TESTS) == TRUE
     gUefiCpuPkgTokenSpaceGuid.PcdSmmExceptionTestModeSupport|TRUE
+    gMmSupervisorPkgTokenSpaceGuid.PcdMmSupervisorTestEnable|TRUE
   !endif
 
 [PcdsPatchableInModule]
@@ -766,6 +832,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x8400
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x8400
   gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize|0x1000
+  gPcBdsPkgTokenSpaceGuid.PcdEnableMemMapOutput|0x1
 !if $(NETWORK_TLS_ENABLE) == FALSE
   # match PcdFlashNvStorageVariableSize purely for convenience
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x40000
@@ -820,6 +887,8 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 
   gDfciPkgTokenSpaceGuid.PcdUnsignedListFormatAllow|FALSE
 
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber|$(QEMU_CORE_NUM)
+
   ## List of valid Profile GUIDs
   ## gQemuQ35PkgProfile1Guid, gQemuQ35PkgProfile2Guid, and gQemuQ35PkgProfile3Guid are supported.
   ## gSetupDataPkgGenericProfileGuid is defaulted to in case retrieved GUID is not in this list
@@ -841,6 +910,8 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x86, 0x40, 0x62, 0xe3, 0xcd, 0x4f, 0x6e, 0x44, 0x9d, 0x7, 0xb6, 0xb9, 0x13, 0x79, 0x20, 0x71 }
   # The GUID of Frontpage.inf from MU_OEM_SAMPLE: 4042708A-0F2D-4823-AC60-0D77B3111889
   gQemuQ35PkgTokenSpaceGuid.PcdUIApplicationFile|{ 0x8A, 0x70, 0x42, 0x40, 0x2D, 0x0F, 0x23, 0x48, 0xAC, 0x60, 0x0D, 0x77, 0xB3, 0x11, 0x18, 0x89 }
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|TRUE
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0x29C0
 
 [PcdsFixedAtBuild.IA32]
   #
@@ -862,6 +933,8 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   #
 !include NetworkPkg/NetworkPcds.dsc.inc
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackSize|0x4000
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode|0x00
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout|1000000
 
 
   # IRQs 5, 9, 10, 11 are level-triggered
@@ -882,20 +955,12 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 ################################################################################
 
 [PcdsDynamicDefault]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
-
-
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|1024
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|768
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable|FALSE
-  #gUefiTempTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0
-  #gUefiQemuQ35PkgTokenSpaceGuid.PcdPciIoBase|0x0
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdPciMmio64Size|0x800000000
   gUefiQemuQ35PkgTokenSpaceGuid.PcdPciIoBase|0x0
   gUefiQemuQ35PkgTokenSpaceGuid.PcdPciIoSize|0x0
   gUefiQemuQ35PkgTokenSpaceGuid.PcdPciMmio32Base|0x0
@@ -915,17 +980,10 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   gUefiQemuQ35PkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
 
   # UefiCpuPkg PCDs related to initial AP bringup and general AP management.
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber|64
   gUefiCpuPkgTokenSpaceGuid.PcdCpuBootLogicalProcessorNumber|0
-
-  # Set memory encryption mask
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask|0x0
-
 
   gUefiQemuQ35PkgTokenSpaceGuid.PcdQ35TsegMbytes|8
   gUefiQemuQ35PkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase|FALSE
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode|0x01
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout|100000
 
 
   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x00
@@ -1002,7 +1060,10 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   }
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
-  QemuQ35Pkg/PlatformPei/PlatformPei.inf
+  QemuQ35Pkg/PlatformPei/PlatformPei.inf {
+    <LibraryClasses>
+      NULL|StandaloneMmPkg/Library/PeiStandaloneMmHobProductionLib/PeiStandaloneMmHobProductionLib.inf
+  }
   UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf {
     <LibraryClasses>
 
@@ -1013,6 +1074,12 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   MdeModulePkg/Universal/FaultTolerantWritePei/FaultTolerantWritePei.inf
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
   QemuQ35Pkg/SmmAccess/SmmAccessPei.inf
+  MmSupervisorPkg/Drivers/StandaloneMmHob/StandaloneMmHob.inf
+  MmSupervisorPkg/Drivers/MmCommunicationBuffer/MmCommunicationBufferPei.inf
+!if $(PEI_MM_IPL_ENABLED) == TRUE
+  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmIplPei.inf
+  QemuQ35Pkg/SmmControl2Dxe/MmControlPei.inf
+!endif
 
   UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 
@@ -1138,7 +1205,8 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 !endif
   }
 
-  MdeModulePkg/Universal/SmmCommunicationBufferDxe/SmmCommunicationBufferDxe.inf
+  MmSupervisorPkg/Drivers/MmSupervisorRing3Broker/MmSupervisorRing3Broker.inf
+  MmSupervisorPkg/Drivers/StandaloneMmUnblockMem/StandaloneMmUnblockMem.inf
 
   QemuQ35Pkg/8259InterruptControllerDxe/8259.inf
   UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
@@ -1344,10 +1412,10 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
   MsGraphicsPkg/MsEarlyGraphics/Dxe/MsEarlyGraphics.inf
   MsWheaPkg/MsWheaReport/Dxe/MsWheaReportDxe.inf
-  MsWheaPkg/MsWheaReport/Smm/MsWheaReportSmm.inf
-  MdeModulePkg/Universal/ReportStatusCodeRouter/Smm/ReportStatusCodeRouterSmm.inf
+  MsWheaPkg/MsWheaReport/Smm/MsWheaReportStandaloneMm.inf
+  MdeModulePkg/Universal/ReportStatusCodeRouter/Smm/ReportStatusCodeRouterStandaloneMm.inf
   MsCorePkg/Universal/StatusCodeHandler/Serial/Smm/SerialStatusCodeHandlerSmm.inf
-  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableSmm/FirmwarePerformanceSmm.inf
+  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableSmm/FirmwarePerformanceStandaloneMm.inf
   MsCorePkg/MuVarPolicyFoundationDxe/MuVarPolicyFoundationDxe.inf
   # COMMENTED OUT FOR OVMF
   #SecurityPkg/Tcg/Tcg2Smm/Tcg2Smm.inf {
@@ -1384,8 +1452,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
     UefiTestingPkg/FunctionalSystemTests/SmmPagingProtectionsTest/Smm/SmmPagingProtectionsTestSmm.inf
     UefiTestingPkg/FunctionalSystemTests/MemoryProtectionTest/Smm/MemoryProtectionTestSmm.inf
     UefiTestingPkg/FunctionalSystemTests/MemoryProtectionTest/App/MemoryProtectionTestApp.inf
-    UefiTestingPkg/AuditTests/PagingAudit/UEFI/SmmPagingAuditDriver.inf
-    UefiTestingPkg/AuditTests/PagingAudit/UEFI/SmmPagingAuditTestApp.inf
+    MmSupervisorPkg/Test/MmPagingAuditTest/UEFI/MmPagingAuditApp.inf
     UefiTestingPkg/AuditTests/PagingAudit/UEFI/DxePagingAuditDriver.inf
     UefiTestingPkg/AuditTests/PagingAudit/UEFI/DxePagingAuditTestApp.inf
     UefiTestingPkg/FunctionalSystemTests/ExceptionPersistenceTestApp/ExceptionPersistenceTestApp.inf
@@ -1418,41 +1485,47 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   #
   # SMM Initial Program Load (a DXE_RUNTIME_DRIVER)
   #
-  MdeModulePkg/Core/PiSmmCore/PiSmmIpl.inf
+!if $(PEI_MM_IPL_ENABLED) == TRUE
+  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmIplX64Relay.inf
+  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmDxeSupport.inf {
+    <LibraryClasses>
+      NULL|StandaloneMmPkg/Library/VariableMmDependency/VariableMmDependency.inf
+  }
+!else
+  QemuQ35Pkg/SmmAccess/SmmAccess2Dxe.inf
+  MmSupervisorPkg/Drivers/StandaloneMmIpl/PiSmmIpl.inf
+!endif
+  MmSupervisorPkg/Drivers/MmCommunicationBuffer/MmCommunicationBufferDxe.inf
+  MmSupervisorPkg/Drivers/MmSupervisorErrorReport/MmSupervisorErrorReport.inf
+  MmSupervisorPkg/Test/MmPagingAuditTest/UEFI/MmPagingAuditApp.inf
 
   #
   # SMM_CORE
   #
-  MdeModulePkg/Core/PiSmmCore/PiSmmCore.inf
+  MmSupervisorPkg/Core/MmSupervisorCore.inf
 
   #
   # Privileged drivers (DXE_SMM_DRIVER modules)
   #
-  UefiCpuPkg/CpuIo2Smm/CpuIo2Smm.inf
+  UefiCpuPkg/CpuIo2Smm/CpuIo2StandaloneMm.inf
   MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.inf {
     <LibraryClasses>
       LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxSmmLib.inf
   }
-  UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf {
-    <LibraryClasses>
-      SmmCpuPlatformHookLib|QemuQ35Pkg/Library/SmmCpuPlatformHookLibQemu/SmmCpuPlatformHookLibQemu.inf
-      SmmCpuFeaturesLib|QemuQ35Pkg/Library/SmmCpuFeaturesLib/SmmCpuFeaturesLib.inf
-  }
 
-  QemuQ35Pkg/SmmAccess/SmmAccess2Dxe.inf
   QemuQ35Pkg/SmmControl2Dxe/SmmControl2Dxe.inf
 
 
   #
   # Variable driver stack (SMM)
   #
-  QemuQ35Pkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesSmm.inf
-  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteSmm.inf
-  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmm.inf {
+  QemuQ35Pkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesStandaloneMm.inf
+  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteStandaloneMm.inf
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStandaloneMm.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
       # mu_change
-      NULL|MdeModulePkg/Library/VarCheckPolicyLib/VarCheckPolicyLib.inf
+      NULL|MdeModulePkg/Library/VarCheckPolicyLib/VarCheckPolicyLibStandaloneMm.inf
   }
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
 
@@ -1533,6 +1606,6 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 
 # Force PE/COFF sections to be aligned at 4KB boundaries to support page level
 # protection of DXE_SMM_DRIVER/SMM_CORE modules
-[BuildOptions.common.EDKII.DXE_SMM_DRIVER, BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER, BuildOptions.common.EDKII.SMM_CORE, BuildOptions.common.EDKII.DXE_DRIVER, BuildOptions.common.EDKII.DXE_CORE, BuildOptions.common.EDKII.UEFI_DRIVER, BuildOptions.common.EDKII.UEFI_APPLICATION]
+[BuildOptions.common.EDKII.DXE_SMM_DRIVER, BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER, BuildOptions.common.EDKII.SMM_CORE, BuildOptions.common.EDKII.DXE_DRIVER, BuildOptions.common.EDKII.DXE_CORE, BuildOptions.common.EDKII.UEFI_DRIVER, BuildOptions.common.EDKII.UEFI_APPLICATION, BuildOptions.common.EDKII.MM_CORE_STANDALONE, BuildOptions.common.EDKII.MM_STANDALONE]
   MSFT:*_*_*_DLINK_FLAGS = /ALIGN:4096
   GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000

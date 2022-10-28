@@ -13,6 +13,8 @@ import time
 import threading
 import datetime
 import subprocess
+import re
+import io
 from edk2toolext.environment import plugin_manager
 from edk2toolext.environment.plugintypes import uefi_helper_plugin
 from edk2toollib import utility_functions
@@ -31,6 +33,24 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         return 0
 
     @staticmethod
+    # raw helper function to extract version number from QEMU
+    def QueryQemuVersion(exec):
+        if exec is None:
+            return None
+
+        result = io.StringIO()
+        ret = utility_functions.RunCmd(exec, "--version", outstream=result)
+        if ret != 0:
+            return None
+
+        # expected version string will be "QEMU emulator version maj.min.rev"
+        res = result.getvalue()
+        ver_str = re.search(r'version\s*([\d.]+)', res).group(1)
+
+        return ver_str.split('.')
+
+
+    @staticmethod
     def Runner(env):
         ''' Runs QEMU '''
         VirtualDrive = env.GetValue("VIRTUAL_DRIVE_PATH")
@@ -38,6 +58,9 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
         # Check if QEMU is on the path, if not find it
         executable = "qemu-system-x86_64"
+
+        # First query the version
+        ver = QemuRunner.QueryQemuVersion(executable)
 
         # write messages to stdio
         args = "-debugcon stdio"
@@ -63,7 +86,8 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         else:
             args += " -m 2048"
         args += " -cpu qemu64,+rdrand,umip,+smep" # most compatible x64 CPU model + RDRAND + UMIP + SMEP support (not included by default)
-        #args += " -smp ..."
+        if env.GetBuildValue ("QEMU_CORE_NUM") is not None:
+          args += " -smp " + env.GetBuildValue ("QEMU_CORE_NUM")
         args += " -global driver=cfi.pflash01,property=secure,value=on"
         args += " -drive if=pflash,format=raw,unit=0,file=" + \
             os.path.join(OutputPath_FV, "QEMUQ35_CODE.fd") + ",readonly=on"
@@ -95,8 +119,18 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         # Run QEMU
         #ret = QemuRunner.RunCmd(executable, args,  thread_target=QemuRunner.QemuCmdReader)
         ret = utility_functions.RunCmd(executable, args)
+        if ret != 0 and os.name != 'nt':
+            # Linux version of QEMU will mess with the print if its run failed, this is to restore it
+            utility_functions.RunCmd ('stty', 'echo')
+
         ## TODO: restore the customized RunCmd once unit tests with asserts are figured out
         if ret == 0xc0000005:
+            ret = 0
+
+        ## TODO: remove this once we upgrade to newer QEMU
+        if ret == 0x8B and ver[0] == '4':
+            # QEMU v4 will return segmentation fault when shutting down.
+            # Tested same FDs on QEMU 6 and 7, not observing the same.
             ret = 0
 
         return ret
