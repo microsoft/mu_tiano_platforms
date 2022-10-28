@@ -12,6 +12,7 @@ import glob
 import time
 import xml.etree.ElementTree
 import tempfile
+import uuid
 
 from edk2toolext.environment import shell_environment
 from edk2toolext.environment.uefi_build import UefiBuilder
@@ -32,7 +33,7 @@ class CommonPlatform():
     PackagesSupported = ("QemuSbsaPkg",)
     ArchSupported = ("AARCH64")
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
-    Scopes = ('qemusbsa', 'gcc_aarch64_linux', 'edk2-build', 'cibuild')
+    Scopes = ('qemusbsa', 'gcc_aarch64_linux', 'edk2-build', 'cibuild', 'setupdata')
     WorkspaceRoot = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     PackagesPath = ("Platforms", "MU_BASECORE", "Common/MU", "Common/MU_TIANO", "Common/MU_OEM_SAMPLE", "Silicon/Arm/MU_TIANO", "Silicon/Arm/TFA")
 
@@ -136,7 +137,12 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
     def GetPackagesPath(self):
         ''' Return a list of paths that should be mapped as edk2 PackagesPath '''
-        return CommonPlatform.PackagesPath
+        result = [
+            shell_environment.GetBuildVars().GetValue("FEATURE_CONFIG_PATH", "")
+        ]
+        for a in CommonPlatform.PackagesPath:
+            result.append(a)
+        return result
 
     # ####################################################################################### #
     #                         Actual Configuration for Platform Build                         #
@@ -182,8 +188,14 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         return CommonPlatform.WorkspaceRoot
 
     def GetPackagesPath(self):
-        ''' Return a list of workspace relative paths that should be mapped as edk2 PackagesPath '''
-        return CommonPlatform.PackagesPath
+        ''' Return a list of paths that should be mapped as edk2 PackagesPath '''
+        result = [
+            shell_environment.GetBuildVars().GetValue("FEATURE_CONFIG_PATH", ""),
+            shell_environment.GetBuildVars().GetValue("FEATURE_MM_SUPV_PATH", "")
+        ]
+        for a in CommonPlatform.PackagesPath:
+            result.append(a)
+        return result
 
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
@@ -229,7 +241,18 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         self.env.SetValue("ARM_TFA_PATH", os.path.join (self.GetWorkspaceRoot (), "Silicon/Arm/TFA"), "Platform hardcoded")
         self.env.SetValue("BLD_*_QEMU_CORE_NUM", "4", "Default")
         # Include the MFCI test cert by default, override on the commandline with "BLD_*_SHIP_MODE=TRUE" if you want the retail MFCI cert
-        # self.env.SetValue("BLD_*_SHIP_MODE", "FALSE", "Default")
+        self.env.SetValue("BLD_*_SHIP_MODE", "FALSE", "Default")
+        self.__SetEsrtGuidVars("CONF_POLICY_GUID", "6E08E434-8E04-47B5-9A77-78A3A24523EA", "Platform Hardcoded")
+        self.env.SetValue("YAML_CONF_FILE", self.mws.join(self.ws, "QemuQ35Pkg", "CfgData", "CfgDataDef.yaml"), "Platform Hardcoded")
+        self.env.SetValue("DELTA_CONF_POLICY", self.mws.join(self.ws, "QemuQ35Pkg", "CfgData", "Profile1.dlt") + ";" +\
+                          self.mws.join(self.ws, "QemuQ35Pkg", "CfgData", "Profile2.dlt") + ";" +\
+                          self.mws.join(self.ws, "QemuQ35Pkg", "CfgData", "Profile3.dlt"), "Platform Hardcoded")
+        self.env.SetValue("CONF_DATA_STRUCT_FOLDER", self.mws.join(self.ws, "QemuQ35Pkg", "Include"), "Platform Defined")
+        self.env.SetValue('CONF_REPORT_FOLDER', self.mws.join(self.ws, "QemuQ35Pkg", "CfgData"), "Platform Defined")
+
+        self.env.SetValue("YAML_POLICY_FILE", self.mws.join(self.ws, "QemuQ35Pkg", "PolicyData", "PolicyDataUsb.yaml"), "Platform Hardcoded")
+        self.env.SetValue("POLICY_DATA_STRUCT_FOLDER", self.mws.join(self.ws, "QemuQ35Pkg", "Include"), "Platform Defined")
+        self.env.SetValue('POLICY_REPORT_FOLDER', self.mws.join(self.ws, "QemuQ35Pkg", "PolicyData"), "Platform Defined")
 
         return 0
 
@@ -302,6 +325,12 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             fvfile.write(additional)
 
         return 0
+
+    def __SetEsrtGuidVars(self, var_name, guid_str, desc_string):
+        cur_guid = uuid.UUID(guid_str)
+        self.env.SetValue("BLD_*_%s_REGISTRY" % var_name, guid_str, desc_string)
+        self.env.SetValue("BLD_*_%s_BYTES" % var_name, "'{" + (",".join(("0x%X" % byte) for byte in cur_guid.bytes_le)) + "}'", desc_string)
+        return
 
     def FlashRomImage(self):
         #Make virtual drive - Allow caller to override path otherwise use default
