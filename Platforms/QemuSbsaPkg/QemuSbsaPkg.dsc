@@ -18,7 +18,7 @@
   PLATFORM_GUID                  = 37d7e986-f7e9-45c2-8067-e371421a626c
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
-  OUTPUT_DIRECTORY               = Build/QemuSbsaPkg-$(ARCH)
+  OUTPUT_DIRECTORY               = Build/QemuSbsaPkg
   SUPPORTED_ARCHITECTURES        = AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
@@ -921,7 +921,7 @@
 
   # Produces FORM DISPLAY ENGINE protocol. Handles input, displays strings.
   MsGraphicsPkg/DisplayEngineDxe/DisplayEngineDxe.inf
-  QemuQ35Pkg/QemuVideoDxe/QemuVideoDxe.inf
+  QemuSbsaPkg/QemuVideoDxe/QemuVideoDxe.inf
   # BEEBE ADDED END
   # MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
@@ -1061,7 +1061,7 @@
       gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
       gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|8000
   }
-  Platforms/QemuSbsaPkg/SbsaQemuPlatformDxe/SbsaQemuPlatformDxe.inf
+  QemuSbsaPkg/SbsaQemuPlatformDxe/SbsaQemuPlatformDxe.inf
   MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
 
 [Components.AARCH64]

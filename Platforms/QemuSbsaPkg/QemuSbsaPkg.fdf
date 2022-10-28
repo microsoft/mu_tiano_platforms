@@ -274,7 +274,7 @@ READ_LOCK_STATUS   = TRUE
   INF MsGraphicsPkg/OnScreenKeyboardDxe/OnScreenKeyboardDxe.inf
   INF MsGraphicsPkg/MsUiTheme/Dxe/MsUiThemeProtocol.inf
   INF MsGraphicsPkg/DisplayEngineDxe/DisplayEngineDxe.inf
-  INF QemuQ35Pkg/QemuVideoDxe/QemuVideoDxe.inf
+  INF QemuSbsaPkg/QemuVideoDxe/QemuVideoDxe.inf
 
   #
   # Bds
@@ -297,7 +297,7 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
   INF MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
 
-  INF Platforms/QemuSbsaPkg/SbsaQemuPlatformDxe/SbsaQemuPlatformDxe.inf
+  INF QemuSbsaPkg/SbsaQemuPlatformDxe/SbsaQemuPlatformDxe.inf
   INF MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
 
   #
