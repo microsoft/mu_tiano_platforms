@@ -479,6 +479,13 @@ QemuVideoBochsModeSetup (
       continue; // duplicate with edid resolution
     }
 
+    // MU_CHANGE: Added a cap so that the graphic helper logic will not try to render 8K
+    if ((QemuVideoBochsModes[Index].Width > PcdGet32 (PcdVideoHorizontalResolution)) &&
+        (QemuVideoBochsModes[Index].Height > PcdGet32 (PcdVideoVerticalResolution)))
+    {
+      break; // duplicate with edid resolution
+    }
+
     QemuVideoBochsAddMode (
       Private,
       AvailableFbSize,
