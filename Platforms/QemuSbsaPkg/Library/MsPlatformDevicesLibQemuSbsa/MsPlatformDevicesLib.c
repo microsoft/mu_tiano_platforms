@@ -233,7 +233,6 @@ STATIC USB_KEYBOARD_DEVICE_PATH  gUsbKeyboardDevicePath = {
 typedef struct {
   ACPI_HID_DEVICE_PATH        PciRootBridge;
   PCI_DEVICE_PATH             PciDevice;
-  // ACPI_ADR_DEVICE_PATH        AcpiAdr;
   EFI_DEVICE_PATH_PROTOCOL    End;
 } PREFERRED_VIDEO_DEVICE;
 
@@ -251,26 +250,6 @@ STATIC PREFERRED_VIDEO_DEVICE  gPreferredVideo = {
     0x00,
     0x01
   },
-  // {
-  //   {
-  //     ACPI_DEVICE_PATH,
-  //     ACPI_ADR_DP,
-  //     {
-  //       (UINT8)(sizeof (ACPI_ADR_DEVICE_PATH)),
-  //       (UINT8)((sizeof (ACPI_ADR_DEVICE_PATH)) >> 8)
-  //     }
-  //   },
-  //   ACPI_DISPLAY_ADR (
-  //     1,                                         // DeviceIdScheme
-  //     0,                                         // HeadId
-  //     0,                                         // NonVgaOutput
-  //     1,                                         // BiosCanDetect
-  //     0,                                         // VendorInfo
-  //     ACPI_ADR_DISPLAY_TYPE_EXTERNAL_DIGITAL,    // Type
-  //     0,                                         // Port
-  //     0                                          // Index
-  //     ),
-  // },
   gEndEntire
 };
 
