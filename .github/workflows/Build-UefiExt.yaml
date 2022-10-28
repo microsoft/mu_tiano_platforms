@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
-name: "UEFI Windbg Extension"
+name: "Build UEFI Debug Extension"
 
 on:
   workflow_dispatch:
@@ -34,3 +34,10 @@ jobs:
       
       - name: Build
         run: msbuild UefiDbgExt\uefiext.vcxproj -property:Configuration=${{ matrix.configuration }} -property:Platform=${{ matrix.platform }}
+      
+      - name: Publish Binary
+        if: ${{ matrix.platform == 'Debug' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: UefiDbgExt
+          path: UefiDbgExt\x64\Release\uefiext.dll
