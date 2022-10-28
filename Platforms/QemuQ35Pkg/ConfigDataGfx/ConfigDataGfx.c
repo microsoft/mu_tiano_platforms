@@ -191,9 +191,9 @@ ConfigDataGfxEntry (
   // Then locate variable ppi.
   Status = PeiServicesLocatePpi (&gEfiPeiReadOnlyVariable2PpiGuid, 0, NULL, (VOID *)&VarPpi);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a Failed to locate EFI_PEI_READ_ONLY_VARIABLE2_PPI - %r\n", __FUNCTION__, Status));
-    ASSERT (FALSE);
-    return Status;
+    DEBUG ((DEBUG_WARN, "%a Failed to locate EFI_PEI_READ_ONLY_VARIABLE2_PPI, moving on with default policy - %r\n", __FUNCTION__, Status));
+    Status = EFI_SUCCESS;
+    goto Exit;
   }
 
   Size    = sizeof (SINGLE_SETTING_PROVIDER_START) + 8;
