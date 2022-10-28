@@ -39,5 +39,5 @@ jobs:
         if: ${{ matrix.configuration == 'Release' && github.event_name == 'push' }}
         uses: actions/upload-artifact@v3
         with:
-          name: UefiDbgExt
+          name: UefiDbgExt-${{ matrix.platform }}
           path: UefiDbgExt\x64\Release\uefiext.dll
