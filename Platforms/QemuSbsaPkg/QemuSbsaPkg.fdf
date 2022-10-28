@@ -216,9 +216,6 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
   INF MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
-!if $(SECURE_BOOT_ENABLE) == TRUE
-  INF SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
-!endif
   INF MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   INF MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
   INF EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
@@ -260,7 +257,9 @@ READ_LOCK_STATUS   = TRUE
   INF QemuQ35Pkg/VirtioScsiDxe/VirtioScsi.inf
   INF QemuQ35Pkg/VirtioRngDxe/VirtioRng.inf
 
-  INF ShellPkg/Application/Shell/Shell.inf
+  # Rng Protocol producer
+  INF SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
+
   FILE APPLICATION=PCD(gPcBdsPkgTokenSpaceGuid.PcdShellFile) {
     SECTION PE32=$(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/AARCH64/Shell.efi
     SECTION UI= "EdkShell"
@@ -274,18 +273,37 @@ READ_LOCK_STATUS   = TRUE
   INF MsGraphicsPkg/OnScreenKeyboardDxe/OnScreenKeyboardDxe.inf
   INF MsGraphicsPkg/MsUiTheme/Dxe/MsUiThemeProtocol.inf
   INF MsGraphicsPkg/DisplayEngineDxe/DisplayEngineDxe.inf
-  INF QemuSbsaPkg/QemuVideoDxe/QemuVideoDxe.inf
+  INF QemuQ35Pkg/QemuVideoDxe/QemuVideoDxe.inf
 
   #
   # Bds
   #
   INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
-  # INF MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
   INF MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
   INF MdeModulePkg/Universal/DriverHealthManagerDxe/DriverHealthManagerDxe.inf
   INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
   INF PcBdsPkg/MsBootPolicy/MsBootPolicy.inf
-  INF MdeModulePkg/Application/UiApp/UiApp.inf
+
+  #
+  # Policy and configuration
+  #
+  INF PolicyServicePkg/PolicyService/Dxe/PolicyDxe.inf
+  INF SetupDataPkg/ConfProfileMgrDxe/ConfProfileMgrDxe.inf
+  INF SetupDataPkg/ConfDataSettingProvider/ConfDataSettingProvider.inf
+
+  #
+  # Frontpages
+  #
+  INF SetupDataPkg/ConfApp/ConfApp.inf
+  # INF OemPkg/FrontpageButtonsVolumeUp/FrontpageButtonsVolumeUp.inf
+  INF OemPkg/FrontPage/FrontPage.inf
+  INF OemPkg/BootMenu/BootMenu.inf
+
+  #
+  # MFCI support
+  #
+  # TODO: This is not enabled, due to variable PEI is currently not supported...
+  # INF MfciPkg/MfciDxe/MfciDxe.inf
 
   #
   # Networking stack
@@ -371,14 +389,62 @@ READ_LOCK_STATUS   = TRUE
 !endif
 
   #
-  # TianoCore logo (splash screen)
-  #
-  INF MdeModulePkg/Logo/LogoDxe.inf
-
-  #
   # Ramdisk support
   #
   INF MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
+
+  #
+  # MU Modules
+  #
+  INF  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
+  INF  MsCorePkg/MuCryptoDxe/MuCryptoDxe.inf
+  INF  MsGraphicsPkg/MsEarlyGraphics/Dxe/MsEarlyGraphics.inf
+  INF  MsWheaPkg/MsWheaReport/Dxe/MsWheaReportDxe.inf
+  INF  MsCorePkg/MuVarPolicyFoundationDxe/MuVarPolicyFoundationDxe.inf
+  INF  MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.inf
+  INF  MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
+  INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
+  INF  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+
+  #
+  # DFCI support
+  #
+  INF  DfciPkg/SettingsManager/SettingsManagerDxe.inf
+  INF  DfciPkg/Application/DfciMenu/DfciMenu.inf
+  INF  DfciPkg/IdentityAndAuthManager/IdentityAndAuthManagerDxe.inf
+  INF  DfciPkg/DfciManager/DfciManager.inf
+  FILE FREEFORM = PCD(gDfciPkgTokenSpaceGuid.PcdDfciTimerFile) {
+      SECTION RAW = DfciPkg/Include/Resources/DfciWorking.bmp
+  }
+  FILE FREEFORM = PCD(gZeroTouchPkgTokenSpaceGuid.PcdZeroTouchCertificateFile) {
+      SECTION RAW = ZeroTouchPkg/Certs/ZeroTouch/ZtdRecovery.cer
+  }
+
+  #
+  # Graphic icons and logos
+  #
+  FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdLogoFile) {
+    SECTION RAW = OemPkg/FrontPage/Resources/BootLogo.bmp
+    SECTION UI = "Logo"
+  }
+  FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdFrontPageLogoFile) {
+    SECTION RAW = OemPkg/FrontPage/Resources/FrontpageLogo.bmp
+  }
+  FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdLowBatteryFile) {
+    SECTION RAW = OemPkg/FrontPage/Resources/LBAT.bmp
+  }
+  FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdThermalFile) {
+    SECTION RAW = OemPkg/FrontPage/Resources/THOT.bmp
+  }
+  FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdVolumeUpIndicatorFile) {
+    SECTION RAW = OemPkg/FrontPage/Resources/VolumeUp.bmp
+  }
+  FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdFirmwareSettingsIndicatorFile) {
+    SECTION RAW = OemPkg/FrontPage/Resources/FirmwareSettings.bmp
+  }
+  FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdBootFailIndicatorFile ) {
+    SECTION RAW = OemPkg/FrontPage/Resources/NoBoot.bmp
+  }
 
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 16
@@ -409,6 +475,13 @@ READ_LOCK_STATUS   = TRUE
   INF MsGraphicsPkg/MsEarlyGraphics/Pei/MsEarlyGraphics.inf
   INF MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
   INF MsCorePkg/Core/GuidedSectionExtractPeim/GuidedSectionExtract.inf
+  INF MsWheaPkg/MsWheaReport/Pei/MsWheaReportPei.inf
+  INF OemPkg/DeviceStatePei/DeviceStatePei.inf
+  INF MfciPkg/MfciPei/MfciPei.inf
+
+  INF  SetupDataPkg/ConfDfciUnsignedListInit/ConfDfciUnsignedListInit.inf
+  INF  PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
+  INF  QemuQ35Pkg/ConfigDataGfx/ConfigDataGfx.inf
 
 !if $(TPM2_ENABLE) == TRUE
   INF MdeModulePkg/Universal/ResetSystemPei/ResetSystemPei.inf

@@ -66,7 +66,6 @@
   # -D FLAG=VALUE
   #
   DEFINE TTY_TERMINAL            = FALSE
-  DEFINE SECURE_BOOT_ENABLE      = FALSE
   DEFINE TPM2_ENABLE             = FALSE
   DEFINE TPM2_CONFIG_ENABLE      = FALSE
 
@@ -216,25 +215,35 @@
 !endif
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   RngLib|MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
+  Hash2CryptoLib|SecurityPkg/Library/BaseHash2CryptoLibNull/BaseHash2CryptoLibNull.inf
 
   #
   # Secure Boot dependencies
   #
-!if $(SECURE_BOOT_ENABLE) == TRUE
   AuthVariableLib|SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf
   SecureBootVariableLib|SecurityPkg/Library/SecureBootVariableLib/SecureBootVariableLib.inf
   SecureBootVariableProvisionLib|SecurityPkg/Library/SecureBootVariableProvisionLib/SecureBootVariableProvisionLib.inf
-
   # re-use the UserPhysicalPresent() dummy implementation from the ovmf tree
-  PlatformSecureLib|QemuSbsaPkg/Library/PlatformSecureLib/PlatformSecureLib.inf
-!else
-  AuthVariableLib|MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
-!endif
+  PlatformSecureLib|QemuQ35Pkg/Library/PlatformSecureLib/PlatformSecureLib.inf
+
+  # Security Libraries
+  LockBoxLib            |QemuQ35Pkg/Library/LockBoxLib/LockBoxBaseLib.inf
+  PasswordStoreLib      |MsCorePkg/Library/PasswordStoreLibNull/PasswordStoreLibNull.inf
+  PasswordPolicyLib     |OemPkg/Library/PasswordPolicyLib/PasswordPolicyLib.inf
+  SecureBootKeyStoreLib |OemPkg/Library/SecureBootKeyStoreLibOem/SecureBootKeyStoreLibOem.inf
+  PlatformPKProtectionLib|SecurityPkg/Library/PlatformPKProtectionLibVarPolicy/PlatformPKProtectionLibVarPolicy.inf
+  MuSecureBootKeySelectorLib|MsCorePkg/Library/MuSecureBootKeySelectorLib/MuSecureBootKeySelectorLib.inf
+
+  # Variable Libraries
   VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
   VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLib.inf
   VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
-  UefiBootManagerLib|MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
 
+  # Whea Libraries
+  MsWheaEarlyStorageLib |MsWheaPkg/Library/MsWheaEarlyStorageLibNull/MsWheaEarlyStorageLibNull.inf
+  MuTelemetryHelperLib  |MsWheaPkg/Library/MuTelemetryHelperLib/MuTelemetryHelperLib.inf
+
+  UefiBootManagerLib|MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
 
   # Base ARM libraries
@@ -285,7 +294,6 @@
   MuUefiVersionLib|OemPkg/Library/MuUefiVersionLib/MuUefiVersionLib.inf
   MsNVBootReasonLib|OemPkg/Library/MsNVBootReasonLib/MsNVBootReasonLib.inf
   MuTelemetryHelperLib|MsWheaPkg/Library/MuTelemetryHelperLib/MuTelemetryHelperLib.inf
-  DisplayDeviceStateLib|MsGraphicsPkg/Library/ColorBarDisplayDeviceStateLib/ColorBarDisplayDeviceStateLib.inf
   UiRectangleLib|MsGraphicsPkg/Library/BaseUiRectangleLib/BaseUiRectangleLib.inf
   DeviceStateLib|MdeModulePkg/Library/DeviceStateLib/DeviceStateLib.inf
   XenPlatformLib|QemuQ35Pkg/Library/XenPlatformLib/XenPlatformLib.inf
@@ -318,15 +326,50 @@
   PlatformThemeLib         |QemuQ35Pkg/Library/PlatformThemeLib/PlatformThemeLib.inf # Q35 theme
   MsUiThemeCopyLib         |MsGraphicsPkg/Library/MsUiThemeCopyLib/MsUiThemeCopyLib.inf # handles copying the theme
   MsAltBootLib             |OemPkg/Library/MsAltBootLib/MsAltBootLib.inf
+  MsPlatformEarlyGraphicsLib|MsGraphicsPkg/Library/MsEarlyGraphicsLibNull/Dxe/MsEarlyGraphicsLibNull.inf
 
-!if $(TPM2_ENABLE) == TRUE
-  Tpm2CommandLib|SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
-  Tcg2PhysicalPresenceLib|QemuQ35Pkg/Library/Tcg2PhysicalPresenceLibQemu/DxeTcg2PhysicalPresenceLib.inf
-  TpmMeasurementLib|SecurityPkg/Library/DxeTpmMeasurementLib/DxeTpmMeasurementLib.inf
-  TpmPlatformHierarchyLib|SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLib/PeiDxeTpmPlatformHierarchyLib.inf
-!else
-  TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
-  TpmPlatformHierarchyLib|SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLibNull/PeiDxeTpmPlatformHierarchyLib.inf
+  # Setup variable libraries
+  ConfigBlobBaseLib         |SetupDataPkg/Library/ConfigBlobBaseLib/ConfigBlobBaseLib.inf
+  ConfigDataLib             |SetupDataPkg/Library/ConfigDataLib/ConfigDataLib.inf
+  ConfigVariableListLib     |SetupDataPkg/Library/ConfigVariableListLib/ConfigVariableListLib.inf
+  ConfigSystemModeLib       |QemuQ35Pkg/Library/ConfigSystemModeLibQ35/ConfigSystemModeLib.inf
+  ActiveProfileSelectorLib  |SetupDataPkg/Library/ActiveProfileSelectorLibNull/ActiveProfileSelectorLibNull.inf
+  OemMfciLib|OemPkg/Library/OemMfciLib/OemMfciLibDxe.inf
+
+  # DFCI / XML / JSON Libraries
+  DfciUiSupportLib                  |DfciPkg/Library/DfciUiSupportLibNull/DfciUiSupportLibNull.inf # Supports DFCI Groups.
+  DfciV1SupportLib                  |DfciPkg/Library/DfciV1SupportLibNull/DfciV1SupportLibNull.inf # Backwards compatibility with DFCI V1 functions.
+  DfciDeviceIdSupportLib            |DfciPkg/Library/DfciDeviceIdSupportLibNull/DfciDeviceIdSupportLibNull.inf
+  DfciGroupLib                      |DfciPkg/Library/DfciGroupLibNull/DfciGroups.inf
+  DfciRecoveryLib                   |DfciPkg/Library/DfciRecoveryLib/DfciRecoveryLib.inf
+   # Zero Touch is part of DFCI
+  ZeroTouchSettingsLib              |ZeroTouchPkg/Library/ZeroTouchSettings/ZeroTouchSettings.inf
+   # Libraries that understands the MsXml Settings Schema and providers helper functions
+  DfciXmlIdentitySchemaSupportLib   |DfciPkg/Library/DfciXmlIdentitySchemaSupportLib/DfciXmlIdentitySchemaSupportLib.inf
+  DfciXmlDeviceIdSchemaSupportLib   |DfciPkg/Library/DfciXmlDeviceIdSchemaSupportLib/DfciXmlDeviceIdSchemaSupportLib.inf
+  DfciXmlSettingSchemaSupportLib    |DfciPkg/Library/DfciXmlSettingSchemaSupportLib/DfciXmlSettingSchemaSupportLib.inf
+  DfciXmlPermissionSchemaSupportLib |DfciPkg/Library/DfciXmlPermissionSchemaSupportLib/DfciXmlPermissionSchemaSupportLib.inf
+  DfciSettingChangedNotificationLib |DfciPkg/Library/DfciSettingChangedNotificationLib/DfciSettingChangedNotificationLibNull.inf
+
+   #XML libraries
+  XmlTreeQueryLib                   |XmlSupportPkg/Library/XmlTreeQueryLib/XmlTreeQueryLib.inf
+  XmlTreeLib                        |XmlSupportPkg/Library/XmlTreeLib/XmlTreeLib.inf
+   # Json parser
+  JsonLiteParserLib |MsCorePkg/Library/JsonLiteParser/JsonLiteParser.inf
+
+  # TPM Libraries
+  OemTpm2InitLib          |SecurityPkg/Library/OemTpm2InitLibNull/OemTpm2InitLib.inf
+  Tpm2DebugLib            |SecurityPkg/Library/Tpm2DebugLib/Tpm2DebugLibNull.inf
+  Tpm12CommandLib         |SecurityPkg/Library/Tpm12CommandLib/Tpm12CommandLib.inf
+  Tpm2CommandLib          |SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
+  Tpm2DeviceLib           |SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg2.inf
+  Tcg2PpVendorLib         |SecurityPkg/Library/Tcg2PpVendorLibNull/Tcg2PpVendorLibNull.inf
+  TpmMeasurementLib       |MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
+  Tcg2PhysicalPresenceLib |QemuQ35Pkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2PhysicalPresenceLib.inf
+!if $(TPM_ENABLE) == TRUE
+  Tcg2PhysicalPresenceLib |QemuQ35Pkg/Library/Tcg2PhysicalPresenceLibQemu/DxeTcg2PhysicalPresenceLib.inf
+  TpmMeasurementLib       |SecurityPkg/Library/DxeTpmMeasurementLib/DxeTpmMeasurementLib.inf
+  Tpm2DebugLib            |SecurityPkg/Library/Tpm2DebugLib/Tpm2DebugLibSimple.inf
 !endif
 
   # Common Standalone MM libraries
@@ -380,6 +423,7 @@
   MsPlatformEarlyGraphicsLib |MsGraphicsPkg/Library/MsEarlyGraphicsLibNull/Pei/MsEarlyGraphicsLibNull.inf
   MsUiThemeLib               |MsGraphicsPkg/Library/MsUiThemeLib/Pei/MsUiThemeLib.inf
   ArmPlatformLib             |QemuSbsaPkg/Library/SbsaQemuLib/SbsaQemuLib.inf
+  OemMfciLib                 |OemPkg/Library/OemMfciLib/OemMfciLibPei.inf
 
 !if $(TPM2_ENABLE) == TRUE
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
@@ -400,6 +444,7 @@
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   PcdDatabaseLoaderLib|MdeModulePkg/Library/PcdDatabaseLoaderLib/Dxe/PcdDatabaseLoaderLibDxe.inf
   UpdateFacsHardwareSignatureLib|PcBdsPkg/Library/UpdateFacsHardwareSignatureLib/UpdateFacsHardwareSignatureLib.inf
+  LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxDxeLib.inf
 
 !if $(TPM2_ENABLE) == TRUE
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg2.inf
@@ -437,12 +482,10 @@
   HobLib|StandaloneMmPkg/Library/StandaloneMmHobLib/StandaloneMmHobLib.inf
   MmServicesTableLib|MdePkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
   MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
-  AuthVariableLib|SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   RngLib|MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
-  PlatformSecureLib|SecurityPkg/Library/PlatformSecureLibNull/PlatformSecureLibNull.inf
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
   VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
@@ -452,7 +495,6 @@
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
   AdvLoggerAccessLib|AdvLoggerPkg/Library/AdvLoggerMmAccessLib/AdvLoggerMmAccessLib.inf
   MemoryTypeInfoSecVarCheckLib|MdeModulePkg/Library/MemoryTypeInfoSecVarCheckLib/MemoryTypeInfoSecVarCheckLib.inf
-  SecurityLockAuditLib|MdeModulePkg/Library/SecurityLockAuditDebugMessageLib/SecurityLockAuditDebugMessageLib.inf
   FltUsedLib|MdePkg/Library/FltUsedLib/FltUsedLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER]
@@ -558,6 +600,10 @@
 #   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy|0xC000000000007FD1
 
   # BEEBE ADDED
+  gMsGraphicsPkgTokenSpaceGuid.PcdUiThemeInDxe|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerInBootOrder|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformRecoverySupport|FALSE
+  gPcBdsPkgTokenSpaceGuid.PcdLowResolutionInternalShell|FALSE
   gMsGraphicsPkgTokenSpaceGuid.PcdMsGopOverrideProtocolGuid|{0xF5, 0x3B, 0x5E, 0xAA, 0x8A, 0x81, 0x2D, 0x41, 0xA1, 0x8E, 0xD8, 0x79, 0x3B, 0xA0, 0x3A, 0x5C}
 
 !if $(ARCH) == AARCH64
@@ -642,6 +688,13 @@
   #  enumeration to complete before installing ACPI tables.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|FALSE
 
+  gDfciPkgTokenSpaceGuid.PcdUnsignedListFormatAllow|FALSE
+
+  ## List of valid Profile GUIDs
+  ## gQemuQ35PkgProfile1Guid, gQemuQ35PkgProfile2Guid, and gQemuQ35PkgProfile3Guid are supported.
+  ## gSetupDataPkgGenericProfileGuid is defaulted to in case retrieved GUID is not in this list
+  gSetupDataPkgTokenSpaceGuid.PcdConfigurationProfileList|{ GUID("E34D00D0-6A10-44BE-B46C-BEE6302C6287"), GUID("848F7E93-C957-4797-8A11-F301ED9B2048"), GUID("454CFA58-6423-4F50-8B2B-744BDECE876A") }
+
   #
   # Network Pcds
   #
@@ -658,7 +711,10 @@
   gQemuSbsaPkgTokenSpaceGuid.PcdPlatformAhciSize|0x00010000
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x21, 0xaa, 0x2c, 0x46, 0x14, 0x76, 0x03, 0x45, 0x83, 0x6e, 0x8a, 0xb6, 0xf4, 0x66, 0x23, 0x31 }
+  # The GUID of SetupDataPkg/ConfApp/ConfApp.inf: E3624086-4FCD-446E-9D07-B6B913792071
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x86, 0x40, 0x62, 0xe3, 0xcd, 0x4f, 0x6e, 0x44, 0x9d, 0x7, 0xb6, 0xb9, 0x13, 0x79, 0x20, 0x71 }
+  # The GUID of Frontpage.inf from MU_OEM_SAMPLE: 4042708A-0F2D-4823-AC60-0D77B3111889
+  gQemuQ35PkgTokenSpaceGuid.PcdUIApplicationFile|{ 0x8A, 0x70, 0x42, 0x40, 0x2D, 0x0F, 0x23, 0x48, 0xAC, 0x60, 0x0D, 0x77, 0xB3, 0x11, 0x18, 0x89 }
 
   #
   # The maximum physical I/O addressability of the processor, set with
@@ -770,6 +826,13 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0
 !endif
 
+[PcdsDynamicExDefault]
+  # Default this to gSetupDataPkgGenericProfileGuid
+  gSetupDataPkgTokenSpaceGuid.PcdSetupConfigActiveProfileFile|{ GUID("8464A6FF-A984-4899-A375-3DC1DB3D4227") }
+
+  # Default this to gQemuQ35PkgDfciUnsignedXmlGuid
+  gDfciPkgTokenSpaceGuid.PcdUnsignedPermissionsFile|{GUID("62CF29AD-FEEE-4930-B71B-4806C787C6AA")}
+
 [PcdsDynamicHii]
   gArmVirtTokenSpaceGuid.PcdForceNoAcpi|L"ForceNoAcpi"|gArmVirtVariableGuid|0x0|FALSE|NV,BS
 
@@ -777,6 +840,13 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x0|"1.3"|NV,BS
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableRev|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x8|3|NV,BS
 !endif
+
+################################################################################
+#
+# MFCI DSC include - packaged this way because MFCI aspires to one day be a binary
+#
+################################################################################
+!include MfciPkg/MfciPkg.dsc.inc
 
 ################################################################################
 #
@@ -820,6 +890,21 @@
   }
 
   #
+  # MU PEI Modules
+  #
+  MsWheaPkg/MsWheaReport/Pei/MsWheaReportPei.inf
+
+  MsGraphicsPkg/MsUiTheme/Pei/MsUiThemePpi.inf
+  MsGraphicsPkg/MsEarlyGraphics/Pei/MsEarlyGraphics.inf
+  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTablePei/FirmwarePerformancePei.inf
+  OemPkg/DeviceStatePei/DeviceStatePei.inf
+  MfciPkg/MfciPei/MfciPei.inf
+
+  SetupDataPkg/ConfDfciUnsignedListInit/ConfDfciUnsignedListInit.inf
+  PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
+  QemuQ35Pkg/ConfigDataGfx/ConfigDataGfx.inf
+
+  #
   # DXE
   #
   MdeModulePkg/Core/Dxe/DxeMain.inf {
@@ -838,7 +923,6 @@
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
-!if $(SECURE_BOOT_ENABLE) == TRUE
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
     <LibraryClasses>
       NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
@@ -846,10 +930,6 @@
       NULL|SecurityPkg/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBootLib.inf
 !endif
   }
-  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
-!else
-  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
-!endif
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
@@ -882,6 +962,9 @@
   QemuQ35Pkg/VirtioNetDxe/VirtioNet.inf
   QemuQ35Pkg/VirtioRngDxe/VirtioRng.inf
 
+  # Rng Protocol producer
+  SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
+
   #
   # FAT filesystem + GPT/MBR partitioning + UDF filesystem + virtio-fs
   #
@@ -900,10 +983,16 @@
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
 
-  # BEEBE ADDED START
-  MsGraphicsPkg/MsUiTheme/Pei/MsUiThemePpi.inf
-  MsGraphicsPkg/MsEarlyGraphics/Pei/MsEarlyGraphics.inf
+  # Spoofs button press to automatically boot to FrontPage.
+  OemPkg/FrontpageButtonsVolumeUp/FrontpageButtonsVolumeUp.inf
 
+  # Application that presents and manages FrontPage.
+  OemPkg/FrontPage/FrontPage.inf
+
+  # Application that presents & manages the Boot Menu Setup on Front Page.
+  OemPkg/BootMenu/BootMenu.inf
+
+  # BEEBE ADDED START
   # Manages windows and fonts to be drawn by the RenderingEngine.
   MsGraphicsPkg/SimpleWindowManagerDxe/SimpleWindowManagerDxe.inf
   # Produces EfiGraphicsOutputProtocol to draw graphics to the screen.
@@ -918,19 +1007,71 @@
 
   # Produces FORM DISPLAY ENGINE protocol. Handles input, displays strings.
   MsGraphicsPkg/DisplayEngineDxe/DisplayEngineDxe.inf
-  QemuSbsaPkg/QemuVideoDxe/QemuVideoDxe.inf
+  QemuQ35Pkg/QemuVideoDxe/QemuVideoDxe.inf
   # BEEBE ADDED END
+
+  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
+  MsCorePkg/MuCryptoDxe/MuCryptoDxe.inf
+  MsGraphicsPkg/MsEarlyGraphics/Dxe/MsEarlyGraphics.inf
+  MsWheaPkg/MsWheaReport/Dxe/MsWheaReportDxe.inf
+  MsCorePkg/MuVarPolicyFoundationDxe/MuVarPolicyFoundationDxe.inf
+  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
+
+  MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
+  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+
+  #
+  # DFCI support
+  #
+  # AuthManager provides authentication for DFCI. AuthManagerNull passes out a consistent token to allow the rest
+  # of FrontPage to be developed and tested while RngLib or other parts of the authentication process are being developed.
+  DfciPkg/IdentityAndAuthManager/IdentityAndAuthManagerDxe.inf
+
+  # Processes ingoing and outgoing DFCI settings requests.
+  DfciPkg/DfciManager/DfciManager.inf
+
+  DfciPkg/SettingsManager/SettingsManagerDxe.inf {
+    #Platform should add all it settings libs here
+    <LibraryClasses>
+      NULL|ZeroTouchPkg/Library/ZeroTouchSettings/ZeroTouchSettings.inf
+      NULL|DfciPkg/Library/DfciSettingsLib/DfciSettingsLib.inf
+      #NULL|DfciPkg/Library/DfciPasswordProvider/DfciPasswordProvider.inf
+      NULL|DfciPkg/Library/DfciVirtualizationSettings/DfciVirtualizationSettings.inf
+      NULL|DfciPkg/Library/DfciWpbtSettingLib/DfciWpbtSetting.inf
+      NULL|DfciPkg/Library/DfciAssetTagSettingLib/DfciAssetTagSetting.inf
+      DfciSettingPermissionLib|DfciPkg/Library/DfciSettingPermissionLib/DfciSettingPermissionLib.inf
+      NULL|PcBdsPkg/Library/MsBootManagerSettingsDxeLib/MsBootManagerSettingsDxeLib.inf
+      NULL|OemPkg/Library/MsSecureBootModeSettingLib/MsSecureBootModeSettingLib.inf
+    <PcdsFeatureFlag>
+      gDfciPkgTokenSpaceGuid.PcdSettingsManagerInstallProvider|TRUE
+  }
+  DfciPkg/Application/DfciMenu/DfciMenu.inf
 
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
   MdeModulePkg/Universal/DriverHealthManagerDxe/DriverHealthManagerDxe.inf
-  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf {
+    <PcdsDynamicExDefault>
+      gMsGraphicsPkgTokenSpaceGuid.PcdPostBackgroundColoringSkipCount|0
+  }
   PcBdsPkg/MsBootPolicy/MsBootPolicy.inf
-  MdeModulePkg/Logo/LogoDxe.inf
-  MdeModulePkg/Application/UiApp/UiApp.inf {
+
+  # Configuration modules
+  PolicyServicePkg/PolicyService/Dxe/PolicyDxe.inf
+  SetupDataPkg/ConfDataSettingProvider/ConfDataSettingProvider.inf {
+    <PcdsFixedAtBuild>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
+  }
+  SetupDataPkg/ConfProfileMgrDxe/ConfProfileMgrDxe.inf
+  SetupDataPkg/ConfApp/ConfApp.inf {
     <LibraryClasses>
-      NULL|MdeModulePkg/Library/DeviceManagerUiLib/DeviceManagerUiLib.inf
-      NULL|MdeModulePkg/Library/BootManagerUiLib/BootManagerUiLib.inf
-      NULL|MdeModulePkg/Library/BootMaintenanceManagerUiLib/BootMaintenanceManagerUiLib.inf
+      JsonLiteParserLib|MsCorePkg/Library/JsonLiteParser/JsonLiteParser.inf
+  }
+
+  # MfciDxe overrides
+  MfciPkg/MfciDxe/MfciDxe.inf {
+    <LibraryClasses>
+      MfciRetrievePolicyLib|MfciPkg/Library/MfciRetrievePolicyLibViaHob/MfciRetrievePolicyLibViaHob.inf
+      MfciDeviceIdSupportLib|MfciPkg/Library/MfciDeviceIdSupportLibSmbios/MfciDeviceIdSupportLibSmbios.inf
   }
 
   #
@@ -981,6 +1122,7 @@
   MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+  MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.inf
 
   #
   # TPM2 support
