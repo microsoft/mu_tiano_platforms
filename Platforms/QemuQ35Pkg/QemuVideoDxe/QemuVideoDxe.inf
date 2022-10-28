@@ -43,7 +43,6 @@
   MsGraphicsPkg/MsGraphicsPkg.dec # MU_CHANGE use MsGopOverrideProtocolGuid
   PolicyServicePkg/PolicyServicePkg.dec
   QemuQ35Pkg/QemuQ35Pkg.dec
-  QemuSbsaPkg/QemuSbsaPkg.dec
 
 [LibraryClasses]
   BaseMemoryLib
@@ -70,7 +69,7 @@
 
 [Pcd]
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
-  gQemuSbsaPkgTokenSpaceGuid.PcdVideoResolutionSource
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdVideoResolutionSource
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
   gMsGraphicsPkgTokenSpaceGuid.PcdMsGopOverrideProtocolGuid   # MU_CHANGE use MsGopOverrideProtocolGuid
