@@ -29,7 +29,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   QemuQ35Pkg/QemuQ35Pkg.dec
-  QemuCortexPkg/QemuCortexPkg.dec
+  QemuSbsaPkg/QemuSbsaPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -48,7 +48,7 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
-  gQeumCortexPkgTokenSpaceGuid.PcdVideoResolutionSource
+  gQemuSbsaPkgTokenSpaceGuid.PcdVideoResolutionSource
 
 [Protocols]
   gEfiDevicePathProtocolGuid      ## PRODUCES

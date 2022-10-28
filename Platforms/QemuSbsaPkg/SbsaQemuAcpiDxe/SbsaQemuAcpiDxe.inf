@@ -26,7 +26,7 @@
   EmbeddedPkg/EmbeddedPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
-  QemuCortexPkg/QemuCortexPkg.dec
+  QemuSbsaPkg/QemuSbsaPkg.dec
 
 [LibraryClasses]
   ArmLib

@@ -24,8 +24,8 @@
   ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  QemuCortexPkg/QemuCortexPkg.dec
+  QemuSbsaPkg/QemuSbsaPkg.dec
 
 [FixedPcd]
-  gQeumCortexPkgTokenSpaceGuid.PcdFlashNvStorageBase
-  gQeumCortexPkgTokenSpaceGuid.PcdFlashNvStorageSize
+  gQemuSbsaPkgTokenSpaceGuid.PcdFlashNvStorageBase
+  gQemuSbsaPkgTokenSpaceGuid.PcdFlashNvStorageSize

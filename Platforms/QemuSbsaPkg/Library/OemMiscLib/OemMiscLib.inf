@@ -26,7 +26,7 @@
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   ArmVirtPkg/ArmVirtPkg.dec
-  QemuCortexPkg/QemuCortexPkg.dec
+  QemuSbsaPkg/QemuSbsaPkg.dec
 
 [LibraryClasses]
   BaseMemoryLib
@@ -43,17 +43,17 @@
   gArmTokenSpaceGuid.PcdSystemBiosRelease
   gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
 
-  gQeumCortexPkgTokenSpaceGuid.PcdSystemManufacturer
-  gQeumCortexPkgTokenSpaceGuid.PcdSystemSerialNumber
-  gQeumCortexPkgTokenSpaceGuid.PcdSystemSKU
-  gQeumCortexPkgTokenSpaceGuid.PcdSystemFamily
-  gQeumCortexPkgTokenSpaceGuid.PcdBaseBoardAssetTag
-  gQeumCortexPkgTokenSpaceGuid.PcdBaseBoardSerialNumber
+  gQemuSbsaPkgTokenSpaceGuid.PcdSystemManufacturer
+  gQemuSbsaPkgTokenSpaceGuid.PcdSystemSerialNumber
+  gQemuSbsaPkgTokenSpaceGuid.PcdSystemSKU
+  gQemuSbsaPkgTokenSpaceGuid.PcdSystemFamily
+  gQemuSbsaPkgTokenSpaceGuid.PcdBaseBoardAssetTag
+  gQemuSbsaPkgTokenSpaceGuid.PcdBaseBoardSerialNumber
   gArmTokenSpaceGuid.PcdBaseBoardManufacturer
-  gQeumCortexPkgTokenSpaceGuid.PcdBaseBoardSKU
-  gQeumCortexPkgTokenSpaceGuid.PcdBaseBoardLocation
-  gQeumCortexPkgTokenSpaceGuid.PcdChassisSerialNumber
-  gQeumCortexPkgTokenSpaceGuid.PcdChassisVersion
-  gQeumCortexPkgTokenSpaceGuid.PcdChassisManufacturer
-  gQeumCortexPkgTokenSpaceGuid.PcdChassisAssetTag
-  gQeumCortexPkgTokenSpaceGuid.PcdChassisSKU
+  gQemuSbsaPkgTokenSpaceGuid.PcdBaseBoardSKU
+  gQemuSbsaPkgTokenSpaceGuid.PcdBaseBoardLocation
+  gQemuSbsaPkgTokenSpaceGuid.PcdChassisSerialNumber
+  gQemuSbsaPkgTokenSpaceGuid.PcdChassisVersion
+  gQemuSbsaPkgTokenSpaceGuid.PcdChassisManufacturer
+  gQemuSbsaPkgTokenSpaceGuid.PcdChassisAssetTag
+  gQemuSbsaPkgTokenSpaceGuid.PcdChassisSKU

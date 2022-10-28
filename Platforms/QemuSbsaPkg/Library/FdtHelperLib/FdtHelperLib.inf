@@ -23,7 +23,7 @@
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
   ArmVirtPkg/ArmVirtPkg.dec
-  QemuCortexPkg/QemuCortexPkg.dec
+  QemuSbsaPkg/QemuSbsaPkg.dec
 
 [LibraryClasses]
   DebugLib

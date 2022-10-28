@@ -29,7 +29,7 @@
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  QemuCortexPkg/QemuCortexPkg.dec
+  QemuSbsaPkg/QemuSbsaPkg.dec
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdGicDistributorBase
@@ -52,25 +52,25 @@
   gArmTokenSpaceGuid.PcdPciIoBase
   gArmTokenSpaceGuid.PcdPciIoSize
   gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation
-  gQeumCortexPkgTokenSpaceGuid.PcdPciIoLimit
+  gQemuSbsaPkgTokenSpaceGuid.PcdPciIoLimit
 
   gArmTokenSpaceGuid.PcdPciMmio32Base
   gArmTokenSpaceGuid.PcdPciMmio32Size
   gEfiMdePkgTokenSpaceGuid.PcdPciMmio32Translation
-  gQeumCortexPkgTokenSpaceGuid.PcdPciMmio32Limit
+  gQemuSbsaPkgTokenSpaceGuid.PcdPciMmio32Limit
 
   gArmTokenSpaceGuid.PcdPciMmio64Base
   gArmTokenSpaceGuid.PcdPciMmio64Size
   gEfiMdePkgTokenSpaceGuid.PcdPciMmio64Translation
-  gQeumCortexPkgTokenSpaceGuid.PcdPciMmio64Limit
+  gQemuSbsaPkgTokenSpaceGuid.PcdPciMmio64Limit
 
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
-  gQeumCortexPkgTokenSpaceGuid.PcdPciExpressBarSize
-  gQeumCortexPkgTokenSpaceGuid.PcdPciExpressBarLimit
+  gQemuSbsaPkgTokenSpaceGuid.PcdPciExpressBarSize
+  gQemuSbsaPkgTokenSpaceGuid.PcdPciExpressBarLimit
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
 
-  gQeumCortexPkgTokenSpaceGuid.PcdPlatformAhciBase
-  gQeumCortexPkgTokenSpaceGuid.PcdPlatformAhciSize
-  gQeumCortexPkgTokenSpaceGuid.PcdPlatformEhciBase
-  gQeumCortexPkgTokenSpaceGuid.PcdPlatformEhciSize
+  gQemuSbsaPkgTokenSpaceGuid.PcdPlatformAhciBase
+  gQemuSbsaPkgTokenSpaceGuid.PcdPlatformAhciSize
+  gQemuSbsaPkgTokenSpaceGuid.PcdPlatformEhciBase
+  gQemuSbsaPkgTokenSpaceGuid.PcdPlatformEhciSize

@@ -29,10 +29,10 @@ class CommonPlatform():
     ''' Common settings for this platform.  Define static data here and use
         for the different parts of stuart
     '''
-    PackagesSupported = ("QemuCortexPkg",)
+    PackagesSupported = ("QemuSbsaPkg",)
     ArchSupported = ("AARCH64")
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
-    Scopes = ('qemucortex', 'gcc_aarch64_linux', 'edk2-build', 'cibuild')
+    Scopes = ('qemusbsa', 'gcc_aarch64_linux', 'edk2-build', 'cibuild')
     WorkspaceRoot = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     PackagesPath = ("Platforms", "MU_BASECORE", "Common/MU", "Common/MU_TIANO", "Common/MU_OEM_SAMPLE", "Silicon/Arm/MU_TIANO", "Silicon/Arm/TFA")
 
@@ -129,10 +129,10 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
         The tuple should be (<workspace relative path to dsc file>, <input dictionary of dsc key value pairs>)
         '''
-        return ("QemuCortexPkg/QemuCortexPkg.dsc", {})
+        return ("QemuSbsaPkg/QemuSbsaPkg.dsc", {})
 
     def GetName(self):
-        return "QemuCortex"
+        return "QemuSbsa"
 
     def GetPackagesPath(self):
         ''' Return a list of paths that should be mapped as edk2 PackagesPath '''
@@ -174,7 +174,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             "TARGET_ARCH", args.build_arch.upper(), "From CmdLine")
 
         shell_environment.GetBuildVars().SetValue(
-            "ACTIVE_PLATFORM", "QemuCortexPkg/QemuCortexPkg.dsc", "From CmdLine")
+            "ACTIVE_PLATFORM", "QemuSbsaPkg/QemuSbsaPkg.dsc", "From CmdLine")
 
 
     def GetWorkspaceRoot(self):
@@ -197,8 +197,8 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         # followed by one with the flag. self.FlashImage will be true if the
         # --FlashOnly flag is passed, meaning we will keep separate build and run logs
         if(self.FlashImage):
-            return "QemuCortexPkg_Run"
-        return "QemuCortexPkg"
+            return "QemuSbsaPkg_Run"
+        return "QemuSbsaPkg"
 
     def GetLoggingLevel(self, loggerType):
         ''' Get the logging level for a given type
@@ -212,8 +212,8 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 
     def SetPlatformEnv(self):
         logging.debug("PlatformBuilder SetPlatformEnv")
-        self.env.SetValue("PRODUCT_NAME", "QemuCortex", "Platform Hardcoded")
-        self.env.SetValue("ACTIVE_PLATFORM", "QemuCortexPkg/QemuCortexPkg.dsc", "Platform Hardcoded")
+        self.env.SetValue("PRODUCT_NAME", "QemuSbsa", "Platform Hardcoded")
+        self.env.SetValue("ACTIVE_PLATFORM", "QemuSbsaPkg/QemuSbsaPkg.dsc", "Platform Hardcoded")
         self.env.SetValue("TARGET_ARCH", "AARCH64", "Platform Hardcoded")
         self.env.SetValue("TOOL_CHAIN_TAG", "GCC5", "set default to gcc5")
         # self.env.SetValue("EMPTY_DRIVE", "FALSE", "Default to false")

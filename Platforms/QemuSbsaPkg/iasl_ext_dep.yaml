@@ -12,7 +12,7 @@
 ##
 {
   "id": "iasl-armvirt-1",
-  "scope": "qemucortex",
+  "scope": "qemusbsa",
   "type": "nuget",
   "name": "iasl",
   "source": "https://api.nuget.org/v3/index.json",

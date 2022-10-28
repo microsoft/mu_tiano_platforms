@@ -24,7 +24,7 @@
   EmbeddedPkg/EmbeddedPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
-  QemuCortexPkg/QemuCortexPkg.dec
+  QemuSbsaPkg/QemuSbsaPkg.dec
 
 [LibraryClasses]
   PcdLib
@@ -33,8 +33,8 @@
   UefiDriverEntryPoint
 
 [Pcd]
-  gQeumCortexPkgTokenSpaceGuid.PcdPlatformAhciBase
-  gQeumCortexPkgTokenSpaceGuid.PcdPlatformAhciSize
+  gQemuSbsaPkgTokenSpaceGuid.PcdPlatformAhciBase
+  gQemuSbsaPkgTokenSpaceGuid.PcdPlatformAhciSize
 
 [Depex]
   TRUE

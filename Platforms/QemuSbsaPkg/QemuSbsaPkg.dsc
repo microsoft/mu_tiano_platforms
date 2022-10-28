@@ -14,15 +14,15 @@
 #
 ################################################################################
 [Defines]
-  PLATFORM_NAME                  = QemuCortexPkg
+  PLATFORM_NAME                  = QemuSbsaPkg
   PLATFORM_GUID                  = 37d7e986-f7e9-45c2-8067-e371421a626c
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
-  OUTPUT_DIRECTORY               = Build/QemuCortexPkg-$(ARCH)
+  OUTPUT_DIRECTORY               = Build/QemuSbsaPkg-$(ARCH)
   SUPPORTED_ARCHITECTURES        = AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
-  FLASH_DEFINITION               = QemuCortexPkg/QemuCortexPkg.fdf
+  FLASH_DEFINITION               = QemuSbsaPkg/QemuSbsaPkg.fdf
 
   #  DEBUG_INIT      0x00000001  // Initialization
   #  DEBUG_WARN      0x00000002  // Warnings
@@ -226,7 +226,7 @@
   SecureBootVariableProvisionLib|SecurityPkg/Library/SecureBootVariableProvisionLib/SecureBootVariableProvisionLib.inf
 
   # re-use the UserPhysicalPresent() dummy implementation from the ovmf tree
-  PlatformSecureLib|QemuCortexPkg/Library/PlatformSecureLib/PlatformSecureLib.inf
+  PlatformSecureLib|QemuSbsaPkg/Library/PlatformSecureLib/PlatformSecureLib.inf
 !else
   AuthVariableLib|MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
 !endif
@@ -252,7 +252,6 @@
 
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   BootLogoLib|MdeModulePkg/Library/BootLogoLib/BootLogoLib.inf
-  # PlatformBootManagerLib|QemuCortexPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   PlatformBootManagerLib|MsCorePkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   PlatformBmPrintScLib|QemuQ35Pkg/Library/PlatformBmPrintScLib/PlatformBmPrintScLib.inf
   CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
@@ -260,7 +259,7 @@
   QemuBootOrderLib|QemuQ35Pkg/Library/QemuBootOrderLib/QemuBootOrderLib.inf
   FileExplorerLib|MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
   PciSegmentLib|MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
-  PciHostBridgeLib|QemuCortexPkg/Library/SbsaQemuPciHostBridgeLib/SbsaQemuPciHostBridgeLib.inf
+  PciHostBridgeLib|QemuSbsaPkg/Library/SbsaQemuPciHostBridgeLib/SbsaQemuPciHostBridgeLib.inf
 
   # BEEBE ADDED
   MemoryTypeInformationChangeLib|MdeModulePkg/Library/MemoryTypeInformationChangeLibNull/MemoryTypeInformationChangeLibNull.inf
@@ -274,7 +273,7 @@
   HwResetSystemLib|ArmPkg/Library/ArmSmcPsciResetSystemLib/ArmSmcPsciResetSystemLib.inf
   FltUsedLib|MdePkg/Library/FltUsedLib/FltUsedLib.inf
   DeviceBootManagerLib|PcBdsPkg/Library/DeviceBootManagerLib/DeviceBootManagerLib.inf
-  MsPlatformDevicesLib|QemuCortexPkg/Library/MsPlatformDevicesLibQemuCortex/MsPlatformDevicesLib.inf
+  MsPlatformDevicesLib|QemuSbsaPkg/Library/MsPlatformDevicesLibQemuSbsa/MsPlatformDevicesLib.inf
   MsNetworkDependencyLib|PcBdsPkg/Library/MsNetworkDependencyLib/MsNetworkDependencyLib.inf
   MsBootOptionsLib|QemuQ35Pkg/Library/MsBootOptionsLibQemuQ35/MsBootOptionsLib.inf
   ConsoleMsgLib|PcBdsPkg/Library/ConsoleMsgLibNull/ConsoleMsgLibNull.inf
@@ -296,8 +295,8 @@
   MmUnblockMemoryLib|MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
   ResetSystemLib|MdeModulePkg/Library/DxeResetSystemLib/DxeResetSystemLib.inf
 
-  FdtHelperLib|QemuCortexPkg/Library/FdtHelperLib/FdtHelperLib.inf
-  OemMiscLib|QemuCortexPkg/Library/OemMiscLib/OemMiscLib.inf
+  FdtHelperLib|QemuSbsaPkg/Library/FdtHelperLib/FdtHelperLib.inf
+  OemMiscLib|QemuSbsaPkg/Library/OemMiscLib/OemMiscLib.inf
 
   # Math Libraries
   FltUsedLib |MdePkg/Library/FltUsedLib/FltUsedLib.inf
@@ -383,7 +382,7 @@
   # BEEBE ADDED
   MsPlatformEarlyGraphicsLib |MsGraphicsPkg/Library/MsEarlyGraphicsLibNull/Pei/MsEarlyGraphicsLibNull.inf
   MsUiThemeLib               |MsGraphicsPkg/Library/MsUiThemeLib/Pei/MsUiThemeLib.inf
-  ArmPlatformLib             |QemuCortexPkg/Library/SbsaQemuLib/SbsaQemuLib.inf
+  ArmPlatformLib             |QemuSbsaPkg/Library/SbsaQemuLib/SbsaQemuLib.inf
 
 !if $(TPM2_ENABLE) == TRUE
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
@@ -452,7 +451,7 @@
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
 
-  NorFlashPlatformLib|QemuCortexPkg/Library/SbsaQemuNorFlashLib/SbsaQemuNorFlashLib.inf
+  NorFlashPlatformLib|QemuSbsaPkg/Library/SbsaQemuNorFlashLib/SbsaQemuNorFlashLib.inf
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
   AdvLoggerAccessLib|AdvLoggerPkg/Library/AdvLoggerMmAccessLib/AdvLoggerMmAccessLib.inf
   MemoryTypeInfoSecVarCheckLib|MdeModulePkg/Library/MemoryTypeInfoSecVarCheckLib/MemoryTypeInfoSecVarCheckLib.inf
@@ -624,20 +623,20 @@
   gArmTokenSpaceGuid.PcdPciBusMax|255
   gArmTokenSpaceGuid.PcdPciIoBase|0x0
   gArmTokenSpaceGuid.PcdPciIoSize|0x00010000
-  gQeumCortexPkgTokenSpaceGuid.PcdPciIoLimit|0x0000ffff
+  gQemuSbsaPkgTokenSpaceGuid.PcdPciIoLimit|0x0000ffff
   gArmTokenSpaceGuid.PcdPciMmio32Base|0x80000000
   gArmTokenSpaceGuid.PcdPciMmio32Size|0x70000000
-  gQeumCortexPkgTokenSpaceGuid.PcdPciMmio32Limit|0xEFFFFFFF
+  gQemuSbsaPkgTokenSpaceGuid.PcdPciMmio32Limit|0xEFFFFFFF
   gArmTokenSpaceGuid.PcdPciMmio64Base|0x100000000
   gArmTokenSpaceGuid.PcdPciMmio64Size|0xFF00000000
-  gQeumCortexPkgTokenSpaceGuid.PcdPciMmio64Limit|0xFFFFFFFFFF
+  gQemuSbsaPkgTokenSpaceGuid.PcdPciMmio64Limit|0xFFFFFFFFFF
 
   # set PcdPciExpressBaseAddress to MAX_UINT64, which signifies that this
   # PCD and PcdPciDisableBusEnumeration have not been assigned yet
   # TODO: PcdPciExpressBaseAddress set to max_uint64
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xf0000000
-  gQeumCortexPkgTokenSpaceGuid.PcdPciExpressBarSize|0x10000000
-  gQeumCortexPkgTokenSpaceGuid.PcdPciExpressBarLimit|0xFFFFFFFF
+  gQemuSbsaPkgTokenSpaceGuid.PcdPciExpressBarSize|0x10000000
+  gQemuSbsaPkgTokenSpaceGuid.PcdPciExpressBarLimit|0xFFFFFFFF
 
   gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation|0x7fff0000
   gEfiMdePkgTokenSpaceGuid.PcdPciMmio32Translation|0x0
@@ -658,8 +657,8 @@
   gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress|0x10000000000
 
   # Non discoverable devices (AHCI,EHCI)
-  gQeumCortexPkgTokenSpaceGuid.PcdPlatformAhciBase|0x60100000
-  gQeumCortexPkgTokenSpaceGuid.PcdPlatformAhciSize|0x00010000
+  gQemuSbsaPkgTokenSpaceGuid.PcdPlatformAhciBase|0x60100000
+  gQemuSbsaPkgTokenSpaceGuid.PcdPlatformAhciSize|0x00010000
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x21, 0xaa, 0x2c, 0x46, 0x14, 0x76, 0x03, 0x45, 0x83, 0x6e, 0x8a, 0xb6, 0xf4, 0x66, 0x23, 0x31 }
@@ -743,21 +742,21 @@
   gArmTokenSpaceGuid.PcdSystemBiosRelease|0x0100
   gArmTokenSpaceGuid.PcdEmbeddedControllerFirmwareRelease|0x0100
 
-  gQeumCortexPkgTokenSpaceGuid.PcdSystemManufacturer|L"Palindrome"
-  gQeumCortexPkgTokenSpaceGuid.PcdSystemSerialNumber|L"42-42-42-42"
-  gQeumCortexPkgTokenSpaceGuid.PcdSystemSKU|L"NorthAmerica"
-  gQeumCortexPkgTokenSpaceGuid.PcdSystemFamily|L"ArmCortex"
+  gQemuSbsaPkgTokenSpaceGuid.PcdSystemManufacturer|L"Palindrome"
+  gQemuSbsaPkgTokenSpaceGuid.PcdSystemSerialNumber|L"42-42-42-42"
+  gQemuSbsaPkgTokenSpaceGuid.PcdSystemSKU|L"NorthAmerica"
+  gQemuSbsaPkgTokenSpaceGuid.PcdSystemFamily|L"ArmMax"
 
-  gQeumCortexPkgTokenSpaceGuid.PcdBaseBoardAssetTag|L"ProjectMu"
-  gQeumCortexPkgTokenSpaceGuid.PcdBaseBoardSerialNumber|L"42-42-42-42"
-  gQeumCortexPkgTokenSpaceGuid.PcdBaseBoardSKU|L"NorthAmerica"
-  gQeumCortexPkgTokenSpaceGuid.PcdBaseBoardLocation|L"Internal"
+  gQemuSbsaPkgTokenSpaceGuid.PcdBaseBoardAssetTag|L"ProjectMu"
+  gQemuSbsaPkgTokenSpaceGuid.PcdBaseBoardSerialNumber|L"42-42-42-42"
+  gQemuSbsaPkgTokenSpaceGuid.PcdBaseBoardSKU|L"NorthAmerica"
+  gQemuSbsaPkgTokenSpaceGuid.PcdBaseBoardLocation|L"Internal"
 
-  gQeumCortexPkgTokenSpaceGuid.PcdChassisSerialNumber|L"42-42-42-42"
-  gQeumCortexPkgTokenSpaceGuid.PcdChassisVersion|L"1.0"
-  gQeumCortexPkgTokenSpaceGuid.PcdChassisManufacturer|L"Palindrome"
-  gQeumCortexPkgTokenSpaceGuid.PcdChassisAssetTag|L"ProjectMu"
-  gQeumCortexPkgTokenSpaceGuid.PcdChassisSKU|L"NorthAmerica"
+  gQemuSbsaPkgTokenSpaceGuid.PcdChassisSerialNumber|L"42-42-42-42"
+  gQemuSbsaPkgTokenSpaceGuid.PcdChassisVersion|L"1.0"
+  gQemuSbsaPkgTokenSpaceGuid.PcdChassisManufacturer|L"Palindrome"
+  gQemuSbsaPkgTokenSpaceGuid.PcdChassisAssetTag|L"ProjectMu"
+  gQemuSbsaPkgTokenSpaceGuid.PcdChassisSKU|L"NorthAmerica"
 
   #
   # IPv4 and IPv6 PXE Boot support.
@@ -966,7 +965,7 @@
   # SMBIOS Support
   #
   MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
-  QemuCortexPkg/SbsaQemuSmbiosDxe/SbsaQemuSmbiosDxe.inf
+  QemuSbsaPkg/SbsaQemuSmbiosDxe/SbsaQemuSmbiosDxe.inf
   ArmPkg/Universal/Smbios/ProcessorSubClassDxe/ProcessorSubClassDxe.inf
   ArmPkg/Universal/Smbios/SmbiosMiscDxe/SmbiosMiscDxe.inf
 
@@ -983,7 +982,7 @@
   #
   # Video support
   #
-  QemuCortexPkg/PlatformDxe/Platform.inf
+  QemuSbsaPkg/PlatformDxe/Platform.inf
 
   #
   # USB Support
@@ -1062,7 +1061,7 @@
       gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
       gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|8000
   }
-  Platforms/QemuCortexPkg/SbsaQemuPlatformDxe/SbsaQemuPlatformDxe.inf
+  Platforms/QemuSbsaPkg/SbsaQemuPlatformDxe/SbsaQemuPlatformDxe.inf
   MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
 
 [Components.AARCH64]
@@ -1072,8 +1071,8 @@
   MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
   MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
-  QemuCortexPkg/AcpiTables/AcpiTables.inf
-  QemuCortexPkg/SbsaQemuAcpiDxe/SbsaQemuAcpiDxe.inf
+  QemuSbsaPkg/AcpiTables/AcpiTables.inf
+  QemuSbsaPkg/SbsaQemuAcpiDxe/SbsaQemuAcpiDxe.inf
 
   #
   # Standalone MM drivers in non-secure world

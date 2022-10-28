@@ -142,8 +142,8 @@ $(SECURE_FLASH_NVSTORAGE_SUBREGION_NV_FTW_SPARE_OFFSET)|$(SECURE_FLASH_NVSTORAGE
 gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
 #NV_FTW_SPARE
 
-SET gQeumCortexPkgTokenSpaceGuid.PcdFlashNvStorageBase = $(SECURE_FLASH_NVSTORAGE_OFFSET)
-SET gQeumCortexPkgTokenSpaceGuid.PcdFlashNvStorageSize = $(SECURE_FLASH_NVSTORAGE_SIZE)
+SET gQemuSbsaPkgTokenSpaceGuid.PcdFlashNvStorageBase = $(SECURE_FLASH_NVSTORAGE_OFFSET)
+SET gQemuSbsaPkgTokenSpaceGuid.PcdFlashNvStorageSize = $(SECURE_FLASH_NVSTORAGE_SIZE)
 
 [FD.BL32_AP_MM]
 BaseAddress   = 0x20002000|gArmTokenSpaceGuid.PcdFdBaseAddress  # UEFI in DRAM + 128MB.
@@ -297,7 +297,7 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
   INF MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
 
-  INF Platforms/QemuCortexPkg/SbsaQemuPlatformDxe/SbsaQemuPlatformDxe.inf
+  INF Platforms/QemuSbsaPkg/SbsaQemuPlatformDxe/SbsaQemuPlatformDxe.inf
   INF MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
 
   #
@@ -315,7 +315,7 @@ READ_LOCK_STATUS   = TRUE
   # SMBIOS Support
   #
   INF MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
-  INF QemuCortexPkg/SbsaQemuSmbiosDxe/SbsaQemuSmbiosDxe.inf
+  INF QemuSbsaPkg/SbsaQemuSmbiosDxe/SbsaQemuSmbiosDxe.inf
   INF ArmPkg/Universal/Smbios/ProcessorSubClassDxe/ProcessorSubClassDxe.inf
   INF ArmPkg/Universal/Smbios/SmbiosMiscDxe/SmbiosMiscDxe.inf
 
@@ -326,8 +326,8 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   INF MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
   INF MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
-  INF QemuCortexPkg/SbsaQemuAcpiDxe/SbsaQemuAcpiDxe.inf
-  INF RuleOverride = ACPITABLE QemuCortexPkg/AcpiTables/AcpiTables.inf
+  INF QemuSbsaPkg/SbsaQemuAcpiDxe/SbsaQemuAcpiDxe.inf
+  INF RuleOverride = ACPITABLE QemuSbsaPkg/AcpiTables/AcpiTables.inf
 
   #
   # EBC support
@@ -353,7 +353,7 @@ READ_LOCK_STATUS   = TRUE
   #
   # Video support
   #
-  INF QemuCortexPkg/PlatformDxe/Platform.inf
+  INF QemuSbsaPkg/PlatformDxe/Platform.inf
 
   #
   # USB Support

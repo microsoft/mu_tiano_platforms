@@ -37,7 +37,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         OutputPath_FV = os.path.join(env.GetValue("BUILD_OUTPUT_BASE"), "FV")
 
         # Check if QEMU is on the path, if not find it
-        executable = "qemu-system-aarch64"
+        executable = "~/qemu-7.1.0/build/qemu-system-aarch64"
 
         # turn off network
         args = "-net none"
@@ -70,7 +70,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         if (env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
             args += " -display none"  # no graphics
         else:
-            args += " -vga cirrus" #std is what the default is
+            args += " -device cirrus-vga" #std is what the default is
             # args += " -device virtio-gpu-pci"
 
         # Check for gdb server setting
