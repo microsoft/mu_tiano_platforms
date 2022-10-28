@@ -1,0 +1,29 @@
+;--------------------------------------------------------------------
+;   Copyright (c) Microsoft Corporation
+;
+;Module:
+;   uefiext.def
+;--------------------------------------------------------------------
+
+EXPORTS
+
+;--------------------------------------------------------------------
+; These are the extensions exported by dll
+;--------------------------------------------------------------------
+    help
+    memorymap
+    findmodules
+    setenv
+    hobs
+
+;--------------------------------------------------------------------
+;
+; these are the extension service functions provided for the debugger
+;
+;--------------------------------------------------------------------
+
+    DebugExtensionNotify
+    DebugExtensionInitialize
+    DebugExtensionUninitialize
+    KnownStructOutput
+    _EFN_Analyze

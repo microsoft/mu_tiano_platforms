@@ -1,0 +1,36 @@
+# 
+# GitHub Action Workflow for building the UEFI debugger extension.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+name: "UEFI Windbg Extension"
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, dbgext ] # TODO: remove dbgext
+    paths:
+      - 'UefiDbgExt/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'UefiDbgExt/**'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false 
+      matrix:
+        configuration: [Debug, Release]
+        platform: [x64]
+    runs-on: windows-2022
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      
+      - name: Setup MsBuild
+        uses: microsoft/setup-msbuild@v1.1
+      
+      - name: Build
+        run: msbuild UefiDbgExt\uefiext.vcxproj -property:Configuration=${{ matrix.configuration }} -property:Platform=${{ matrix.platform }}

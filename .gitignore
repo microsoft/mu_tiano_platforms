@@ -5,7 +5,10 @@
 __pycache__/
 tags/
 .vscode/
+.vs/
 *.bak
 BuildConfig.conf
+UefiDbgExt/x64/
+*.vcxproj.user
 
 /Conf/
