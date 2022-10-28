@@ -26,14 +26,8 @@
 [Includes]
   Include
 
-[LibraryClasses]
-  ##  @libraryclass  Install Virtio Device Protocol instances on virtio-mmio
-  #                  transports.
-  VirtioMmioDeviceLib|Include/Library/VirtioMmioDeviceLib.h
-
 [Guids]
   gQeumCortexPkgTokenSpaceGuid          = { 0x549288f7, 0x4281, 0x4f08, { 0x8f, 0x9e, 0x89, 0xe8, 0xd2, 0xf1, 0x8f, 0x2b } }
-  gVirtioMmioTransportGuid              = {0x837dca9e, 0xe874, 0x4d82, {0xb2, 0x9a, 0x23, 0xfe, 0x0e, 0x23, 0xd1, 0xe2}}
 
 [PcdsFixedAtBuild]
   ##
@@ -46,6 +40,37 @@
   # Non discoverable devices Pcds
   gQeumCortexPkgTokenSpaceGuid.PcdPlatformAhciBase|0|UINT64|0x00000003
   gQeumCortexPkgTokenSpaceGuid.PcdPlatformAhciSize|0x10000|UINT32|0x00000004
+  gQeumCortexPkgTokenSpaceGuid.PcdPlatformEhciBase|0|UINT64|0x00000005
+  gQeumCortexPkgTokenSpaceGuid.PcdPlatformEhciSize|0x10000|UINT32|0x00000006
+
+  # PCDs complementing PCIe layout pulled into ACPI tables
+  # Limit = Base + Size - 1
+  gQeumCortexPkgTokenSpaceGuid.PcdPciIoLimit|0x0000ffff|UINT32|0x00000007
+  gQeumCortexPkgTokenSpaceGuid.PcdPciMmio32Limit|0xEFFFFFFF|UINT32|0x00000008
+  gQeumCortexPkgTokenSpaceGuid.PcdPciMmio64Limit|0xFFFFFFFFFF|UINT64|0x00000009
+
+  # PCDs complementing gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+  # BarLimit = BaseAddress + BarSize - 1
+  gQeumCortexPkgTokenSpaceGuid.PcdPciExpressBarSize|0x10000000|UINT64|0x0000000A
+  gQeumCortexPkgTokenSpaceGuid.PcdPciExpressBarLimit|0xFFFFFFFF|UINT64|0x0000000B
+
+[PcdsDynamic.common]
+  gQeumCortexPkgTokenSpaceGuid.PcdSystemManufacturer|L""|VOID*|0x00000110
+  gQeumCortexPkgTokenSpaceGuid.PcdSystemSerialNumber|L""|VOID*|0x00000111
+  gQeumCortexPkgTokenSpaceGuid.PcdSystemSKU|L""|VOID*|0x00000112
+  gQeumCortexPkgTokenSpaceGuid.PcdSystemFamily|L""|VOID*|0x00000113
+
+  gQeumCortexPkgTokenSpaceGuid.PcdBaseBoardAssetTag|L""|VOID*|0x00000114
+  gQeumCortexPkgTokenSpaceGuid.PcdBaseBoardSerialNumber|L""|VOID*|0x00000115
+  gQeumCortexPkgTokenSpaceGuid.PcdBaseBoardManufacturer|L""|VOID*|0x00000116
+  gQeumCortexPkgTokenSpaceGuid.PcdBaseBoardSKU|L""|VOID*|0x00000117
+  gQeumCortexPkgTokenSpaceGuid.PcdBaseBoardLocation|L""|VOID*|0x00000118
+
+  gQeumCortexPkgTokenSpaceGuid.PcdChassisSerialNumber|L""|VOID*|0x00000119
+  gQeumCortexPkgTokenSpaceGuid.PcdChassisVersion|L""|VOID*|0x0000011A
+  gQeumCortexPkgTokenSpaceGuid.PcdChassisManufacturer|L""|VOID*|0x0000011B
+  gQeumCortexPkgTokenSpaceGuid.PcdChassisAssetTag|L""|VOID*|0x0000011C
+  gQeumCortexPkgTokenSpaceGuid.PcdChassisSKU|L""|VOID*|0x0000011D
 
 [PcdsDynamic, PcdsDynamicEx]
   ## This PCD tracks where PcdVideo{Horizontal,Vertical}Resolution
