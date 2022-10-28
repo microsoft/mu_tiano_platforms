@@ -10,8 +10,8 @@ on:
   workflow_dispatch:
   push:
     branches: [ main, dbgext ] # TODO: remove dbgext
-    paths:
-      - 'UefiDbgExt/**'
+    #paths:
+    #  - 'UefiDbgExt/**'
   pull_request:
     branches: [ main ]
     paths:
@@ -36,7 +36,7 @@ jobs:
         run: msbuild UefiDbgExt\uefiext.vcxproj -property:Configuration=${{ matrix.configuration }} -property:Platform=${{ matrix.platform }}
       
       - name: Publish Binary
-        if: ${{ matrix.platform == 'Debug' }}
+        if: ${{ matrix.configuration == 'Release' && github.event_name == 'push' }}
         uses: actions/upload-artifact@v3
         with:
           name: UefiDbgExt
