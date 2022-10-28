@@ -37,7 +37,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         OutputPath_FV = os.path.join(env.GetValue("BUILD_OUTPUT_BASE"), "FV")
 
         # Check if QEMU is on the path, if not find it
-        executable = "~/qemu-7.1.0/build/qemu-system-aarch64"
+        executable = "qemu-system-aarch64"
 
         # turn off network
         args = "-net none"
@@ -54,8 +54,9 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         args += " -machine sbsa-ref" #,accel=(tcg|kvm)"
         args += " -m 1024"
         args += " -cpu max"
-        #args += " -smp ..."
-        # args += " -global driver=cfi.pflash01,property=secure,value=on"
+        if env.GetBuildValue ("QEMU_CORE_NUM") is not None:
+          args += " -smp " + env.GetBuildValue ("QEMU_CORE_NUM")
+        args += " -global driver=cfi.pflash01,property=secure,value=on"
         args += " -drive if=pflash,format=raw,unit=0,file=" + \
             os.path.join(OutputPath_FV, "SECURE_FLASH0.fd")
         args += " -drive if=pflash,format=raw,unit=1,file=" + \
@@ -79,7 +80,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         # write ConOut messages to telnet localhost port
         serial_port = env.GetValue("SERIAL_PORT")
         if serial_port != None:
-            args += " -serial tcp:127.0.0.1:" + serial_port + ",server"
+            args += " -serial tcp:127.0.0.1:" + serial_port + ",server,nowait"
         else:
             # write messages to stdio
             args += " -serial stdio"
