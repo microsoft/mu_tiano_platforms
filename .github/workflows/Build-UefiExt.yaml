@@ -40,4 +40,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: UefiDbgExt-${{ matrix.platform }}
-          path: UefiDbgExt\x64\Release\uefiext.dll
+          path: UefiDbgExt\${{ matrix.platform }}\${{ matrix.configuration }}\uefiext.dll
