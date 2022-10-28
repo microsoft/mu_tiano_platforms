@@ -421,6 +421,13 @@ READ_LOCK_STATUS   = TRUE
   }
 
   #
+  # Unit Test
+  #
+  !if $(BUILD_UNIT_TESTS) == TRUE
+  # INF  UefiTestingPkg/AuditTests/PagingAudit/UEFI/DxePagingAuditDriver.inf
+  !endif
+
+  #
   # Graphic icons and logos
   #
   FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdLogoFile) {
