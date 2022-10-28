@@ -80,5 +80,4 @@ jobs:
           displayName: Install Packages
           condition: and(gt(variables.pkg_count, 0), succeeded())
         extra_artifacts: |
-          **/QEMU_EFI.fd
-          
+          **/QEMU_EFI.fd,**/SECURE_FLASH0.fd
