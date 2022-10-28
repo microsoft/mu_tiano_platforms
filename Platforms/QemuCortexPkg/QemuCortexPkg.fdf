@@ -206,9 +206,7 @@ READ_LOCK_STATUS   = TRUE
 
   INF MdeModulePkg/Core/Dxe/DxeMain.inf
   INF MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
-  INF QemuCortexPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf
   INF EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
-  INF QemuCortexPkg/Fdt/HighMemDxe/HighMemDxe.inf
 
   #
   # PI DXE Drivers producing Architectural Protocols (EFI Services)
@@ -248,7 +246,6 @@ READ_LOCK_STATUS   = TRUE
   INF FatPkg/EnhancedFatDxe/Fat.inf
   INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
   INF MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
-  INF QemuCortexPkg/VirtioFsDxe/VirtioFsDxe.inf
 
   #
   # Status Code Routing
@@ -289,7 +286,6 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
   INF PcBdsPkg/MsBootPolicy/MsBootPolicy.inf
   INF MdeModulePkg/Application/UiApp/UiApp.inf
-  INF QemuQ35Pkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf
 
   #
   # Networking stack
@@ -319,16 +315,19 @@ READ_LOCK_STATUS   = TRUE
   # SMBIOS Support
   #
   INF MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
-  INF QemuQ35Pkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
+  INF QemuCortexPkg/SbsaQemuSmbiosDxe/SbsaQemuSmbiosDxe.inf
+  INF ArmPkg/Universal/Smbios/ProcessorSubClassDxe/ProcessorSubClassDxe.inf
+  INF ArmPkg/Universal/Smbios/SmbiosMiscDxe/SmbiosMiscDxe.inf
 
   #
   # ACPI Support
   #
-  INF ArmVirtPkg/PlatformHasAcpiDtDxe/PlatformHasAcpiDtDxe.inf
 !if $(ARCH) == AARCH64
   INF MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   INF MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
   INF MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
+  INF QemuCortexPkg/SbsaQemuAcpiDxe/SbsaQemuAcpiDxe.inf
+  INF RuleOverride = ACPITABLE QemuCortexPkg/AcpiTables/AcpiTables.inf
 
   #
   # EBC support
@@ -354,8 +353,6 @@ READ_LOCK_STATUS   = TRUE
   #
   # Video support
   #
-  INF QemuQ35Pkg/QemuRamfbDxe/QemuRamfbDxe.inf
-  INF QemuCortexPkg/VirtioGpuDxe/VirtioGpu.inf
   INF QemuCortexPkg/PlatformDxe/Platform.inf
 
   #

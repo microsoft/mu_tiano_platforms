@@ -205,8 +205,6 @@
   # USB Libraries
   UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
 
-  XenIoMmioLib|QemuCortexPkg/Library/XenIoMmioLib/XenIoMmioLib.inf
-
   #
   # CryptoPkg libraries needed by multiple firmware features
   #
@@ -247,11 +245,6 @@
 
   # Virtio Support
   VirtioLib|QemuQ35Pkg/Library/VirtioLib/VirtioLib.inf
-  VirtioMmioDeviceLib|QemuCortexPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
-  QemuFwCfgLib|QemuQ35Pkg/Library/QemuFwCfgLib/QemuFwCfgLibMmio.inf
-  QemuFwCfgS3Lib|QemuQ35Pkg/Library/QemuFwCfgS3Lib/BaseQemuFwCfgS3LibNull.inf
-  QemuFwCfgSimpleParserLib|QemuQ35Pkg/Library/QemuFwCfgSimpleParserLib/QemuFwCfgSimpleParserLib.inf
-  QemuLoadImageLib|QemuQ35Pkg/Library/GenericQemuLoadImageLib/GenericQemuLoadImageLib.inf
 
   ArmPlatformLib|ArmPlatformPkg/Library/ArmPlatformLibNull/ArmPlatformLibNull.inf
 
@@ -268,7 +261,6 @@
   FileExplorerLib|MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
   PciSegmentLib|MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
   PciHostBridgeLib|QemuCortexPkg/Library/SbsaQemuPciHostBridgeLib/SbsaQemuPciHostBridgeLib.inf
-  PciHostBridgeUtilityLib|QemuQ35Pkg/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf
 
   # BEEBE ADDED
   MemoryTypeInformationChangeLib|MdeModulePkg/Library/MemoryTypeInformationChangeLibNull/MemoryTypeInformationChangeLibNull.inf
@@ -284,7 +276,7 @@
   DeviceBootManagerLib|PcBdsPkg/Library/DeviceBootManagerLib/DeviceBootManagerLib.inf
   MsPlatformDevicesLib|QemuCortexPkg/Library/MsPlatformDevicesLibQemuCortex/MsPlatformDevicesLib.inf
   MsNetworkDependencyLib|PcBdsPkg/Library/MsNetworkDependencyLib/MsNetworkDependencyLib.inf
-  MsBootOptionsLib|PcBdsPkg/Library/MsBootOptionsLib/MsBootOptionsLib.inf
+  MsBootOptionsLib|QemuQ35Pkg/Library/MsBootOptionsLibQemuQ35/MsBootOptionsLib.inf
   ConsoleMsgLib|PcBdsPkg/Library/ConsoleMsgLibNull/ConsoleMsgLibNull.inf
   MsBootPolicyLib|OemPkg/Library/MsBootPolicyLib/MsBootPolicyLib.inf
   MsBootManagerSettingsLib|PcBdsPkg/Library/MsBootManagerSettingsDxeLib/MsBootManagerSettingsDxeLib.inf
@@ -303,6 +295,9 @@
   XenPlatformLib|QemuQ35Pkg/Library/XenPlatformLib/XenPlatformLib.inf
   MmUnblockMemoryLib|MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
   ResetSystemLib|MdeModulePkg/Library/DxeResetSystemLib/DxeResetSystemLib.inf
+
+  FdtHelperLib|QemuCortexPkg/Library/FdtHelperLib/FdtHelperLib.inf
+  OemMiscLib|QemuCortexPkg/Library/OemMiscLib/OemMiscLib.inf
 
   # Math Libraries
   FltUsedLib |MdePkg/Library/FltUsedLib/FltUsedLib.inf
@@ -590,6 +585,7 @@
 
   # Size of the region used by UEFI in permanent memory (Reserved 64MB)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x04000000
+  gArmPlatformTokenSpaceGuid.PcdCoreCount|4
 
   #
   # ARM PrimeCell
@@ -628,20 +624,20 @@
   gArmTokenSpaceGuid.PcdPciBusMax|255
   gArmTokenSpaceGuid.PcdPciIoBase|0x0
   gArmTokenSpaceGuid.PcdPciIoSize|0x00010000
-  # gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPciIoLimit|0x0000ffff
+  gQeumCortexPkgTokenSpaceGuid.PcdPciIoLimit|0x0000ffff
   gArmTokenSpaceGuid.PcdPciMmio32Base|0x80000000
   gArmTokenSpaceGuid.PcdPciMmio32Size|0x70000000
-  # gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPciMmio32Limit|0xEFFFFFFF
+  gQeumCortexPkgTokenSpaceGuid.PcdPciMmio32Limit|0xEFFFFFFF
   gArmTokenSpaceGuid.PcdPciMmio64Base|0x100000000
   gArmTokenSpaceGuid.PcdPciMmio64Size|0xFF00000000
-  # gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPciMmio64Limit|0xFFFFFFFFFF
+  gQeumCortexPkgTokenSpaceGuid.PcdPciMmio64Limit|0xFFFFFFFFFF
 
   # set PcdPciExpressBaseAddress to MAX_UINT64, which signifies that this
   # PCD and PcdPciDisableBusEnumeration have not been assigned yet
   # TODO: PcdPciExpressBaseAddress set to max_uint64
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xf0000000
-  # gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPciExpressBarSize|0x10000000
-  # gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPciExpressBarLimit|0xFFFFFFFF
+  gQeumCortexPkgTokenSpaceGuid.PcdPciExpressBarSize|0x10000000
+  gQeumCortexPkgTokenSpaceGuid.PcdPciExpressBarLimit|0xFFFFFFFF
 
   gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation|0x7fff0000
   gEfiMdePkgTokenSpaceGuid.PcdPciMmio32Translation|0x0
@@ -689,6 +685,28 @@
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x0f
   gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize|0x20000
 
+  #
+  # ARM General Interrupt Controller
+  #
+  gArmTokenSpaceGuid.PcdGicDistributorBase|0x40060000
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase|0x40080000
+
+  # PPI #13
+  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|29
+  # PPI #14
+  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|30
+  # PPI #11
+  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|27
+  # PPI #10
+  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|26
+
+[PcdsFixedAtBuild.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId|"Palindrome"
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId|0x756D6551754D #MuQemuArm
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision|0x20221026
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId|0x554D5250 #PRMU
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision|1
+
 [PcdsFixedAtBuild.AARCH64]
   # Clearing BIT0 in this PCD prevents installing a 32-bit SMBIOS entry point,
   # if the entry point version is >= 3.0. AARCH64 OSes cannot assume the
@@ -703,21 +721,6 @@
 
   # System Memory Size -- 1 MB initially, actual size will be fetched from DT
   gArmTokenSpaceGuid.PcdSystemMemorySize|0x08000000
-
-  # PPI #13
-  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|29
-  # PPI #14
-  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|30
-  # PPI #11
-  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|27
-  # PPI #10
-  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|26
-
-  #
-  # ARM General Interrupt Controller
-  #
-  gArmTokenSpaceGuid.PcdGicDistributorBase|0x40060000
-  gArmTokenSpaceGuid.PcdGicRedistributorsBase|0x40080000
 
   ## PL031 RealTimeClock
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x60010000
@@ -734,9 +737,27 @@
   #
   # SMBIOS entry point version
   #
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0300
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0304
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
+
+  gArmTokenSpaceGuid.PcdSystemBiosRelease|0x0100
+  gArmTokenSpaceGuid.PcdEmbeddedControllerFirmwareRelease|0x0100
+
+  gQeumCortexPkgTokenSpaceGuid.PcdSystemManufacturer|L"Palindrome"
+  gQeumCortexPkgTokenSpaceGuid.PcdSystemSerialNumber|L"42-42-42-42"
+  gQeumCortexPkgTokenSpaceGuid.PcdSystemSKU|L"NorthAmerica"
+  gQeumCortexPkgTokenSpaceGuid.PcdSystemFamily|L"ArmCortex"
+
+  gQeumCortexPkgTokenSpaceGuid.PcdBaseBoardAssetTag|L"ProjectMu"
+  gQeumCortexPkgTokenSpaceGuid.PcdBaseBoardSerialNumber|L"42-42-42-42"
+  gQeumCortexPkgTokenSpaceGuid.PcdBaseBoardSKU|L"NorthAmerica"
+  gQeumCortexPkgTokenSpaceGuid.PcdBaseBoardLocation|L"Internal"
+
+  gQeumCortexPkgTokenSpaceGuid.PcdChassisSerialNumber|L"42-42-42-42"
+  gQeumCortexPkgTokenSpaceGuid.PcdChassisVersion|L"1.0"
+  gQeumCortexPkgTokenSpaceGuid.PcdChassisManufacturer|L"Palindrome"
+  gQeumCortexPkgTokenSpaceGuid.PcdChassisAssetTag|L"ProjectMu"
+  gQeumCortexPkgTokenSpaceGuid.PcdChassisSKU|L"NorthAmerica"
 
   #
   # IPv4 and IPv6 PXE Boot support.
@@ -859,9 +880,7 @@
   #
   # Platform Driver
   #
-  QemuCortexPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf
   EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
-  QemuCortexPkg/Fdt/HighMemDxe/HighMemDxe.inf
   QemuQ35Pkg/VirtioBlkDxe/VirtioBlk.inf
   QemuQ35Pkg/VirtioScsiDxe/VirtioScsi.inf
   QemuQ35Pkg/VirtioNetDxe/VirtioNet.inf
@@ -875,7 +894,6 @@
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
   FatPkg/EnhancedFatDxe/Fat.inf
   MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
-  QemuCortexPkg/VirtioFsDxe/VirtioFsDxe.inf
 
   #
   # Bds
@@ -918,27 +936,15 @@
       NULL|MdeModulePkg/Library/BootManagerUiLib/BootManagerUiLib.inf
       NULL|MdeModulePkg/Library/BootMaintenanceManagerUiLib/BootMaintenanceManagerUiLib.inf
   }
-  QemuQ35Pkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf {
-    <LibraryClasses>
-      NULL|QemuQ35Pkg/Library/BlobVerifierLibNull/BlobVerifierLibNull.inf
-  }
+  # QemuQ35Pkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf {
+  #   <LibraryClasses>
+  #     NULL|QemuQ35Pkg/Library/BlobVerifierLibNull/BlobVerifierLibNull.inf
+  # }
 
   #
   # Networking stack
   #
-!include NetworkPkg/NetworkComponents.dsc.inc
-
-  NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf {
-    <LibraryClasses>
-      NULL|QemuQ35Pkg/Library/PxeBcPcdProducerLib/PxeBcPcdProducerLib.inf
-  }
-
-!if $(NETWORK_TLS_ENABLE) == TRUE
-  NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf {
-    <LibraryClasses>
-      NULL|QemuCortexPkg/Library/TlsAuthConfigLib/TlsAuthConfigLib.inf
-  }
-!endif
+!include NetworkPkg/Network.dsc.inc
 
   #
   # SCSI Bus and Disk Driver
@@ -959,11 +965,10 @@
   #
   # SMBIOS Support
   #
-  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf {
-    <LibraryClasses>
-      NULL|QemuQ35Pkg/Library/SmbiosVersionLib/DetectSmbiosVersionLib.inf
-  }
-  QemuQ35Pkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
+  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
+  QemuCortexPkg/SbsaQemuSmbiosDxe/SbsaQemuSmbiosDxe.inf
+  ArmPkg/Universal/Smbios/ProcessorSubClassDxe/ProcessorSubClassDxe.inf
+  ArmPkg/Universal/Smbios/SmbiosMiscDxe/SmbiosMiscDxe.inf
 
   #
   # PCI support
@@ -978,8 +983,6 @@
   #
   # Video support
   #
-  QemuQ35Pkg/QemuRamfbDxe/QemuRamfbDxe.inf
-  QemuCortexPkg/VirtioGpuDxe/VirtioGpu.inf
   QemuCortexPkg/PlatformDxe/Platform.inf
 
   #
@@ -1061,14 +1064,16 @@
   }
   Platforms/QemuCortexPkg/SbsaQemuPlatformDxe/SbsaQemuPlatformDxe.inf
   MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
+
+[Components.AARCH64]
   #
   # ACPI Support
   #
-  ArmVirtPkg/PlatformHasAcpiDtDxe/PlatformHasAcpiDtDxe.inf
-[Components.AARCH64]
   MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
   MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
+  QemuCortexPkg/AcpiTables/AcpiTables.inf
+  QemuCortexPkg/SbsaQemuAcpiDxe/SbsaQemuAcpiDxe.inf
 
   #
   # Standalone MM drivers in non-secure world
