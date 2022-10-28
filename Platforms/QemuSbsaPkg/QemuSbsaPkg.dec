@@ -71,11 +71,3 @@
   gQemuSbsaPkgTokenSpaceGuid.PcdChassisManufacturer|L""|VOID*|0x0000011B
   gQemuSbsaPkgTokenSpaceGuid.PcdChassisAssetTag|L""|VOID*|0x0000011C
   gQemuSbsaPkgTokenSpaceGuid.PcdChassisSKU|L""|VOID*|0x0000011D
-
-[PcdsDynamic, PcdsDynamicEx]
-  ## This PCD tracks where PcdVideo{Horizontal,Vertical}Resolution
-  #  values are coming from.
-  #    0 - unset (defaults from platform dsc)
-  #    1 - set from PlatformConfig
-  #    2 - set by GOP Driver.
-  gQemuSbsaPkgTokenSpaceGuid.PcdVideoResolutionSource|0|UINT8|0x64
