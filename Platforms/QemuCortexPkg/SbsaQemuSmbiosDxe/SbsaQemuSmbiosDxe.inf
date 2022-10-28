@@ -1,0 +1,48 @@
+#/** @file
+#
+#  Static SMBIOS tables for the SbsaQemu platform.
+#
+#  Copyright (c) 2022, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = SbsaQemuSmbiosDxe
+  FILE_GUID                      = DDE1ACCB-0555-4CAA-85E7-3CBC8962026E
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SbsaQemuSmbiosDriverEntryPoint
+
+[Sources]
+  SbsaQemuSmbiosDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPkg/ArmPkg.dec
+
+[LibraryClasses]
+  ArmLib
+  ArmPlatformLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  UefiLib
+  UefiDriverEntryPoint
+  DebugLib
+  PrintLib
+
+[Protocols]
+  gEfiSmbiosProtocolGuid
+
+[Depex]
+  gEfiSmbiosProtocolGuid
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
