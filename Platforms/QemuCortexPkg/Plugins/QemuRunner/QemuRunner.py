@@ -41,17 +41,19 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
         # turn off network
         args = "-net none"
-        # Mount disk with startup.nsh
-        if os.path.isfile(VirtualDrive):
+        # Mount disk with either startup.nsh or OS image
+        if env.GetValue("PATH_TO_OS") is not None:
+            args += " -hda " + env.GetValue("PATH_TO_OS")
+        elif os.path.isfile(VirtualDrive):
             args += f" -hdd {VirtualDrive}"
         elif os.path.isdir(VirtualDrive):
             args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
         else:
             logging.critical("Virtual Drive Path Invalid")
 
-        args += " -M sbsa-ref" #,accel=(tcg|kvm)"
+        args += " -machine sbsa-ref" #,accel=(tcg|kvm)"
         args += " -m 1024"
-        args += " -cpu cortex-a57"
+        args += " -cpu max"
         #args += " -smp ..."
         # args += " -global driver=cfi.pflash01,property=secure,value=on"
         args += " -drive if=pflash,format=raw,unit=0,file=" + \
