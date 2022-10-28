@@ -16,7 +16,7 @@ the folder and run "msbuild".
     msbuild -property:Configuration=Release -property:Platform=x64
 
 The project can also be loaded and built in Visual Studio using the solution
-file.
+file. This project requires the Windows SDK and the Windows Driver Kit.
 
 ## Installing the Extension
 
