@@ -351,11 +351,6 @@ READ_LOCK_STATUS   = TRUE
   INF QemuQ35Pkg/Virtio10Dxe/Virtio10.inf
 
   #
-  # Video support
-  #
-  INF QemuSbsaPkg/PlatformDxe/Platform.inf
-
-  #
   # USB Support
   #
   INF MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf

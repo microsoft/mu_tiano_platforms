@@ -923,7 +923,7 @@
   MsGraphicsPkg/DisplayEngineDxe/DisplayEngineDxe.inf
   QemuSbsaPkg/QemuVideoDxe/QemuVideoDxe.inf
   # BEEBE ADDED END
-  # MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
+
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
   MdeModulePkg/Universal/DriverHealthManagerDxe/DriverHealthManagerDxe.inf
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
@@ -935,10 +935,6 @@
       NULL|MdeModulePkg/Library/BootManagerUiLib/BootManagerUiLib.inf
       NULL|MdeModulePkg/Library/BootMaintenanceManagerUiLib/BootMaintenanceManagerUiLib.inf
   }
-  # QemuQ35Pkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf {
-  #   <LibraryClasses>
-  #     NULL|QemuQ35Pkg/Library/BlobVerifierLibNull/BlobVerifierLibNull.inf
-  # }
 
   #
   # Networking stack
@@ -978,11 +974,6 @@
   QemuQ35Pkg/PciHotPlugInitDxe/PciHotPlugInit.inf
   QemuQ35Pkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
   QemuQ35Pkg/Virtio10Dxe/Virtio10.inf
-
-  #
-  # Video support
-  #
-  QemuSbsaPkg/PlatformDxe/Platform.inf
 
   #
   # USB Support
