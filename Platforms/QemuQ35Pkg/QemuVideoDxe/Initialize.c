@@ -464,17 +464,12 @@ QemuVideoBochsModeSetup (
 
   QemuVideoBochsEdid (Private, &XRes, &YRes);
   if (XRes && YRes) {
-    // MU_CHANGE: Added a cap so that the graphic helper logic will not try to render 8K
-    if ((XRes <= PcdGet32 (PcdVideoHorizontalResolution)) &&
-        (YRes <= PcdGet32 (PcdVideoVerticalResolution)))
-    {
-      QemuVideoBochsAddMode (
-        Private,
-        AvailableFbSize,
-        XRes,
-        YRes
-        );
-    }
+    QemuVideoBochsAddMode (
+      Private,
+      AvailableFbSize,
+      XRes,
+      YRes
+      );
   }
 
   for (Index = 0; Index < QEMU_VIDEO_BOCHS_MODE_COUNT; Index++) {
@@ -482,13 +477,6 @@ QemuVideoBochsModeSetup (
         (QemuVideoBochsModes[Index].Height == YRes))
     {
       continue; // duplicate with edid resolution
-    }
-
-    // MU_CHANGE: Added a cap so that the graphic helper logic will not try to render 8K
-    if ((QemuVideoBochsModes[Index].Width > PcdGet32 (PcdVideoHorizontalResolution)) ||
-        (QemuVideoBochsModes[Index].Height > PcdGet32 (PcdVideoVerticalResolution)))
-    {
-      continue; // Do not support the modes that are too fancy.
     }
 
     QemuVideoBochsAddMode (
