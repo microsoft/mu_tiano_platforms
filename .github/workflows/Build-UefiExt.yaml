@@ -9,9 +9,9 @@ name: "Build UEFI Debug Extension"
 on:
   workflow_dispatch:
   push:
-    branches: [ main, dbgext ] # TODO: remove dbgext
-    #paths:
-    #  - 'UefiDbgExt/**'
+    branches: [ main ]
+    paths:
+      - 'UefiDbgExt/**'
   pull_request:
     branches: [ main ]
     paths:
