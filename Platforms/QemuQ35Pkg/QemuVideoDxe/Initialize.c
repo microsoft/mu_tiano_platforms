@@ -463,29 +463,37 @@ QemuVideoBochsModeSetup (
   }
 
   QemuVideoBochsEdid (Private, &XRes, &YRes);
-  if (XRes && YRes) {
-    QemuVideoBochsAddMode (
-      Private,
-      AvailableFbSize,
-      XRes,
-      YRes
-      );
-  }
-
+  // MU_CHANGE Starts: This is a change to sugarcoat the logic in GraphicsConsoleHelper
+  //                   We will only report the closest desired resolutions as supported modes.
+  UINT32  NativeHorizontalResolution = 0;
+  UINT32  NativeVerticalResolution   = 0;
   for (Index = 0; Index < QEMU_VIDEO_BOCHS_MODE_COUNT; Index++) {
-    if ((QemuVideoBochsModes[Index].Width == XRes) &&
-        (QemuVideoBochsModes[Index].Height == YRes))
+    if ((QemuVideoBochsModes[Index].Width <= PcdGet32 (PcdVideoHorizontalResolution)) &&
+        (QemuVideoBochsModes[Index].Height <= PcdGet32 (PcdVideoHorizontalResolution)))
     {
-      continue; // duplicate with edid resolution
+      // Potential candidate for target display
+      if ((NativeHorizontalResolution < QemuVideoBochsModes[Index].Width) &&
+          (NativeVerticalResolution < QemuVideoBochsModes[Index].Height)) {
+        NativeHorizontalResolution  = QemuVideoBochsModes[Index].Width;
+        NativeVerticalResolution    = QemuVideoBochsModes[Index].Height;
+      }
     }
-
-    QemuVideoBochsAddMode (
-      Private,
-      AvailableFbSize,
-      QemuVideoBochsModes[Index].Width,
-      QemuVideoBochsModes[Index].Height
-      );
   }
 
+  DEBUG ((DEBUG_INFO, "%a Discovered HRes: %d VRes: %d\n", __FUNCTION__, NativeHorizontalResolution, NativeVerticalResolution));
+
+  if (NativeHorizontalResolution == 0 && NativeVerticalResolution == 0) {
+    NativeHorizontalResolution  = XRes;
+    NativeVerticalResolution    = YRes;
+    DEBUG ((DEBUG_INFO, "%a Using default resolutions\n", __FUNCTION__, NativeHorizontalResolution, NativeVerticalResolution));
+  }
+
+  QemuVideoBochsAddMode (
+    Private,
+    AvailableFbSize,
+    NativeHorizontalResolution,
+    NativeVerticalResolution
+    );
+  // MU_CHANGE Ends
   return EFI_SUCCESS;
 }
