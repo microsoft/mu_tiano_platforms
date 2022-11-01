@@ -95,8 +95,6 @@ findmodule(PDEBUG_CLIENT4 Client, PCSTR args)
     ULONG BytesRead;
     INIT_API();
 
-    UNREFERENCED_PARAMETER(args);
-
     if (strlen(args) == 0) {
         args = "@$ip";
     }
@@ -104,6 +102,7 @@ findmodule(PDEBUG_CLIENT4 Client, PCSTR args)
     Address = GetExpression(args);
     if ((Address == 0) || (Address == (-1))) {
         dprintf("Invalid address!\n");
+        dprintf("Usage: !uefiext.findmodule [Address]\n");
         return ERROR_NOT_FOUND;
     }
 
