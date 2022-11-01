@@ -14,6 +14,7 @@ EXPORTS
     memorymap
     findmodule
     loadmodules
+    findall
     setenv
     hobs
 

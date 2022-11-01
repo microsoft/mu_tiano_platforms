@@ -15,6 +15,44 @@ Abstract:
 
 #include "uefiext.h"
 
+HRESULT
+FindModuleBackwards(ULONG64 Address)
+{
+    ULONG64 MinAddress;
+    CHAR Command[512];
+    ULONG64 MaxSize;
+    ULONG32 Check;
+    CONST ULONG32 Magic = 0x5A4D;
+    ULONG BytesRead;
+    HRESULT Result;
+
+    MaxSize = 0x400000; // 4 Mb
+    Address = PAGE_ALIGN_DOWN(Address);
+    if (Address > MaxSize) {
+        MinAddress = Address - MaxSize;
+    }
+    else {
+        MinAddress = 0;
+    }
+
+    Result = ERROR_NOT_FOUND;
+    for (; Address >= MinAddress; Address -= PAGE_SIZE) {
+        Check = 0;
+        ReadMemory(Address, &Check, sizeof(Check), &BytesRead);
+        if ((BytesRead == sizeof(Check)) && (Check == Magic)) {
+            sprintf_s(&Command[0], sizeof(Command), ".imgscan /l /r %I64x %I64x", Address, Address + 0xFFF);
+            g_ExtControl->Execute(DEBUG_OUTCTL_ALL_CLIENTS,
+                &Command[0],
+                DEBUG_EXECUTE_DEFAULT);
+
+            Result = S_OK;
+            break;
+        }
+    }
+
+    return Result;
+}
+
 HRESULT CALLBACK
 loadmodules(PDEBUG_CLIENT4 Client, PCSTR args)
 {
@@ -87,12 +125,7 @@ HRESULT CALLBACK
 findmodule(PDEBUG_CLIENT4 Client, PCSTR args)
 {
     ULONG64 Address;
-    ULONG64 MinAddress;
-    CHAR Command[512];
-    ULONG64 MaxSize;
-    ULONG32 Check;
-    CONST ULONG32 Magic = 0x5A4D;
-    ULONG BytesRead;
+    HRESULT Result;
     INIT_API();
 
     if (strlen(args) == 0) {
@@ -106,26 +139,67 @@ findmodule(PDEBUG_CLIENT4 Client, PCSTR args)
         return ERROR_NOT_FOUND;
     }
 
-    MaxSize = 0x400000; // 4 Mb
-    Address = PAGE_ALIGN_DOWN(Address);
-    if (Address > MaxSize) {
-        MinAddress = Address - MaxSize;
-    }
-    else {
-        MinAddress = 0;
+    Result = FindModuleBackwards(Address);
+
+    EXIT_API();
+    return Result;
+}
+
+HRESULT CALLBACK
+findall(PDEBUG_CLIENT4 Client, PCSTR args)
+{
+    HRESULT Result;
+    ULONG64 BsPtrAddr;
+    ULONG64 BsTableAddr;
+    INIT_API();
+
+    if (gUefiEnv != DXE) {
+        dprintf("Only supported for DXE!\n");
+        return ERROR_NOT_SUPPORTED;
     }
 
-    for (; Address >= MinAddress; Address -= PAGE_SIZE) {
-        Check = 0;
-        ReadMemory(Address, &Check, sizeof(Check), &BytesRead);
-        if ((BytesRead == sizeof(Check)) && (Check == Magic)) {
-            sprintf_s(Command, sizeof(Command), ".imgscan /l /r %I64x %I64x", Address, Address + 0xFFF);
-            g_ExtControl->Execute(DEBUG_OUTCTL_ALL_CLIENTS,
-                Command,
-                DEBUG_EXECUTE_DEFAULT);
-            break;
-        }
+    //
+    // First find the current module
+    //
+
+    Result = FindModuleBackwards(GetExpression("@$ip"));
+    if (Result != S_OK) {
+        return Result;
     }
+
+    g_ExtControl->Execute(DEBUG_OUTCTL_ALL_CLIENTS,
+                          "ld *",
+                          DEBUG_EXECUTE_DEFAULT);
+
+    //
+    // Find the core module. This might be the same as the executing one.
+    //
+
+    BsPtrAddr = GetExpression("gBS");
+    if (BsPtrAddr == NULL) {
+        dprintf("Failed to find boot services table pointer!\n");
+        return ERROR_NOT_FOUND;
+    }
+
+    if (!ReadPointer(BsPtrAddr, &BsTableAddr)) {
+        dprintf("Failed to find boot services table!\n");
+        return ERROR_NOT_FOUND;
+    }
+
+    Result = FindModuleBackwards(BsTableAddr);
+    if (Result != S_OK) {
+        return Result;
+    }
+
+    g_ExtControl->Execute(DEBUG_OUTCTL_ALL_CLIENTS,
+        "ld *",
+        DEBUG_EXECUTE_DEFAULT);
+
+    //
+    // Load all the other modules.
+    //
+
+    Result = loadmodules(Client, "");
 
     EXIT_API();
     return S_OK;
