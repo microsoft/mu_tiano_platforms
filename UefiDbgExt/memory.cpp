@@ -126,12 +126,12 @@ memorymap(PDEBUG_CLIENT4 Client, PCSTR args)
         }
     }
     dprintf("-------------------------------------------------------------------------------------------------------\n");
-    // for (Type = 0; Type < MEMORY_TYPE_COUNT; Type++) {
-    //     dprintf("    %-30s %16I64x\n", MemoryTypeString[Type], TypeSize[Type]);
-    // }
-    // dprintf("\n    %-30s %16I64x\n", "Total", TotalMemory);
+    for (Type = 0; Type < MEMORY_TYPE_COUNT; Type++) {
+        dprintf("    %-30s %16I64x\n", MemoryTypeString[Type], TypeSize[Type]);
+    }
+    dprintf("\n    %-30s %16I64x\n", "Total", TotalMemory);
 
-    // dprintf("-------------------------------------------------------------------------------------------------------\n");
+    dprintf("-------------------------------------------------------------------------------------------------------\n");
 
     EXIT_API();
     return S_OK;

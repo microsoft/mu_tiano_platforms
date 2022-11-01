@@ -19,6 +19,7 @@ Abstract:
 //
 
 #define PAGE_SIZE (0x1000)
+#define PAGE_ALIGN_DOWN(_ptr) (_ptr & ~(PAGE_SIZE - 1))
 
 //
 // EFI environment information.

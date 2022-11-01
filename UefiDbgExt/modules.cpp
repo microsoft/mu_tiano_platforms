@@ -16,7 +16,7 @@ Abstract:
 #include "uefiext.h"
 
 HRESULT CALLBACK
-findmodules(PDEBUG_CLIENT4 Client, PCSTR args)
+loadmodules(PDEBUG_CLIENT4 Client, PCSTR args)
 {
     ULONG64 HeaderAddress;
     UINT32 TableSize;
@@ -53,6 +53,10 @@ findmodules(PDEBUG_CLIENT4 Client, PCSTR args)
         return ERROR_NOT_FOUND;
     }
 
+    if (TableSize <= 1) {
+        dprintf("Debug info array is empty.\n");
+    }
+
     // Skip the 0-index to avoid reloading DxeCore. There is probably a better way to do this.
     for (Index = 1; Index < TableSize; Index++) {
         Entry = Table + (Index * GetTypeSize("EFI_DEBUG_IMAGE_INFO"));
@@ -73,6 +77,55 @@ findmodules(PDEBUG_CLIENT4 Client, PCSTR args)
         g_ExtControl->Execute(DEBUG_OUTCTL_ALL_CLIENTS,
                               Command,
                               DEBUG_EXECUTE_DEFAULT);
+    }
+
+    EXIT_API();
+    return S_OK;
+}
+
+HRESULT CALLBACK
+findmodule(PDEBUG_CLIENT4 Client, PCSTR args)
+{
+    ULONG64 Address;
+    ULONG64 MinAddress;
+    CHAR Command[512];
+    ULONG64 MaxSize;
+    ULONG32 Check;
+    CONST ULONG32 Magic = 0x5A4D;
+    ULONG BytesRead;
+    INIT_API();
+
+    UNREFERENCED_PARAMETER(args);
+
+    if (strlen(args) == 0) {
+        args = "@$ip";
+    }
+
+    Address = GetExpression(args);
+    if ((Address == 0) || (Address == (-1))) {
+        dprintf("Invalid address!\n");
+        return ERROR_NOT_FOUND;
+    }
+
+    MaxSize = 0x400000; // 4 Mb
+    Address = PAGE_ALIGN_DOWN(Address);
+    if (Address > MaxSize) {
+        MinAddress = Address - MaxSize;
+    }
+    else {
+        MinAddress = 0;
+    }
+
+    for (; Address >= MinAddress; Address -= PAGE_SIZE) {
+        Check = 0;
+        ReadMemory(Address, &Check, sizeof(Check), &BytesRead);
+        if ((BytesRead == sizeof(Check)) && (Check == Magic)) {
+            sprintf_s(Command, sizeof(Command), ".imgscan /l /r %I64x %I64x", Address, Address + 0xFFF);
+            g_ExtControl->Execute(DEBUG_OUTCTL_ALL_CLIENTS,
+                Command,
+                DEBUG_EXECUTE_DEFAULT);
+            break;
+        }
     }
 
     EXIT_API();

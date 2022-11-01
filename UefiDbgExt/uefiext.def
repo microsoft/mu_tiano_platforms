@@ -12,7 +12,8 @@ EXPORTS
 ;--------------------------------------------------------------------
     help
     memorymap
-    findmodules
+    findmodule
+    loadmodules
     setenv
     hobs
 
