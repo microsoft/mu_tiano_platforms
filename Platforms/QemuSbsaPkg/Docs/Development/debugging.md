@@ -20,8 +20,8 @@ Once Windbg is connected, following the instruction in the readme, the symbols
 and source can be loaded by scanning memory for images using the image scan
 command. For example:
 
-    kd> r rip
-    rip=000000007d1fc64b
+    kd> r pc
+    pc=000000007d1fc64b
     kd> .imgscan /l /r 0x07d000000 0x07e000000
 
 This will scan for image headers between the specified addresses and load their

@@ -1,19 +1,19 @@
 # QemuRunner_plug_in
 
 The QEMU runner plugin supports easy execution of the QEMU emulator running the locally compiled
-QemuQ35Pkg firmware.  This runner also supports easy local and server execution of UEFI shell based tests.
+QemuSbsaPkg firmware.  This runner also supports easy local and server execution of UEFI shell based tests.
 It can automatically collect compiled UEFI shell based unit tests, mount a VHD or map a folder as a drive,
 and then parse the results once QEMU has finished.
 
 ## Configuration
 
-The plugin has numerous configuration options to support the Q35 Platform.  These can be set
+The plugin has numerous configuration options to support the SBSA Platform.  These can be set
 when calling `stuart_build` or `platform_build` by adding `<name>=<value>` to the command line.
 
 **Example** setting up unit test to run automatically
 
 ```bash
-stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py SHUTDOWN_AFTER_RUN=TRUE RUN_TESTS=TRUE
+stuart_build -c Platforms/QemuSbsaPkg/PlatformBuild.py SHUTDOWN_AFTER_RUN=TRUE RUN_TESTS=TRUE
 ```
 
 ### QEMU_HEADLESS

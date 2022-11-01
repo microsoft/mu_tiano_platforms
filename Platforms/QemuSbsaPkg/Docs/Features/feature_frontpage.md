@@ -2,4 +2,4 @@
 
 Todo
 
-![Front page in Q35](q35_mu.gif)
+![Front page in SBSA](sbsa_mu.gif)

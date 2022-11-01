@@ -1,8 +1,8 @@
 # Building
 
-Steps to setup your environment, compile, and run the QemuQ35Pkg.
+Steps to setup your environment, compile, and run the QemuSbsaPkg.
 
-This solution for building and running QemuQ35Pkg has only been validated with Windows 10
+This solution for building and running QemuSbsaPkg has only been validated with Windows 10
 with VS2019 and Ubuntu 18.04 with GCC5 toolchain.
 
 ## Developer environment
@@ -49,7 +49,7 @@ On most Linux distros this requires an extra step for mono and nuget support.
 4. Initialize & Update Submodules - only when submodules updated
 
     ``` bash
-    stuart_setup -c Platforms/QemuQ35Pkg/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG>
+    stuart_setup -c Platforms/QemuSbsaPkg/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG>
     ```
 
     - `TOOL_CHAIN_TAG` being the toolchain you want to build with, currently `VS2017`, `VS2019`, and `GCC5` are
@@ -58,16 +58,16 @@ On most Linux distros this requires an extra step for mono and nuget support.
 5. Initialize & Update Dependencies - only as needed when ext_deps change
 
     ``` bash
-    stuart_update -c Platforms/QemuQ35Pkg/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG>
+    stuart_update -c Platforms/QemuSbsaPkg/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG>
     ```
 
 6. Compile Firmware
 
     ``` bash
-    stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG>
+    stuart_build -c Platforms/QemuSbsaPkg/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG>
     ```
 
-    - use `stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py -h` option to see additional
+    - use `stuart_build -c Platforms/QemuSbsaPkg/PlatformBuild.py -h` option to see additional
     options like `--clean`
 
 7. Running Emulator
@@ -76,24 +76,24 @@ On most Linux distros this requires an extra step for mono and nuget support.
     - or use the `--FlashOnly` feature to just run the emulator.
 
       ``` bash
-      stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> --FlashOnly
+      stuart_build -c Platforms/QemuSbsaPkg/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> --FlashOnly
       ```
 
 8. Alternative Options
     - All the commands specified here can use a shortcut, which is to invoke the Build file directly. For example:
 
       ``` bash
-      py Platforms/QemuQ35Pkg/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG>  --FlashOnly
+      py Platforms/QemuSbsaPkg/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG>  --FlashOnly
       ```
 
     - Setup and update can be done by passing it in
 
       ``` bash
-      py Platforms/QemuQ35Pkg/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG>  --setup
+      py Platforms/QemuSbsaPkg/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG>  --setup
       ```
 
       ``` bash
-      py Platforms/QemuQ35Pkg/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG>  --update
+      py Platforms/QemuSbsaPkg/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG>  --update
       ```
 
     - Under the hood, it just does the invocation of Stuart for you.
@@ -101,7 +101,7 @@ On most Linux distros this requires an extra step for mono and nuget support.
 ### Notes
 
 1. QEMU must be on your path.  On Windows this is a manual process and not part of the QEMU installer.
-2. QEMU output will be in Build/BUILDLOG_QemuQ35Pkg.txt as well as Build/QemuQ35Pkg/QEMULOG_QemuQ35Pkg.txt
+2. QEMU output will be in Build/BUILDLOG_QemuSbsaPkg.txt as well as Build/QemuSbsaPkg/QEMULOG_QemuSbsaPkg.txt
 
 **NOTE:** Logging the execution output will be in the normal stuart log as well as to your console (if you have the
 correct logging level set, by default it doesn't output to console).
@@ -124,7 +124,7 @@ command-line. *stuart_build* currently requires values to be assigned, so add a 
 For example, to enable the E1000 network support, instead of the traditional "-D E1000_ENABLE", the stuart_build
 command-line would be:
 
-`stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py BLD_*_E1000_ENABLE=1`
+`stuart_build -c Platforms/QemuSbsaPkg/PlatformBuild.py BLD_*_E1000_ENABLE=1`
 
 ## References
 

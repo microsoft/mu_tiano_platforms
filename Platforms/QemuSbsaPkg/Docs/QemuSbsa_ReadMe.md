@@ -1,38 +1,33 @@
-# QemuQ35Pkg
+# QemuSbsaPkg
 
-**QemuQ35Pkg...**
+**QemuSbsaPkg...**
 
-- Is a derivative of OvmfPkg.
+- Is another derivative of OvmfPkg based on EDK2 QEMU-SBSA ARM platform.
 - Will not support Legacy BIOS or CSM.
 - WIll not support S3 sleep functionality.
-- Has a 32-bit PEI phase and a 64-bit DXE phase.
-- Seeks to enable a tightly constrained virtual platform based on the QEMU Q35 machine type.
+- Has 64-bit for both PEI and DXE phase.
+- Seeks to enable a tightly constrained virtual platform based on the QEMU SBSA machine type.
 
-By solely focusing on the Q35 chipset, this package can be optimized such that it is allowed to break compatibility
-with other QEMU supported chipsets. The Q35 chipset can be paired with an IA32 or X64 processor to enable a machine
-that can emulate PC class hardware with industry standard features like SMM and PCI-E.
+By solely focusing on the ARM chipset, this package can be optimized such that it is allowed to break compatibility
+with other QEMU supported chipsets. The ARM chipset can be paired with an AARCH64 processor to enable a machine
+that can emulate server class hardware with industry standard features like TrustZone and PCI-E.
 
-## Q35 Platform
+## QEMU-SBSA Platform
 
-Q35 is a machine type that QEMU emulates.
-Below is a diagram from Qemu.org about the Q35 chipset which emulates a ICH9 (I/O controller hub).
+SBSA is an ARM based machine type that QEMU emulates.
 
-![Q35 ICH9](https://wiki.qemu.org/images/4/46/QEMU-ICH9.png)
-
-The advantages of the ICH9 over the I440FX (which is what QEMU often emulates) is that it has PCI-E instead of just PCI
-as well as having an integrated AHCI controller and no ISA bus.
-
-Visit the feature wiki detailing QEMU Q35 for more information: <https://wiki.qemu.org/Features/Q35>
+The advantages of the SBSA over the virtual ARM platform (which is what QEMU often emulates) is that it has
+better ARM based platform level support (ACPI, etc.) as well as having an integrated AHCI controller.
 
 ## Compiling and Running QEMU
 
-QemuQ35Pkg uses the Project Mu repositories and Edk2 PyTools for its build operations.
+QemuSbsaPkg uses the Project Mu repositories and Edk2 PyTools for its build operations.
 Specific details can be found here [Development/building.md](Development/building.md)
 
 ## Firmware Features
 
-QemuQ35Pkg is a great environment to demonstrate Project Mu features without any restricted or costly physical
-hardware. Current QEMU Q35 platform supports the following features provided by Project Mu:
+QemuSbsaPkg is a great environment to demonstrate Project Mu features without any restricted or costly physical
+hardware. Current QEMU SBSA platform supports the following features provided by Project Mu:
 
 ### Mu Front Page
 
@@ -81,6 +76,6 @@ sample PRM modules are used to demonstrate the feature and show how additional m
 
 | Libraries | Link to Documentation |
 | --- | --- |
-| **MsPlatformDevicesLib** | [MsPlatformDevicesLib](../Library/MsPlatformDevicesLibQemuQ35/ReadMe.md) |
+| **MsPlatformDevicesLib** | [MsPlatformDevicesLib](../Library/MsPlatformDevicesLibQemuSbsa/ReadMe.md) |
 | **PlatformDebugLibIoPort** | [PlatformDebugLibIoPort](../Library/PlatformDebugLibIoPort/ReadMe.md) |
 | **PlatformThemeLib** | [PlatformThemeLib](../Library/PlatformThemeLib/ReadMe.md) |
