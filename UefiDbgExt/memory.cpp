@@ -2,6 +2,8 @@
 
 Copyright (c) Microsoft Corporation
 
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
 Module Name:
 
     memory.cpp
@@ -9,6 +11,8 @@ Module Name:
 Abstract:
 
     This file contains debug commands for memory operations.
+
+    SPDX-License-Identifier: BSD-2-Clause-Patent
 
 --*/
 
