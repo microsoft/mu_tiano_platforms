@@ -1,6 +1,7 @@
 /** @file
 
  Copyright (c) 2019, Linaro Ltd. All rights reserved
+ Copyright (c) Microsoft Corporation.
 
  SPDX-License-Identifier: BSD-2-Clause-Patent
 
