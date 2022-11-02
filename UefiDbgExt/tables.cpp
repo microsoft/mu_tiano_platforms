@@ -17,7 +17,7 @@ Abstract:
 GUID TableGuids[] = EFI_TABLE_GUIDS;
 
 ULONG64
-GetTableAddress (EFI_TABLE Table)
+GetTableAddress(EFI_TABLE Table)
 {
 
     ULONG64 StPtrAddr;
@@ -64,7 +64,8 @@ GetTableAddress (EFI_TABLE Table)
             }
         }
 
-    } else {
+    }
+    else {
         dprintf("Not supported for this environment!\n");
     }
 

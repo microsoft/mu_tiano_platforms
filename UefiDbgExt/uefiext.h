@@ -48,4 +48,4 @@ typedef enum _EFI_TABLE {
         { 0x7739F24C, 0x93D7, 0x11D4, { 0x9A, 0x3A, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }} /* Hoblist */ \
     }
 
-ULONG64 GetTableAddress (EFI_TABLE Table);
+ULONG64 GetTableAddress(EFI_TABLE Table);

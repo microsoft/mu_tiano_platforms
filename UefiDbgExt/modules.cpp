@@ -113,8 +113,8 @@ loadmodules(PDEBUG_CLIENT4 Client, PCSTR args)
         GetFieldValue(ImageProtocol, "EFI_LOADED_IMAGE_PROTOCOL", "ImageBase", ImageBase);
         sprintf_s(Command, sizeof(Command), ".imgscan /l /r %I64x (%I64x + 0xFFF)", ImageBase, ImageBase);
         g_ExtControl->Execute(DEBUG_OUTCTL_ALL_CLIENTS,
-                              Command,
-                              DEBUG_EXECUTE_DEFAULT);
+            Command,
+            DEBUG_EXECUTE_DEFAULT);
     }
 
     EXIT_API();
@@ -136,7 +136,7 @@ findmodule(PDEBUG_CLIENT4 Client, PCSTR args)
     if ((Address == 0) || (Address == (-1))) {
         dprintf("Invalid address!\n");
         dprintf("Usage: !uefiext.findmodule [Address]\n");
-        return ERROR_NOT_FOUND;
+        return ERROR_INVALID_PARAMETER;
     }
 
     Result = FindModuleBackwards(Address);

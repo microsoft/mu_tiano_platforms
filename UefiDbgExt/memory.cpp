@@ -73,7 +73,7 @@ memorymap(PDEBUG_CLIENT4 Client, PCSTR args)
     UINT64 Pages;
     UINT64 Attribute;
     ULONG64 TotalMemory = 0;
-    ULONG64 TypeSize[MEMORY_TYPE_COUNT] = {0};
+    ULONG64 TypeSize[MEMORY_TYPE_COUNT] = { 0 };
     INIT_API();
 
     UNREFERENCED_PARAMETER(args);
@@ -93,8 +93,8 @@ memorymap(PDEBUG_CLIENT4 Client, PCSTR args)
     dprintf("    Start             End               Pages             Attributes        MemoryType   \n");
     dprintf("-------------------------------------------------------------------------------------------------------\n");
     for (GetFieldValue(HeadAddress, "_LIST_ENTRY", "ForwardLink", Address);
-         Address != HeadAddress;
-         GetFieldValue(Address, "_LIST_ENTRY", "ForwardLink", Address)) {
+        Address != HeadAddress;
+        GetFieldValue(Address, "_LIST_ENTRY", "ForwardLink", Address)) {
 
         if (Address == NULL) {
             dprintf("NULL address found in list!\n");
@@ -109,12 +109,12 @@ memorymap(PDEBUG_CLIENT4 Client, PCSTR args)
         Pages = ((End + 1) - Start) / PAGE_SIZE;
 
         dprintf("    %016I64x  %016I64x  %16I64x  %016I64x  %-2d (%s)\n",
-                Start,
-                End,
-                Pages,
-                Attribute,
-                Type,
-                Type < MEMORY_TYPE_COUNT ? MemoryTypeString[Type] : "Unknown");
+            Start,
+            End,
+            Pages,
+            Attribute,
+            Type,
+            Type < MEMORY_TYPE_COUNT ? MemoryTypeString[Type] : "Unknown");
 
         //
         // Memory size tracking.
@@ -180,7 +180,7 @@ hobs(PDEBUG_CLIENT4 Client, PCSTR args)
 
             TypeString = NULL;
             if (HobType < HOB_TYPE_COUNT) {
-                TypeString =  HobTypes[HobType];
+                TypeString = HobTypes[HobType];
             }
 
             if (TypeString == NULL) {
@@ -200,7 +200,8 @@ hobs(PDEBUG_CLIENT4 Client, PCSTR args)
             HobAddr += HobLength;
         } while ((HobType != 0xFFFF) && (HobLength != 0));
 
-    } else {
+    }
+    else {
         dprintf("Not supported for this environment!\n");
         return ERROR_NOT_SUPPORTED;
     }
