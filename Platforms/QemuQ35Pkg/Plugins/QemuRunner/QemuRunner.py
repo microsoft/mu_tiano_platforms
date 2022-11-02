@@ -78,7 +78,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         else:
             logging.critical("Virtual Drive Path Invalid")
 
-        args += " -machine q35,smm=on,accel=kvm" #,accel=(tcg|kvm)"
+        args += " -machine q35,smm=on" #,accel=(tcg|kvm)"
         if env.GetValue("PATH_TO_OS") is not None:
             # Potentially dealing with big daddy, give it more juice...
             args += " -m 8192"
