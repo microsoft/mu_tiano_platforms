@@ -22,7 +22,7 @@ FindModuleBackwards(ULONG64 Address)
     CHAR Command[512];
     ULONG64 MaxSize;
     ULONG32 Check;
-    CONST ULONG32 Magic = 0x5A4D;
+    CONST ULONG32 Magic = 0x5A4D; // MZ
     ULONG BytesRead;
     HRESULT Result;
 
@@ -168,8 +168,8 @@ findall(PDEBUG_CLIENT4 Client, PCSTR args)
     }
 
     g_ExtControl->Execute(DEBUG_OUTCTL_ALL_CLIENTS,
-                          "ld *",
-                          DEBUG_EXECUTE_DEFAULT);
+        "ld *",
+        DEBUG_EXECUTE_DEFAULT);
 
     //
     // Find the core module. This might be the same as the executing one.

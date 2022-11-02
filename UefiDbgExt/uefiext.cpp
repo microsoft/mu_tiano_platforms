@@ -55,6 +55,7 @@ help(PDEBUG_CLIENT4 Client, PCSTR args)
 
     dprintf("Help for uefiext.dll\n"
             "  help                - Shows this help\n"
+            "  findall             - Attempts to detect environment and load all modules"
             "  findmodule          - Find the currently running module\n"
             "  memorymap           - Prints the current memory map\n"
             "  loadmodules         - Find and loads symbols for all modules in the debug list\n"
