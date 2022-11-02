@@ -119,6 +119,10 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         # Run QEMU
         #ret = QemuRunner.RunCmd(executable, args,  thread_target=QemuRunner.QemuCmdReader)
         ret = utility_functions.RunCmd(executable, args)
+        if ret != 0 and os.name != 'nt':
+            # Linux version of QEMU will mess with the print if its run failed, this is to restore it
+            utility_functions.RunCmd ('stty', 'echo')
+
         ## TODO: restore the customized RunCmd once unit tests with asserts are figured out
         if ret == 0xc0000005:
             ret = 0

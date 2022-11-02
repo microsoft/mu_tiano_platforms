@@ -812,7 +812,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugSupport|FALSE
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdRequireIommu|FALSE # don't require IOMMU
-  
+
   !if $(BUILD_UNIT_TESTS) == TRUE
     gUefiCpuPkgTokenSpaceGuid.PcdSmmExceptionTestModeSupport|TRUE
     gMmSupervisorPkgTokenSpaceGuid.PcdMmSupervisorTestEnable|TRUE
@@ -1594,10 +1594,11 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 [BuildOptions]
   GCC:RELEASE_*_*_CC_FLAGS             = -DMDEPKG_NDEBUG
   MSFT:RELEASE_*_*_CC_FLAGS            = /D MDEPKG_NDEBUG
-!if $(SOURCE_DEBUG_ENABLE) == TRUE
+
+  # Exception tables are required for stack walks in the debugger.
   MSFT:*_*_X64_GENFW_FLAGS  = --keepexceptiontable
   GCC:*_*_X64_GENFW_FLAGS   = --keepexceptiontable
-!endif
+
   #
   # Disable deprecated APIs.
   #
