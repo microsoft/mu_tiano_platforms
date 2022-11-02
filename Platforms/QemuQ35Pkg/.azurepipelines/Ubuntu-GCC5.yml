@@ -65,8 +65,6 @@ jobs:
     container: ghcr.io/tianocore/containers/fedora-35-test:5800d58
 
     steps:
-    - script: echo "##vso[task.prependpath]/home/vsts_azpcontainer/.local/bin"
-      displayName: Add User Local Bin to Path
     - template: Steps/BuildPlatform.yml@mu_devops
       parameters:
         tool_chain_tag: $(tool_chain_tag)
