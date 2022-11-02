@@ -13,9 +13,9 @@ resources:
   repositories:
     - repository: mu_devops
       type: github
-      endpoint: cfernald
-      name: cfernald/mu_devops
-      ref: platform_container
+      endpoint: microsoft
+      name: microsoft/mu_devops
+      ref: main
 
 variables:
 - group: architectures-x86-64
