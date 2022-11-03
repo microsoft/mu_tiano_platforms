@@ -1,6 +1,8 @@
 /*++
 
-    Copyright (c) 2000  Microsoft Corporation
+    Copyright (c) Microsoft Corporation
+
+    SPDX-License-Identifier: BSD-2-Clause-Patent
 
 Module Name:
 

@@ -1,8 +1,8 @@
 /*++
 
-Copyright (c) Microsoft Corporation
+    Copyright (c) Microsoft Corporation
 
-SPDX-License-Identifier: BSD-2-Clause-Patent
+    SPDX-License-Identifier: BSD-2-Clause-Patent
 
 Module Name:
 
@@ -11,8 +11,6 @@ Module Name:
 Abstract:
 
     This file contains debug commands for memory operations.
-
-    SPDX-License-Identifier: BSD-2-Clause-Patent
 
 --*/
 

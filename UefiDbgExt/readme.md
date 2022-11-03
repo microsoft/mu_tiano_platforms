@@ -1,10 +1,15 @@
 
 # UEFI Debugger Extension
 
+[![Build UEFI Debug Extension](https://github.com/microsoft/mu_tiano_platforms/actions/workflows/Build-UefiExt.yaml/badge.svg)](https://github.com/microsoft/mu_tiano_platforms/actions/workflows/Build-UefiExt.yaml)
+
 This folder contains the source for the UEFI debugger extension. This provides
 functionality within windbg for debugging the UEFI environment. Using the UEFI
-extension requires that windbgx has access to the symbol files for the target
+extension requires that Windbgx has access to the symbol files for the target
 UEFI code.
+
+The most recent compiled version of this binary can be found as a build artifact
+in the [debug extension workflow](https://github.com/microsoft/mu_tiano_platforms/actions/workflows/Build-UefiExt.yaml).
 
 ## Compiling
 
