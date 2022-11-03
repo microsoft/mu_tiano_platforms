@@ -254,7 +254,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
     def __SetEsrtGuidVars(self, var_name, guid_str, desc_string):
         cur_guid = uuid.UUID(guid_str)
         self.env.SetValue("BLD_*_%s_REGISTRY" % var_name, guid_str, desc_string)
-        self.env.SetValue("BLD_*_%s_BYTES" % var_name, "{" + (",".join(("0x%X" % byte) for byte in cur_guid.bytes_le)) + "}", desc_string)
+        self.env.SetValue("BLD_*_%s_BYTES" % var_name, "'{" + (",".join(("0x%X" % byte) for byte in cur_guid.bytes_le)) + "}'", desc_string)
         return
 
     def FlashRomImage(self):
