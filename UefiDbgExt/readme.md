@@ -47,6 +47,24 @@ commands. To see its commands, use the help command to get started.
 
     !uefiext.help
 
+One particularly useful instruction will be the `!uefiext.findall` instruction
+to load the needed modules.
+
+## Design
+
+Windbg debug extensions allow for programmatic decoding and outputting of data
+from to debugger. The UEFI debug extension is designed to help
+finding, parsing, and changing data in the UEFI environment more accessible from
+the debugger.
+
+Because UEFI has various environments, SEC, DXE, MM, the extension has a concept
+of the current running environment. This can be manually set using `!uefiext.setenv`.
+This environment should be used to change the operation of various routines based
+on the current context. For example, enumerating the hobs or loaded modules is
+done differently in DXE then it is in MM. At the time of writing this, most functions
+are only implemented in DXE, but this environment should always be checked before
+accessing environment specific information.
+
 ## Creating new commands
 
 New commands can be exported by added them to the exports in uefiext.def. New
