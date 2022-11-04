@@ -201,6 +201,7 @@
   MmUnblockMemoryLib             |MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
   DxeMemoryProtectionHobLib      |MdeModulePkg/Library/MemoryProtectionHobLibNull/DxeMemoryProtectionHobLibNull.inf
   ExceptionPersistenceLib        |MsCorePkg/Library/ExceptionPersistenceLibCmos/ExceptionPersistenceLibCmos.inf
+  CpuPageTableLib                |UefiCpuPkg/Library/CpuPageTableLib/CpuPageTableLib.inf
 
   # Variable Libraries
   VariablePolicyLib         |MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLib.inf
