@@ -46,6 +46,7 @@
   gArmTokenSpaceGuid.PcdFdSize
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
   gArmTokenSpaceGuid.PcdArmPrimaryCore
+  gArmTokenSpaceGuid.PcdMmBufferBase
   gArmTokenSpaceGuid.PcdMmBufferSize
 
 [Ppis]

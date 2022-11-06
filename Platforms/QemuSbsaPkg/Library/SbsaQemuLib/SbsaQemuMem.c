@@ -16,7 +16,7 @@
 #include <libfdt.h>
 
 // Number of Virtual Memory Map Descriptors
-#define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS          4
+#define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS          5
 
 RETURN_STATUS
 EFIAPI
@@ -140,8 +140,14 @@ ArmPlatformGetVirtualMemoryMap (
   VirtualMemoryTable[2].Length       = FixedPcdGet32 (PcdFdSize);
   VirtualMemoryTable[2].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
 
+  // MM Memory Space
+  VirtualMemoryTable[3].PhysicalBase = PcdGet64 (PcdMmBufferBase);
+  VirtualMemoryTable[3].VirtualBase    = PcdGet64 (PcdMmBufferBase);
+  VirtualMemoryTable[3].Length         = PcdGet64 (PcdMmBufferSize);
+  VirtualMemoryTable[3].Attributes     = ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED;
+
   // End of Table
-  ZeroMem (&VirtualMemoryTable[3], sizeof (ARM_MEMORY_REGION_DESCRIPTOR));
+  ZeroMem (&VirtualMemoryTable[4], sizeof (ARM_MEMORY_REGION_DESCRIPTOR));
 
   *VirtualMemoryMap = VirtualMemoryTable;
 }
