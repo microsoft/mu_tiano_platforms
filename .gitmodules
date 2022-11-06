@@ -21,4 +21,4 @@
 [submodule "Silicon/Arm/TFA"]
 	path = Silicon/Arm/TFA
 	url = https://github.com/ARM-software/arm-trusted-firmware.git
-	branch = master
+	branch = v2.7
