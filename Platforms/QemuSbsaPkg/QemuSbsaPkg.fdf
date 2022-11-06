@@ -304,7 +304,7 @@ READ_LOCK_STATUS   = TRUE
   # MFCI support
   #
   # TODO: This is not enabled, due to variable PEI is currently not supported...
-  # INF MfciPkg/MfciDxe/MfciDxe.inf
+  INF MfciPkg/MfciDxe/MfciDxe.inf
 
   #
   # Networking stack
@@ -492,6 +492,8 @@ READ_LOCK_STATUS   = TRUE
   INF ArmPlatformPkg/PlatformPei/PlatformPeim.inf
   INF ArmPlatformPkg/MemoryInitPei/MemoryInitPeim.inf
   INF ArmPkg/Drivers/CpuPei/CpuPei.inf
+  INF ArmPkg/Drivers/MmCommunicationPei/MmCommunicationPei.inf
+  INF ArmPkg/Drivers/SmmVariablePei/SmmVariablePei.inf
   INF MdeModulePkg/Universal/PCD/Pei/Pcd.inf
   INF MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
   INF MsGraphicsPkg/MsUiTheme/Pei/MsUiThemePpi.inf

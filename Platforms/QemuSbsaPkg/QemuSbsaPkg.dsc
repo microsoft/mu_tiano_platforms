@@ -883,6 +883,8 @@
   ArmPlatformPkg/PlatformPei/PlatformPeim.inf
   ArmPlatformPkg/MemoryInitPei/MemoryInitPeim.inf
   ArmPkg/Drivers/CpuPei/CpuPei.inf
+  ArmPkg/Drivers/MmCommunicationPei/MmCommunicationPei.inf
+  ArmPkg/Drivers/SmmVariablePei/SmmVariablePei.inf
 
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
 
