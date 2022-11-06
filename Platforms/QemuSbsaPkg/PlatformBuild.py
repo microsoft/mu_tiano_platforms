@@ -190,8 +190,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
     def GetPackagesPath(self):
         ''' Return a list of paths that should be mapped as edk2 PackagesPath '''
         result = [
-            shell_environment.GetBuildVars().GetValue("FEATURE_CONFIG_PATH", ""),
-            shell_environment.GetBuildVars().GetValue("FEATURE_MM_SUPV_PATH", "")
+            shell_environment.GetBuildVars().GetValue("FEATURE_CONFIG_PATH", "")
         ]
         for a in CommonPlatform.PackagesPath:
             result.append(a)
@@ -283,6 +282,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         args += " SPM_MM=1 EL3_EXCEPTION_HANDLING=1"
         args += " BL32=" + os.path.join(op_fv, "BL32_AP_MM.fd")
         args += " all fip"
+        args += " -j $(nproc)"
         ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_TFA_PATH"))
         if ret != 0:
             return ret
