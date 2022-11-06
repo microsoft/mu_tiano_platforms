@@ -40,5 +40,6 @@
   gPeiPolicyPpiGuid                 ## CONSUMES
 
 [Depex]
+  gEfiPeiReadOnlyVariable2PpiGuid AND
   gPeiPolicyPpiGuid
 
