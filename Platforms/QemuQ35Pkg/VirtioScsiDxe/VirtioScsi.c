@@ -499,8 +499,8 @@ VirtioScsiPassThru (
     // addition to the error code we also need to update Packet fields
     // accordingly so that we report the full loss of the incoming transfer.
     //
-    // We allocate a QemuQ35Pkgorary buffer and map it with BusMasterCommonBuffer. If
-    // the Virtio request is successful then we copy the data from QemuQ35Pkgorary
+    // We allocate a temporary buffer and map it with BusMasterCommonBuffer. If
+    // the Virtio request is successful then we copy the data from temporary
     // buffer into Packet->InDataBuffer.
     //
     InDataNumPages = EFI_SIZE_TO_PAGES ((UINTN)Packet->InTransferLength);
@@ -1274,9 +1274,9 @@ VirtioScsiDriverBindingSupported (
   VIRTIO_DEVICE_PROTOCOL  *VirtIo;
 
   //
-  // AtQemuQ35Pkgt to open the device with the VirtIo set of interfaces. On success,
+  // Attempt to open the device with the VirtIo set of interfaces. On success,
   // the protocol is "instantiated" for the VirtIo device. Covers duplicate open
-  // atQemuQ35Pkgts (EFI_ALREADY_STARTED).
+  // attempts (EFI_ALREADY_STARTED).
   //
   Status = gBS->OpenProtocol (
                   DeviceHandle,               // candidate device
@@ -1357,7 +1357,7 @@ VirtioScsiDriverBindingStart (
   }
 
   //
-  // Setup complete, atQemuQ35Pkgt to export the driver instance's PassThru
+  // Setup complete, attempt to export the driver instance's PassThru
   // interface.
   //
   Dev->Signature = VSCSI_SIG;

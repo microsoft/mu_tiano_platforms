@@ -78,7 +78,7 @@ QemuFlashDetected (
     return FALSE;
   }
 
-  DEBUG ((DEBUG_INFO, "QEMU Flash: AtQemuQ35Pkgting flash detection at %p\n", Ptr));
+  DEBUG ((DEBUG_INFO, "QEMU Flash: Attempting flash detection at %p\n", Ptr));
 
   if (MemEncryptSevEsIsEnabled ()) {
     //

@@ -838,8 +838,8 @@ SecCoreStartupWithStack (
   //
 
   ASSERT (
-    (UINTN)(PcdGet32 (PcdOvmfSecPeiQemuQ35PkgRamBase) +
-            PcdGet32 (PcdOvmfSecPeiQemuQ35PkgRamSize)) ==
+    (UINTN)(PcdGet32 (PcdSecPeiTemporaryRamBase) +
+            PcdGet32 (PcdSecPeiTemporaryRamSize)) ==
     (UINTN)TopOfCurrentStack
     );
 
@@ -848,7 +848,7 @@ SecCoreStartupWithStack (
   //
   SecCoreData.DataSize = sizeof (EFI_SEC_PEI_HAND_OFF);
 
-  SecCoreData.TemporaryRamSize = (UINTN)PcdGet32 (PcdOvmfSecPeiQemuQ35PkgRamSize);
+  SecCoreData.TemporaryRamSize = (UINTN)PcdGet32 (PcdSecPeiTemporaryRamSize);
   SecCoreData.TemporaryRamBase = (VOID *)((UINT8 *)TopOfCurrentStack - SecCoreData.TemporaryRamSize);
 
   SecCoreData.PeiTemporaryRamBase = SecCoreData.TemporaryRamBase;

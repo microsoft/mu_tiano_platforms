@@ -62,7 +62,7 @@ PeiFvInitialization (
     );
 
   //
-  // Additionally, said decompression will use QemuQ35Pkgorary memory above the end
+  // Additionally, said decompression will use temporary memory above the end
   // of DXEFV, so let's keep away the OS from there too.
   //
   if (SecureS3Needed) {

@@ -706,7 +706,7 @@ SerializeVariablesIterateInstanceVariables (
   @retval      RETURN_OUT_OF_RESOURCES - There we not enough resources to
                  set all the variables
   @return      Any of RETURN_ERROR indicates an error reading the variables
-                 or in atQemuQ35Pkgting to set a variable
+                 or in attempting to set a variable
 
 **/
 RETURN_STATUS

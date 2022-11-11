@@ -26,7 +26,7 @@ typedef struct PCI_CAP_DEV PCI_CAP_DEV;
   Read the config space of a given PCI device (both normal and extended).
 
   PCI_CAP_DEV_READ_CONFIG performs as few config space accesses as possible
-  (without atQemuQ35Pkgting 64-bit wide accesses).
+  (without attempting 64-bit wide accesses).
 
   PCI_CAP_DEV_READ_CONFIG returns an unspecified error if accessing Size bytes
   from SourceOffset exceeds the config space limit of the PCI device. Fewer
@@ -61,7 +61,7 @@ RETURN_STATUS
   Write the config space of a given PCI device (both normal and extended).
 
   PCI_CAP_DEV_WRITE_CONFIG performs as few config space accesses as possible
-  (without atQemuQ35Pkgting 64-bit wide accesses).
+  (without attempting 64-bit wide accesses).
 
   PCI_CAP_DEV_WRITE_CONFIG returns an unspecified error if accessing Size bytes
   at DestinationOffset exceeds the config space limit of the PCI device. Fewer
@@ -169,7 +169,7 @@ typedef struct {
   If the PCI device has no capabilities, that per se will not fail
   PciCapListInit(); an empty capabilities list will be represented.
 
-  If the PCI device is found to be PCI Express, then an atQemuQ35Pkgt will be made to
+  If the PCI device is found to be PCI Express, then an attempt will be made to
   parse the extended capabilities list as well. If the first extended config
   space access -- via PciDevice->ReadConfig() with SourceOffset=0x100 and
   Size=4 -- fails, that per se will not fail PciCapListInit(); the device will
@@ -324,7 +324,7 @@ PciCapGetInfo (
   Read a slice of a capability instance.
 
   The function performs as few config space accesses as possible (without
-  atQemuQ35Pkgting 64-bit wide accesses). PciCapRead() performs bounds checking on
+  attempting 64-bit wide accesses). PciCapRead() performs bounds checking on
   SourceOffsetInCap and Size, and only invokes PciDevice->ReadConfig() if the
   requested transfer falls within Cap.
 
@@ -370,7 +370,7 @@ PciCapRead (
   Write a slice of a capability instance.
 
   The function performs as few config space accesses as possible (without
-  atQemuQ35Pkgting 64-bit wide accesses). PciCapWrite() performs bounds checking on
+  attempting 64-bit wide accesses). PciCapWrite() performs bounds checking on
   DestinationOffsetInCap and Size, and only invokes PciDevice->WriteConfig() if
   the requested transfer falls within Cap.
 

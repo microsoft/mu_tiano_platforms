@@ -34,7 +34,7 @@ CHAR16  *mPciHostBridgeUtilityLibAcpiAddressSpaceTypeStr[] = {
 
 STATIC
 CONST
-OVMF_PCI_ROOT_BRIDGE_DEVICE_PATH  mRootBridgeDevicePathQemuQ35Pkglate = {
+OVMF_PCI_ROOT_BRIDGE_DEVICE_PATH  mRootBridgeDevicePathTemplate = {
   {
     {
       ACPI_DEVICE_PATH,
@@ -149,8 +149,8 @@ PciHostBridgeUtilityInitRootBridge (
   RootBus->NoExtendedConfigSpace = NoExtendedConfigSpace;
 
   DevicePath = AllocateCopyPool (
-                 sizeof mRootBridgeDevicePathQemuQ35Pkglate,
-                 &mRootBridgeDevicePathQemuQ35Pkglate
+                 sizeof (mRootBridgeDevicePathTemplate),
+                 &mRootBridgeDevicePathTemplate
                  );
   if (DevicePath == NULL) {
     DEBUG ((DEBUG_ERROR, "%a: %r\n", __FUNCTION__, EFI_OUT_OF_RESOURCES));

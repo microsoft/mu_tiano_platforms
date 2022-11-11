@@ -701,7 +701,7 @@ PublishPeiMemory (
     //
     // Determine the range of memory to use during PEI
     //
-    // Technically we could lay the permanent PEI RAM over SEC's QemuQ35Pkgorary
+    // Technically we could lay the permanent PEI RAM over SEC's temporary
     // decompression and scratch buffer even if "secure S3" is needed, since
     // their lifetimes don't overlap. However, PeiFvInitialization() will cover
     // RAM up to PcdOvmfDecompressionScratchEnd with an EfiACPIMemoryNVS memory
@@ -790,7 +790,7 @@ QemuInitializeRam (
     //
     // Normally we'd create memory HOBs only on the normal boot path. However,
     // CpuMpPei specifically needs such a low-memory HOB on the S3 path as
-    // well, for "borrowing" a subset of it QemuQ35Pkgorarily, for the AP startup
+    // well, for "borrowing" a subset of it temporarily, for the AP startup
     // vector.
     //
     // CpuMpPei saves the original contents of the borrowed area in permanent
@@ -916,13 +916,13 @@ InitializeRamRegions (
       );
 
     //
-    // Cover the initial RAM area used as stack and QemuQ35Pkgorary PEI heap.
+    // Cover the initial RAM area used as stack and temporary PEI heap.
     //
     // This is reserved as ACPI NVS so it can be used on S3 resume.
     //
     BuildMemoryAllocationHob (
-      PcdGet32 (PcdOvmfSecPeiQemuQ35PkgRamBase),
-      PcdGet32 (PcdOvmfSecPeiQemuQ35PkgRamSize),
+      PcdGet32 (PcdSecPeiTemporaryRamBase),
+      PcdGet32 (PcdSecPeiTemporaryRamSize),
       EfiACPIMemoryNVS
       );
 

@@ -52,7 +52,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @retval EFI_SUCCESS            Timer Architectural Protocol created
   @retval EFI_OUT_OF_RESOURCES   Not enough resources available to initialize driver.
-  @retval EFI_DEVICE_ERROR       A device error occurred atQemuQ35Pkgting to initialize the driver.
+  @retval EFI_DEVICE_ERROR       A device error occurred attempting to initialize the driver.
 
 **/
 EFI_STATUS
@@ -69,7 +69,7 @@ TimerDriverInitialize (
   by TimerPeriod.  If the timer period is updated, then the selected timer
   period is stored in EFI_TIMER.TimerPeriod, and EFI_SUCCESS is returned.  If
   the timer hardware is not programmable, then EFI_UNSUPPORTED is returned.
-  If an error occurs while atQemuQ35Pkgting to update the timer period, then the
+  If an error occurs while attempting to update the timer period, then the
   timer hardware will be put back in its state prior to this call, and
   EFI_DEVICE_ERROR is returned.  If TimerPeriod is 0, then the timer interrupt
   is disabled.  This is not the same as disabling the CPU's interrupts.
@@ -105,7 +105,7 @@ TimerDriverRegisterHandler (
   by TimerPeriod.  If the timer period is updated, then the selected timer
   period is stored in EFI_TIMER.TimerPeriod, and EFI_SUCCESS is returned.  If
   the timer hardware is not programmable, then EFI_UNSUPPORTED is returned.
-  If an error occurs while atQemuQ35Pkgting to update the timer period, then the
+  If an error occurs while attempting to update the timer period, then the
   timer hardware will be put back in its state prior to this call, and
   EFI_DEVICE_ERROR is returned.  If TimerPeriod is 0, then the timer interrupt
   is disabled.  This is not the same as disabling the CPU's interrupts.
