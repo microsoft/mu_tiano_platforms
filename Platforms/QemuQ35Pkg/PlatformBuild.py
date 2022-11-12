@@ -78,11 +78,27 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
                     if path not in [x.path for x in rs]:
                         # add it with recursive since we don't know
                         rs.append(RequiredSubmodule(path, True))
-        return rs
+        return rs        
 
+    # ####################################################################################### #
+    #                     Verify requested Ci Build Config                           #
+    # ####################################################################################### #
+
+    def SetPackages(self, list_of_requested_packages):
+        ''' Confirm the requested package is valid.
+
+        Raise UnsupportedException if a requested_package is not supported
+        '''
+        unsupported = set(list_of_requested_packages) - \
+            set(self.GetPackagesSupported())
+        if(len(unsupported) > 0):
+            logging.critical(
+                "Unsupported Package Requested: " + " ".join(unsupported))
+            raise Exception("Unsupported Package Requested: " +
+                            " ".join(unsupported))
+    
     def SetArchitectures(self, list_of_requested_architectures):
-        ''' Confirm the requests architecture list is valid and configure SettingsManager
-        to run only the requested architectures.
+        ''' Confirm the requests architecture list is valid.
 
         Raise Exception if a list_of_requested_architectures is not supported
         '''
@@ -93,7 +109,6 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
                 "Unsupported Architecture Requested: " + " ".join(unsupported))
             logging.critical( errorString )
             raise Exception( errorString )
-        self.ActualArchitectures = list_of_requested_architectures
 
     def GetWorkspaceRoot(self):
         ''' get WorkspacePath '''
