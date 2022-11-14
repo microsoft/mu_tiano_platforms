@@ -474,8 +474,8 @@ Tcg2UserConfirm (
   BOOLEAN                           NoPpiInfo;
   UINT16                            Index;
   CHAR16                            DstStr[81];
-  CHAR16                            QemuQ35PkgBuffer[1024];
-  CHAR16                            QemuQ35PkgBuffer2[1024];
+  CHAR16                            TempBuffer[1024];
+  CHAR16                            TempBuffer2[1024];
   EFI_TCG2_PROTOCOL                 *Tcg2Protocol;
   EFI_TCG2_BOOT_SERVICE_CAPABILITY  ProtocolCapability;
   UINT32                            CurrentPCRBanks;
@@ -542,12 +542,12 @@ Tcg2UserConfirm (
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       FreePool (TmpStr1);
 
-      Tcg2FillBufferWithBootHashAlg (QemuQ35PkgBuffer, sizeof (QemuQ35PkgBuffer), TpmPpCommandParameter);
-      Tcg2FillBufferWithBootHashAlg (QemuQ35PkgBuffer2, sizeof (QemuQ35PkgBuffer2), CurrentPCRBanks);
+      Tcg2FillBufferWithBootHashAlg (TempBuffer, sizeof (TempBuffer), TpmPpCommandParameter);
+      Tcg2FillBufferWithBootHashAlg (TempBuffer2, sizeof (TempBuffer2), CurrentPCRBanks);
 
       TmpStr1 = AllocateZeroPool (BufSize);
       ASSERT (TmpStr1 != NULL);
-      UnicodeSPrint (TmpStr1, BufSize, L"Current PCRBanks is 0x%x. (%s)\nNew PCRBanks is 0x%x. (%s)\n", CurrentPCRBanks, QemuQ35PkgBuffer2, TpmPpCommandParameter, QemuQ35PkgBuffer);
+      UnicodeSPrint (TmpStr1, BufSize, L"Current PCRBanks is 0x%x. (%s)\nNew PCRBanks is 0x%x. (%s)\n", CurrentPCRBanks, TempBuffer2, TpmPpCommandParameter, TempBuffer);
 
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), L" \n", (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);

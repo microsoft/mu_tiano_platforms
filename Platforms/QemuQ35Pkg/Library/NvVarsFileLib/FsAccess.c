@@ -55,7 +55,7 @@ GetNvVarsFile (
   }
 
   //
-  // AtQemuQ35Pkgt to open the NvVars file in the root directory
+  // Attempt to open the NvVars file in the root directory
   //
   Status = Root->Open (
                    Root,
@@ -277,7 +277,7 @@ SetNvVarsVariable (
   //
   // Write a variable to indicate we've already loaded the
   // variable data.  If it is found, we skip the loading on
-  // subsequent atQemuQ35Pkgts.
+  // subsequent attempts.
   //
   Size    = sizeof (VarData);
   VarData = TRUE;
@@ -336,7 +336,7 @@ LoadNvVarsFromFs (
   }
 
   //
-  // AtQemuQ35Pkgt to restore the variables from the NvVars file.
+  // Attempt to restore the variables from the NvVars file.
   //
   Status = ReadNvVarsFile (FsHandle);
   if (EFI_ERROR (Status)) {
@@ -347,7 +347,7 @@ LoadNvVarsFromFs (
   //
   // Write a variable to indicate we've already loaded the
   // variable data.  If it is found, we skip the loading on
-  // subsequent atQemuQ35Pkgts.
+  // subsequent attempts.
   //
   SetNvVarsVariable ();
 
@@ -485,7 +485,7 @@ SaveNvVarsToFs (
     //
     // Write a variable to indicate we've already loaded the
     // variable data.  If it is found, we skip the loading on
-    // subsequent atQemuQ35Pkgts.
+    // subsequent attempts.
     //
     SetNvVarsVariable ();
 

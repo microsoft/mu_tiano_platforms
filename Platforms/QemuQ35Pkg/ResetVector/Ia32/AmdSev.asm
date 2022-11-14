@@ -95,7 +95,7 @@ BITS    32
     wrmsr
 
     ; Issue VMGEXIT - NASM doesn't support the vmmcall instruction in 32-bit
-    ; mode, so work around this by QemuQ35Pkgorarily switching to 64-bit mode.
+    ; mode, so work around this by temporarily switching to 64-bit mode.
     ;
 BITS    64
     rep     vmmcall
@@ -132,7 +132,7 @@ BITS    32
     wrmsr
     ;
     ; Issue VMGEXIT - NASM doesn't support the vmmcall instruction in 32-bit
-    ; mode, so work around this by QemuQ35Pkgorarily switching to 64-bit mode.
+    ; mode, so work around this by temporarily switching to 64-bit mode.
     ;
 BITS    64
     rep     vmmcall
@@ -228,7 +228,7 @@ CheckSevFeatures:
 
     ;
     ; Set up exception handlers to check for SEV-ES
-    ;   Load QemuQ35Pkgorary RAM stack based on PCDs (see SevEsIdtVmmComm for
+    ;   Load temporary RAM stack based on PCDs (see SevEsIdtVmmComm for
     ;   stack usage)
     ;   Establish exception handlers
     ;

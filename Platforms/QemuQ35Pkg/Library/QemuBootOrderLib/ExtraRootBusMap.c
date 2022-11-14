@@ -138,7 +138,7 @@ CreateExtraRootBusMap (
   ORDERED_COLLECTION_ENTRY  *Entry, *Entry2;
 
   //
-  // Handles and Collection are QemuQ35Pkgorary / helper variables, while in Map we
+  // Handles and Collection are temporary / helper variables, while in Map we
   // build the return value.
   //
 
@@ -241,7 +241,7 @@ CreateExtraRootBusMap (
   Status           = EFI_SUCCESS;
 
   //
-  // Fall through in order to release QemuQ35Pkgoraries.
+  // Fall through in order to release temporaries.
   //
 
 FreeMap:

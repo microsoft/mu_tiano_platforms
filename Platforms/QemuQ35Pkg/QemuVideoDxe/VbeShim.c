@@ -91,7 +91,7 @@ InstallVbeShim (
   SegmentF = 0xF0000;
 
   //
-  // AtQemuQ35Pkgt to cover the real mode IVT with an allocation. This is a UEFI
+  // Attempt to cover the real mode IVT with an allocation. This is a UEFI
   // driver, hence the arch protocols have been installed previously. Among
   // those, the CPU arch protocol has configured the IDT, so we can overwrite
   // the IVT used in real mode.

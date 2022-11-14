@@ -951,7 +951,7 @@ Virtio10UnmapSharedBuffer (
   return Status;
 }
 
-STATIC CONST VIRTIO_DEVICE_PROTOCOL  mVirtIoQemuQ35Pkglate = {
+STATIC CONST VIRTIO_DEVICE_PROTOCOL  mVirtIoTemplate = {
   VIRTIO_SPEC_REVISION (1,     0, 0),
   0,                           // SubSystemDeviceId, filled in dynamically
   Virtio10GetDeviceFeatures,
@@ -1072,7 +1072,7 @@ Virtio10BindingStart (
   }
 
   Device->Signature = VIRTIO_1_0_SIGNATURE;
-  CopyMem (&Device->VirtIo, &mVirtIoQemuQ35Pkglate, sizeof mVirtIoQemuQ35Pkglate);
+  CopyMem (&Device->VirtIo, &mVirtIoTemplate, sizeof (mVirtIoTemplate));
 
   Status = gBS->OpenProtocol (
                   DeviceHandle,

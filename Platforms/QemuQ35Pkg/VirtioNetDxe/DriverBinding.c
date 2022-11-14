@@ -23,7 +23,7 @@
           ))
 
 /*
-  QemuQ35Pkgorarily enable then reset the virtio-net device in order to retrieve
+  Temporarily enable then reset the virtio-net device in order to retrieve
   configuration values needed by Simple Network Protocol and Simple Network
   Mode fields.
 
@@ -362,9 +362,9 @@ VirtioNetDriverBindingSupported (
   VIRTIO_DEVICE_PROTOCOL  *VirtIo;
 
   //
-  // AtQemuQ35Pkgt to open the device with the VirtIo set of interfaces. On success,
+  // Attempt to open the device with the VirtIo set of interfaces. On success,
   // the protocol is "instantiated" for the VirtIo device. Covers duplicate open
-  // atQemuQ35Pkgts (EFI_ALREADY_STARTED).
+  // attempts (EFI_ALREADY_STARTED).
   //
   Status = gBS->OpenProtocol (
                   DeviceHandle,               // candidate device

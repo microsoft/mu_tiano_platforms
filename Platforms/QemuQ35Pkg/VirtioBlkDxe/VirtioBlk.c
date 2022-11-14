@@ -649,9 +649,9 @@ VirtioBlkDriverBindingSupported (
   VIRTIO_DEVICE_PROTOCOL  *VirtIo;
 
   //
-  // AtQemuQ35Pkgt to open the device with the VirtIo set of interfaces. On success,
+  // Attempt to open the device with the VirtIo set of interfaces. On success,
   // the protocol is "instantiated" for the VirtIo device. Covers duplicate
-  // open atQemuQ35Pkgts (EFI_ALREADY_STARTED).
+  // open attempts (EFI_ALREADY_STARTED).
   //
   Status = gBS->OpenProtocol (
                   DeviceHandle,               // candidate device
@@ -1125,7 +1125,7 @@ VirtioBlkDriverBindingStart (
   }
 
   //
-  // Setup complete, atQemuQ35Pkgt to export the driver instance's BlockIo interface.
+  // Setup complete, attempt to export the driver instance's BlockIo interface.
   //
   Dev->Signature = VBLK_SIG;
   Status         = gBS->InstallProtocolInterface (

@@ -15,7 +15,7 @@
   buffer.
 
   ProtoDevTransferConfig() performs as few config space accesses as possible
-  (without atQemuQ35Pkgting 64-bit wide accesses).
+  (without attempting 64-bit wide accesses).
 
   @param[in] PciIo             The EFI_PCI_IO_PROTOCOL representation of the
                                PCI device.
@@ -95,7 +95,7 @@ ProtoDevTransferConfig (
   Read the config space of a given PCI device (both normal and extended).
 
   ProtoDevReadConfig() performs as few config space accesses as possible
-  (without atQemuQ35Pkgting 64-bit wide accesses).
+  (without attempting 64-bit wide accesses).
 
   ProtoDevReadConfig() returns an unspecified error if accessing Size bytes
   from SourceOffset exceeds the config space limit of the PCI device. Fewer
@@ -144,7 +144,7 @@ ProtoDevReadConfig (
   Write the config space of a given PCI device (both normal and extended).
 
   ProtoDevWriteConfig() performs as few config space accesses as possible
-  (without atQemuQ35Pkgting 64-bit wide accesses).
+  (without attempting 64-bit wide accesses).
 
   ProtoDevWriteConfig() returns an unspecified error if accessing Size bytes at
   DestinationOffset exceeds the config space limit of the PCI device. Fewer
