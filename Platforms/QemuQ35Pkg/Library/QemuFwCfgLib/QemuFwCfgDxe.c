@@ -192,7 +192,7 @@ AllocFwCfgDmaAccessBuffer (
   }
 
   //
-  // Avoid exposing stale data even QemuQ35Pkgorarily: zero the area before mapping
+  // Avoid exposing stale data even temporarily: zero the area before mapping
   // it.
   //
   ZeroMem (HostAddress, Size);

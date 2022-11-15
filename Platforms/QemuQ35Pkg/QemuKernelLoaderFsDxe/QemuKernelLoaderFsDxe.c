@@ -166,7 +166,7 @@ typedef struct {
                                 medium is no longer supported.
   @retval EFI_DEVICE_ERROR      The device reported an error.
   @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
-  @retval EFI_WRITE_PROTECTED   An atQemuQ35Pkgt was made to create a file, or open a
+  @retval EFI_WRITE_PROTECTED   An attempt was made to create a file, or open a
                                 file for write when the media is
                                 write-protected.
   @retval EFI_ACCESS_DENIED     The service denied access to the file.
@@ -335,7 +335,7 @@ ConvertKernelBlobTypeToFileInfo (
   @retval EFI_SUCCESS           Data was read.
   @retval EFI_NO_MEDIA          The device has no medium.
   @retval EFI_DEVICE_ERROR      The device reported an error.
-  @retval EFI_DEVICE_ERROR      An atQemuQ35Pkgt was made to read from a deleted
+  @retval EFI_DEVICE_ERROR      An attempt was made to read from a deleted
                                 file.
   @retval EFI_DEVICE_ERROR      On entry, the current file position is beyond
                                 the end of the file.
@@ -426,7 +426,7 @@ StubFileRead (
                                 supported.
   @retval EFI_NO_MEDIA          The device has no medium.
   @retval EFI_DEVICE_ERROR      The device reported an error.
-  @retval EFI_DEVICE_ERROR      An atQemuQ35Pkgt was made to write to a deleted file.
+  @retval EFI_DEVICE_ERROR      An attempt was made to write to a deleted file.
   @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
   @retval EFI_WRITE_PROTECTED   The file or medium is write-protected.
   @retval EFI_ACCESS_DENIED     The file was opened read only.
@@ -460,7 +460,7 @@ StubFileWrite (
 
   @retval EFI_SUCCESS      The position was returned.
   @retval EFI_UNSUPPORTED  The request is not valid on open directories.
-  @retval EFI_DEVICE_ERROR An atQemuQ35Pkgt was made to get the position from a
+  @retval EFI_DEVICE_ERROR An attempt was made to get the position from a
                            deleted file.
 **/
 STATIC
@@ -495,7 +495,7 @@ StubFileGetPosition (
   @retval EFI_SUCCESS       The position was set.
   @retval EFI_UNSUPPORTED   The seek request for nonzero is not valid on open
                             directories.
-  @retval EFI_DEVICE_ERROR  An atQemuQ35Pkgt was made to set the position of a
+  @retval EFI_DEVICE_ERROR  An attempt was made to set the position of a
                             deleted file.
 **/
 STATIC
@@ -668,14 +668,14 @@ StubFileGetInfo (
   @retval EFI_WRITE_PROTECTED   InformationType is
                                 EFI_FILE_SYSTEM_VOLUME_LABEL_ID and the media
                                 is read-only.
-  @retval EFI_ACCESS_DENIED     An atQemuQ35Pkgt is made to change the name of a file
+  @retval EFI_ACCESS_DENIED     An attempt is made to change the name of a file
                                 to a file that is already present.
-  @retval EFI_ACCESS_DENIED     An atQemuQ35Pkgt is being made to change the
+  @retval EFI_ACCESS_DENIED     An attempt is being made to change the
                                 EFI_FILE_DIRECTORY Attribute.
-  @retval EFI_ACCESS_DENIED     An atQemuQ35Pkgt is being made to change the size of
+  @retval EFI_ACCESS_DENIED     An attempt is being made to change the size of
                                 a directory.
   @retval EFI_ACCESS_DENIED     InformationType is EFI_FILE_INFO_ID and the
-                                file was opened read-only and an atQemuQ35Pkgt is
+                                file was opened read-only and an attempt is
                                 being made to modify a field other than
                                 Attribute.
   @retval EFI_VOLUME_FULL       The volume is full.
@@ -720,9 +720,9 @@ StubFileFlush (
 }
 
 //
-// External definition of the file protocol QemuQ35Pkglate.
+// External definition of the file protocol template.
 //
-STATIC CONST EFI_FILE_PROTOCOL  mEfiFileProtocolQemuQ35Pkglate = {
+STATIC CONST EFI_FILE_PROTOCOL  mEfiFileProtocolTemplate = {
   EFI_FILE_PROTOCOL_REVISION, // revision 1
   StubFileOpen,
   StubFileClose,
@@ -804,8 +804,8 @@ StubFileOpen (
   NewStubFile->Position  = 0;
   CopyMem (
     &NewStubFile->File,
-    &mEfiFileProtocolQemuQ35Pkglate,
-    sizeof mEfiFileProtocolQemuQ35Pkglate
+    &mEfiFileProtocolTemplate,
+    sizeof (mEfiFileProtocolTemplate)
     );
   *NewHandle = &NewStubFile->File;
 
@@ -859,8 +859,8 @@ StubFileSystemOpenVolume (
   StubFile->Position  = 0;
   CopyMem (
     &StubFile->File,
-    &mEfiFileProtocolQemuQ35Pkglate,
-    sizeof mEfiFileProtocolQemuQ35Pkglate
+    &mEfiFileProtocolTemplate,
+    sizeof (mEfiFileProtocolTemplate)
     );
   *Root = &StubFile->File;
 

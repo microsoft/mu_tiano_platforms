@@ -20,7 +20,7 @@
 
 #include "VirtioPciDevice.h"
 
-STATIC VIRTIO_DEVICE_PROTOCOL  mDeviceProtocolQemuQ35Pkglate = {
+STATIC VIRTIO_DEVICE_PROTOCOL  mDeviceProtocolTemplate = {
   0,                                    // Revision
   0,                                    // SubSystemDeviceId
   VirtioPciGetDeviceFeatures,           // GetDeviceFeatures
@@ -246,9 +246,9 @@ VirtioPciDeviceBindingSupported (
   PCI_TYPE00           Pci;
 
   //
-  // AtQemuQ35Pkgt to open the device with the PciIo set of interfaces. On success,
+  // Attempt to open the device with the PciIo set of interfaces. On success,
   // the protocol is "instantiated" for the PCI device. Covers duplicate open
-  // atQemuQ35Pkgts (EFI_ALREADY_STARTED).
+  // attempts (EFI_ALREADY_STARTED).
   //
   Status = gBS->OpenProtocol (
                   DeviceHandle,               // candidate device
@@ -352,11 +352,11 @@ VirtioPciInit (
   }
 
   //
-  // Copy protocol QemuQ35Pkglate
+  // Copy protocol template
   //
   CopyMem (
     &Device->VirtioDevice,
-    &mDeviceProtocolQemuQ35Pkglate,
+    &mDeviceProtocolTemplate,
     sizeof (VIRTIO_DEVICE_PROTOCOL)
     );
 
@@ -494,7 +494,7 @@ VirtioPciDeviceBindingStart (
   }
 
   //
-  // Setup complete, atQemuQ35Pkgt to export the driver instance's VirtioDevice
+  // Setup complete, attempt to export the driver instance's VirtioDevice
   // interface.
   //
   Device->Signature = VIRTIO_PCI_DEVICE_SIGNATURE;

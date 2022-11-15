@@ -566,11 +566,11 @@ IoMmuAllocateBuffer (
   //
   // Allocate the stash in EfiBootServicesData type memory.
   //
-  // Map() will QemuQ35Pkgorarily save encrypted data in the stash for
+  // Map() will temporarily save encrypted data in the stash for
   // BusMasterCommonBuffer[64] operations, so the data can be decrypted to the
   // original location.
   //
-  // Unmap() will QemuQ35Pkgorarily save plaintext data in the stash for
+  // Unmap() will temporarily save plaintext data in the stash for
   // BusMasterCommonBuffer[64] operations, so the data can be encrypted to the
   // original location.
   //
@@ -724,7 +724,7 @@ IoMmuFreeBuffer (
   @retval EFI_OUT_OF_RESOURCES   There are not enough resources available to
                                  modify the IOMMU access.
   @retval EFI_DEVICE_ERROR       The IOMMU device reported an error while
-                                 atQemuQ35Pkgting the operation.
+                                 attempting the operation.
 
 **/
 EFI_STATUS

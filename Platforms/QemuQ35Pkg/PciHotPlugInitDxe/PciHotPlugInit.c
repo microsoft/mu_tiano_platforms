@@ -38,7 +38,7 @@ STATIC BOOLEAN  mPciExtConfSpaceSupported;
 STATIC EFI_PCI_HOT_PLUG_INIT_PROTOCOL  mPciHotPlugInit;
 
 //
-// Resource padding QemuQ35Pkglate for the GetResourcePadding() protocol member
+// Resource padding template for the GetResourcePadding() protocol member
 // function.
 //
 // Refer to Table 8 "ACPI 2.0 & 3.0 QWORD Address Space Descriptor Usage" in

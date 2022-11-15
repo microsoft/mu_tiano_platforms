@@ -411,7 +411,7 @@ typedef struct {
 
   @param[out]    IsFinal  In case of successful parsing, this parameter signals
                           whether the node just parsed is the final node in the
-                          device path. The call after a final node will atQemuQ35Pkgt
+                          device path. The call after a final node will attempt
                           to start parsing the next path. If the call doesn't
                           succeed, then this parameter is not changed.
 
@@ -1524,7 +1524,7 @@ TranslateOfwPath (
 /**
   Connect devices based on the boot order retrieved from QEMU.
 
-  AtQemuQ35Pkgt to retrieve the "bootorder" fw_cfg file from QEMU. Translate the
+  Attempt to retrieve the "bootorder" fw_cfg file from QEMU. Translate the
   OpenFirmware device paths therein to UEFI device path fragments. Connect the
   devices identified by the UEFI devpath prefixes as narrowly as possible, then
   connect all their child devices, recursively.
@@ -1778,7 +1778,7 @@ Match (
   }
 
   //
-  // AtQemuQ35Pkgt to expand any relative UEFI device path to
+  // Attempt to expand any relative UEFI device path to
   // an absolute device path first.
   //
   if (Shortform) {
@@ -2000,7 +2000,7 @@ PruneBootVariables (
 
   Set the boot order based on configuration retrieved from QEMU.
 
-  AtQemuQ35Pkgt to retrieve the "bootorder" fw_cfg file from QEMU. Translate the
+  Attempt to retrieve the "bootorder" fw_cfg file from QEMU. Translate the
   OpenFirmware device paths therein to UEFI device path fragments. Match the
   translated fragments against the current list of boot options, and rewrite
   the BootOrder NvVar so that it corresponds to the order described in fw_cfg.

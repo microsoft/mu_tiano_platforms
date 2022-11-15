@@ -300,8 +300,8 @@ typedef enum {
   Legacy16Boot = 0x0003,
 
   ///
-  /// Allows the Compatibility16 code to get the last device from which a boot was atQemuQ35Pkgted. This is
-  /// stored in CMOS and is the priority number of the last atQemuQ35Pkgted boot device.
+  /// Allows the Compatibility16 code to get the last device from which a boot was attempted. This is
+  /// stored in CMOS and is the priority number of the last attempted boot device.
   /// Input:
   ///   AX = Compatibility16RetrieveLastBootDevice
   /// Output:
@@ -587,7 +587,7 @@ typedef struct {
   UINT16    Reserved1   : 4;                            ///< Reserved for future use.
   UINT16    Enabled     : 1;                            ///< If 0, ignore this entry.
   UINT16    Failed      : 1;                            ///< 0 = Not known if boot failure occurred.
-                                                        ///< 1 = Boot atQemuQ35Pkgted failed.
+                                                        ///< 1 = Boot attempt failed.
 
   ///
   /// State of media present.
@@ -1244,7 +1244,7 @@ EFI_STATUS
   );
 
 /**
-  This function atQemuQ35Pkgts to traditionally boot the specified BootOption. If the EFI context has
+  This function attempts to traditionally boot the specified BootOption. If the EFI context has
   been compromised, this function will not return. This procedure is not used for loading an EFI-aware
   OS off a traditional device. The following actions occur:
   - Get EFI SMBIOS data structures, convert them to a traditional format, and copy to
