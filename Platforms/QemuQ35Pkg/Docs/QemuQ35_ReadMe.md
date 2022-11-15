@@ -69,6 +69,19 @@ sample PRM modules are used to demonstrate the feature and show how additional m
 
 [Details](Features/feature_prm.md)
 
+### CodeQL
+
+CodeQL is open source and free for open-source projects. It is maintained by GitHub and naturally has excellent
+integration with GitHub projects. CodeQL uses a semantic code analysis engine to discover vulnerabilities in a
+number of programming languages (both compiled and interpreted).
+
+Project Mu (and TianoCore) use CodeQL C/C++ queries to find common programming errors and security vulnerabilities in
+firmware code. This platform leverages the CodeQL build plugin from Mu Basecore that makes it very easy to run CodeQL
+against this platform. You simply use provide the `--codeql` argument in your normal `stuart_update` and `stuart_build`
+commands.
+
+[Details](Features/feature_codeql.md)
+
 ## Mu Customized Components
 
 ### Modules
