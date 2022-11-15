@@ -19,6 +19,8 @@ variables:
 - group: tool-chain-ubuntu-gcc
 
 jobs:
+- script: echo "##vso[task.prependpath]/home/vsts_azpcontainer/.local/bin"
+  displayName: Add User Local Bin to Path
 - template: Jobs/PrGate.yml@mu_devops
   parameters:
     arch_list: $(arch_list)
