@@ -31,6 +31,5 @@ jobs:
     target_list: NO-TARGET
     tool_chain_tag: $(tool_chain_tag)
     vm_image: ubuntu-latest
-    install_tools: false
-    container_image: ghcr.io/tianocore/containers/fedora-35-build:5800d58
+    container_build: true
 
