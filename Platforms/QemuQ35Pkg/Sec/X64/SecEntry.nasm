@@ -40,20 +40,20 @@ ASM_PFX(_ModuleEntryPoint):
     ; The loop below will seed the heap as well, but that's harmless.
     ;
     mov     rax, (FixedPcdGet32 (PcdInitValueInTempStack) << 32) | FixedPcdGet32 (PcdInitValueInTempStack)
-                                                              ; qword to store
-    mov     rdi, FixedPcdGet32 (PcdOvmfSecPeiQemuQ35PkgRamBase)     ; base address,
-                                                              ;   relative to
-                                                              ;   ES
-    mov     rcx, FixedPcdGet32 (PcdOvmfSecPeiQemuQ35PkgRamSize) / 8 ; qword count
-    cld                                                       ; store from base
-                                                              ;   up
+                                                                    ; qword to store
+    mov     rdi, FixedPcdGet32 (PcdSecPeiTemporaryRamBase)          ; base address,
+                                                                    ;   relative to
+                                                                    ;   ES
+    mov     rcx, FixedPcdGet32 (PcdSecPeiTemporaryRamSize) / 8      ; qword count
+    cld                                                             ; store from base
+                                                                    ;   up
     rep stosq
 
     ;
     ; Load Temporary RAM stack based on PCDs
     ;
-    %define SEC_TOP_OF_STACK (FixedPcdGet32 (PcdOvmfSecPeiQemuQ35PkgRamBase) + \
-                          FixedPcdGet32 (PcdOvmfSecPeiQemuQ35PkgRamSize))
+    %define SEC_TOP_OF_STACK (FixedPcdGet32 (PcdSecPeiTemporaryRamBase) + \
+                          FixedPcdGet32 (PcdSecPeiTemporaryRamSize))
     mov     rsp, SEC_TOP_OF_STACK
     nop
 

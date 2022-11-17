@@ -79,8 +79,8 @@
   %define TDX_CFV_MEMORY_BASE       FixedPcdGet32 (PcdCfvBase),
   %define TDX_CFV_MEMORY_SIZE       FixedPcdGet32 (PcdCfvRawDataSize),
 
-  %define TDX_HEAP_STACK_BASE       FixedPcdGet32 (PcdOvmfSecPeiQemuQ35PkgRamBase)
-  %define TDX_HEAP_STACK_SIZE       FixedPcdGet32 (PcdOvmfSecPeiQemuQ35PkgRamSize)
+  %define TDX_HEAP_STACK_BASE       FixedPcdGet32 (PcdSecPeiTemporaryRamBase)
+  %define TDX_HEAP_STACK_SIZE       FixedPcdGet32 (PcdSecPeiTemporaryRamSize)
 
   %define TDX_HOB_MEMORY_BASE       FixedPcdGet32 (PcdOvmfSecGhcbBase)
   %define TDX_HOB_MEMORY_SIZE       FixedPcdGet32 (PcdOvmfSecGhcbSize)
@@ -102,7 +102,7 @@
   %define SEV_ES_WORK_AREA (FixedPcdGet32 (PcdSevEsWorkAreaBase))
   %define SEV_ES_WORK_AREA_RDRAND (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 8)
   %define SEV_ES_WORK_AREA_ENC_MASK (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 16)
-  %define SEV_ES_VC_TOP_OF_STACK (FixedPcdGet32 (PcdOvmfSecPeiQemuQ35PkgRamBase) + FixedPcdGet32 (PcdOvmfSecPeiQemuQ35PkgRamSize))
+  %define SEV_ES_VC_TOP_OF_STACK (FixedPcdGet32 (PcdSecPeiTemporaryRamBase) + FixedPcdGet32 (PcdSecPeiTemporaryRamSize))
   %define SEV_SNP_SECRETS_BASE  (FixedPcdGet32 (PcdOvmfSnpSecretsBase))
   %define SEV_SNP_SECRETS_SIZE  (FixedPcdGet32 (PcdOvmfSnpSecretsSize))
   %define CPUID_BASE  (FixedPcdGet32 (PcdOvmfCpuidBase))

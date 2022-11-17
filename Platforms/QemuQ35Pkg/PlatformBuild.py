@@ -20,8 +20,8 @@ from edk2toolext.invocables.edk2_platform_build import BuildSettingsManager
 from edk2toolext.invocables.edk2_setup import SetupSettingsManager, RequiredSubmodule
 from edk2toolext.invocables.edk2_update import UpdateSettingsManager
 from edk2toolext.invocables.edk2_pr_eval import PrEvalSettingsManager
-from edk2toollib.utility_functions import RunCmd, RunPythonScript
-
+from edk2toollib.utility_functions import RunCmd, GetHostInfo
+from typing import Tuple
 
     # ####################################################################################### #
     #                                Common Configuration                                     #
@@ -37,10 +37,45 @@ class CommonPlatform():
     WorkspaceRoot = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     PackagesPath = ("Platforms", "MU_BASECORE", "Common/MU", "Common/MU_TIANO", "Common/MU_OEM_SAMPLE")
 
+    @staticmethod
+    def add_common_command_line_options(parserObj) -> None:
+        """Adds command line options common to settings managers."""
+        parserObj.add_argument('--codeql', dest='codeql', action='store_true', default=False,
+            help="Optional - Produces CodeQL results from the build. See "
+                 "MU_BASECORE/.pytool/Plugin/CodeQL/Readme.md for more information.")
+
+    @staticmethod
+    def retrieve_common_command_line_options(args) -> bool:
+        """Retrieves command line options common to settings managers."""
+        return args.codeql
+
+    @staticmethod
+    def get_active_scopes(codeql_enabled: bool) -> Tuple[str]:
+        """Returns the active scopes for the platform."""
+        active_scopes = CommonPlatform.Scopes
+
+        # Enable the CodeQL plugin if chosen on command line
+        if codeql_enabled:
+            if GetHostInfo().os == "Linux":
+                active_scopes += ("codeql-linux-ext-dep",)
+            else:
+                active_scopes += ("codeql-windows-ext-dep",)
+            active_scopes += ("codeql-build", "codeql-analyze")
+
+        return active_scopes
+
     # ####################################################################################### #
     #                         Configuration for Update & Setup                                #
     # ####################################################################################### #
 class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSettingsManager):
+
+    def AddCommandLineOptions(self, parserObj):
+        """Add command line options to the argparser"""
+        CommonPlatform.add_common_command_line_options(parserObj)
+
+    def RetrieveCommandLineOptions(self, args):
+        """Retrieve command line options from the argparser"""
+        self.codeql = CommonPlatform.retrieve_common_command_line_options(args)
 
     def GetPackagesSupported(self):
         ''' return iterable of edk2 packages supported by this build.
@@ -101,7 +136,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
-        return CommonPlatform.Scopes
+        return CommonPlatform.get_active_scopes(self.codeql)
 
     def FilterPackagesToTest(self, changedFilesList: list, potentialPackagesList: list) -> list:
         ''' Filter other cases that this package should be built
@@ -147,7 +182,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
     # ####################################################################################### #
     #                         Actual Configuration for Platform Build                         #
     # ####################################################################################### #
-class PlatformBuilder( UefiBuilder, BuildSettingsManager):
+class PlatformBuilder(UefiBuilder, BuildSettingsManager):
     def __init__(self):
         UefiBuilder.__init__(self)
 
@@ -161,11 +196,14 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             help="Optional - CSV of architecture to build.  IA32,X64 will use IA32 for PEI and "
             "X64 for DXE and is the only valid option for this platform.")
 
+        CommonPlatform.add_common_command_line_options(parserObj)
+
     def RetrieveCommandLineOptions(self, args):
         '''  Retrieve command line options from the argparser '''
         if args.build_arch.upper() != "IA32,X64":
             raise Exception("Invalid Arch Specified.  Please see comments in PlatformBuild.py::PlatformBuilder::AddCommandLineOptions")
 
+        self.codeql = CommonPlatform.retrieve_common_command_line_options(args)
 
     def GetWorkspaceRoot(self):
         ''' get WorkspacePath '''
@@ -183,7 +221,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
-        return CommonPlatform.Scopes
+        return CommonPlatform.get_active_scopes(self.codeql)
 
     def GetName(self):
         ''' Get the name of the repo, platform, or product being build '''
@@ -235,6 +273,10 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         self.env.SetValue("POLICY_DATA_STRUCT_FOLDER", self.mws.join(self.ws, "QemuQ35Pkg", "Include"), "Platform Defined")
         self.env.SetValue('POLICY_REPORT_FOLDER', self.mws.join(self.ws, "QemuQ35Pkg", "PolicyData"), "Platform Defined")
 
+        # Globally set CodeQL failures to be ignored in this repo.
+        # Note: This has no impact if CodeQL is not active/enabled.
+        self.env.SetValue("STUART_CODEQL_AUDIT_ONLY", "true", "Platform Defined")
+
         return 0
 
     def PlatformPreBuild(self):
@@ -254,7 +296,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
     def __SetEsrtGuidVars(self, var_name, guid_str, desc_string):
         cur_guid = uuid.UUID(guid_str)
         self.env.SetValue("BLD_*_%s_REGISTRY" % var_name, guid_str, desc_string)
-        self.env.SetValue("BLD_*_%s_BYTES" % var_name, "{" + (",".join(("0x%X" % byte) for byte in cur_guid.bytes_le)) + "}", desc_string)
+        self.env.SetValue("BLD_*_%s_BYTES" % var_name, "'{" + (",".join(("0x%X" % byte) for byte in cur_guid.bytes_le)) + "}'", desc_string)
         return
 
     def FlashRomImage(self):

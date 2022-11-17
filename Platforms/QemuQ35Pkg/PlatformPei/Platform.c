@@ -747,7 +747,7 @@ MaxCpuCountInitialization (
         }
 
         //
-        // AtQemuQ35Pkgt to select the next CPU.
+        // Attempt to select the next CPU.
         //
         ++Possible;
         IoWrite32 (CpuHpBase + QEMU_CPUHP_W_CPU_SEL, Possible);

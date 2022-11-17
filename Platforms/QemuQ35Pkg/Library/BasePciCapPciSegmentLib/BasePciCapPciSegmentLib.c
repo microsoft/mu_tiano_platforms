@@ -18,7 +18,7 @@
   Read the config space of a given PCI device (both normal and extended).
 
   SegmentDevReadConfig() performs as few config space accesses as possible
-  (without atQemuQ35Pkgting 64-bit wide accesses).
+  (without attempting 64-bit wide accesses).
 
   @param[in] PciDevice           Implementation-specific unique representation
                                  of the PCI device in the PCI hierarchy.
@@ -79,7 +79,7 @@ SegmentDevReadConfig (
   Write the config space of a given PCI device (both normal and extended).
 
   SegmentDevWriteConfig() performs as few config space accesses as possible
-  (without atQemuQ35Pkgting 64-bit wide accesses).
+  (without attempting 64-bit wide accesses).
 
   @param[in] PciDevice          Implementation-specific unique representation
                                 of the PCI device in the PCI hierarchy.

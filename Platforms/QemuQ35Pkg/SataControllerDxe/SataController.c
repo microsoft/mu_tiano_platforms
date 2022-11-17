@@ -104,11 +104,11 @@ CalculateBestPioMode (
 {
   UINT16  PioMode;
   UINT16  AdvancedPioMode;
-  UINT16  QemuQ35Pkg;
+  UINT16  Temp;
   UINT16  Index;
   UINT16  MinimumPioCycleTime;
 
-  QemuQ35Pkg = 0xff;
+  Temp = 0xff;
 
   PioMode = (UINT8)(((ATA5_IDENTIFY_DATA *)(&(IdentifyData->AtaData)))->pio_cycle_timing >> 8);
 
@@ -121,19 +121,19 @@ CalculateBestPioMode (
 
     for (Index = 0; Index < 8; Index++) {
       if ((AdvancedPioMode & 0x01) != 0) {
-        QemuQ35Pkg = Index;
+        Temp = Index;
       }
 
       AdvancedPioMode >>= 1;
     }
 
     //
-    // If QemuQ35Pkg is modified, mean the advanced_pio_modes is not zero;
-    // if QemuQ35Pkg is not modified, mean there is no advanced PIO mode supported,
+    // If Temp is modified, mean the advanced_pio_modes is not zero;
+    // if Temp is not modified, mean there is no advanced PIO mode supported,
     // the best PIO Mode is the value in pio_cycle_timing.
     //
-    if (QemuQ35Pkg != 0xff) {
-      AdvancedPioMode = (UINT16)(QemuQ35Pkg + 3);
+    if (Temp != 0xff) {
+      AdvancedPioMode = (UINT16)(Temp + 3);
     } else {
       AdvancedPioMode = PioMode;
     }
@@ -216,7 +216,7 @@ CalculateBestUdmaMode (
   OUT UINT16            *SelectedMode
   )
 {
-  UINT16  QemuQ35PkgMode;
+  UINT16  TempMode;
   UINT16  DeviceUDmaMode;
 
   DeviceUDmaMode = 0;
@@ -231,10 +231,10 @@ CalculateBestUdmaMode (
   DeviceUDmaMode = IdentifyData->AtaData.ultra_dma_mode;
   DEBUG ((DEBUG_INFO, "CalculateBestUdmaMode: DeviceUDmaMode = %x\n", DeviceUDmaMode));
   DeviceUDmaMode &= 0x3f;
-  QemuQ35PkgMode  = 0;                // initialize it to UDMA-0
+  TempMode        = 0;          // initialize it to UDMA-0
 
   while ((DeviceUDmaMode >>= 1) != 0) {
-    QemuQ35PkgMode++;
+    TempMode++;
   }
 
   //
@@ -246,15 +246,15 @@ CalculateBestUdmaMode (
       return EFI_UNSUPPORTED;   // no mode below ATA_UDMA_MODE_0
     }
 
-    if (QemuQ35PkgMode >= *DisUDmaMode) {
-      QemuQ35PkgMode = (UINT16)(*DisUDmaMode - 1);
+    if (TempMode >= *DisUDmaMode) {
+      TempMode = (UINT16)(*DisUDmaMode - 1);
     }
   }
 
   //
   // Possible returned mode is between ATA_UDMA_MODE_0 and ATA_UDMA_MODE_5
   //
-  *SelectedMode = QemuQ35PkgMode;
+  *SelectedMode = TempMode;
 
   return EFI_SUCCESS;
 }
@@ -321,7 +321,7 @@ SataControllerSupported (
   PCI_TYPE00           PciData;
 
   //
-  // AtQemuQ35Pkgt to open PCI I/O Protocol
+  // Attempt to open PCI I/O Protocol
   //
   Status = gBS->OpenProtocol (
                   Controller,
@@ -775,7 +775,7 @@ IdeInitGetChannelInfo (
   @retval EFI_UNSUPPORTED         Phase is not supported.
   @retval EFI_INVALID_PARAMETER   Channel is invalid (Channel >= ChannelCount).
   @retval EFI_NOT_READY           This phase cannot be entered at this time; for
-                                  example, an atQemuQ35Pkgt was made to enter a Phase
+                                  example, an attempt was made to enter a Phase
                                   without having entered one or more previous
                                   Phase.
 

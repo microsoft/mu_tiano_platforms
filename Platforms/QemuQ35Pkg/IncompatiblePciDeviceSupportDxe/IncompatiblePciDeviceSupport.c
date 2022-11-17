@@ -32,7 +32,7 @@ STATIC EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL
   mIncompatiblePciDeviceSupport;
 
 //
-// Configuration QemuQ35Pkglate for the CheckDevice() protocol member function.
+// Configuration template for the CheckDevice() protocol member function.
 //
 // Refer to Table 20 "ACPI 2.0 & 3.0 QWORD Address Space Descriptor Usage" in
 // the Platform Init 1.4a Spec, Volume 5.

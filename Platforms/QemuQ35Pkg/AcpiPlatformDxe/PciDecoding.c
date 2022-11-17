@@ -1,5 +1,5 @@
 /** @file
-  QemuQ35Pkgorarily enable IO and MMIO decoding for all PCI devices while QEMU
+  Temporarily enable IO and MMIO decoding for all PCI devices while QEMU
   regenerates the ACPI tables.
 
   Copyright (C) 2016, Red Hat, Inc.

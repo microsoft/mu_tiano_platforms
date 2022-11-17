@@ -73,8 +73,8 @@
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfPeiMemFvSize
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfDxeMemFvBase
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecPeiQemuQ35PkgRamBase
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecPeiQemuQ35PkgRamSize
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdSecPeiTemporaryRamBase
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdSecPeiTemporaryRamSize
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecPageTablesBase
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecPageTablesSize
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecGhcbPageTableBase

@@ -658,7 +658,7 @@ Done:
 
   The function iterates through the PhysicalAddress one page at a time, and set
   or clears the memory encryption mask in the page table. If it encounters
-  that a given physical address range is part of large page then it atQemuQ35Pkgts to
+  that a given physical address range is part of large page then it attempts to
   change the attribute at one go (based on size), otherwise it splits the
   large pages into smaller (e.g 2M page into 4K pages) and then try to set or
   clear the encryption bit on the smallest page size.

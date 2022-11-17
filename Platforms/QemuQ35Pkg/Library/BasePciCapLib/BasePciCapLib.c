@@ -487,7 +487,7 @@ EmptyAndUninitPciCapCollection (
   If the PCI device has no capabilities, that per se will not fail
   PciCapListInit(); an empty capabilities list will be represented.
 
-  If the PCI device is found to be PCI Express, then an atQemuQ35Pkgt will be made to
+  If the PCI device is found to be PCI Express, then an attempt will be made to
   parse the extended capabilities list as well. If the first extended config
   space access -- via PciDevice->ReadConfig() with SourceOffset=0x100 and
   Size=4 -- fails, that per se will not fail PciCapListInit(); the device will
@@ -548,7 +548,7 @@ PciCapListInit (
   }
 
   //
-  // The (QemuQ35Pkgorary) CapHdrOffsets collection only references PCI_CAP
+  // The (temporary) CapHdrOffsets collection only references PCI_CAP
   // structures, and orders them based on PCI_CAP.Offset.
   //
   CapHdrOffsets = OrderedCollectionInit (
@@ -634,7 +634,7 @@ PciCapListInit (
   }
 
   //
-  // If the device has been found PCI Express, atQemuQ35Pkgt to traverse the extended
+  // If the device has been found PCI Express, attempt to traverse the extended
   // capabilities list. It starts right after the normal config space.
   //
   if (DeviceIsExpress) {
@@ -964,7 +964,7 @@ PciCapGetInfo (
   Read a slice of a capability instance.
 
   The function performs as few config space accesses as possible (without
-  atQemuQ35Pkgting 64-bit wide accesses). PciCapRead() performs bounds checking on
+  attempting 64-bit wide accesses). PciCapRead() performs bounds checking on
   SourceOffsetInCap and Size, and only invokes PciDevice->ReadConfig() if the
   requested transfer falls within Cap.
 
@@ -1026,7 +1026,7 @@ PciCapRead (
   Write a slice of a capability instance.
 
   The function performs as few config space accesses as possible (without
-  atQemuQ35Pkgting 64-bit wide accesses). PciCapWrite() performs bounds checking on
+  attempting 64-bit wide accesses). PciCapWrite() performs bounds checking on
   DestinationOffsetInCap and Size, and only invokes PciDevice->WriteConfig() if
   the requested transfer falls within Cap.
 

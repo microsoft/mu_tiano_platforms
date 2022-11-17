@@ -104,7 +104,7 @@
 
   # This PPI signals that accessing the MMIO range of the TPM is possible in
   # the PEI phase, regardless of memory encryption
-  gQemuQ35PkgTpmMmioAccessiblePpiGuid         = {0x35c84ff2, 0x7bfe, 0x453d, {0x84, 0x5f, 0x68, 0x3a, 0x49, 0x2c, 0xf7, 0xb7}}
+  gQemuQ35TpmMmioAccessiblePpiGuid            = {0x35c84ff2, 0x7bfe, 0x453d, {0x84, 0x5f, 0x68, 0x3a, 0x49, 0x2c, 0xf7, 0xb7}}
 
 [Protocols]
   gVirtioDeviceProtocolGuid             = {0xfa920010, 0x6785, 0x4941, {0xb6, 0xec, 0x49, 0x8c, 0x57, 0x9f, 0x16, 0x0a}}
@@ -158,8 +158,8 @@
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfFdBaseAddress|0x0|UINT32|0xf
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecPageTablesBase|0x0|UINT32|0x11
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecPageTablesSize|0x0|UINT32|0x12
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecPeiQemuQ35PkgRamBase|0x0|UINT32|0x13
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecPeiQemuQ35PkgRamSize|0x0|UINT32|0x14
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdSecPeiTemporaryRamBase|0x0|UINT32|0x13
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdSecPeiTemporaryRamSize|0x0|UINT32|0x14
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase|0x0|UINT32|0x18
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize|0x0|UINT32|0x19
   gUefiQemuQ35PkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize|0x0|UINT32|0x1a

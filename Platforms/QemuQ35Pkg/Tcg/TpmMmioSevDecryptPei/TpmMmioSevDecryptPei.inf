@@ -1,6 +1,6 @@
 ## @file
 # Map TPM MMIO range unencrypted when SEV-ES is active.
-# Install gQemuQ35PkgTpmMmioAccessiblePpiGuid unconditionally.
+# Install gQemuQ35TpmMmioAccessiblePpiGuid unconditionally.
 #
 # Copyright (C) 2021, Advanced Micro Devices, Inc.
 #
@@ -31,7 +31,7 @@
   PeiServicesLib
 
 [Ppis]
-  gQemuQ35PkgTpmMmioAccessiblePpiGuid                      ## PRODUCES
+  gQemuQ35TpmMmioAccessiblePpiGuid                   ## PRODUCES
 
 [FixedPcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress    ## CONSUMES

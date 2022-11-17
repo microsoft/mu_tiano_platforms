@@ -1,6 +1,6 @@
 /** @file
   Map TPM MMIO range unencrypted when SEV-ES is active.
-  Install gQemuQ35PkgTpmMmioAccessiblePpiGuid unconditionally.
+  Install gQemuQ35TpmMmioAccessiblePpiGuid unconditionally.
 
   Copyright (C) 2021, Advanced Micro Devices, Inc.
 
@@ -16,7 +16,7 @@
 
 STATIC CONST EFI_PEI_PPI_DESCRIPTOR  mTpmMmioRangeAccessible = {
   EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
-  &gQemuQ35PkgTpmMmioAccessiblePpiGuid,
+  &gQemuQ35TpmMmioAccessiblePpiGuid,
   NULL
 };
 
