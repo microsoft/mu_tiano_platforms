@@ -2,15 +2,17 @@
 
 **QemuSbsaPkg...**
 
-- Is another derivative of OvmfPkg based on EDK2 QEMU-SBSA ARM platform.
+- Is another derivative of OvmfPkg based on EDK2 QEMU-SBSA ARM machine type.
 - Will not support Legacy BIOS or CSM.
 - WIll not support S3 sleep functionality.
 - Has 64-bit for both PEI and DXE phase.
-- Seeks to enable a tightly constrained virtual platform based on the QEMU SBSA machine type.
+- Seeks to enable a tightly constrained virtual platform based on the QEMU ARM CPUs.
 
 By solely focusing on the ARM chipset, this package can be optimized such that it is allowed to break compatibility
 with other QEMU supported chipsets. The ARM chipset can be paired with an AARCH64 processor to enable a machine
-that can emulate server class hardware with industry standard features like TrustZone and PCI-E.
+that can emulate ARM based hardware with industry standard features like TrustZone and PCI-E. Although leveraging
+SBSA machine type provided by QEMU, the features enabled/included in this package will not be server class platform
+centric.
 
 ## QEMU-SBSA Platform
 
