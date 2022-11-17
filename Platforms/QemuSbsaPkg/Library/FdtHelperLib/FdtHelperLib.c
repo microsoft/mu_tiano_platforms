@@ -14,8 +14,8 @@
 #include <Library/PcdLib.h>
 #include <libfdt.h>
 
-STATIC INT32 mFdtFirstCpuOffset;
-STATIC INT32 mFdtCpuNodeSize;
+STATIC INT32  mFdtFirstCpuOffset;
+STATIC INT32  mFdtCpuNodeSize;
 
 /**
   Get MPIDR for a given cpu from device tree passed by Qemu.
@@ -26,20 +26,22 @@ STATIC INT32 mFdtCpuNodeSize;
 **/
 UINT64
 FdtHelperGetMpidr (
-  IN UINTN   CpuId
+  IN UINTN  CpuId
   )
 {
-  VOID           *DeviceTreeBase;
-  CONST UINT64   *RegVal;
-  INT32          Len;
+  VOID          *DeviceTreeBase;
+  CONST UINT64  *RegVal;
+  INT32         Len;
 
   DeviceTreeBase = (VOID *)(UINTN)PcdGet64 (PcdDeviceTreeInitialBaseAddress);
   ASSERT (DeviceTreeBase != NULL);
 
-  RegVal = fdt_getprop (DeviceTreeBase,
+  RegVal = fdt_getprop (
+             DeviceTreeBase,
              mFdtFirstCpuOffset + (CpuId * mFdtCpuNodeSize),
              "reg",
-             &Len);
+             &Len
+             );
   if (!RegVal) {
     DEBUG ((DEBUG_ERROR, "Couldn't find reg property for CPU:%d\n", CpuId));
     return 0;
@@ -59,11 +61,11 @@ FdtHelperCountCpus (
   VOID
   )
 {
-  VOID   *DeviceTreeBase;
-  INT32  Node;
-  INT32  Prev;
-  INT32  CpuNode;
-  UINT32 CpuCount;
+  VOID    *DeviceTreeBase;
+  INT32   Node;
+  INT32   Prev;
+  INT32   CpuNode;
+  UINT32  CpuCount;
 
   DeviceTreeBase = (VOID *)(UINTN)PcdGet64 (PcdDeviceTreeInitialBaseAddress);
   ASSERT (DeviceTreeBase != NULL);
@@ -82,7 +84,7 @@ FdtHelperCountCpus (
   // Walk through /cpus node and count the number of subnodes.
   // The count of these subnodes corresponds to the number of
   // CPUs created by Qemu.
-  Prev = fdt_first_subnode (DeviceTreeBase, CpuNode);
+  Prev               = fdt_first_subnode (DeviceTreeBase, CpuNode);
   mFdtFirstCpuOffset = Prev;
   while (1) {
     CpuCount++;
@@ -90,8 +92,9 @@ FdtHelperCountCpus (
     if (Node < 0) {
       break;
     }
+
     mFdtCpuNodeSize = Node - Prev;
-    Prev = Node;
+    Prev            = Node;
   }
 
   return CpuCount;

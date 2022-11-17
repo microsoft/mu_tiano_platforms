@@ -19,7 +19,7 @@
 **/
 UINT64
 FdtHelperGetMpidr (
-  IN UINTN   CpuId
+  IN UINTN  CpuId
   );
 
 /** Walks through the Device Tree created by Qemu and counts the number
