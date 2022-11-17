@@ -485,7 +485,7 @@ QemuVideoBochsModeSetup (
   if (NativeHorizontalResolution == 0 && NativeVerticalResolution == 0) {
     NativeHorizontalResolution  = XRes;
     NativeVerticalResolution    = YRes;
-    DEBUG ((DEBUG_INFO, "%a Using default resolutions\n", __FUNCTION__, NativeHorizontalResolution, NativeVerticalResolution));
+    DEBUG ((DEBUG_INFO, "%a Using default resolutions %d by %d\n", __FUNCTION__, NativeHorizontalResolution, NativeVerticalResolution));
   }
 
   QemuVideoBochsAddMode (
