@@ -8,7 +8,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = MsPlatformDevicesLibQemuQ35
-  FILE_GUID                      = C873E407-24B2-4F2F-9EE4-9E36EFDFCAB9
+  FILE_GUID                      = A9784614-312B-41CE-969B-8513FF19E3F5
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = MsPlatformDevicesLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION
