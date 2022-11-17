@@ -49,12 +49,14 @@
             "ArmVirtPkg/ArmVirtPkg.dec",
             "NetworkPkg/NetworkPkg.dec",
             "ArmPkg/ArmPkg.dec",
-            "OvmfPkg/OvmfPkg.dec",
             "EmbeddedPkg/EmbeddedPkg.dec",
             "ArmPlatformPkg/ArmPlatformPkg.dec",
-            "PcAtChipsetPkg/PcAtChipsetPkg.dec",
             "SecurityPkg/SecurityPkg.dec",
-            "ShellPkg/ShellPkg.dec"  #Is this ok?
+            "SourceLevelDebugPkg/SourceLevelDebugPkg.dec",
+            "MsCorePkg/MsCorePkg.dec",
+            "PcBdsPkg/PcBdsPkg.dec",
+            "QemuQ35Pkg/QemuQ35Pkg.dec",
+            "QemuSbsaPkg/QemuSbsaPkg.dec",
         ],
         # For host based unit tests
         "AcceptableDependencies-HOST_APPLICATION":[
