@@ -1,5 +1,5 @@
 # @file
-# Script to Build ArmVirtPkg UEFI firmware
+# Script to Build QEMU SBSA Platform UEFI firmware
 #
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
