@@ -664,7 +664,6 @@
   #
   # MM Communicate
   #
-  gArmTokenSpaceGuid.PcdMmBufferBase|0x1003FE00000
   gArmTokenSpaceGuid.PcdMmBufferSize|0x200000
 
   #
@@ -842,6 +841,11 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0
 !endif
+
+  #
+  # MM Communicate. The MM buffer base will be computed and set at runtime to top of memory.
+  #
+  gArmTokenSpaceGuid.PcdMmBufferBase
 
 [PcdsDynamicExDefault]
   # Default this to gSetupDataPkgGenericProfileGuid

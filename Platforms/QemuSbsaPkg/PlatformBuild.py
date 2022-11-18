@@ -175,7 +175,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         '''  Retrieve command line options from the argparser '''
         if args.build_arch.upper() != "AARCH64":
             raise Exception("Invalid Arch Specified.  Please see comments in PlatformBuild.py::PlatformBuilder::AddCommandLineOptions")
-        
+
         shell_environment.GetBuildVars().SetValue(
             "TARGET_ARCH", args.build_arch.upper(), "From CmdLine")
 
