@@ -283,6 +283,8 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         args += " BL32=" + os.path.join(op_fv, "BL32_AP_MM.fd")
         args += " all fip"
         args += " -j $(nproc)"
+        # Reuse the openssl from CryptoPkg
+        args += " OPENSSL_DIR=" + self.mws.join(self.ws, "CryptoPkg", "Library", "OpensslLib", "openssl")
         ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_TFA_PATH"))
         if ret != 0:
             return ret
