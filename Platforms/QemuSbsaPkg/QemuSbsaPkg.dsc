@@ -845,7 +845,7 @@
   #
   # MM Communicate
   #
-  gArmTokenSpaceGuid.PcdMmBufferBase|0x1003FE00000
+  gArmTokenSpaceGuid.PcdMmBufferBase|0x0
 
 [PcdsDynamicExDefault]
   # Default this to gSetupDataPkgGenericProfileGuid
