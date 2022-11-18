@@ -51,8 +51,12 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         else:
             logging.critical("Virtual Drive Path Invalid")
 
+        if env.GetValue("PATH_TO_OS") is not None:
+            args += " -m 8192"
+        else:
+            args += " -m 2048"
+
         args += " -machine sbsa-ref" #,accel=(tcg|kvm)"
-        args += " -m 1024"
         args += " -cpu max"
         if env.GetBuildValue ("QEMU_CORE_NUM") is not None:
           args += " -smp " + env.GetBuildValue ("QEMU_CORE_NUM")

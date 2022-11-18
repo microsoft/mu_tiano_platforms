@@ -86,6 +86,8 @@ SbsaQemuLibConstructor (
   // TODO: This is carved out by the BL31 during DT build up.
   PcdStatus = PcdSet64S (PcdSystemMemorySize, NewSize - PcdGet64 (PcdMmBufferSize));
   ASSERT_RETURN_ERROR (PcdStatus);
+  PcdStatus = PcdSet64S (PcdMmBufferBase, CurBase + NewSize - PcdGet64 (PcdMmBufferSize));
+  ASSERT_RETURN_ERROR (PcdStatus);
 
   return RETURN_SUCCESS;
 }
