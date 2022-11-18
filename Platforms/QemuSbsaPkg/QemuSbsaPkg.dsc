@@ -843,7 +843,7 @@
 !endif
 
   #
-  # MM Communicate
+  # MM Communicate. The MM buffer base will be computed and set at runtime to top of memory.
   #
   gArmTokenSpaceGuid.PcdMmBufferBase|0x0
 
