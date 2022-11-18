@@ -11,7 +11,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = QemuVideoDxe
-  FILE_GUID                      = bc5c35eb-e6fa-45b8-a31f-7943464c82aa
+  FILE_GUID                      = e3752948-b9a1-4770-90c4-df41c38986be
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
 
@@ -36,7 +36,6 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  QemuQ35Pkg/QemuQ35Pkg.dec
   MsGraphicsPkg/MsGraphicsPkg.dec # MU_CHANGE use MsGopOverrideProtocolGuid
   PolicyServicePkg/PolicyServicePkg.dec
   QemuQ35Pkg/QemuQ35Pkg.dec
@@ -66,9 +65,10 @@
 
 [Pcd]
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdVideoResolutionSource
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
   gMsGraphicsPkgTokenSpaceGuid.PcdMsGopOverrideProtocolGuid   # MU_CHANGE use MsGopOverrideProtocolGuid
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution # MU_CHANGE use pcds to control default resolution
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution   # MU_CHANGE use pcds to control default resolution
 
 [Depex]
   gPolicyProtocolGuid

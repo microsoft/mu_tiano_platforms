@@ -1,0 +1,45 @@
+## @file
+# QemuQ35 Ms Platform Devices Library
+#
+# Copyright (C) Microsoft Corporation. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MsPlatformDevicesLibQemuQ35
+  FILE_GUID                      = A9784614-312B-41CE-969B-8513FF19E3F5
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MsPlatformDevicesLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+ MsPlatformDevicesLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  PcBdsPkg/PcBdsPkg.dec
+  MsCorePkg/MsCorePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  QemuQ35Pkg/QemuQ35Pkg.dec
+  SourceLevelDebugPkg/SourceLevelDebugPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  IoLib
+  PciLib
+  UefiBootServicesTableLib
+  UefiLib
+  XenPlatformLib
+
+[Guids]
+  gRootBridgesConnectedEventGroupGuid
+
+[Pcd]
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId

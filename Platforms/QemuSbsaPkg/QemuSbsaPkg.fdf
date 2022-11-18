@@ -1,0 +1,588 @@
+#
+#  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
+#  Copyright (c) 2014-2016, Linaro Limited. All rights reserved.
+#  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.
+#  Copyright (c) Microsoft Corporation.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+################################################################################
+#
+# FD Section
+# The [FD] Section is made up of the definition statements and a
+# description of what goes into  the Flash Device Image.  Each FD section
+# defines one flash "device" image.  A flash device image may be one of
+# the following: Removable media bootable image (like a boot floppy
+# image,) an Option ROM image (that would be "flashed" into an add-in
+# card,) a System "Flash"  image (that would be burned into a system's
+# flash) or an Update ("Capsule") image that will be used to update and
+# existing system flash.
+#
+################################################################################
+
+[Defines]
+!if $(FD_SIZE_IN_MB) == 2
+  DEFINE FVMAIN_COMPACT_SIZE  = 0x1ff000
+!endif
+!if $(FD_SIZE_IN_MB) == 3
+  DEFINE FVMAIN_COMPACT_SIZE  = 0x2ff000
+!endif
+
+#===================================================================================
+  # SECURE_FLASH0 Layout
+#===================================================================================
+  DEFINE SECURE_FLASH_REGION_BL1_OFFSET                               = 0x00000000
+  DEFINE SECURE_FLASH_REGION_BL1_SIZE                                 = 0x00008000
+#===================================================================================
+  DEFINE SECURE_FLASH_REGION_FIP_OFFSET                               = 0x00008000
+  DEFINE SECURE_FLASH_REGION_FIP_SIZE                                 = 0x002D0000
+#===================================================================================
+  # Unused bytes offset                                                 0x002D8000
+  # Unused bytes size                                                   0x00D28000
+#===================================================================================
+  DEFINE SECURE_FLASH_NVSTORAGE_OFFSET                                = 0x01000000
+  DEFINE SECURE_FLASH_NVSTORAGE_SIZE                                  = 0x000C0000
+    DEFINE SECURE_FLASH_NVSTORAGE_SUBREGION_NV_VARIABLE_STORE_OFFSET  = 0x01000000
+    DEFINE SECURE_FLASH_NVSTORAGE_SUBREGION_NV_VARIABLE_STORE_SIZE    = 0x00040000
+    DEFINE SECURE_FLASH_NVSTORAGE_SUBREGION_NV_FTW_WORKING_OFFSET     = 0x01040000
+    DEFINE SECURE_FLASH_NVSTORAGE_SUBREGION_NV_FTW_WORKING_SIZE       = 0x00040000
+    DEFINE SECURE_FLASH_NVSTORAGE_SUBREGION_NV_FTW_SPARE_OFFSET       = 0x01080000
+    DEFINE SECURE_FLASH_NVSTORAGE_SUBREGION_NV_FTW_SPARE_SIZE         = 0x00040000
+#===================================================================================
+
+[FD.SECURE_FLASH0]
+BaseAddress   = 0x00000000
+Size          = 0x01100000
+ErasePolarity = 1
+BlockSize     = 0x00001000
+NumBlocks     = 0x1100
+
+################################################################################
+#
+# Following are lists of FD Region layout which correspond to the locations of different
+# images within the flash device.
+#
+# Regions must be defined in ascending order and may not overlap.
+#
+# A Layout Region start with a eight digit hex offset (leading "0x" required) followed by
+# the pipe "|" character, followed by the size of the region, also in hex with the leading
+# "0x" characters. Like:
+# Offset|Size
+# PcdOffsetCName|PcdSizeCName
+# RegionType <FV, DATA, or FILE>
+#
+################################################################################
+
+## Placeholder for Trusted Firmware
+# flash0 is secure so we put here the BL1
+$(SECURE_FLASH_REGION_BL1_OFFSET)|$(SECURE_FLASH_REGION_BL1_SIZE)
+# Build script post build step will eventually patch this region as:
+# FILE = Common/TFA/build/qemu_sbsa/debug/fip.bin
+
+# and FIP (BL2 + BL31)
+$(SECURE_FLASH_REGION_FIP_OFFSET)|$(SECURE_FLASH_REGION_FIP_SIZE)
+# Build script post build step will eventually patch this region as:
+# FILE = Common/TFA/build/qemu_sbsa/debug/fip.bin
+
+## Place for Variables. They share flash1 with EFI
+# Must be aligned to Flash Block size 0x40000
+$(SECURE_FLASH_NVSTORAGE_SUBREGION_NV_VARIABLE_STORE_OFFSET)|0x00040000
+gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+#NV_VARIABLE_STORE
+DATA = {
+  ## This is the EFI_FIRMWARE_VOLUME_HEADER
+  # ZeroVector []
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  # FileSystemGuid: gEfiSystemNvDataFvGuid         =
+  #   { 0xFFF12B8D, 0x7696, 0x4C8B,
+  #     { 0xA9, 0x85, 0x27, 0x47, 0x07, 0x5B, 0x4F, 0x50 }}
+  0x8D, 0x2B, 0xF1, 0xFF, 0x96, 0x76, 0x8B, 0x4C,
+  0xA9, 0x85, 0x27, 0x47, 0x07, 0x5B, 0x4F, 0x50,
+  # FvLength: 0xC0000
+  0x00, 0x00, 0x0C, 0x00, 0x00, 0x00, 0x00, 0x00,
+  # Signature "_FVH"       # Attributes
+  0x5f, 0x46, 0x56, 0x48, 0xff, 0xfe, 0x04, 0x00,
+  # HeaderLength # CheckSum # ExtHeaderOffset #Reserved #Revision
+  0x48, 0x00, 0x28, 0x09, 0x00, 0x00, 0x00, 0x02,
+  # Blockmap[0]: 0x3 Blocks * 0x40000 Bytes / Block
+  0x3, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00,
+  # Blockmap[1]: End
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  ## This is the VARIABLE_STORE_HEADER
+  # It is compatible with SECURE_BOOT_ENABLE == FALSE as well.
+  # Signature: gEfiAuthenticatedVariableGuid =
+  #   { 0xaaf32c78, 0x947b, 0x439a,
+  #     { 0xa1, 0x80, 0x2e, 0x14, 0x4e, 0xc3, 0x77, 0x92 }}
+  0x78, 0x2c, 0xf3, 0xaa, 0x7b, 0x94, 0x9a, 0x43,
+  0xa1, 0x80, 0x2e, 0x14, 0x4e, 0xc3, 0x77, 0x92,
+  # Size: 0x40000 (gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize) -
+  #         0x48 (size of EFI_FIRMWARE_VOLUME_HEADER) = 0x3ffb8
+  # This can speed up the Variable Dispatch a bit.
+  0xB8, 0xFF, 0x03, 0x00,
+  # FORMATTED: 0x5A #HEALTHY: 0xFE #Reserved: UINT16 #Reserved1: UINT32
+  0x5A, 0xFE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+}
+
+$(SECURE_FLASH_NVSTORAGE_SUBREGION_NV_FTW_WORKING_OFFSET)|0x00040000
+gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+#NV_FTW_WORKING
+DATA = {
+  # EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER->Signature = gEdkiiWorkingBlockSignatureGuid         =
+  #  { 0x9e58292b, 0x7c68, 0x497d, { 0xa0, 0xce, 0x65,  0x0, 0xfd, 0x9f, 0x1b, 0x95 }}
+  0x2b, 0x29, 0x58, 0x9e, 0x68, 0x7c, 0x7d, 0x49,
+  0xa0, 0xce, 0x65,  0x0, 0xfd, 0x9f, 0x1b, 0x95,
+  # Crc:UINT32            #WorkingBlockValid:1, WorkingBlockInvalid:1, Reserved
+  0x5b, 0xe7, 0xc6, 0x86, 0xFE, 0xFF, 0xFF, 0xFF,
+  # WriteQueueSize: UINT64
+  0xE0, 0xFF, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00
+}
+
+$(SECURE_FLASH_NVSTORAGE_SUBREGION_NV_FTW_SPARE_OFFSET)|$(SECURE_FLASH_NVSTORAGE_SUBREGION_NV_FTW_SPARE_SIZE)
+gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+#NV_FTW_SPARE
+
+SET gQemuSbsaPkgTokenSpaceGuid.PcdFlashNvStorageBase = $(SECURE_FLASH_NVSTORAGE_OFFSET)
+SET gQemuSbsaPkgTokenSpaceGuid.PcdFlashNvStorageSize = $(SECURE_FLASH_NVSTORAGE_SIZE)
+
+[FD.BL32_AP_MM]
+BaseAddress   = 0x20002000|gArmTokenSpaceGuid.PcdFdBaseAddress  # UEFI in DRAM + 128MB.
+Size          = 0x00e00000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the device (64MiB).
+ErasePolarity = 1
+
+BlockSize     = 0x00001000
+NumBlocks     = 0x0e00
+
+0x00000000|0x00280000
+gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
+FV = FV_STANDALONE_MM_COMPACT
+
+[FD.QEMU_EFI]
+BaseAddress   = 0x10000000|gArmTokenSpaceGuid.PcdFdBaseAddress
+Size          = 0x002C0000|gArmTokenSpaceGuid.PcdFdSize
+ErasePolarity = 1
+
+# This one is tricky, it must be: BlockSize * NumBlocks = Size
+BlockSize     = 0x00001000
+NumBlocks     = 0x2C0
+
+## Place for EFI (BL33)
+# This offset (if any as it is 0x0 currently) + BaseAddress (0x10000000) must be set in PRELOADED_BL33_BASE at ATF
+0x00000000|0x00200000
+gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
+FV = FVMAIN_COMPACT
+
+################################################################################
+#
+# FV Section
+#
+# [FV] section is used to define what components or modules are placed within a flash
+# device file.  This section also defines order the components and modules are positioned
+# within the image.  The [FV] section consists of define statements, set statements and
+# module statements.
+#
+################################################################################
+
+[FV.FvMain]
+FvNameGuid         = 64074afe-340a-4be6-94ba-91b5b4d0f71e
+BlockSize          = 0x40
+NumBlocks          = 0         # This FV gets compressed so make it just big enough
+FvAlignment        = 16        # FV alignment and FV attributes setting.
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+  INF MdeModulePkg/Core/Dxe/DxeMain.inf
+  INF MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
+  INF EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
+
+  #
+  # PI DXE Drivers producing Architectural Protocols (EFI Services)
+  #
+  INF ArmPkg/Drivers/CpuDxe/CpuDxe.inf
+  INF MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
+  INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+  INF MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
+  INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
+  INF MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
+  INF MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
+  INF EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
+  INF EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
+  INF MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
+
+  #
+  # Multiple Console IO support
+  #
+  INF MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
+  INF MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
+  INF MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
+  INF MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
+  INF MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
+
+  INF ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
+  INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
+  INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
+
+  #
+  # FAT filesystem + GPT/MBR partitioning + UDF filesystem + virtio-fs
+  #
+  INF MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
+  INF MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+  INF FatPkg/EnhancedFatDxe/Fat.inf
+  INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+  INF MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
+
+  #
+  # Status Code Routing
+  #
+  INF MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
+
+  #
+  # Platform Driver
+  #
+  INF QemuQ35Pkg/VirtioBlkDxe/VirtioBlk.inf
+  INF QemuQ35Pkg/VirtioNetDxe/VirtioNet.inf
+  INF QemuQ35Pkg/VirtioScsiDxe/VirtioScsi.inf
+  INF QemuQ35Pkg/VirtioRngDxe/VirtioRng.inf
+
+  # Rng Protocol producer
+  INF SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
+
+  FILE APPLICATION=PCD(gPcBdsPkgTokenSpaceGuid.PcdShellFile) {
+    SECTION PE32=$(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/AARCH64/Shell.efi
+    SECTION UI= "EdkShell"
+  }
+  INF ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
+  INF ShellPkg/DynamicCommand/HttpDynamicCommand/HttpDynamicCommand.inf
+  INF QemuQ35Pkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
+
+  INF MsGraphicsPkg/SimpleWindowManagerDxe/SimpleWindowManagerDxe.inf
+  INF MsGraphicsPkg/RenderingEngineDxe/RenderingEngineDxe.inf
+  INF MsGraphicsPkg/OnScreenKeyboardDxe/OnScreenKeyboardDxe.inf
+  INF MsGraphicsPkg/MsUiTheme/Dxe/MsUiThemeProtocol.inf
+  INF MsGraphicsPkg/DisplayEngineDxe/DisplayEngineDxe.inf
+  INF QemuQ35Pkg/QemuVideoDxe/QemuVideoDxe.inf
+
+  #
+  # Bds
+  #
+  INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+  INF MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+  INF MdeModulePkg/Universal/DriverHealthManagerDxe/DriverHealthManagerDxe.inf
+  INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+  INF PcBdsPkg/MsBootPolicy/MsBootPolicy.inf
+
+  #
+  # Policy and configuration
+  #
+  INF PolicyServicePkg/PolicyService/Dxe/PolicyDxe.inf
+  INF SetupDataPkg/ConfProfileMgrDxe/ConfProfileMgrDxe.inf
+  INF SetupDataPkg/ConfDataSettingProvider/ConfDataSettingProvider.inf
+
+  #
+  # Frontpages
+  #
+  INF SetupDataPkg/ConfApp/ConfApp.inf
+  # INF OemPkg/FrontpageButtonsVolumeUp/FrontpageButtonsVolumeUp.inf
+  INF OemPkg/FrontPage/FrontPage.inf
+  INF OemPkg/BootMenu/BootMenu.inf
+
+  #
+  # MFCI support
+  #
+  # TODO: This is not enabled, due to variable PEI is currently not supported...
+  INF MfciPkg/MfciDxe/MfciDxe.inf
+
+  #
+  # Networking stack
+  #
+!include NetworkPkg/Network.fdf.inc
+
+  # IDE/AHCI Support
+  INF QemuQ35Pkg/SataControllerDxe/SataControllerDxe.inf
+  INF MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
+  INF MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
+
+  INF QemuSbsaPkg/SbsaQemuPlatformDxe/SbsaQemuPlatformDxe.inf
+  INF MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
+
+  #
+  # SCSI Bus and Disk Driver
+  #
+  INF MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
+  INF MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
+
+  #
+  # NVME Driver
+  #
+  INF MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
+
+  #
+  # SMBIOS Support
+  #
+  INF MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
+  INF QemuSbsaPkg/SbsaQemuSmbiosDxe/SbsaQemuSmbiosDxe.inf
+  INF ArmPkg/Universal/Smbios/ProcessorSubClassDxe/ProcessorSubClassDxe.inf
+  INF ArmPkg/Universal/Smbios/SmbiosMiscDxe/SmbiosMiscDxe.inf
+
+  #
+  # ACPI Support
+  #
+!if $(ARCH) == AARCH64
+  INF MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
+  INF MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
+  INF MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
+  INF QemuSbsaPkg/SbsaQemuAcpiDxe/SbsaQemuAcpiDxe.inf
+  INF RuleOverride = ACPITABLE QemuSbsaPkg/AcpiTables/AcpiTables.inf
+
+  #
+  # EBC support
+  #
+  INF MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
+
+  #
+  # Standalone MM drivers in non-secure world
+  #
+  INF ArmPkg/Drivers/MmCommunicationDxe/MmCommunication.inf
+!endif
+
+  #
+  # PCI support
+  #
+  INF ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
+  INF MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
+  INF MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
+  INF QemuQ35Pkg/PciHotPlugInitDxe/PciHotPlugInit.inf
+  INF QemuQ35Pkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
+  INF QemuQ35Pkg/Virtio10Dxe/Virtio10.inf
+
+  #
+  # USB Support
+  #
+  INF MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
+  INF MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
+  INF MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
+  INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
+  INF MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
+  INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+
+  #
+  # TPM2 support
+  #
+!if $(TPM2_ENABLE) == TRUE
+  INF SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
+!if $(TPM2_CONFIG_ENABLE) == TRUE
+  INF SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
+!endif
+!endif
+
+  #
+  # Ramdisk support
+  #
+  INF MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
+
+  #
+  # MU Modules
+  #
+  INF  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
+  INF  MsCorePkg/MuCryptoDxe/MuCryptoDxe.inf
+  INF  MsGraphicsPkg/MsEarlyGraphics/Dxe/MsEarlyGraphics.inf
+  INF  MsWheaPkg/MsWheaReport/Dxe/MsWheaReportDxe.inf
+  INF  MsCorePkg/MuVarPolicyFoundationDxe/MuVarPolicyFoundationDxe.inf
+  INF  MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.inf
+  INF  MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
+  INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
+  INF  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+
+  #
+  # DFCI support
+  #
+  INF  DfciPkg/SettingsManager/SettingsManagerDxe.inf
+  INF  DfciPkg/Application/DfciMenu/DfciMenu.inf
+  INF  DfciPkg/IdentityAndAuthManager/IdentityAndAuthManagerDxe.inf
+  INF  DfciPkg/DfciManager/DfciManager.inf
+  FILE FREEFORM = PCD(gDfciPkgTokenSpaceGuid.PcdDfciTimerFile) {
+      SECTION RAW = DfciPkg/Include/Resources/DfciWorking.bmp
+  }
+  FILE FREEFORM = PCD(gZeroTouchPkgTokenSpaceGuid.PcdZeroTouchCertificateFile) {
+      SECTION RAW = ZeroTouchPkg/Certs/ZeroTouch/ZtdRecovery.cer
+  }
+
+  #
+  # Unit Test
+  #
+  !if $(BUILD_UNIT_TESTS) == TRUE
+  # INF  UefiTestingPkg/AuditTests/PagingAudit/UEFI/DxePagingAuditDriver.inf
+  !endif
+
+  #
+  # Graphic icons and logos
+  #
+  FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdLogoFile) {
+    SECTION RAW = OemPkg/FrontPage/Resources/BootLogo.bmp
+    SECTION UI = "Logo"
+  }
+  FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdFrontPageLogoFile) {
+    SECTION RAW = OemPkg/FrontPage/Resources/FrontpageLogo.bmp
+  }
+  FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdLowBatteryFile) {
+    SECTION RAW = OemPkg/FrontPage/Resources/LBAT.bmp
+  }
+  FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdThermalFile) {
+    SECTION RAW = OemPkg/FrontPage/Resources/THOT.bmp
+  }
+  FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdVolumeUpIndicatorFile) {
+    SECTION RAW = OemPkg/FrontPage/Resources/VolumeUp.bmp
+  }
+  FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdFirmwareSettingsIndicatorFile) {
+    SECTION RAW = OemPkg/FrontPage/Resources/FirmwareSettings.bmp
+  }
+  FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdBootFailIndicatorFile ) {
+    SECTION RAW = OemPkg/FrontPage/Resources/NoBoot.bmp
+  }
+  FILE FREEFORM = gSetupDataPkgGenericProfileGuid {
+    SECTION RAW = $(CONF_BIN_FILE_0)
+  }
+  FILE FREEFORM = gQemuQ35PkgProfile1Guid {
+    SECTION RAW = $(CONF_BIN_FILE_1)
+  }
+  FILE FREEFORM = gQemuQ35PkgProfile2Guid {
+    SECTION RAW = $(CONF_BIN_FILE_2)
+  }
+  FILE FREEFORM = gQemuQ35PkgProfile3Guid {
+    SECTION RAW = $(CONF_BIN_FILE_3)
+  }
+  FILE FREEFORM = gQemuQ35PkgDfciUnsignedXmlGuid {
+        SECTION RAW = QemuQ35Pkg/UnsignedPermissions.xml
+  }
+
+[FV.FVMAIN_COMPACT]
+FvAlignment        = 16
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+  INF ArmPlatformPkg/PrePeiCore/PrePeiCoreUniCore.inf
+  INF MdeModulePkg/Core/Pei/PeiMain.inf
+  INF ArmPlatformPkg/PlatformPei/PlatformPeim.inf
+  INF ArmPlatformPkg/MemoryInitPei/MemoryInitPeim.inf
+  INF ArmPkg/Drivers/CpuPei/CpuPei.inf
+  INF ArmPkg/Drivers/MmCommunicationPei/MmCommunicationPei.inf
+  INF ArmPkg/Drivers/SmmVariablePei/SmmVariablePei.inf
+  INF MdeModulePkg/Universal/PCD/Pei/Pcd.inf
+  INF MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
+  INF MsGraphicsPkg/MsUiTheme/Pei/MsUiThemePpi.inf
+  INF MsGraphicsPkg/MsEarlyGraphics/Pei/MsEarlyGraphics.inf
+  INF MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+  INF MsCorePkg/Core/GuidedSectionExtractPeim/GuidedSectionExtract.inf
+  INF MsWheaPkg/MsWheaReport/Pei/MsWheaReportPei.inf
+  INF OemPkg/DeviceStatePei/DeviceStatePei.inf
+  INF MfciPkg/MfciPei/MfciPei.inf
+
+  INF  SetupDataPkg/ConfDfciUnsignedListInit/ConfDfciUnsignedListInit.inf
+  INF  PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
+  INF  QemuQ35Pkg/ConfigDataGfx/ConfigDataGfx.inf
+
+!if $(TPM2_ENABLE) == TRUE
+  INF MdeModulePkg/Universal/ResetSystemPei/ResetSystemPei.inf
+  INF QemuQ35Pkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
+  INF SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
+!endif
+
+  FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
+    SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
+      SECTION FV_IMAGE = FVMAIN
+    }
+  }
+
+[FV.FV_STANDALONE_MM_COMPACT]
+FvAlignment        = 16
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+  INF StandaloneMmPkg/Core/StandaloneMmCore.inf
+  INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteStandaloneMm.inf
+  INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStandaloneMm.inf
+  INF ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashStandaloneMm.inf
+  INF ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
+
+################################################################################
+#
+# Rules are use with the [FV] section's module INF type to define
+# how an FFS file is created for a given INF file. The following Rule are the default
+# rules for the different module type. User can add the customized rules to define the
+# content of the FFS file.
+#
+################################################################################
+
+
+############################################################################
+# Example of a DXE_DRIVER FFS file with a Checksum encapsulation section   #
+############################################################################
+#
+#[Rule.Common.DXE_DRIVER]
+#  FILE DRIVER = $(NAMED_GUID) {
+#    DXE_DEPEX    DXE_DEPEX               Optional $(INF_OUTPUT)/$(MODULE_NAME).depex
+#    COMPRESS PI_STD {
+#      GUIDED {
+#        PE32     PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
+#        UI       STRING="$(MODULE_NAME)" Optional
+#        VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+#      }
+#    }
+#  }
+#
+############################################################################
+
+!include ArmVirtPkg/ArmVirtRules.fdf.inc
+
+[Rule.Common.MM_CORE_STANDALONE]
+  FILE SEC = $(NAMED_GUID) RELOCS_STRIPPED FIXED {
+    PE32  PE32 Align = Auto             $(INF_OUTPUT)/$(MODULE_NAME).efi
+  }
+
+[Rule.Common.MM_STANDALONE]
+  FILE MM_STANDALONE = $(NAMED_GUID) {
+    SMM_DEPEX SMM_DEPEX Optional       $(INF_OUTPUT)/$(MODULE_NAME).depex
+    PE32      PE32                     $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI        STRING="$(MODULE_NAME)" Optional
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }

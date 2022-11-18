@@ -198,3 +198,304 @@ QemuVideoCirrusModeSetup (
 
   return EFI_SUCCESS;
 }
+
+///
+/// Table of supported video modes
+///
+STATIC QEMU_VIDEO_BOCHS_MODES  QemuVideoBochsModes[] = {
+  { 640,  480  },
+  { 800,  480  },
+  { 800,  600  },
+  { 832,  624  },
+  { 960,  640  },
+  { 1024, 600  },
+  { 1024, 768  },
+  { 1152, 864  },
+  { 1152, 870  },
+  { 1280, 720  },
+  { 1280, 760  },
+  { 1280, 768  },
+  { 1280, 800  },
+  { 1280, 960  },
+  { 1280, 1024 },
+  { 1360, 768  },
+  { 1366, 768  },
+  { 1400, 1050 },
+  { 1440, 900  },
+  { 1600, 900  },
+  { 1600, 1200 },
+  { 1680, 1050 },
+  { 1920, 1080 },
+  { 1920, 1200 },
+  { 1920, 1440 },
+  { 2000, 2000 },
+  { 2048, 1536 },
+  { 2048, 2048 },
+  { 2560, 1440 },
+  { 2560, 1600 },
+  { 2560, 2048 },
+  { 2800, 2100 },
+  { 3200, 2400 },
+  { 3840, 2160 },
+  { 4096, 2160 },
+  { 7680, 4320 },
+  { 8192, 4320 }
+};
+
+#define QEMU_VIDEO_BOCHS_MODE_COUNT \
+  (ARRAY_SIZE (QemuVideoBochsModes))
+
+STATIC
+VOID
+QemuVideoBochsAddMode (
+  QEMU_VIDEO_PRIVATE_DATA  *Private,
+  UINT32                   AvailableFbSize,
+  UINT32                   Width,
+  UINT32                   Height
+  )
+{
+  QEMU_VIDEO_MODE_DATA  *ModeData = Private->ModeData + Private->MaxMode;
+  UINTN                 RequiredFbSize;
+
+  RequiredFbSize = (UINTN)Width * Height * 4;
+  if (RequiredFbSize > AvailableFbSize) {
+    DEBUG ((
+      DEBUG_INFO,
+      "Skipping Bochs Mode %dx%d, 32-bit (not enough vram)\n",
+      Width,
+      Height
+      ));
+    return;
+  }
+
+  ModeData->InternalModeIndex    = (UINT32)Private->MaxMode;
+  ModeData->HorizontalResolution = Width;
+  ModeData->VerticalResolution   = Height;
+  ModeData->ColorDepth           = 32;
+  DEBUG ((
+    DEBUG_INFO,
+    "Adding Bochs Internal Mode %d: %dx%d, %d-bit\n",
+    ModeData->InternalModeIndex,
+    ModeData->HorizontalResolution,
+    ModeData->VerticalResolution,
+    ModeData->ColorDepth
+    ));
+
+  Private->MaxMode++;
+}
+
+STATIC
+VOID
+QemuVideoBochsEdid (
+  QEMU_VIDEO_PRIVATE_DATA  *Private,
+  UINT32                   *XRes,
+  UINT32                   *YRes
+  )
+{
+  EFI_STATUS  Status;
+
+  if (Private->Variant != QEMU_VIDEO_BOCHS_MMIO) {
+    return;
+  }
+
+  Status = Private->PciIo->Mem.Read (
+                                 Private->PciIo,
+                                 EfiPciIoWidthUint8,
+                                 PCI_BAR_IDX2,
+                                 0,
+                                 sizeof (Private->Edid),
+                                 Private->Edid
+                                 );
+  if (Status != EFI_SUCCESS) {
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: mmio read failed\n",
+      __FUNCTION__
+      ));
+    return;
+  }
+
+  if ((Private->Edid[0] != 0x00) ||
+      (Private->Edid[1] != 0xff))
+  {
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: magic check failed\n",
+      __FUNCTION__
+      ));
+    return;
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: blob found (extensions: %d)\n",
+    __FUNCTION__,
+    Private->Edid[126]
+    ));
+
+  if ((Private->Edid[54] == 0x00) &&
+      (Private->Edid[55] == 0x00))
+  {
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: no detailed timing descriptor\n",
+      __FUNCTION__
+      ));
+    return;
+  }
+
+  *XRes = Private->Edid[56] | ((Private->Edid[58] & 0xf0) << 4);
+  *YRes = Private->Edid[59] | ((Private->Edid[61] & 0xf0) << 4);
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: default resolution: %dx%d\n",
+    __FUNCTION__,
+    *XRes,
+    *YRes
+    ));
+
+  if (PcdGet8 (PcdVideoResolutionSource) == 0) {
+    Status = PcdSet32S (PcdVideoHorizontalResolution, *XRes);
+    ASSERT_RETURN_ERROR (Status);
+    Status = PcdSet32S (PcdVideoVerticalResolution, *YRes);
+    ASSERT_RETURN_ERROR (Status);
+    Status = PcdSet8S (PcdVideoResolutionSource, 2);
+    ASSERT_RETURN_ERROR (Status);
+  }
+
+  // TODO: register edid as gEfiEdidDiscoveredProtocolGuid ?
+}
+
+EFI_STATUS
+QemuVideoBochsModeSetup (
+  QEMU_VIDEO_PRIVATE_DATA  *Private,
+  BOOLEAN                  IsQxl
+  )
+{
+  UINT32  AvailableFbSize;
+  UINT32  Index, XRes = 0, YRes = 0;
+
+  //
+  // Fetch the available framebuffer size.
+  //
+  // VBE_DISPI_INDEX_VIDEO_MEMORY_64K is expected to return the size of the
+  // drawable framebuffer. Up to and including qemu-2.1 however it used to
+  // return the size of PCI BAR 0 (ie. the full video RAM size).
+  //
+  // On stdvga the two concepts coincide with each other; the full memory size
+  // is usable for drawing.
+  //
+  // On QXL however, only a leading segment, "surface 0", can be used for
+  // drawing; the rest of the video memory is used for the QXL guest-host
+  // protocol. VBE_DISPI_INDEX_VIDEO_MEMORY_64K should report the size of
+  // "surface 0", but since it doesn't (up to and including qemu-2.1), we
+  // retrieve the size of the drawable portion from a field in the QXL ROM BAR,
+  // where it is also available.
+  //
+  if (IsQxl) {
+    UINT32  Signature;
+    UINT32  DrawStart;
+
+    Signature       = 0;
+    DrawStart       = 0xFFFFFFFF;
+    AvailableFbSize = 0;
+    if (EFI_ERROR (
+          Private->PciIo->Mem.Read (
+                                Private->PciIo,
+                                EfiPciIoWidthUint32,
+                                PCI_BAR_IDX2,
+                                0,
+                                1,
+                                &Signature
+                                )
+          ) ||
+        (Signature != SIGNATURE_32 ('Q', 'X', 'R', 'O')) ||
+        EFI_ERROR (
+          Private->PciIo->Mem.Read (
+                                Private->PciIo,
+                                EfiPciIoWidthUint32,
+                                PCI_BAR_IDX2,
+                                36,
+                                1,
+                                &DrawStart
+                                )
+          ) ||
+        (DrawStart != 0) ||
+        EFI_ERROR (
+          Private->PciIo->Mem.Read (
+                                Private->PciIo,
+                                EfiPciIoWidthUint32,
+                                PCI_BAR_IDX2,
+                                40,
+                                1,
+                                &AvailableFbSize
+                                )
+          ))
+    {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: can't read size of drawable buffer from QXL "
+        "ROM\n",
+        __FUNCTION__
+        ));
+      return EFI_NOT_FOUND;
+    }
+  } else {
+    AvailableFbSize  = BochsRead (Private, VBE_DISPI_INDEX_VIDEO_MEMORY_64K);
+    AvailableFbSize *= SIZE_64KB;
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: AvailableFbSize=0x%x\n",
+    __FUNCTION__,
+    AvailableFbSize
+    ));
+
+  //
+  // Setup Video Modes
+  //
+  Private->ModeData = AllocatePool (
+                        sizeof (Private->ModeData[0]) * (QEMU_VIDEO_BOCHS_MODE_COUNT+1)
+                        );
+  if (Private->ModeData == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  QemuVideoBochsEdid (Private, &XRes, &YRes);
+  // MU_CHANGE Starts: This is a change to sugarcoat the logic in GraphicsConsoleHelper
+  //                   We will only report the closest desired resolutions as supported modes.
+  UINT32  NativeHorizontalResolution = 0;
+  UINT32  NativeVerticalResolution   = 0;
+
+  for (Index = 0; Index < QEMU_VIDEO_BOCHS_MODE_COUNT; Index++) {
+    if ((QemuVideoBochsModes[Index].Width <= PcdGet32 (PcdVideoHorizontalResolution)) &&
+        (QemuVideoBochsModes[Index].Height <= PcdGet32 (PcdVideoHorizontalResolution)))
+    {
+      // Potential candidate for target display
+      if ((NativeHorizontalResolution < QemuVideoBochsModes[Index].Width) &&
+          (NativeVerticalResolution < QemuVideoBochsModes[Index].Height))
+      {
+        NativeHorizontalResolution = QemuVideoBochsModes[Index].Width;
+        NativeVerticalResolution   = QemuVideoBochsModes[Index].Height;
+      }
+    }
+  }
+
+  DEBUG ((DEBUG_INFO, "%a Discovered HRes: %d VRes: %d\n", __FUNCTION__, NativeHorizontalResolution, NativeVerticalResolution));
+
+  if ((NativeHorizontalResolution == 0) && (NativeVerticalResolution == 0)) {
+    NativeHorizontalResolution = XRes;
+    NativeVerticalResolution   = YRes;
+    DEBUG ((DEBUG_INFO, "%a Using default resolutions %d by %d\n", __FUNCTION__, NativeHorizontalResolution, NativeVerticalResolution));
+  }
+
+  QemuVideoBochsAddMode (
+    Private,
+    AvailableFbSize,
+    NativeHorizontalResolution,
+    NativeVerticalResolution
+    );
+  // MU_CHANGE Ends
+  return EFI_SUCCESS;
+}

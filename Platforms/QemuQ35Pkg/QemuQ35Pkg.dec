@@ -296,6 +296,13 @@
   #  instance in PiSmmCpuDxeSmm, and CpuHotplugSmm.
   gUefiQemuQ35PkgTokenSpaceGuid.PcdCpuHotEjectDataAddress|0|UINT64|0x46
 
+  ## This PCD tracks where PcdVideo{Horizontal,Vertical}Resolution
+  #  values are coming from.
+  #    0 - unset (defaults from platform dsc)
+  #    1 - set from PlatformConfig
+  #    2 - set by GOP Driver.
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdVideoResolutionSource|0|UINT8|0x64
+
 [PcdsFeatureFlag]
   gUefiQemuQ35PkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE|BOOLEAN|0x1c
   gUefiQemuQ35PkgTokenSpaceGuid.PcdQemuBootOrderMmioTranslation|FALSE|BOOLEAN|0x1d

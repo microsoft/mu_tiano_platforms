@@ -1,0 +1,77 @@
+#/** @file
+#
+#  Copyright (c) 2014, Linaro Limited. All rights reserved.
+#  Copyright (c) 2020, ARM Limited. All rights reserved.
+#  Copyright (c) Microsoft Corporation.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = QemuSbsaPkg
+  PACKAGE_GUID                   = 9EBD48E1-2370-4B1C-AFF7-811DD22E8BCB
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes]
+  Include
+
+[LibraryClasses]
+  ##  @libraryclass  Flat device tree support library on the CPU ID related operations
+  FdtHelperLib|Include/Library/FdtHelperLib.h
+
+[Guids]
+  gQemuSbsaPkgTokenSpaceGuid          = { 0x549288f7, 0x4281, 0x4f08, { 0x8f, 0x9e, 0x89, 0xe8, 0xd2, 0xf1, 0x8f, 0x2b } }
+
+[PcdsFixedAtBuild]
+  ##
+  # This is the physical address of the flash allocated for NV storage, including
+  # fault tolerance working and spare copies.
+  #
+  gQemuSbsaPkgTokenSpaceGuid.PcdFlashNvStorageBase|0x0|UINT64|0x00000001
+  gQemuSbsaPkgTokenSpaceGuid.PcdFlashNvStorageSize|0x0|UINT64|0x00000002
+
+  # Non discoverable devices Pcds
+  gQemuSbsaPkgTokenSpaceGuid.PcdPlatformAhciBase|0|UINT64|0x00000003
+  gQemuSbsaPkgTokenSpaceGuid.PcdPlatformAhciSize|0x10000|UINT32|0x00000004
+  gQemuSbsaPkgTokenSpaceGuid.PcdPlatformEhciBase|0|UINT64|0x00000005
+  gQemuSbsaPkgTokenSpaceGuid.PcdPlatformEhciSize|0x10000|UINT32|0x00000006
+
+  # PCDs complementing PCIe layout pulled into ACPI tables
+  # Limit = Base + Size - 1
+  gQemuSbsaPkgTokenSpaceGuid.PcdPciIoLimit|0x0000ffff|UINT32|0x00000007
+  gQemuSbsaPkgTokenSpaceGuid.PcdPciMmio32Limit|0xEFFFFFFF|UINT32|0x00000008
+  gQemuSbsaPkgTokenSpaceGuid.PcdPciMmio64Limit|0xFFFFFFFFFF|UINT64|0x00000009
+
+  # PCDs complementing gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+  # BarLimit = BaseAddress + BarSize - 1
+  gQemuSbsaPkgTokenSpaceGuid.PcdPciExpressBarSize|0x10000000|UINT64|0x0000000A
+  gQemuSbsaPkgTokenSpaceGuid.PcdPciExpressBarLimit|0xFFFFFFFF|UINT64|0x0000000B
+
+[PcdsDynamic.common]
+  gQemuSbsaPkgTokenSpaceGuid.PcdSystemManufacturer|L""|VOID*|0x00000110
+  gQemuSbsaPkgTokenSpaceGuid.PcdSystemSerialNumber|L""|VOID*|0x00000111
+  gQemuSbsaPkgTokenSpaceGuid.PcdSystemSKU|L""|VOID*|0x00000112
+  gQemuSbsaPkgTokenSpaceGuid.PcdSystemFamily|L""|VOID*|0x00000113
+
+  gQemuSbsaPkgTokenSpaceGuid.PcdBaseBoardAssetTag|L""|VOID*|0x00000114
+  gQemuSbsaPkgTokenSpaceGuid.PcdBaseBoardSerialNumber|L""|VOID*|0x00000115
+  gQemuSbsaPkgTokenSpaceGuid.PcdBaseBoardManufacturer|L""|VOID*|0x00000116
+  gQemuSbsaPkgTokenSpaceGuid.PcdBaseBoardSKU|L""|VOID*|0x00000117
+  gQemuSbsaPkgTokenSpaceGuid.PcdBaseBoardLocation|L""|VOID*|0x00000118
+
+  gQemuSbsaPkgTokenSpaceGuid.PcdChassisSerialNumber|L""|VOID*|0x00000119
+  gQemuSbsaPkgTokenSpaceGuid.PcdChassisVersion|L""|VOID*|0x0000011A
+  gQemuSbsaPkgTokenSpaceGuid.PcdChassisManufacturer|L""|VOID*|0x0000011B
+  gQemuSbsaPkgTokenSpaceGuid.PcdChassisAssetTag|L""|VOID*|0x0000011C
+  gQemuSbsaPkgTokenSpaceGuid.PcdChassisSKU|L""|VOID*|0x0000011D

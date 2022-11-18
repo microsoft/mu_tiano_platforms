@@ -1,0 +1,81 @@
+## @file
+# Azure Pipeline build file for building a platform.
+#
+# Platform: QemuQ35
+# OS: Ubuntu
+# Toolchain: GCC
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+resources:
+  repositories:
+    - repository: mu_devops
+      type: github
+      endpoint: microsoft
+      name: microsoft/mu_devops
+      ref: main
+
+variables:
+- group: architectures-arm64
+- group: tool-chain-ubuntu-gcc
+
+jobs:
+  - job: Platform_CI
+    variables:
+      package: 'QemuSbsaPkg'
+      should_run: true
+      run_flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE"
+
+    # Use matrix to speed up the build process
+    strategy:
+        matrix:
+
+          QemuSbsa_DEBUG:
+            Build.File: "Platforms/$(package)/PlatformBuild.py"
+            Build.Arch: $(arch_list)
+            Build.Flags: ""
+            Build.Target: "DEBUG"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+
+          QemuSbsa_RELEASE:
+            Build.File: "Platforms/$(package)/PlatformBuild.py"
+            Build.Arch: $(arch_list)
+            Build.Flags: ""
+            Build.Target: "RELEASE"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+
+          # NOOPT build too big to fit in FVs
+          #QemuSbsa_NOOPT:
+          #  Build.File: "Platforms/$(package)/PlatformBuild.py"
+          #  Build.Arch: $(arch_list)
+          #  Build.Flags: ""
+          #  Build.Target: "NOOPT"
+          #  Run.Flags: $(run_flags)
+          #  Run: $(should_run)
+    workspace:
+      clean: all
+
+    pool:
+      vmImage: $(vm_image)
+
+    container: ghcr.io/tianocore/containers/fedora-35-test:5800d58
+
+    steps:
+    - script: echo "##vso[task.prependpath]/home/vsts_azpcontainer/.local/bin"
+      displayName: Add User Local Bin to Path
+    - template: Steps/BuildPlatform.yml@mu_devops
+      parameters:
+        tool_chain_tag: $(tool_chain_tag)
+        build_pkg: $(package)
+        build_target: $(Build.Target)
+        build_arch: $(Build.Arch)
+        build_file: $(Build.File)
+        build_flags: $(Build.Flags)
+        run_flags: $(Run.Flags)
+        install_tools: false
+        extra_artifacts: |
+          **/QEMU_EFI.fd,**/SECURE_FLASH0.fd

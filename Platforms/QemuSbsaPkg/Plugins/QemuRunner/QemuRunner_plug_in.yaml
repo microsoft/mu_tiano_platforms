@@ -1,0 +1,12 @@
+## @file QemuRunner_plug_in.yaml
+# Q35 customized helper plugin to provide functions for
+# running Q35 firmware in QEMU and supporting additional features
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+    "scope": "qemusbsa",
+    "name": "QEMU Runner",
+    "module": "QemuRunner"
+  }

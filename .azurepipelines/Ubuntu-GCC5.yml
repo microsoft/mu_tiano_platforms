@@ -15,7 +15,7 @@ resources:
       ref: main
 
 variables:
-- group: architectures-x86-64
+- group: architectures-arm64-x86-64
 - group: tool-chain-ubuntu-gcc
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
     do_non_ci_build: false
     do_non_ci_setup: true
     do_pr_eval: true
-    packages: QemuQ35Pkg
+    packages: QemuQ35Pkg,QemuSbsaPkg
     target_list: NO-TARGET
     tool_chain_tag: $(tool_chain_tag)
     vm_image: ubuntu-latest

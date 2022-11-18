@@ -30,8 +30,15 @@ QemuVideoCompleteModeInfo (
     Info->PixelInformation.BlueMask     = PIXEL24_BLUE_MASK;
     Info->PixelInformation.ReservedMask = 0;
   } else if (ModeData->ColorDepth == 32) {
-    DEBUG ((DEBUG_INFO, "PixelBlueGreenRedReserved8BitPerColor\n"));
-    Info->PixelFormat = PixelBlueGreenRedReserved8BitPerColor;
+    DEBUG ((DEBUG_VERBOSE, "PixelBlueGreenRedReserved8BitPerColor\n"));
+    Info->PixelFormat                   = PixelBlueGreenRedReserved8BitPerColor;
+    Info->PixelInformation.RedMask      = 0;
+    Info->PixelInformation.GreenMask    = 0;
+    Info->PixelInformation.BlueMask     = 0;
+    Info->PixelInformation.ReservedMask = 0;
+  } else {
+    DEBUG ((DEBUG_ERROR, "%a: Invalid ColorDepth %u", __FUNCTION__, ModeData->ColorDepth));
+    ASSERT (FALSE);
   }
 
   Info->PixelsPerScanLine = Info->HorizontalResolution;
@@ -175,6 +182,10 @@ Routine Description:
     case QEMU_VIDEO_CIRRUS_5446:
       InitializeCirrusGraphicsMode (Private, &QemuVideoCirrusModes[ModeData->InternalModeIndex]);
       break;
+    case QEMU_VIDEO_BOCHS_MMIO:
+    case QEMU_VIDEO_BOCHS:
+      InitializeBochsGraphicsMode (Private, ModeData);
+      break;
     default:
       ASSERT (FALSE);
       return EFI_DEVICE_ERROR;
@@ -245,16 +256,16 @@ Routine Description:
 EFI_STATUS
 EFIAPI
 QemuVideoGraphicsOutputBlt (
-  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL *This,
-  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL *BltBuffer, OPTIONAL
-  IN  EFI_GRAPHICS_OUTPUT_BLT_OPERATION     BltOperation,
-  IN  UINTN                                 SourceX,
-  IN  UINTN                                 SourceY,
-  IN  UINTN                                 DestinationX,
-  IN  UINTN                                 DestinationY,
-  IN  UINTN                                 Width,
-  IN  UINTN                                 Height,
-  IN  UINTN                                 Delta
+  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL       *This,
+  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BltBuffer  OPTIONAL,
+  IN  EFI_GRAPHICS_OUTPUT_BLT_OPERATION  BltOperation,
+  IN  UINTN                              SourceX,
+  IN  UINTN                              SourceY,
+  IN  UINTN                              DestinationX,
+  IN  UINTN                              DestinationY,
+  IN  UINTN                              Width,
+  IN  UINTN                              Height,
+  IN  UINTN                              Delta
   )
 
 /*++
@@ -434,6 +445,12 @@ QemuVideoGraphicsOutputConstructor (
   if (EFI_ERROR (Status)) {
     goto FreeInfo;
   }
+
+  DrawLogo (
+    Private,
+    Private->ModeData[Private->GraphicsOutput.Mode->Mode].HorizontalResolution,
+    Private->ModeData[Private->GraphicsOutput.Mode->Mode].VerticalResolution
+    );
 
   return EFI_SUCCESS;
 

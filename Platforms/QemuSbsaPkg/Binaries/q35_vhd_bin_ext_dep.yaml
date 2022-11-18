@@ -1,0 +1,8 @@
+{
+  "scope": "qemusbsa",
+  "type": "nuget",
+  "name": "mu-disc-utils-bin",
+  "source": "https://api.nuget.org/v3/index.json",
+  "version": "0.0.1",
+  "flags":["set_path"]
+}

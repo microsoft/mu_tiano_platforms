@@ -41,12 +41,13 @@ class Settings(CiSetupSettingsManager, CiBuildSettingsManager, UpdateSettingsMan
         ''' return iterable of edk2 packages supported by this build.
         These should be edk2 workspace relative paths '''
 
-        return ("QemuQ35Pkg",)
+        return ("QemuQ35Pkg","QemuSbsaPkg")
 
     def GetArchitecturesSupported(self):
         ''' return iterable of edk2 architectures supported by this build '''
         return ("IA32",
-                "X64")
+                "X64",
+                "AARCH64")
 
     def GetTargetsSupported(self):
         ''' return iterable of edk2 target tags supported by this build '''
