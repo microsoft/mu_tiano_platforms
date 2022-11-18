@@ -55,7 +55,7 @@ InitializeSbsaQemuPlatformDxe (
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "%a: NonDiscoverable: Cannot install AHCI device @%p (Staus == %r)\n",
+      "%a: NonDiscoverable: Cannot install AHCI device @%p (Status == %r)\n",
       __FUNCTION__,
       Base,
       Status

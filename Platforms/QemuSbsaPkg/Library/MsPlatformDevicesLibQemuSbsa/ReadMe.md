@@ -8,5 +8,5 @@ QEMU (BOCHS) video controller is configured to preferred graphics output for cur
 
 ## Copyright
 
-Copyright (C) Microsoft Corporation.
+Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent

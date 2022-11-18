@@ -5,8 +5,8 @@
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef SBSAQEMUACPI_H
-#define SBSAQEMUACPI_H
+#ifndef SBSA_QEMU_ACPI_H_
+#define SBSA_QEMU_ACPI_H_
 
 // A macro to initialise the common header part of EFI ACPI tables as defined by
 // EFI_ACPI_DESCRIPTION_HEADER structure.

@@ -94,7 +94,7 @@ AddMadtTable (
   // Initialize GIC Redistributor Structure
   EFI_ACPI_6_0_GICR_STRUCTURE  Gicr = SBSAQEMU_MADT_GICR_INIT ();
 
-  // Get CoreCount which was determined eariler after parsing device tree
+  // Get CoreCount which was determined earlier after parsing device tree
   NumCores = PcdGet32 (PcdCoreCount);
 
   // Calculate the new table size based on the number of cores

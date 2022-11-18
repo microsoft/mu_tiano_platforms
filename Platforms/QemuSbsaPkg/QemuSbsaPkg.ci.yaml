@@ -118,7 +118,22 @@
             "werror",
             "xenio",
             "kvmtool",
-            "cloudhv"
+            "cloudhv",
+            "MPIDR",
+            "SBSA",
+            "NUVIA",
+            "NVSTORAGE",
+            "PNPID",
+            "PDECODE",
+            "PMBASE",
+            "PMCNTRL",
+            "EISAID",
+            "BLKIO",
+            "DMDEPKG",
+            "DDISABLE",
+            "mstrict",
+            "Intune",
+            "BOCHS"
         ],           # words to extend to the dictionary for this package
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
         "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)

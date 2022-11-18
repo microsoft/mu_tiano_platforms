@@ -450,7 +450,7 @@ DefinitionBlock ("DsdtTable.aml", "DSDT",
       Method (_OSC,4) {
         // Check for proper UUID
         If (LEqual(Arg0,ToUUID("33DB4D5B-1FF7-401C-9657-7441C03DD766"))) {
-          // Create DWord-adressable fields from the Capabilities Buffer
+          // Create DWord-addressable fields from the Capabilities Buffer
           CreateDWordField (Arg3,0,CDW1)
           CreateDWordField (Arg3,4,CDW2)
           CreateDWordField (Arg3,8,CDW3)
