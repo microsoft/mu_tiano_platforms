@@ -77,5 +77,9 @@ jobs:
         build_flags: $(Build.Flags)
         run_flags: $(Run.Flags)
         install_tools: false
+        extra_install_step:
+          - script: sudo microdnf --assumeyes install openssl-devel
+            displayName: Install openssl
+            condition: and(gt(variables.pkg_count, 0), succeeded())
         extra_artifacts: |
           **/QEMU_EFI.fd,**/SECURE_FLASH0.fd

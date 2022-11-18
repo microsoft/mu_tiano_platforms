@@ -30,6 +30,7 @@
   ConfigBlobBaseLib
   PeimEntryPoint
   PeiServicesLib
+  PrintLib
 
 [Guids]
   gSetupConfigPolicyVariableGuid                # CONSUMES

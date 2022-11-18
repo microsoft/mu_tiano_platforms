@@ -1,5 +1,5 @@
 # @file
-# Script to Build ArmVirtPkg UEFI firmware
+# Script to Build QEMU SBSA Platform UEFI firmware
 #
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -31,7 +31,7 @@ class CommonPlatform():
         for the different parts of stuart
     '''
     PackagesSupported = ("QemuSbsaPkg",)
-    ArchSupported = ("AARCH64")
+    ArchSupported = ("AARCH64",)
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
     Scopes = ('qemusbsa', 'gcc_aarch64_linux', 'edk2-build', 'cibuild', 'setupdata')
     WorkspaceRoot = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
