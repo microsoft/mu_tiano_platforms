@@ -285,6 +285,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         args += " -j $(nproc)"
         # Reuse the openssl from CryptoPkg
         args += " OPENSSL_DIR=" + self.mws.join(self.ws, "CryptoPkg", "Library", "OpensslLib", "openssl")
+        args += " PLAT_INCLUDES=" + self.mws.join(self.ws, "CryptoPkg", "Library", "Include", "openssl")
         ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_TFA_PATH"))
         if ret != 0:
             return ret
