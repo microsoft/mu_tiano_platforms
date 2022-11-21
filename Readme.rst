@@ -18,6 +18,7 @@ Platform and Toolchain        Status
 ============================= =================
 Q35_VS2022_                   |Q35VsBuild|
 Q35_GCC5_                     |Q35GccBuild|
+SBSA_GCC5_                    |SBSAGccBuild|
 ============================= =================
 
 This repository is part of Project Mu.  Please see Project Mu for details https://microsoft.github.io/mu
@@ -233,4 +234,4 @@ POSSIBILITY OF SUCH DAMAGE.
 .. |Q35GccBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20Q35%20Plat%20CI%20GCC5?branchName=main
 
 .. _SBSA_GCC5:   https://dev.azure.com/projectmu/mu/_build/latest?definitionId=138&&branchName=main
-.. |SBSAGccBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20SBSA%20Plat%20CI%20GCC5?repoName=microsoft%2Fmu_tiano_platforms&branchName=main
+.. |SBSAGccBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20SBSA%20Plat%20CI%20GCC5?branchName=main
