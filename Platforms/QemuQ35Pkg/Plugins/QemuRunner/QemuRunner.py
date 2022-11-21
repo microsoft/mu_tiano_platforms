@@ -116,6 +116,11 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         if serial_port != None:
             args += " -serial tcp:127.0.0.1:" + serial_port + ",server,nowait"
 
+        # Connect the debug monitor to a telnet localhost port
+        monitor_port = env.GetValue("MONITOR_PORT")
+        if monitor_port is not None:
+            args += " -monitor tcp:127.0.0.1:" + monitor_port + ",server,nowait"
+
         # Run QEMU
         #ret = QemuRunner.RunCmd(executable, args,  thread_target=QemuRunner.QemuCmdReader)
         ret = utility_functions.RunCmd(executable, args)
