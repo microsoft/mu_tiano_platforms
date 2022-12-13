@@ -914,6 +914,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   gQemuQ35PkgTokenSpaceGuid.PcdUIApplicationFile|{ 0x8A, 0x70, 0x42, 0x40, 0x2D, 0x0F, 0x23, 0x48, 0xAC, 0x60, 0x0D, 0x77, 0xB3, 0x11, 0x18, 0x89 }
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|TRUE
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0x29C0
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdEnableMemoryProtection|$(MEMORY_PROTECTION)
 
 [PcdsFixedAtBuild.IA32]
   #

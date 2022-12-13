@@ -255,6 +255,7 @@
   ## The range of memory that is validated by the SEC phase.
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecValidatedStart|0|UINT32|0x62
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecValidatedEnd|0|UINT32|0x63
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdEnableMemoryProtection|TRUE|BOOLEAN|0x65
 
 [PcdsFixedAtBuild, PcdsDynamic, PcdsDynamicEx]
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10
