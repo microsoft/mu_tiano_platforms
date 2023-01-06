@@ -823,28 +823,30 @@ InitializePlatform (
   DXE_MEMORY_PROTECTION_SETTINGS  DxeSettings;
   MM_MEMORY_PROTECTION_SETTINGS   MmSettings;
 
-  DxeSettings = (DXE_MEMORY_PROTECTION_SETTINGS)DXE_MEMORY_PROTECTION_SETTINGS_DEBUG;
-  MmSettings  = (MM_MEMORY_PROTECTION_SETTINGS)MM_MEMORY_PROTECTION_SETTINGS_DEBUG;
+  if (FixedPcdGetBool (PcdEnableMemoryProtection) == TRUE) {
+    DxeSettings = (DXE_MEMORY_PROTECTION_SETTINGS)DXE_MEMORY_PROTECTION_SETTINGS_DEBUG;
+    MmSettings  = (MM_MEMORY_PROTECTION_SETTINGS)MM_MEMORY_PROTECTION_SETTINGS_DEBUG;
 
-  MmSettings.HeapGuardPolicy.Fields.MmPageGuard                    = 1;
-  MmSettings.HeapGuardPolicy.Fields.MmPoolGuard                    = 1;
-  DxeSettings.ImageProtectionPolicy.Fields.ProtectImageFromUnknown = 1;
-  // THE /NXCOMPAT DLL flag cannot be set using non MinGW GCC
+    MmSettings.HeapGuardPolicy.Fields.MmPageGuard                    = 1;
+    MmSettings.HeapGuardPolicy.Fields.MmPoolGuard                    = 1;
+    DxeSettings.ImageProtectionPolicy.Fields.ProtectImageFromUnknown = 1;
+    // THE /NXCOMPAT DLL flag cannot be set using non MinGW GCC
  #ifdef __GNUC__
-  DxeSettings.ImageProtectionPolicy.Fields.BlockImagesWithoutNxFlag = 0;
+    DxeSettings.ImageProtectionPolicy.Fields.BlockImagesWithoutNxFlag = 0;
  #endif
 
-  BuildGuidDataHob (
-    &gDxeMemoryProtectionSettingsGuid,
-    &DxeSettings,
-    sizeof (DxeSettings)
-    );
+    BuildGuidDataHob (
+      &gDxeMemoryProtectionSettingsGuid,
+      &DxeSettings,
+      sizeof (DxeSettings)
+      );
 
-  BuildGuidDataHob (
-    &gMmMemoryProtectionSettingsGuid,
-    &MmSettings,
-    sizeof (MmSettings)
-    );
+    BuildGuidDataHob (
+      &gMmMemoryProtectionSettingsGuid,
+      &MmSettings,
+      sizeof (MmSettings)
+      );
+  }
 
   // MU_CHANGE END
   DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
