@@ -1,0 +1,200 @@
+## @file
+# Azure Pipeline build file for publishing release artifacts.
+#
+# Note: This file assumes it is run immediately after the release it applies to has been
+#       published (that release is the latest release).
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+parameters:
+- name: publish_q35_binaries
+  displayName: Publish QEMU Q35 Binaries
+  type: boolean
+  default: true
+- name: publish_sbsa_binaries
+  displayName: Publish QEMU SBSA Binaries
+  type: boolean
+  default: true
+
+jobs:
+  - job: Publish
+
+    variables:
+      - name: raw_content_url
+        value: https://raw.githubusercontent.com
+      - name: org_repo
+        value: microsoft/mu_tiano_platforms
+
+    strategy:
+      matrix:
+        ${{ if eq(parameters.publish_q35_binaries, true) }}:
+          QEMU Q35 Debug:
+            gcc_artifact_name: 'Binaries QemuQ35Pkg GCC5 DEBUG'
+            gcc_folder_name: GCC-x64
+            nuget_package_config_file: >-
+              Platforms/QemuQ35Pkg/NugetPublishing/DebugConfig.yaml
+            vs_artifact_name: 'Binaries QemuQ35Pkg VS2022 DEBUG'
+            vs_folder_name: VisualStudio-x64
+
+          QEMU Q35 Release:
+            gcc_artifact_name: 'Binaries QemuQ35Pkg GCC5 RELEASE'
+            gcc_folder_name: GCC-x64
+            nuget_package_config_file: >-
+              Platforms/QemuQ35Pkg/NugetPublishing/ReleaseConfig.yaml
+            vs_artifact_name: 'Binaries QemuQ35Pkg VS2022 RELEASE'
+            vs_folder_name: VisualStudio-x64
+
+        ${{ if eq(parameters.publish_sbsa_binaries, true) }}:
+          QEMU SBSA Debug:
+            gcc_artifact_name: 'Binaries QemuSbsaPkg GCC5 DEBUG'
+            gcc_folder_name: GCC-AARCH64
+            nuget_package_config_file: >-
+              Platforms/QemuSbsaPkg/NugetPublishing/DebugConfig.yaml
+            vs_artifact_name: ''
+            vs_folder_name: ''
+
+          QEMU SBSA Release:
+            gcc_artifact_name: 'Binaries QemuSbsaPkg GCC5 RELEASE'
+            gcc_folder_name: GCC-AARCH64
+            nuget_package_config_file: >-
+              Platforms/QemuSbsaPkg/NugetPublishing/ReleaseConfig.yaml
+            vs_artifact_name: ''
+            vs_folder_name: ''
+
+    workspace:
+      clean: all
+
+    pool:
+      vmImage: ubuntu-latest
+
+    steps:
+    - checkout: none
+
+    - task: UsePythonVersion@0
+      displayName: Use Python 3.10.x
+      inputs:
+        versionSpec: 3.10.x
+        architecture: x64
+
+    - script: python -m pip install edk2-pytool-extensions==0.*
+      displayName: Install edk2-pytool-extensions
+
+    - script: |
+        curl -s https://api.github.com/repos/${ORG_REPO}/releases/latest --output release_response.json
+        rawRepoVer=$(cat release_response.json | jq -r '.name')
+        id=$(cat release_response.json | jq -r '.id')
+        prefixToRemove="v"
+        repoVer=$(echo "${rawRepoVer/#$prefixToRemove}")
+        echo "##vso[task.setvariable variable=raw_repo_version;]${rawRepoVer}"
+        echo "##vso[task.setvariable variable=repo_version;]${repoVer}"
+        echo "##vso[task.setvariable variable=repo_release_id;]${id}"
+      displayName: Get Current Repo Release ID & Version
+
+    - script: |
+        read type tagSha < <(echo $(curl -s "https://api.github.com/repos/${ORG_REPO}/git/ref/tags/$RAW_REPO_VERSION" | jq -r '.object.type,.object.sha'))
+        if [ $type == "commit" ]; then
+          echo "##vso[task.setvariable variable=repo_release_commit_sha;]${tagSha}"
+        else
+          finalTagSha=$(curl -s "https://api.github.com/repos/${ORG_REPO}/git/tags/$tagSha" | jq '.object.sha')
+          echo "##vso[task.setvariable variable=repo_release_commit_sha;]${finalTagSha}"
+        fi
+      displayName: Get Current Release Commit Hash
+
+    - script: |
+        licenseFileName="License.txt"
+        licenseFileUrl="${RAW_CONTENT_URL}/${ORG_REPO}/${RAW_REPO_VERSION}/${licenseFileName}"
+        curl $licenseFileUrl --output "${BUILD_ARTIFACTSTAGINGDIRECTORY}/${licenseFileName}"
+      displayName: Download NuGet Package License File
+
+    - script: |
+        configFileUrl="${RAW_CONTENT_URL}/${ORG_REPO}/${RAW_REPO_VERSION}/${NUGET_PACKAGE_CONFIG_FILE}"
+        curl $configFileUrl --output "${BUILD_ARTIFACTSTAGINGDIRECTORY}/NugetConfigFile.txt"
+      displayName: Download NuGet Package Config File
+
+    - script: |
+        nugetPackageName=$(grep '^name:' "${BUILD_ARTIFACTSTAGINGDIRECTORY}/NugetConfigFile.txt" | cut -d: -f2 | xargs)
+        echo "##vso[task.setvariable variable=nuget_package_name;]${nugetPackageName}"
+      displayName: Get NuGet Package Name
+
+    - task: DownloadPipelineArtifact@2
+      name: DownloadGccArtifacts
+      displayName: Download GCC Artifacts
+      inputs:
+        buildType: 'current'
+        artifactName: $(gcc_artifact_name)
+        targetPath: '$(Build.ArtifactStagingDirectory)/$(gcc_folder_name)'
+      condition: and(ne(variables.gcc_artifact_name, ''), ne(variables.gcc_folder_name, ''))
+
+    - task: CopyFiles@2
+      displayName: Copy GCC Binaries
+      inputs:
+        targetFolder: '$(Build.StagingDirectory)/Nuget/package_contents/$(gcc_folder_name)'
+        sourceFolder: '$(Build.ArtifactStagingDirectory)/$(gcc_folder_name)'
+        contents: '**'
+        flattenFolders: true
+      condition: and(ne(variables.gcc_artifact_name, ''), ne(variables.gcc_folder_name, ''))
+
+    - task: DownloadPipelineArtifact@2
+      name: DownloadVisualStudioArtifacts
+      displayName: Download Visual Studio Artifacts
+      inputs:
+        buildType: 'current'
+        artifactName: $(vs_artifact_name)
+        targetPath: '$(Build.ArtifactStagingDirectory)/$(vs_folder_name)'
+      condition: and(ne(variables.vs_artifact_name, ''), ne(variables.vs_folder_name, ''))
+
+    - task: CopyFiles@2
+      displayName: Copy Visual Studio Binaries
+      inputs:
+        targetFolder: '$(Build.StagingDirectory)/Nuget/package_contents/$(vs_folder_name)'
+        sourceFolder: '$(Build.ArtifactStagingDirectory)/$(vs_folder_name)'
+        contents: '**'
+        flattenFolders: true
+      condition: and(ne(variables.vs_artifact_name, ''), ne(variables.vs_folder_name, ''))
+
+    - task: Bash@3
+      name: PackAndPublishNugetPackage
+      displayName: Pack and Push Nuget Package
+      env:
+        LICENSE_FILE_PATH: $(Build.ArtifactStagingDirectory)/License.txt
+        NUGET_KEY: $(NUGET_KEY)
+        NUGET_PACKAGE_CONFIG_FILE_PATH: $(Build.ArtifactStagingDirectory)/NugetConfigFile.txt
+        NUGET_PACKAGE_VERSION: $(repo_version)
+        RELEASE_COMMIT_SHA: $(repo_release_commit_sha)
+      inputs:
+        targetType: 'inline'
+        script: |
+          apiKey=$NUGET_KEY
+          configFilePath=$NUGET_PACKAGE_CONFIG_FILE_PATH
+          customLicensePath=$LICENSE_FILE_PATH
+          inputFolderPath="${BUILD_STAGINGDIRECTORY}/Nuget/package_contents"
+          outputLogPath="${BUILD_STAGINGDIRECTORY}/Nuget/NugetPackagingLog.txt"
+          packageVersion=$NUGET_PACKAGE_VERSION
+          releaseCommitSha=$RELEASE_COMMIT_SHA
+          nuget-publish --Operation PackAndPush --OutputLog "$outputLogPath" --ConfigFilePath "$configFilePath" --InputFolderPath "$inputFolderPath" --Version "$packageVersion" --ApiKey "$apiKey" --CustomLicensePath "$customLicensePath" --RepositoryCommit "$releaseCommitSha"
+
+    - task: Bash@3
+      name: ZipAndPublishReleaseAsset
+      displayName: Add Zip File Release Asset
+      env:
+        GH_TOKEN: $(NUGET_KEY)
+        INPUT_FOLDER_PATH: "$(Build.StagingDirectory)/Nuget/package_contents"
+        NUGET_PACKAGE_NAME: $(nuget_package_name)
+        NUGET_PACKAGE_VERSION: $(repo_version)
+        REPO_RELEASE_ID: $(repo_release_id)
+      inputs:
+        targetType: 'inline'
+        script: |
+          inputFolderPath="${BUILD_STAGINGDIRECTORY}/Nuget/package_contents"
+          zipFolderPath="${BUILD_STAGINGDIRECTORY}/Nuget/$NUGET_PACKAGE_NAME-$NUGET_PACKAGE_VERSION.zip"
+          (cd "${inputFolderPath}" && zip -r "${zipFolderPath}" .)
+          curl \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN"\
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            -H "Content-Type: application/octet-stream" \
+            "https://uploads.github.com/repos/${ORG_REPO}/releases/${REPO_RELEASE_ID}/assets?name=${NUGET_PACKAGE_NAME}-${NUGET_PACKAGE_VERSION}.zip" \
+            --data-binary "@${zipFolderPath}"

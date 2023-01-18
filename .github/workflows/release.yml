@@ -1,0 +1,25 @@
+# This workflow performs release work for this repo after a
+# release is published on GitHub.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+name: Create Repo Release
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  nuget_release:
+    name: Publish via Azure Pipeline
+    runs-on: ubuntu-latest
+    steps:
+    - name: Azure Pipeline Publication
+      uses: Azure/pipelines@v1
+      with:
+        azure-devops-project-url: https://dev.azure.com/projectmu/mu
+        azure-pipeline-name: 'Mu Tiano Platforms Release'
+        azure-devops-token: ${{ secrets.AZURE_DEVOPS_TOKEN }}

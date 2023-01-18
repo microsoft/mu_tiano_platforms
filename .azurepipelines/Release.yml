@@ -1,0 +1,43 @@
+## @file
+# Azure Pipeline build file to perform a release in this repo.
+#
+# Note: This file should be invoked immediately after a release has been published
+#       on GitHub.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+trigger: none
+pr: none
+
+resources:
+  repositories:
+    - repository: mu_devops
+      type: github
+      endpoint: microsoft
+      name: microsoft/mu_devops
+      ref: refs/tags/v2.0.1
+
+name: $(Date:yyyyMMdd)$(Rev:.r) Mu Tiano Platforms Release
+
+stages:
+- stage: BuildQemuQ35
+  displayName: Build QEMU Q35
+  jobs:
+    - template: ../Platforms/QemuQ35Pkg/.azurepipelines/templates/Job-Ubuntu-GCC5.yml
+    - template: ../Platforms/QemuQ35Pkg/.azurepipelines/templates/Job-Windows-VS.yml
+
+- stage: BuildQemuSbsa
+  displayName: Build QEMU SBSA
+  dependsOn: [] # Build in parallel with the previous stage
+  jobs:
+    - template: ../Platforms/QemuSbsaPkg/.azurepipelines/templates/Job-Ubuntu-GCC5.yml
+
+- stage: PublishReleaseArtifacts
+  displayName: Publish Release Artifacts
+  dependsOn:
+  - BuildQemuQ35
+  - BuildQemuSbsa
+  jobs:
+    - template: templates/Job-Publish.yml
