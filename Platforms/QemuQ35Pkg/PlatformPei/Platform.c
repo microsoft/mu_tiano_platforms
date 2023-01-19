@@ -553,7 +553,8 @@ ReserveEmuVariableNvStore (
     (2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize)) / 1024
     ));
   // MU_CHANGE: Remove dynamic PCD set to support usage in Standalone MM
-  PcdStatus = (PcdGet64 (PcdEmuVariableNvStoreReserved) != VariableStore) ? EFI_UNSUPPORTED : EFI_SUCCESS;
+  // PcdStatus = (PcdGet64 (PcdEmuVariableNvStoreReserved) != VariableStore) ? EFI_UNSUPPORTED : EFI_SUCCESS;
+  PcdStatus = PcdSet64S (PcdEmuVariableNvStoreReserved, VariableStore);
   ASSERT_RETURN_ERROR (PcdStatus);
 }
 

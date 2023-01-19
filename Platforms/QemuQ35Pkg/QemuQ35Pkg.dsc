@@ -494,6 +494,7 @@
   HwResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeRuntimeCapsuleLib.inf
+  VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
 
 [LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_DRIVER]
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
@@ -610,8 +611,9 @@
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|TRUE
 
   #gUefiTempTokenSpaceGuid.PcdSmmSmramRequire|TRUE
-  gQemuPkgTokenSpaceGuid.PcdSmmSmramRequire|TRUE
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdStandaloneMmEnable|TRUE
+
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdSmmSmramRequire|$(SMM_ENABLED)
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdStandaloneMmEnable|$(SMM_ENABLED)
   gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugSupport|FALSE
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdRequireIommu|FALSE # don't require IOMMU
@@ -796,6 +798,16 @@
   gUefiQemuQ35PkgTokenSpaceGuid.PcdPciMmio64Base|0x0
   gUefiQemuQ35PkgTokenSpaceGuid.PcdPciMmio64Size|0x800000000
 
+!if $(SMM_ENABLED) == FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0
+!endif
+
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|TRUE
 
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0
 
@@ -1376,6 +1388,17 @@
       NULL|MdeModulePkg/Library/VarCheckPolicyLib/VarCheckPolicyLibStandaloneMm.inf
   }
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
+
+  #
+  # Variable driver stack (NO SMM)
+  #
+  QemuQ35Pkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
+  #QemuQ35Pkg/EmuVariableFvbRuntimeDxe/Fvb.inf {
+  #  <LibraryClasses>
+  #    PlatformFvbLib|QemuQ35Pkg/Library/EmuVariableFvbLib/EmuVariableFvbLib.inf
+  #}
+  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 
   #
   # TPM support

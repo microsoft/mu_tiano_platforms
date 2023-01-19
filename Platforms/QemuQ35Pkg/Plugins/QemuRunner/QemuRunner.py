@@ -78,7 +78,12 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         else:
             logging.critical("Virtual Drive Path Invalid")
 
-        args += " -machine q35,smm=on" #,accel=(tcg|kvm)"
+        if env.GetBuildValue("SMM_ENABLED") is None or env.GetBuildValue("SMM_ENABLED").lower() == "true":
+            smm_enabled = "on"
+        else:
+            smm_enabled = "off"
+
+        args += " -machine q35,smm=" + smm_enabled #,accel=(tcg|kvm)"
         if env.GetValue("PATH_TO_OS") is not None:
             # Potentially dealing with big daddy, give it more juice...
             args += " -m 8192"
@@ -87,8 +92,9 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             args += " -m 2048"
         args += " -cpu qemu64,+rdrand,umip,+smep" # most compatible x64 CPU model + RDRAND + UMIP + SMEP support (not included by default)
         if env.GetBuildValue ("QEMU_CORE_NUM") is not None:
-          args += " -smp " + env.GetBuildValue ("QEMU_CORE_NUM")
-        args += " -global driver=cfi.pflash01,property=secure,value=on"
+            args += " -smp " + env.GetBuildValue ("QEMU_CORE_NUM")
+        if smm_enabled == "on":
+            args += " -global driver=cfi.pflash01,property=secure,value=on"
         args += " -drive if=pflash,format=raw,unit=0,file=" + \
             os.path.join(OutputPath_FV, "QEMUQ35_CODE.fd") + ",readonly=on"
         args += " -drive if=pflash,format=raw,unit=1,file=" + \
