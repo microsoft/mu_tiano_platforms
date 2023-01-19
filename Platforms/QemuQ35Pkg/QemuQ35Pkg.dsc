@@ -931,7 +931,8 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 #       the MU UEFI UI Front Page entry,  press the left button down, while keeping the left
 #       button down, move the mouse pointer to the first boot option (probably Internal Stoarage),
 #       then let go of the left button. The GUI is very slow, so wait for it).
-#    5. Select Exit, Restart to restart the system to enter front page with the varialbes unlocked
+#    5. Select Exit, Restart to restart the system to enter front page with the variables unlocked
+
 #
 #  Until you build again, every time you start Q35, the GUI front page will load first.
 #
