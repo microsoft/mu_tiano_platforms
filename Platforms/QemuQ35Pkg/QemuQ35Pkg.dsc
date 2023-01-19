@@ -921,8 +921,9 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 #
 #  To use this feature:
 #
-#    1. build Q35Pkg with BLD_*_GUI_FRONT_PAGE=TRUE
-#    2. Run Q35
+#    1. Build QemuQ35Pkg with BLD_*_GUI_FRONT_PAGE=TRUE
+#    2. Run QEMU
+
 #    3. Exit from the shell to enter the gui front page. Because the shell was booted first,
 #       the private settings variables will still be locked, and the boot order is unlocked.
 #    4. Reorder the the UEFI front page boot option to be the first boot option using GUI (click
