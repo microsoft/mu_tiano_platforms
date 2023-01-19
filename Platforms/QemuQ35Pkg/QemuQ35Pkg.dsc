@@ -798,16 +798,7 @@
   gUefiQemuQ35PkgTokenSpaceGuid.PcdPciMmio64Base|0x0
   gUefiQemuQ35PkgTokenSpaceGuid.PcdPciMmio64Size|0x800000000
 
-!if $(SMM_ENABLED) == FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0
-!endif
-
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|TRUE
 
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0
 

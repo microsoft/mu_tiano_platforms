@@ -224,26 +224,9 @@ SetPcdFlashNvStorageBaseAddresses (
   VOID
   )
 {
-  RETURN_STATUS  PcdStatus;
-
   //
-  // Set several PCD values to point to flash
+  // Do nothing.
   //
-  PcdStatus = PcdSet64S (
-                PcdFlashNvStorageVariableBase64,
-                (UINTN)PcdGet32 (PcdOvmfFlashNvStorageVariableBase)
-                );
-  ASSERT_RETURN_ERROR (PcdStatus);
-  PcdStatus = PcdSet32S (
-                PcdFlashNvStorageFtwWorkingBase,
-                PcdGet32 (PcdOvmfFlashNvStorageFtwWorkingBase)
-                );
-  ASSERT_RETURN_ERROR (PcdStatus);
-  PcdStatus = PcdSet32S (
-                PcdFlashNvStorageFtwSpareBase,
-                PcdGet32 (PcdOvmfFlashNvStorageFtwSpareBase)
-                );
-  ASSERT_RETURN_ERROR (PcdStatus);
 }
 
 // MU_CHANGE: Abstract dynamic PCD set to support Standalone MM
@@ -254,6 +237,7 @@ UpdateQemuFlashVariablesEnable (
 {
   RETURN_STATUS  PcdStatus;
 
-  PcdStatus = PcdSetBoolS (PcdOvmfFlashVariablesEnable, TRUE);
+  // PcdStatus = PcdSetBoolS (PcdOvmfFlashVariablesEnable, TRUE);
+  PcdStatus = (PcdGetBool (PcdOvmfFlashVariablesEnable) != TRUE) ? EFI_UNSUPPORTED : EFI_SUCCESS;
   ASSERT_RETURN_ERROR (PcdStatus);
 }
