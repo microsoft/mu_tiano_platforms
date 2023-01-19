@@ -35,6 +35,7 @@
   DEFINE OPT_INTO_MFCI_PRE_PRODUCTION   = TRUE
   DEFINE BUILD_UNIT_TESTS               = TRUE
   DEFINE PEI_MM_IPL_ENABLED             = TRUE
+  DEFINE GUI_FRONT_PAGE                 = FALSE
 
   # Configure Shared Crypto
   !ifndef ENABLE_SHARED_CRYPTO # by default true
@@ -909,9 +910,38 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformRecoverySupport|FALSE
   gPcBdsPkgTokenSpaceGuid.PcdLowResolutionInternalShell|FALSE
   # The GUID of SetupDataPkg/ConfApp/ConfApp.inf: E3624086-4FCD-446E-9D07-B6B913792071
+
+!if $(GUI_FRONT_PAGE) == TRUE
+# Note:
+#  The PcdBootManagerMenuFile Pcd does two things:
+#    1.  It sets the default front page (the one entered exiting the shell, or if all boot
+#        boot options fail), and:
+#    2.  If this application is the first boot option being loaded, Bds does not call ReadyToBoot
+#        to lock the private settings variables.
+#
+#  To use this feature:
+#
+#    1. Build QemuQ35Pkg with BLD_*_GUI_FRONT_PAGE=TRUE
+#    2. Run QEMU
+
+#    3. Exit from the shell to enter the gui front page. Because the shell was booted first,
+#       the private settings variables will still be locked, and the boot order is unlocked.
+#    4. Reorder the the UEFI front page boot option to be the first boot option using GUI (click
+#       the mouse in the Q35 display to give Qemu the mouse pointer, move the mouse pointer to
+#       the MU UEFI UI Front Page entry,  press the left button down, while keeping the left
+#       button down, move the mouse pointer to the first boot option (probably Internal Stoarage),
+#       then let go of the left button. The GUI is very slow, so wait for it).
+#    5. Select Exit, Restart to restart the system to enter front page with the variables unlocked
+
+#
+#  Until you build again, every time you start Q35, the GUI front page will load first.
+#
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x8A, 0x70, 0x42, 0x40, 0x2D, 0x0F, 0x23, 0x48, 0xAC, 0x60, 0x0D, 0x77, 0xB3, 0x11, 0x18, 0x89 }
+!else
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x86, 0x40, 0x62, 0xe3, 0xcd, 0x4f, 0x6e, 0x44, 0x9d, 0x7, 0xb6, 0xb9, 0x13, 0x79, 0x20, 0x71 }
-  # The GUID of Frontpage.inf from MU_OEM_SAMPLE: 4042708A-0F2D-4823-AC60-0D77B3111889
+!endif
   gQemuQ35PkgTokenSpaceGuid.PcdUIApplicationFile|{ 0x8A, 0x70, 0x42, 0x40, 0x2D, 0x0F, 0x23, 0x48, 0xAC, 0x60, 0x0D, 0x77, 0xB3, 0x11, 0x18, 0x89 }
+
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|TRUE
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0x29C0
   gUefiQemuQ35PkgTokenSpaceGuid.PcdEnableMemoryProtection|$(MEMORY_PROTECTION)
