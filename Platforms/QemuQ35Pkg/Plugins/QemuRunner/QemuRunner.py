@@ -83,7 +83,16 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         else:
             smm_enabled = "off"
 
-        args += " -machine q35,smm=" + smm_enabled #,accel=(tcg|kvm)"
+        accel = ""
+        if env.GetValue("QEMU_ACCEL") is not None:
+            if (env.GetValue("QEMU_ACCEL").lower() == "kvm"):
+                accel = ",accel=kvm"
+            elif (env.GetValue("QEMU_ACCEL").lower() == "tcg"):
+                accel = ",accel=tcg"
+            elif (env.GetValue("QEMU_ACCEL").lower() == "whpx"):
+                accel = ",accel=whpx"
+
+        args += " -machine q35,smm=" + smm_enabled + accel
         if env.GetValue("PATH_TO_OS") is not None:
             # Potentially dealing with big daddy, give it more juice...
             args += " -m 8192"
