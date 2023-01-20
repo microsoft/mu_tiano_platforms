@@ -1384,10 +1384,6 @@
   # Variable driver stack (NO SMM)
   #
   QemuQ35Pkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
-  #QemuQ35Pkg/EmuVariableFvbRuntimeDxe/Fvb.inf {
-  #  <LibraryClasses>
-  #    PlatformFvbLib|QemuQ35Pkg/Library/EmuVariableFvbLib/EmuVariableFvbLib.inf
-  #}
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 
