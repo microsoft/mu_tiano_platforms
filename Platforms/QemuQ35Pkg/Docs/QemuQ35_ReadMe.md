@@ -82,6 +82,13 @@ commands.
 
 [Details](Features/feature_codeql.md)
 
+### Q35 Supported Color Bar
+
+Color bars are used to quickly convey the Device state, based upon the DeviceStateLib. Color bars are displayed
+by the ColorBarDisplayDeviceStateLib.
+
+[Details](Features/feature_colorbar.md)
+
 ## Mu Customized Components
 
 ### Modules
