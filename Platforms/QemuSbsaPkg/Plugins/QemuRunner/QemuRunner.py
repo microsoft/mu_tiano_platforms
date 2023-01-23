@@ -43,7 +43,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         args = "-net none"
         # Mount disk with either startup.nsh or OS image
         if env.GetValue("PATH_TO_OS") is not None:
-            args += " -hda " + env.GetValue("PATH_TO_OS")
+            args += " -hda \"" + env.GetValue("PATH_TO_OS") + "\""
         elif os.path.isfile(VirtualDrive):
             args += f" -hdd {VirtualDrive}"
         elif os.path.isdir(VirtualDrive):
