@@ -82,7 +82,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         if env.GetValue("PATH_TO_OS") is not None:
             # Potentially dealing with big daddy, give it more juice...
             args += " -m 8192"
-            args += " -hda " + env.GetValue("PATH_TO_OS")
+            args += " -hda \"" + env.GetValue("PATH_TO_OS") + "\""
         else:
             args += " -m 2048"
         args += " -cpu qemu64,+rdrand,umip,+smep" # most compatible x64 CPU model + RDRAND + UMIP + SMEP support (not included by default)
