@@ -33,6 +33,12 @@ failure_exempt_tests["MsWheaEarlyUnitTestApp.efi"] = datetime.datetime(2022, 2, 
 failure_exempt_tests["VariablePolicyFuncTestApp.efi"] = datetime.datetime(2022, 2, 1, 0, 0, 0)
 failure_exempt_tests["DeviceIdTestApp.efi"] = datetime.datetime(2022, 2, 1, 0, 0, 0)
 
+# Allow failure exempt tests to be ignored for 90 days
+FAILURE_EXEMPT_OMISSION_LENGTH = 90*24*60*60
+
+# Declare tests which require platform reset(s)
+reset_tests = ["MorLockFunctionalTestApp.efi", "VariablePolicyFuncTestApp.efi"]
+
     # ####################################################################################### #
     #                                Common Configuration                                     #
     # ####################################################################################### #
@@ -394,7 +400,11 @@ class UnitTestSupport(object):
 
     def write_tests_to_startup_nsh(self,nshfile):
         for test in self.test_list:
-            nshfile.AddLine(os.path.basename(test))
+            if (os.path.basename(test) in reset_tests):
+                nshfile.AddLine(os.path.basename(test))
+        for test in self.test_list:
+            if not (os.path.basename(test) in reset_tests):
+                nshfile.AddLine(os.path.basename(test))
 
     def report_results(self, virtualdrive) -> int:
         from html import unescape
@@ -409,7 +419,7 @@ class UnitTestSupport(object):
             if (os.path.basename(unit_test) in failure_exempt_tests.keys()):
                 now = datetime.datetime.now()
                 last_ignore_time = failure_exempt_tests[os.path.basename(unit_test)]
-                if (now - last_ignore_time).total_seconds() > 45*24*60*60:
+                if (now - last_ignore_time).total_seconds() > FAILURE_EXEMPT_OMISSION_LENGTH:
                     logging.info("Ignoring output of " + os.path.basename(unit_test))
                     ignore_failure = True
             xml_result_file = os.path.basename(unit_test)[:-4] + "_JUNIT.XML"

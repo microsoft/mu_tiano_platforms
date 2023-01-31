@@ -1273,7 +1273,8 @@
   ## Where-Object {(Select-String -InputObject $_ -Pattern "MODULE_TYPE\s*=\s*UEFI_APPLICATION")} | ^
   ## ForEach-Object {$path = $_.FullName -replace '\\','/'; Write-Output $path}
   !if $(BUILD_UNIT_TESTS) == TRUE
-
+  
+    # TEST APPS
     UefiTestingPkg/FunctionalSystemTests/MemoryProtectionTest/App/MemoryProtectionTestApp.inf
     AdvLoggerPkg/UnitTests/LineParser/LineParserTestApp.inf
     DfciPkg/UnitTests/DeviceIdTest/DeviceIdTestApp.inf
@@ -1317,6 +1318,12 @@
     UefiTestingPkg/AuditTests/PagingAudit/UEFI/DxePagingAuditTestApp.inf
     UefiTestingPkg/FunctionalSystemTests/ExceptionPersistenceTestApp/ExceptionPersistenceTestApp.inf
     # UefiTestingPkg/FunctionalSystemTests/VarPolicyUnitTestApp/VarPolicyUnitTestApp.inf
+    XmlSupportPkg/Test/UnitTest/XmlTreeQueryLib/XmlTreeQueryLibUnitTestApp.inf {
+      <PcdsPatchableInModule>
+        #Turn off Halt on Assert and Print Assert so that libraries can
+        #be tested in more of a release mode environment
+        gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
+    }
     CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf {
       <LibraryClasses>
         BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
@@ -1328,12 +1335,13 @@
         gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
     }
 
-    XmlSupportPkg/Test/UnitTest/XmlTreeQueryLib/XmlTreeQueryLibUnitTestApp.inf {
-      <PcdsPatchableInModule>
-        #Turn off Halt on Assert and Print Assert so that libraries can
-        #be tested in more of a release mode environment
-        gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
-    }
+    # OTHER TESTS
+    UnitTestFrameworkPkg/Library/UnitTestBootLibUsbClass/UnitTestBootLibUsbClass.inf
+    UnitTestFrameworkPkg/Library/UnitTestPersistenceLibSimpleFileSystem/UnitTestPersistenceLibSimpleFileSystem.inf
+    UefiTestingPkg/FunctionalSystemTests/SmmPagingProtectionsTest/Smm/SmmPagingProtectionsTestSmm.inf
+    UefiTestingPkg/FunctionalSystemTests/MemoryProtectionTest/Smm/MemoryProtectionTestSmm.inf
+    MmSupervisorPkg/Test/MmPagingAuditTest/UEFI/MmPagingAuditApp.inf
+    UefiTestingPkg/AuditTests/PagingAudit/UEFI/DxePagingAuditDriver.inf
 
   !endif
   #########################################
