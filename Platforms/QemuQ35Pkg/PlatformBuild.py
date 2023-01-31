@@ -32,6 +32,7 @@ failure_exempt_tests["MorLockFunctionalTestApp.efi"] = datetime.datetime(2022, 2
 failure_exempt_tests["MsWheaEarlyUnitTestApp.efi"] = datetime.datetime(2022, 2, 1, 0, 0, 0)
 failure_exempt_tests["VariablePolicyFuncTestApp.efi"] = datetime.datetime(2022, 2, 1, 0, 0, 0)
 failure_exempt_tests["DeviceIdTestApp.efi"] = datetime.datetime(2022, 2, 1, 0, 0, 0)
+failure_exempt_tests["DxePagingAuditTestApp.efi"] = datetime.datetime(2022, 2, 1, 0, 0, 0)
 
 # Allow failure exempt tests to be ignored for 90 days
 FAILURE_EXEMPT_OMISSION_LENGTH = 90*24*60*60
@@ -442,10 +443,11 @@ class UnitTestSupport(object):
                         caseresult = "\t\t\tPASS"
                         level = logging.INFO
                         for result in case:
-                            if result.tag == 'failure' and not ignore_failure:
-                                failure_count += 1
+                            if result.tag == 'failure':
                                 level = logging.ERROR
                                 caseresult = "\t\tFAIL" + " - " + unescape(result.attrib['message'])
+                                if not ignore_failure:
+                                    failure_count += 1
                         logging.log( level, caseresult)
             except Exception as ex:
                 logging.error("Exception trying to read xml." + str(ex))
