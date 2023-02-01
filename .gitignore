@@ -10,5 +10,5 @@ tags/
 BuildConfig.conf
 UefiDbgExt/x64/
 *.vcxproj.user
-
 /Conf/
+/**/Include/Generated/**

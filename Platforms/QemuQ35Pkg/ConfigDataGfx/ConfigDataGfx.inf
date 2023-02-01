@@ -27,20 +27,16 @@
   BaseLib
   DebugLib
   MemoryAllocationLib
-  ConfigBlobBaseLib
   PeimEntryPoint
   PeiServicesLib
   PrintLib
+  ConfigKnobShimLib
 
 [Guids]
-  gSetupConfigPolicyVariableGuid                # CONSUMES
   gPolicyDataGFXGuid                            # CONSUMES
 
 [Ppis]
-  gEfiPeiReadOnlyVariable2PpiGuid   ## CONSUMES
   gPeiPolicyPpiGuid                 ## CONSUMES
 
 [Depex]
-  gEfiPeiReadOnlyVariable2PpiGuid AND
   gPeiPolicyPpiGuid
-

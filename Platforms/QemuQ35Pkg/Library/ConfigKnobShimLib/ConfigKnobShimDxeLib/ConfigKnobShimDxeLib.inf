@@ -1,0 +1,44 @@
+## @file
+# Library interface for the autogen XML config header to call into to fetch a config value.
+#
+# Copyright (c) Microsoft Corporation
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION         = 0x00010017
+  BASE_NAME           = ConfigKnobShimDxeLib
+  FILE_GUID           = 08264D55-BFA4-4875-8271-D9D8BA1AA890
+  VERSION_STRING      = 1.0
+  MODULE_TYPE         = DXE_DRIVER
+  LIBRARY_CLASS       = ConfigKnobShimLib | DXE_DRIVER DXE_RUNTIME_DRIVER
+
+#
+# The following information is for reference only and not required by the
+# build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  ConfigKnobShimDxeLib.c
+  ../ConfigKnobShimLibCommon.c
+  ../ConfigKnobShimLibCommon.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SetupDataPkg/SetupDataPkg.dec
+  QemuQ35Pkg/QemuQ35Pkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  UefiRuntimeServicesTableLib
+
+[Ppis]
+  gEfiVariableArchProtocolGuid   ## CONSUMES
+
+[Depex]
+  gEfiVariableArchProtocolGuid

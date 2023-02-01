@@ -1,0 +1,12 @@
+<ConfigSchema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="configschema.xsd">
+
+  <!-- gQemuQ35PkgConfigKnobNamespaceGuid -->
+  <Knobs namespace="{5E6A1994-E683-4D8C-9DC1-F1F63490FC60}">
+    <!-- Enum knobs -->
+
+    <Knob type="bool" name="PowerOnPort0" default="false" />
+
+  </Knobs>
+
+</ConfigSchema>

@@ -1,0 +1,44 @@
+## @file
+# Library interface for the autogen XML config header to call into to fetch a config value.
+#
+# Copyright (c) Microsoft Corporation
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION         = 0x00010017
+  BASE_NAME           = ConfigKnobShimPeiLib
+  FILE_GUID           = CA4C3E6E-0230-42E0-9A37-AF4380895B63
+  VERSION_STRING      = 1.0
+  MODULE_TYPE         = PEIM
+  LIBRARY_CLASS       = ConfigKnobShimLib | PEIM PEI_CORE
+
+#
+# The following information is for reference only and not required by the
+# build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  ConfigKnobShimPeiLib.c
+  ../ConfigKnobShimLibCommon.c
+  ../ConfigKnobShimLibCommon.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SetupDataPkg/SetupDataPkg.dec
+  QemuQ35Pkg/QemuQ35Pkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  PeiServicesLib
+
+[Ppis]
+  gEfiPeiReadOnlyVariable2PpiGuid    ## CONSUMES
+
+[Depex]
+  gEfiPeiReadOnlyVariable2PpiGuid
