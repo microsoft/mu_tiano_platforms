@@ -9,12 +9,11 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
 
 #define CONFIG_INCLUDE_CACHE
 #include <Generated/ConfigClientGenerated.h>
 #include <Generated/ConfigServiceGenerated.h>
-
-#define CONFIG_KNOB_NAME_MAX_LENGTH  64
 
 #include "ConfigKnobShimLibCommon.h"
 
@@ -71,6 +70,15 @@ GetConfigKnob (
   if (ConfigKnobDataSize != VariableSize) {
     // we will only accept this variable if it is the correct size
     Status = EFI_NOT_FOUND;
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: found config knob %a with mismatched size. Defaulting to profile defined value."
+      " Expected size: %u, found size: %u\n",
+      __FUNCTION__,
+      ConfigKnobName,
+      ConfigKnobDataSize,
+      VariableSize
+      ));
   }
 
   if (EFI_ERROR (Status)) {
@@ -118,18 +126,31 @@ Exit:
 //
 
 VOID *
-EFIAPI
 GetKnobValue (
   KNOB  Knob
   )
 {
-  ASSERT (Knob < KNOB_MAX);
-  KNOB_DATA  *KnobData = &gKnobData[(UINTN)Knob];
+  KNOB_DATA  *KnobData;
+  UINTN      AsciiSize;
+  CHAR16     *UnicodeName;
 
+  if (Knob >= KNOB_MAX) {
+    DEBUG ((DEBUG_ERROR, "%a: Knob outside of bounds!\n", __FUNCTION__));
+    ASSERT (Knob < KNOB_MAX);
+    return NULL;
+  }
+
+  KnobData  = &gKnobData[(UINTN)Knob];
+  AsciiSize = AsciiStrSize (KnobData->Name);
   // Convert the name to a CHAR16 string
-  CHAR16  UnicodeName[CONFIG_KNOB_NAME_MAX_LENGTH];
+  UnicodeName = AllocatePool (AsciiSize * 2);
 
-  AsciiStrToUnicodeStrS (KnobData->Name, UnicodeName, AsciiStrSize (KnobData->Name));
+  if (UnicodeName == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: Failed name memory allocation\n", __FUNCTION__));
+    return NULL;
+  }
+
+  AsciiStrToUnicodeStrS (KnobData->Name, UnicodeName, AsciiSize);
 
   // Get the knob value
   EFI_STATUS  Result = GetConfigKnob (
@@ -154,6 +175,8 @@ GetKnobValue (
       CopyMem (KnobData->CacheValueAddress, KnobData->DefaultValueAddress, KnobData->ValueSize);
     }
   }
+
+  FreePool (UnicodeName);
 
   // Return a pointer to the data, the generated functions will cast this to the correct type
   return KnobData->CacheValueAddress;
