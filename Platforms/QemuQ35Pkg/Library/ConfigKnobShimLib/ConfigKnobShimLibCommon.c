@@ -133,6 +133,7 @@ GetKnobValue (
   KNOB_DATA  *KnobData;
   UINTN      AsciiSize;
   CHAR16     *UnicodeName;
+  EFI_STATUS Status;
 
   if (Knob >= KNOB_MAX) {
     DEBUG ((DEBUG_ERROR, "%a: Knob outside of bounds!\n", __FUNCTION__));
@@ -153,7 +154,7 @@ GetKnobValue (
   AsciiStrToUnicodeStrS (KnobData->Name, UnicodeName, AsciiSize);
 
   // Get the knob value
-  EFI_STATUS  Result = GetConfigKnob (
+  Status = GetConfigKnob (
                          (EFI_GUID *)&KnobData->VendorNamespace,
                          UnicodeName,
                          KnobData->CacheValueAddress,
@@ -165,7 +166,10 @@ GetKnobValue (
   // The only failure cases are invalid parameters, which should not happen
   // The platform implementing this can decide whether variable services not being available is a failure case or if
   // the profile default value is returned in that instance.
-  ASSERT (Result == EFI_SUCCESS);
+  if (EFI_ERROR(Status)) {
+    ASSERT (Status == EFI_SUCCESS);
+    return NULL;
+  }
 
   // Validate the value from flash meets the constraints of the knob
   if (KnobData->Validator != NULL) {
