@@ -130,10 +130,10 @@ GetKnobValue (
   KNOB  Knob
   )
 {
-  KNOB_DATA  *KnobData;
-  UINTN      AsciiSize;
-  CHAR16     *UnicodeName;
-  EFI_STATUS Status;
+  KNOB_DATA   *KnobData;
+  UINTN       AsciiSize;
+  CHAR16      *UnicodeName;
+  EFI_STATUS  Status;
 
   if (Knob >= KNOB_MAX) {
     DEBUG ((DEBUG_ERROR, "%a: Knob outside of bounds!\n", __FUNCTION__));
@@ -155,18 +155,18 @@ GetKnobValue (
 
   // Get the knob value
   Status = GetConfigKnob (
-                         (EFI_GUID *)&KnobData->VendorNamespace,
-                         UnicodeName,
-                         KnobData->CacheValueAddress,
-                         KnobData->ValueSize,
-                         (VOID *)KnobData->DefaultValueAddress
-                         );
+             (EFI_GUID *)&KnobData->VendorNamespace,
+             UnicodeName,
+             KnobData->CacheValueAddress,
+             KnobData->ValueSize,
+             (VOID *)KnobData->DefaultValueAddress
+             );
 
   // This function should not fail for us
   // The only failure cases are invalid parameters, which should not happen
   // The platform implementing this can decide whether variable services not being available is a failure case or if
   // the profile default value is returned in that instance.
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     ASSERT (Status == EFI_SUCCESS);
     return NULL;
   }
