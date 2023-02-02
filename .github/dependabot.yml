@@ -29,6 +29,8 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
+      timezone: "America/Los_Angeles"
+      time: "06:00"
     commit-message:
       prefix: "GitHub Action"
     labels:
@@ -38,6 +40,8 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+      timezone: "America/Los_Angeles"
+      time: "23:00"
     labels:
       - "type:submodules"
       - "type:dependencies"
@@ -46,6 +50,8 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+      timezone: "America/Los_Angeles"
+      time: "01:00"
     commit-message:
       prefix: "pip"
     labels:
