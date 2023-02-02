@@ -300,9 +300,7 @@
   !include NetworkPkg/NetworkLibs.dsc.inc
 
 #SHARED_CRYPTO
-!if $(ENABLE_SHARED_CRYPTO) == TRUE
-  #!include CryptoPkg/Driver/Bin/CryptoDriver.inc.dsc
-!else
+!if $(ENABLE_SHARED_CRYPTO) == FALSE
   [LibraryClasses.IA32]
     BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
     TlsLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
@@ -425,7 +423,6 @@
   QemuFwCfgS3Lib             |QemuQ35Pkg/Library/QemuFwCfgS3Lib/PeiQemuFwCfgS3LibFwCfg.inf
   PcdLib                     |MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   QemuFwCfgLib               |QemuQ35Pkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
-  #BaseCryptLib               |CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
   PcdDatabaseLoaderLib       |MdeModulePkg/Library/PcdDatabaseLoaderLib/Pei/PcdDatabaseLoaderLibPei.inf
   OemMfciLib                 |OemPkg/Library/OemMfciLib/OemMfciLibPei.inf
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
@@ -492,7 +489,6 @@
   ResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
   HwResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
-  #BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeRuntimeCapsuleLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_DRIVER]

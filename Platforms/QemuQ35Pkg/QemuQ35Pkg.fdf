@@ -507,7 +507,7 @@ INF  SetupDataPkg/ConfProfileMgrDxe/ConfProfileMgrDxe.inf
   !include CryptoPkg/Driver/Bin/CryptoDriver.DXE.inc.fdf
 !else
   INF  CryptoPkg/Driver/CryptoDxe.inf
-  #INF  CryptoPkg/Driver/CryptoSmm.inf
+  INF  CryptoPkg/Driver/CryptoSmm.inf
 !endif
 
 !if $(BUILD_UNIT_TESTS) == TRUE
