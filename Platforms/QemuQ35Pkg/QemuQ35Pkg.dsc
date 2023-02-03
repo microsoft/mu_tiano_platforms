@@ -223,11 +223,7 @@
   XenPlatformLib  |QemuQ35Pkg/Library/XenPlatformLib/XenPlatformLib.inf
 
   # Crypto Libraries
-  BaseCryptLib    |CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
-  OpensslLib      |CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
-  IntrinsicLib    |CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-  TlsLib          |CryptoPkg/Library/TlsLib/TlsLib.inf
-  RngLib          |MdePkg/Library/BaseRngLibNull/BaseRngLibNull.inf
+  RngLib          |MdePkg/Library/BaseRngLib/BaseRngLib.inf
   Hash2CryptoLib  |SecurityPkg/Library/BaseHash2CryptoLibNull/BaseHash2CryptoLibNull.inf
 
   # Power/Thermal/Power State Libraries
@@ -304,9 +300,7 @@
   !include NetworkPkg/NetworkLibs.dsc.inc
 
 #SHARED_CRYPTO
-!if $(ENABLE_SHARED_CRYPTO) == TRUE
-  !include CryptoPkg/Driver/Bin/CryptoDriver.inc.dsc
-!else
+!if $(ENABLE_SHARED_CRYPTO) == FALSE
   [LibraryClasses.IA32]
     BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
     TlsLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
@@ -319,6 +313,9 @@
     BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/SmmCryptLib.inf
     TlsLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/SmmCryptLib.inf
 
+  [LibraryClasses.X64.MM_STANDALONE]
+    BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
+
   [Components.IA32]
     CryptoPkg/Driver/CryptoPei.inf {
         <LibraryClasses>
@@ -327,36 +324,10 @@
           !if $(TOOL_CHAIN_TAG) == VS2017 or $(TOOL_CHAIN_TAG) == VS2015 or $(TOOL_CHAIN_TAG) == VS2019 or $(TOOL_CHAIN_TAG) == VS2022
             NULL|MdePkg/Library/VsIntrinsicLib/VsIntrinsicLib.inf
           !endif
-
+          IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
         <PcdsFixedAtBuild>
-        # HMACSHA256 family
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceHmacSha256New             | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceHmacSha256Free            | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceHmacSha256SetKey          | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceHmacSha256Duplicate       | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceHmacSha256Update          | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceHmacSha256Final           | TRUE
-        # SHA1 family
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha1GetContextSize        | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha1Init                  | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha1Duplicate             | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha1Update                | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha1Final                 | TRUE
-        # SHA256 family
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha256GetContextSize      | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha256Init                | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha256Duplicate           | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha256Update              | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha256Final               | TRUE
-        # SHA384 family
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha384GetContextSize      | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha384Init                | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha384Duplicate           | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha384Update              | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha384Final               | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha384HashAll             | TRUE
-        # Individuals
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServicePkcs5HashPassword         | TRUE
+          !include CryptoPkg/Driver/Bin/Crypto.pcd.TINY_SHA.inc.dsc
     }
 
   [Components.X64]
@@ -364,175 +335,19 @@
         <LibraryClasses>
           BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
           TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
+          IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
         <PcdsFixedAtBuild>
-        # HMACSHA1 family
-        # HMACSHA256 family
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceHmacSha256New             | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceHmacSha256Free            | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceHmacSha256SetKey          | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceHmacSha256Duplicate       | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceHmacSha256Update          | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceHmacSha256Final           | TRUE
-        # PKCS family
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServicePkcs5HashPassword         | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServicePkcs1v2Encrypt            | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServicePkcs7GetSigners           | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServicePkcs7FreeSigners          | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServicePkcs7Verify               | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceVerifyEKUsInPkcs7Signature| TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServicePkcs7GetAttachedContent   | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceAuthenticodeVerify        | TRUE
-        # RANDOM family
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceRandomSeed                | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceRandomBytes               | TRUE
-        # SHA1 family
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha1GetContextSize        | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha1Init                  | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha1Duplicate             | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha1Update                | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha1Final                 | TRUE
-        # SHA256 family
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha256GetContextSize      | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha256Init                | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha256Duplicate           | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha256Update              | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha256Final               | TRUE
-        # TLS family
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsInitialize             | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsCtxFree                | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsCtxNew                 | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsFree                   | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsNew                    | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsInHandshake            | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsDoHandshake            | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsHandleAlert            | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsCloseNotify            | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsCtrlTrafficOut         | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsCtrlTrafficIn          | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsRead                   | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsWrite                  | TRUE
-        # TLSSET family
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsSetVersion             | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsSetConnectionEnd       | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsSetCipherList          | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsSetCompressionMethod   | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsSetVerify              | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsSetVerifyHost          | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsSetSessionId           | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsSetCaCertificate       | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsSetHostPublicCert      | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsSetHostPrivateKey      | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsSetCertRevocationList  | TRUE
-        # TLSGET family
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetVersion             | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetConnectionEnd       | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetCurrentCipher       | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetCurrentCompressionId| TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetVerify              | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetSessionId           | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetClientRandom        | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetServerRandom        | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetKeyMaterial         | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetCaCertificate       | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetHostPublicCert      | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetHostPrivateKey      | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetCertRevocationList  | TRUE
-        # Individuals
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceRsaNew                    | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceRsaFree                   | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceRsaPkcs1Verify            | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceRsaGetPublicKeyFromX509   | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceX509GetSubjectName        | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceX509GetCommonName         | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceX509GetOrganizationName   | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceX509GetTBSCert            | TRUE
+          !include CryptoPkg/Driver/Bin/Crypto.pcd.STANDARD.inc.dsc
     }
     CryptoPkg/Driver/CryptoSmm.inf {
         <LibraryClasses>
           BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
           TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
+          IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
         <PcdsFixedAtBuild>
-        # HMACSHA1 family
-        # HMACSHA256 family
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceHmacSha256New             | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceHmacSha256Free            | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceHmacSha256SetKey          | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceHmacSha256Duplicate       | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceHmacSha256Update          | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceHmacSha256Final           | TRUE
-        # PKCS family
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServicePkcs5HashPassword         | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServicePkcs1v2Encrypt            | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServicePkcs7GetSigners           | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServicePkcs7FreeSigners          | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServicePkcs7Verify               | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceVerifyEKUsInPkcs7Signature| TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServicePkcs7GetAttachedContent   | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceAuthenticodeVerify        | TRUE
-        # RANDOM family
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceRandomSeed                | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceRandomBytes               | TRUE
-        # SHA1 family
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha1GetContextSize        | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha1Init                  | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha1Duplicate             | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha1Update                | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha1Final                 | TRUE
-        # SHA256 family
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha256GetContextSize      | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha256Init                | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha256Duplicate           | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha256Update              | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceSha256Final               | TRUE
-        # TLS family
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsInitialize             | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsCtxFree                | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsCtxNew                 | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsFree                   | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsNew                    | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsInHandshake            | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsDoHandshake            | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsHandleAlert            | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsCloseNotify            | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsCtrlTrafficOut         | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsCtrlTrafficIn          | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsRead                   | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsWrite                  | TRUE
-        # TLSSET family
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsSetVersion             | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsSetConnectionEnd       | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsSetCipherList          | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsSetCompressionMethod   | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsSetVerify              | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsSetVerifyHost          | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsSetSessionId           | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsSetCaCertificate       | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsSetHostPublicCert      | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsSetHostPrivateKey      | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsSetCertRevocationList  | TRUE
-        # TLSGET family
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetVersion             | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetConnectionEnd       | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetCurrentCipher       | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetCurrentCompressionId| TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetVerify              | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetSessionId           | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetClientRandom        | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetServerRandom        | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetKeyMaterial         | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetCaCertificate       | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetHostPublicCert      | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetHostPrivateKey      | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceTlsGetCertRevocationList  | TRUE
-        # Individuals
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceRsaNew                    | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceRsaFree                   | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceRsaPkcs1Verify            | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceRsaGetPublicKeyFromX509   | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceX509GetSubjectName        | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceX509GetCommonName         | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceX509GetOrganizationName   | TRUE
-          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceX509GetTBSCert            | TRUE
+          !include CryptoPkg/Driver/Bin/Crypto.pcd.STANDARD.inc.dsc
     }
 !endif
 
@@ -608,7 +423,6 @@
   QemuFwCfgS3Lib             |QemuQ35Pkg/Library/QemuFwCfgS3Lib/PeiQemuFwCfgS3LibFwCfg.inf
   PcdLib                     |MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   QemuFwCfgLib               |QemuQ35Pkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
-  BaseCryptLib               |CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
   PcdDatabaseLoaderLib       |MdeModulePkg/Library/PcdDatabaseLoaderLib/Pei/PcdDatabaseLoaderLibPei.inf
   OemMfciLib                 |OemPkg/Library/OemMfciLib/OemMfciLibPei.inf
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
@@ -675,7 +489,6 @@
   ResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
   HwResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeRuntimeCapsuleLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_DRIVER]
@@ -726,7 +539,6 @@
   MmServicesTableLib|MdePkg/Library/MmServicesTableLib/MmServicesTableLib.inf
   SmmServicesTableLib|MdePkg/Library/SmmServicesTableLib/SmmServicesTableLib.inf
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/SmmCpuExceptionHandlerLib.inf
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
   RngLib|MdePkg/Library/BaseRngLibNull/BaseRngLibNull.inf
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxSmmLib.inf
   AdvLoggerAccessLib|AdvLoggerPkg/Library/AdvLoggerSmmAccessLib/AdvLoggerSmmAccessLib.inf
@@ -1065,6 +877,11 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 # Components Section - list of all EDK II Modules needed by this Platform.
 #
 ################################################################################
+[Components]
+# Shared Crypto Include
+!if $(ENABLE_SHARED_CRYPTO) == TRUE
+  !include CryptoPkg/Driver/Bin/CryptoDriver.inc.dsc
+!endif
 
 [Components.IA32]
   QemuQ35Pkg/ResetVector/ResetVector.inf
@@ -1158,11 +975,6 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
   QemuQ35Pkg/ConfigDataGfx/ConfigDataGfx.inf
 
-!if $(ENABLE_SHARED_CRYPTO) == TRUE
-  [PcdsFixedAtBuild]
-    !include CryptoPkg/Driver/Bin/Crypto.pcd.STANDARD.inc.dsc
-!endif
-
 [Components.X64]
   #########################################
   # DXE Phase modules
@@ -1189,15 +1001,6 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 
   # Profile Enforcement
   SetupDataPkg/ConfProfileMgrDxe/ConfProfileMgrDxe.inf
-
-!if $(ENABLE_SHARED_CRYPTO) == TRUE
-  DEFINE DXE_CRYPTO_DRIVER_FILE_GUID = 254e0f83-c675-4578-bc16-d44111c34e00
-  CryptoPkg/Driver/CryptoDxe.inf {
-    <LibraryClasses>
-      BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
-      TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
-  }
-!endif
 
   # Manages windows and fonts to be drawn by the RenderingEngine.
   MsGraphicsPkg/SimpleWindowManagerDxe/SimpleWindowManagerDxe.inf
@@ -1493,6 +1296,10 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
     UefiTestingPkg/FunctionalSystemTests/ExceptionPersistenceTestApp/ExceptionPersistenceTestApp.inf
     # UefiTestingPkg/FunctionalSystemTests/VarPolicyUnitTestApp/VarPolicyUnitTestApp.inf
     CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf {
+      <LibraryClasses>
+        BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+        OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
+        IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
       <PcdsPatchableInModule>
         #Turn off Halt on Assert and Print Assert so that libraries can
         #be tested in more of a release mode environment
