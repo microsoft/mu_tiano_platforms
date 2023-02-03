@@ -81,6 +81,7 @@ jobs:
           - script: sudo microdnf --assumeyes install openssl-devel
             displayName: Install openssl
             condition: and(gt(variables.pkg_count, 0), succeeded())
-        extra_artifacts: |
+        artifacts_identifier: '$(package) $(Build.Target)'
+        artifacts_binary: |
           **/QEMU_EFI.fd
           **/SECURE_FLASH0.fd
