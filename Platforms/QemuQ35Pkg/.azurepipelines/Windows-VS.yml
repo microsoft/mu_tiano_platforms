@@ -77,6 +77,7 @@ jobs:
         - powershell: choco install qemu --version=2022.8.31; Write-Host "##vso[task.prependpath]c:\Program Files\qemu"
           displayName: Install QEMU and Set QEMU on path # friendly name displayed in the UI
           condition: and(gt(variables.pkg_count, 0), succeeded())
-        extra_artifacts: |
+        artifacts_identifier: '$(package) $(Build.Target)'
+        artifacts_binary: |
           **/QEMUQ35_*.fd
 
