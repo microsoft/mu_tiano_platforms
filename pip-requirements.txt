@@ -12,7 +12,7 @@
 # https://www.python.org/dev/peps/pep-0440/#version-specifiers
 ##
 
-edk2-pytool-library==0.13.0 
+edk2-pytool-library==0.13.1 
 edk2-pytool-extensions==0.21.1
 xmlschema==2.1.1
 regex==2022.10.31
