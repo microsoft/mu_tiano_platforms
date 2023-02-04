@@ -62,7 +62,7 @@ jobs:
     pool:
       vmImage: $(vm_image)
 
-    container: ghcr.io/tianocore/containers/fedora-35-test:5800d58
+    container: ghcr.io/tianocore/containers/fedora-35-test:5b8a008
 
     steps:
     - script: echo "##vso[task.prependpath]/home/vsts_azpcontainer/.local/bin"

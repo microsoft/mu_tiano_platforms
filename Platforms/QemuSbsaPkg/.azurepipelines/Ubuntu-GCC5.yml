@@ -62,7 +62,7 @@ jobs:
     pool:
       vmImage: $(vm_image)
 
-    container: ghcr.io/tianocore/containers/fedora-35-test:5800d58
+    container: ghcr.io/tianocore/containers/fedora-35-test:5b8a008
 
     steps:
     - script: echo "##vso[task.prependpath]/home/vsts_azpcontainer/.local/bin"
@@ -78,7 +78,7 @@ jobs:
         run_flags: $(Run.Flags)
         install_tools: false
         extra_install_step:
-          - script: sudo microdnf --assumeyes install openssl-devel
+          - script: sudo dnf --assumeyes install openssl-devel
             displayName: Install openssl
             condition: and(gt(variables.pkg_count, 0), succeeded())
         artifacts_identifier: '$(package) $(Build.Target)'
