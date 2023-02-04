@@ -78,7 +78,7 @@ jobs:
         run_flags: $(Run.Flags)
         install_tools: false
         extra_install_step:
-          - script: sudo microdnf --assumeyes install openssl-devel
+          - script: sudo dnf --assumeyes install openssl-devel
             displayName: Install openssl
             condition: and(gt(variables.pkg_count, 0), succeeded())
         artifacts_identifier: '$(package) $(Build.Target)'
