@@ -1267,7 +1267,7 @@
 
   ## Unit Tests
   #
-  ## Powershell script to discover unit tests in a given directory:
+  ## Powershell script to discover unit tests:
   #
   ## Get-ChildItem -Recurse -Force -File | Where-Object {($_.Name -like "*test*") -and ($_.Extension -eq ".inf")} | ^
   ## Where-Object {(Select-String -InputObject $_ -Pattern "MODULE_TYPE\s*=\s*UEFI_APPLICATION")} | ^
@@ -1297,7 +1297,12 @@
     UefiTestingPkg/FunctionalSystemTests/MorLockTestApp/MorLockTestApp.inf
     # UefiTestingPkg/FunctionalSystemTests/SmmPagingProtectionsTest/App/SmmPagingProtectionsTestApp.inf # NOT APPLICABLE TO Q35
     XmlSupportPkg/Test/UnitTest/XmlTreeLib/XmlTreeLibUnitTestApp.inf
-    XmlSupportPkg/Test/UnitTest/XmlTreeQueryLib/XmlTreeQueryLibUnitTestApp.inf
+    XmlSupportPkg/Test/UnitTest/XmlTreeQueryLib/XmlTreeQueryLibUnitTestApp.inf {
+      <PcdsPatchableInModule>
+        #Turn off Halt on Assert and Print Assert so that libraries can
+        #be tested in more of a release mode environment
+        gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
+    }
     FmpDevicePkg/Test/UnitTest/Library/FmpDependencyLib/FmpDependencyLibUnitTestApp.inf
     MmSupervisorPkg/Test/MmSupvRequestUnitTestApp/MmSupvRequestUnitTestApp.inf
     CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf
@@ -1318,12 +1323,6 @@
     UefiTestingPkg/AuditTests/PagingAudit/UEFI/DxePagingAuditTestApp.inf
     UefiTestingPkg/FunctionalSystemTests/ExceptionPersistenceTestApp/ExceptionPersistenceTestApp.inf
     # UefiTestingPkg/FunctionalSystemTests/VarPolicyUnitTestApp/VarPolicyUnitTestApp.inf
-    XmlSupportPkg/Test/UnitTest/XmlTreeQueryLib/XmlTreeQueryLibUnitTestApp.inf {
-      <PcdsPatchableInModule>
-        #Turn off Halt on Assert and Print Assert so that libraries can
-        #be tested in more of a release mode environment
-        gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
-    }
     CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf {
       <LibraryClasses>
         BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
