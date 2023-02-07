@@ -21,7 +21,7 @@ jobs:
       - name: should_run
         value: true
       - name: run_flags
-        value: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE"
+        value: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp.efi RUN_TESTS=TRUE"
 
     #Use matrix to speed up the build process
     strategy:
