@@ -114,6 +114,10 @@ jobs:
       displayName: Download NuGet Package Config File
 
     - script: |
+        curl "${RAW_CONTENT_URL}/${ORG_REPO}/${RAW_REPO_VERSION}/.azurepipelines/NugetPublish.py" --output $(Build.SourcesDirectory)/NugetPublish.py --create-dirs
+      displayName: Temporary - Download NuGet Publish Python Script
+
+    - script: |
         nugetPackageName=$(grep '^name:' "${BUILD_ARTIFACTSTAGINGDIRECTORY}/NugetConfigFile.txt" | cut -d: -f2 | xargs)
         echo "##vso[task.setvariable variable=nuget_package_name;]${nugetPackageName}"
       displayName: Get NuGet Package Name
@@ -173,7 +177,9 @@ jobs:
           outputLogPath="${BUILD_STAGINGDIRECTORY}/Nuget/NugetPackagingLog.txt"
           packageVersion=$NUGET_PACKAGE_VERSION
           releaseCommitSha=$RELEASE_COMMIT_SHA
-          nuget-publish --Operation PackAndPush --OutputLog "$outputLogPath" --ConfigFilePath "$configFilePath" --InputFolderPath "$inputFolderPath" --Version "$packageVersion" --ApiKey "$apiKey" --CustomLicensePath "$customLicensePath" --RepositoryCommit "$releaseCommitSha"
+          #nuget-publish --Operation PackAndPush --OutputLog "$outputLogPath" --ConfigFilePath "$configFilePath" --InputFolderPath "$inputFolderPath" --Version "$packageVersion" --ApiKey "$apiKey" --CustomLicensePath "$customLicensePath" --RepositoryCommit "$releaseCommitSha"
+          # Temporarily call local script until edk2-pytool-extensions 0.21.3 is published
+          python3 ${BUILD_SOURCESDIRECTORY}/NugetPublish.py --Operation PackAndPush --OutputLog "$outputLogPath" --ConfigFilePath "$configFilePath" --InputFolderPath "$inputFolderPath" --Version "$packageVersion" --ApiKey "$apiKey" --CustomLicensePath "$customLicensePath" --RepositoryCommit "$releaseCommitSha"
 
     - task: Bash@3
       name: ZipAndPublishReleaseAsset
