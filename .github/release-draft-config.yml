@@ -28,6 +28,9 @@ template: |
   **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
 
 categories:
+  - title: '⚠️ Breaking Changes'
+    labels:
+      - 'impact:breaking-change'
   - title: '🚀 Features & ✨ Enhancements'
     labels:
       - 'type:design-change'
