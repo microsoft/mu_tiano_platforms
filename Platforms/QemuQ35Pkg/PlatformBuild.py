@@ -354,6 +354,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             VirtualDrivePath = self.env.GetValue("VIRTUAL_DRIVE_PATH", os.path.join(output_base, "VirtualDrive"))
             logging.warning("Linux currently isn't supported for the virtual drive. Falling back to an older method")
 
+            test_regex = self.env.GetValue("TEST_REGEX", "")
+
             if run_tests:
                 logging.critical("Linux doesn't support running unit tests due to lack of VHD support")
 
