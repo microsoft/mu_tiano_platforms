@@ -267,6 +267,7 @@ READ_LOCK_STATUS   = TRUE
   }
   INF ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
   INF ShellPkg/DynamicCommand/HttpDynamicCommand/HttpDynamicCommand.inf
+  INF ShellPkg/DynamicCommand/VariablePolicyDynamicCommand/VariablePolicyDynamicCommand.inf
   INF QemuQ35Pkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
 
   INF MsGraphicsPkg/SimpleWindowManagerDxe/SimpleWindowManagerDxe.inf
