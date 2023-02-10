@@ -299,6 +299,17 @@
   MsNetworkDependencyLib |PcBdsPkg/Library/MsNetworkDependencyLib/MsNetworkDependencyLib.inf # Library that is attached to drivers that require networking.
   !include NetworkPkg/NetworkLibs.dsc.inc
 
+##MSCHANGE Begin
+!if $(TOOL_CHAIN_TAG) == VS2019 or $(TOOL_CHAIN_TAG) == VS2022
+[LibraryClasses.X64, LibraryClasses.IA32]
+  #if debug is enabled provide StackCookie support lib so that we can link to /GS exports on MSVC
+  RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
+[LibraryClasses.X64]
+  BaseBinSecurityLib|MdePkg/Library/BaseBinSecurityLibRng/BaseBinSecurityLibRng.inf
+  NULL|MdePkg/Library/BaseBinSecurityLibRng/BaseBinSecurityLibRng.inf
+!endif
+##MSCHANGE End
+
 #SHARED_CRYPTO
 !if $(ENABLE_SHARED_CRYPTO) == FALSE
   [LibraryClasses.IA32]
