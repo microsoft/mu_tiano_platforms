@@ -2,144 +2,177 @@
 Mu Tiano Platform Repository
 ============================
 
-Core CI Build Status:
+|Latest Mu Tiano Platform Release Version (latest SemVer)| |Commits Since Last Release|
 
 =========================== =================== ==================
 Host and Toolchain          Build Status        Test Status
 =========================== =================== ==================
-Windows_VS2022_             |WindowsCiBuild|    |WindowsCiTest|
-Ubuntu_GCC5_                |UbuntuCiBuild|     |UbuntuCiTest|
+`Windows Visual Studio`_    |WindowsCiBuild|    |WindowsCiTest|
+`Ubuntu GCC5`_              |UbuntuCiBuild|     |UbuntuCiTest|
 =========================== =================== ==================
-
-Platform Build and Boot Status:
 
 ============================= =================
 Platform and Toolchain        Status
 ============================= =================
-Q35_VS2022_                   |Q35VsBuild|
-Q35_GCC5_                     |Q35GccBuild|
-SBSA_GCC5_                    |SBSAGccBuild|
+`Q35 Visual Studio`_          |Q35VsBuild|
+`Q35 GCC5`_                   |Q35GccBuild|
+`SBSA GCC5`_                  |SBSAGccBuild|
 ============================= =================
 
-This repository is part of Project Mu.  Please see Project Mu for details https://microsoft.github.io/mu
+.. |Latest Mu Tiano Platform Release Version (latest SemVer)| image:: https://img.shields.io/github/v/release/microsoft/mu_tiano_platforms?label=Latest%20Release
+   :target: https://github.com/microsoft/mu_tiano_platforms/releases/latest
 
-Branch Status - release/202202
-==============================
+.. |Commits Since Last Release| image:: https://img.shields.io/github/commits-since/microsoft/mu_tiano_platforms/latest/main?include_prereleases
+   :target: https://github.com/microsoft/mu_tiano_platforms/releases
 
-:Status:
-  In Development
+----
 
-:Entered Development:
-  2022/03/10
+Quick Links
+===========
 
-:Anticipated Stabilization:
-  May 2022
+- `Build Instructions <Platforms/QemuQ35Pkg/Docs/Development/building.md>`_
+- `Contribution Instructions <CONTRIBUTING.md>`_
+- `Questions and Other Discussion <https://github.com/microsoft/mu_tiano_platforms/discussions>`_
+- `Releases <https://github.com/microsoft/mu_tiano_platforms/releases>`_
+- `Submit and View Bugs, Doc Requests, Feature Requests <https://github.com/microsoft/mu_tiano_platforms/issues>`_
+- `Security Issue Reporting Procedure <https://github.com/microsoft/mu_tiano_platforms/security/policy>`_
 
-Branch Changes - release/202202
-===============================
+About This Repo
+===============
 
-Breaking Changes-dev
---------------------
+Mu Tiano Platform is a public repository of `Project Mu`_ based firmware that targets the open-source `QEMU`_
+processor emulator.
 
-- None
+This repository provides readily available, free, and feature rich platforms that serve as an example for feature
+enablement and validation, demonstrating how a single firmware codebase can be shared across multiple products and
+architectures, promoting serviceable, maintainable, up-to-date and secure firmware.
 
-Main Changes-dev
-----------------
+A goal of this repository is to reduce the overhead of testing and evaluating common functionality before deployment
+to physical hardware.
 
-- None
+Current Platforms Supported
+---------------------------
 
-Bug Fixes-dev
--------------
+- `QemuQ35Pkg`_
 
-- None
+  - `QemuQ35Pkg Detailed Info`_
 
-2202_RefBoot Changes
---------------------
+  - Intel Q35 chipset with ICH9 south bridge
 
-- None
+- `QemuSbsaPkg`_
 
-2202_CIBuild Changes
---------------------
+  - `QemuSbsaPkg Detailed Info`_
 
-- None
+  - ARM Server Base System Architecture
 
-2202_Rebase Changes
--------------------
-
-| Starting commit: 0e84c00d
-| Destination commit: 64d9590a
-
-- None
+.. _`Project Mu`: https://microsoft.github.io/mu
+.. _`QEMU`: https://www.qemu.org/
+.. _`QemuQ35Pkg`: Platforms/QemuQ35Pkg
+.. _`QemuQ35Pkg Detailed Info`: Platforms/QemuQ35Pkg/Docs/QemuQ35_ReadMe.md
+.. _`QemuSbsaPkg`: Platforms/QemuSbsaPkg
+.. _`QemuSbsaPkg Detailed Info`: Platforms/QemuSbsaPkg/Docs/QemuSbsa_ReadMe.md
 
 Getting Started
 ===============
 
-The best way to get started is to review the details of this repository and look at the platforms in this repo.
+Individual platforms are maintained in the `Platforms` directory. Each platform directory has a readme file and a
+`Docs` folders with more detailed platform-specific information.
 
-- `Repo Details <RepoDetails.md>`_
+Build Instructions
+------------------
 
-Platforms can be found under the `Platforms` folder inside the root of this repo.
+1. If you are new to the "stuart" build system in general refer to the following for a general overview
+   `How to Build in edk2 with Stuart`_.
 
-Details about the platform and how to build/use each platform can be found in their respective directories.
+2. For instructions specific to this repo refer to `building QemuQ35Pkg`_.
 
-- `Q35 Platform <Platforms/QemuQ35Pkg/Docs/QemuQ35_ReadMe.md>`_
-- `Ovmf upstream Platform <Platforms/OvmfPkg/ReadMe.md>`_
+You can then apply that knowledge to build the platform you're interested in with the `PlatformBuild.py` files located
+in the platform directory.
+
+.. _`Building QemuQ35Pkg`: Platforms/QemuQ35Pkg/Docs/Development/building.md
+.. _`How to Build in edk2 with Stuart`: https://github.com/tianocore/tianocore.github.io/wiki/How-to-Build-With-Stuart
+
+Releases
+--------
+
+It is recommended to consume binaries built from the code in this repo (outside of development purposes) through a
+release.
+
+Releases are tagged in the repository and are available for download from the `Releases`_ page. Each release contains
+release notes describing the changes since the last release that highlight important changes such as breaking changes.
+
+A semantic versioning process (version is `<major.minor.patch>`) is followed with the following rules:
+
+- Major Version
+
+  - A major version change indicates a breaking change. This means that the release is not backward
+    compatible with the previous release. This is typically a change to the API or ABI of a component.
+
+- Minor Version
+
+  - A minor version change indicates a new feature or enhancement. This means that the release is backward
+    compatible with the previous release but includes new functionality or a major rework of existing functionality.
+
+- Patch Version
+
+  - A patch version change indicates a bug fix or any other change. This means that the release is backward compatible
+    with the previous release and contains no new functionality.
+
+Every release includes `DEBUG` and `RELEASE` binaries for all supported platforms. `DEBUG` is recommended to debug
+a release and `RELEASE` used for non-debug scenarios. If you file a bug and a "debug log" is requested, that needs to
+be produced from the `DEBUG` build of the release.
+
+Every release is published as both a `NuGet`_ package and a zip file. Both formats contain the exact same content and
+both can be manually downloaded or used in an automated build environment.
+
+NuGet packages are published in the `Mu Tiano Platforms GitHub NuGet Feed`_ and zip files are attached as "assets" to
+the release on GitHub.
+
+- Zip File Usage Example: Scroll to the bottom of the `v1.0.0`_ release page and you will see an "Assets"
+  section that contains the zip files for that release. You can manually download the appropriate zip file there.
+
+- NuGet Package Usage Example: A tool like `dependabot`_ can easily hook into the NuGet feed to automatically download
+  releases into a project based on the semantic versioning rules described above.
+
+Outside of topics that should be filed as an issue, please feel free to ask questions about the project in general or
+a particular release in the `Discussions`_ area.
+
+.. _`v1.0.0`: https://github.com/microsoft/mu_tiano_platforms/releases/tag/v1.0.0
+.. _`dependabot`: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuring-dependabot-version-updates
+.. _`Discussions`: https://github.com/microsoft/mu_tiano_platforms/discussions/categories/general
+.. _`Mu Tiano Platforms GitHub NuGet Feed`: https://github.com/orgs/microsoft/packages?repo_name=mu_tiano_platforms
+.. _`NuGet`: https://learn.microsoft.com/nuget/what-is-nuget
 
 Feature Branches
-================
+----------------
 
-This repository is used to develop and validate new core features on the Q35 platform.  This repository supports a
-feature branch pattern where new features are developed and introduced in a branch.  The feature branch used for
-development can serve as an standalone example of feature enablement or it can be merged into the main release branch
-after development is complete.
+1. Create a branch for involved feature development on your fork of the repository.
 
-To create a new feature branch:
+2. When the feature is ready, submit a pull request.
 
-1. Checkout the latest release branch
-2. Create a branch named feature/{release you branched from}/<your feature name here>
-3. Create a `Branch_ReadMe.md` in the docs folder of your new branch.
+You can choose to squash all commits into one feature commit into `mu_tiano_platforms/main` or prepare
+a series of commits exactly as you would like them to appear and the pull request will be rebased on top of the
+`mu_tiano_platforms/main` branch.
 
 A template for `Branch_ReadMe.md` can be found in `docs/BranchReadMe_template.md`
 
-An example of a feature branch name would be feature/202202/sbat.
-The feature is sbat and it is based on release/202202.
+Features must be "on by default" in all applicable platforms to avoid build switch complexity that leads to stale
+feature coverage.
 
-Features must be "ON by default" and QemuQ35Pkg tries to avoid switches where possible. If your feature is required
-to boot to an OS, please make changes to OvmfPkg which is considered the minimum platform.
+Repository Origin
+=================
 
-Feature branches over two releases old will be archived. For example, feature/202002/sbat would get archived
-when release/202102 was released, by moving it to archived/feature/202002/sbat. As such, feature branch owners
-will need to rebase their feature on top of release branches as they are released and publish a new feature branch.
+`QemuQ35Pkg` in this repository was originally derived from `OvmfPkg` in TianoCore. The package is considered
+stable so regular syncing is not performed with the upstream package. Select changes are cherry-picked based on
+functional or security importance. Additional cherry picks are welcome if they are necessary for you to be productive
+with the platform  in this repository.
 
-Example Branches
-================
+⚠️ Security Warning
+===================
 
-Example branches are different from feature branches in that they are not meant to merge into Q35 eventually.
-The goal is for them to be shared as an example of how to integrate a specific feature.
-Naming follows feature branches so an example example branch would be example/202102/prm.
-In the example branch, please create a Branch_ReadMe.md in the docs folder, similar to a feature branch.
-However, in your Branch_ReadMe.md, please specify that this is an example branch.
-
-Commits should be laid out in an easy to understand manner with an empty commit that specifies that the example starts after the empty commit.
-This can be done by running git commit --allow-empty -m "Example of {feature} starts here".
-This will allow those you share it with to easily understand what commits are relevant.
-
-Example branches also follow the same archiving process, so example branches will only last two releases.
-Example branch owners will need to rebase their example branches for them to stay current.
-
-Repo Maintenance
-================
-
-Upstream Sync Details
----------------------
-
-The `upstream/main` branch should be automatically maitained by the script in the `upstream/sync` branch. These branches are
-primarily on the internal repo and maintained by an internal pipeline.
-
-In each commit, the "MU SOURCE COMMIT" comment at the end is the equivalent of the "cherry-picked from..." comment in a
-`git cherry-pick -x ...` command.
-
-For the integration process, the target commit should be selected and tagged `XXXX_Upstream` and pushed to all mirrors.
+This repository and all code within it is not part of an officially supported customer facing product and therefore
+long term servicing is not supported. All code in this repository is provided as-is and is not intended to be used
+in a production system and may not be suitable in a production system.
 
 Code of Conduct
 ===============
@@ -148,12 +181,6 @@ This project has adopted the Microsoft Open Source Code of Conduct https://opens
 
 For more information see the Code of Conduct FAQ https://opensource.microsoft.com/codeofconduct/faq/
 or contact `opencode@microsoft.com <mailto:opencode@microsoft.com>`_. with any additional questions or comments.
-
-Contributions
-=============
-
-Contributions are always welcome and encouraged!
-Please open any issues in the Project Mu GitHub tracker and read https://microsoft.github.io/mu/How/contributing/
 
 Copyright & License
 ===================
@@ -220,18 +247,18 @@ POSSIBILITY OF SUCH DAMAGE.
 .. This is a bunch of directives to make the README file more readable
 .. ===================================================================
 
-.. _Windows_VS2022: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=58&&branchName=main
+.. _`Windows Visual Studio`: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=58&&branchName=main
 .. |WindowsCiBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20CI%20VS?branchName=main
 .. |WindowsCiTest|  image:: https://img.shields.io/azure-devops/tests/projectmu/mu/58.svg
 
-.. _Ubuntu_GCC5: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=57&branchName=main
+.. _`Ubuntu GCC5`: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=57&branchName=main
 .. |UbuntuCiBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20CI%20Ubuntu%20GCC5?branchName=main
 .. |UbuntuCiTest|  image:: https://img.shields.io/azure-devops/tests/projectmu/mu/57.svg
 
-.. _Q35_VS2022: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=59&&branchName=main
+.. _`Q35 Visual Studio`: https://dev.azure.com/projectmu/mu/_build/latest?definitionId=59&&branchName=main
 .. |Q35VsBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20Q35%20Plat%20CI%20VS?branchName=main
-.. _Q35_GCC5:   https://dev.azure.com/projectmu/mu/_build/latest?definitionId=60&&branchName=main
+.. _`Q35 GCC5`:   https://dev.azure.com/projectmu/mu/_build/latest?definitionId=60&&branchName=main
 .. |Q35GccBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20Q35%20Plat%20CI%20GCC5?branchName=main
 
-.. _SBSA_GCC5:   https://dev.azure.com/projectmu/mu/_build/latest?definitionId=138&&branchName=main
+.. _`SBSA GCC5`:   https://dev.azure.com/projectmu/mu/_build/latest?definitionId=138&&branchName=main
 .. |SBSAGccBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20SBSA%20Plat%20CI%20GCC5?branchName=main
