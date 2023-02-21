@@ -288,11 +288,9 @@
   LoadLinuxLib         |QemuQ35Pkg/Library/LoadLinuxLib/LoadLinuxLib.inf
 
   # Setup variable libraries
-  ConfigBlobBaseLib         |SetupDataPkg/Library/ConfigBlobBaseLib/ConfigBlobBaseLib.inf
-  ConfigDataLib             |SetupDataPkg/Library/ConfigDataLib/ConfigDataLib.inf
-  ConfigVariableListLib     |SetupDataPkg/Library/ConfigVariableListLib/ConfigVariableListLib.inf
-  ConfigSystemModeLib       |QemuQ35Pkg/Library/ConfigSystemModeLibQ35/ConfigSystemModeLib.inf
-  ActiveProfileSelectorLib  |SetupDataPkg/Library/ActiveProfileSelectorLibNull/ActiveProfileSelectorLibNull.inf
+  SvdXmlSettingSchemaSupportLib |SetupDataPkg/Library/SvdXmlSettingSchemaSupportLib/SvdXmlSettingSchemaSupportLib.inf
+  ConfigVariableListLib         |SetupDataPkg/Library/ConfigVariableListLib/ConfigVariableListLib.inf
+  ConfigSystemModeLib           |QemuQ35Pkg/Library/ConfigSystemModeLibQ35/ConfigSystemModeLib.inf
 
   # Network libraries
   NetLib                 |NetworkPkg/Library/DxeNetLib/DxeNetLib.inf
@@ -368,6 +366,8 @@
   PrmModuleDiscoveryLib|PrmPkg/Library/DxePrmModuleDiscoveryLib/DxePrmModuleDiscoveryLib.inf
   PrmPeCoffLib|PrmPkg/Library/DxePrmPeCoffLib/DxePrmPeCoffLib.inf
 
+  ConfigVariableListLib|SetupDataPkg/Library/ConfigVariableListLib/ConfigVariableListLib.inf
+
 #########################################
 # SEC Libraries
 #########################################
@@ -436,6 +436,7 @@
   QemuFwCfgLib               |QemuQ35Pkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
   PcdDatabaseLoaderLib       |MdeModulePkg/Library/PcdDatabaseLoaderLib/Pei/PcdDatabaseLoaderLibPei.inf
   OemMfciLib                 |OemPkg/Library/OemMfciLib/OemMfciLibPei.inf
+  ConfigKnobShimLib          |SetupDataPkg/Library/ConfigKnobShimLib/ConfigKnobShimPeiLib/ConfigKnobShimPeiLib.inf
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
   DebugAgentLib              |SourceLevelDebugPkg/Library/DebugAgent/SecPeiDebugAgentLib.inf
 !endif
@@ -483,7 +484,7 @@
   RngLib   |MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf # MU_CHANGE use timer lib as the source of random
   PciLib   |QemuQ35Pkg/Library/DxePciLibI440FxQ35/DxePciLibI440FxQ35.inf
 
-  OemMfciLib  |OemPkg/Library/OemMfciLib/OemMfciLibDxe.inf
+  OemMfciLib |OemPkg/Library/OemMfciLib/OemMfciLibDxe.inf
 
 [LibraryClasses.common.DXE_CORE]
   HobLib                  |MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
@@ -711,14 +712,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugLoadImageMethod|0x2
 !endif
 
-  gDfciPkgTokenSpaceGuid.PcdUnsignedListFormatAllow|FALSE
-
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber|$(QEMU_CORE_NUM)
-
-  ## List of valid Profile GUIDs
-  ## gQemuQ35PkgProfile1Guid, gQemuQ35PkgProfile2Guid, and gQemuQ35PkgProfile3Guid are supported.
-  ## gSetupDataPkgGenericProfileGuid is defaulted to in case retrieved GUID is not in this list
-  gSetupDataPkgTokenSpaceGuid.PcdConfigurationProfileList|{ GUID("E34D00D0-6A10-44BE-B46C-BEE6302C6287"), GUID("848F7E93-C957-4797-8A11-F301ED9B2048"), GUID("454CFA58-6423-4F50-8B2B-744BDECE876A") }
 
 [PcdsFixedAtBuild.common]
   # a PCD that controls the enumeration and connection of ConIn's. When true, ConIn is only connected once a console input is requests
@@ -732,6 +726,8 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerInBootOrder|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformRecoverySupport|FALSE
   gPcBdsPkgTokenSpaceGuid.PcdLowResolutionInternalShell|FALSE
+  # Set this to be gOemConfigPolicyGuid
+  gSetupDataPkgTokenSpaceGuid.PcdConfigurationPolicyGuid|{GUID("ba320ade-e132-4c99-a3df-74d673ea6f76")}
   # The GUID of SetupDataPkg/ConfApp/ConfApp.inf: E3624086-4FCD-446E-9D07-B6B913792071
 
 !if $(GUI_FRONT_PAGE) == TRUE
@@ -863,13 +859,6 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
     gEfiMdeModulePkgTokenSpaceGuid.PcdDeviceStateBitmask|0x20
   !endif
 
-[PcdsDynamicExDefault]
-  # Default this to gSetupDataPkgGenericProfileGuid
-  gSetupDataPkgTokenSpaceGuid.PcdSetupConfigActiveProfileFile|{ GUID("8464A6FF-A984-4899-A375-3DC1DB3D4227") }
-
-  # Default this to gQemuQ35PkgDfciUnsignedXmlGuid
-  gDfciPkgTokenSpaceGuid.PcdUnsignedPermissionsFile|{GUID("62CF29AD-FEEE-4930-B71B-4806C787C6AA")}
-
 [PcdsDynamicHii]
 !if $(TPM_ENABLE) == TRUE && $(TPM_CONFIG_ENABLE) == TRUE
   gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x0|"1.3"|NV,BS
@@ -982,9 +971,14 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   OemPkg/DeviceStatePei/DeviceStatePei.inf
   MfciPkg/MfciPei/MfciPei.inf
 
-  SetupDataPkg/ConfDfciUnsignedListInit/ConfDfciUnsignedListInit.inf
   PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
-  QemuQ35Pkg/ConfigDataGfx/ConfigDataGfx.inf
+  QemuQ35Pkg/PolicyDataGfx/PolicyDataGfx.inf
+  QemuQ35Pkg/ConfigKnobs/ConfigKnobs.inf
+  OemPkg/OemConfigPolicyCreatorPei/OemConfigPolicyCreatorPei.inf {
+    <LibraryClasses>
+      # producer of config data
+      NULL|QemuQ35Pkg/Library/Q35ConfigDataLib/Q35ConfigDataLib.inf
+  }
 
 [Components.X64]
   #########################################
@@ -1009,9 +1003,6 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
 
   # Processes ingoing and outgoing DFCI settings requests.
   DfciPkg/DfciManager/DfciManager.inf
-
-  # Profile Enforcement
-  SetupDataPkg/ConfProfileMgrDxe/ConfProfileMgrDxe.inf
 
   # Manages windows and fonts to be drawn by the RenderingEngine.
   MsGraphicsPkg/SimpleWindowManagerDxe/SimpleWindowManagerDxe.inf
@@ -1246,10 +1237,7 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   }
 
   PolicyServicePkg/PolicyService/Dxe/PolicyDxe.inf
-  SetupDataPkg/ConfDataSettingProvider/ConfDataSettingProvider.inf {
-    <PcdsFixedAtBuild>
-      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
-  }
+
   SetupDataPkg/ConfApp/ConfApp.inf {
     <LibraryClasses>
       JsonLiteParserLib|MsCorePkg/Library/JsonLiteParser/JsonLiteParser.inf
