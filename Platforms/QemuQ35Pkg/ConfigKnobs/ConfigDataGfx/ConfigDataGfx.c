@@ -112,7 +112,7 @@ ApplyGfxConfigToPolicy (
     return EFI_INVALID_PARAMETER;
   }
 
-  DEBUG ((DEBUG_ERROR, "%a Entry...\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a Entry...\n", __FUNCTION__));
 
   // query autogen header to get config knob value
   GfxEnablePort0 = *(BOOLEAN *)ConfigBuffer;
