@@ -1081,7 +1081,7 @@ InitializeQemuVideo (
     mGfxPolicy[0].Power_State_Port = FALSE;
     // don't return a failed status in this case
     PolicySize = sizeof (mGfxPolicy);
-    Status = EFI_SUCCESS;
+    Status     = EFI_SUCCESS;
   }
 
   if (PolicySize != sizeof (mGfxPolicy)) {
