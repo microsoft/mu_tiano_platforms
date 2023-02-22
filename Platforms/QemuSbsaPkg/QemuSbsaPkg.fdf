@@ -290,8 +290,6 @@ READ_LOCK_STATUS   = TRUE
   # Policy and configuration
   #
   INF PolicyServicePkg/PolicyService/Dxe/PolicyDxe.inf
-  INF SetupDataPkg/ConfProfileMgrDxe/ConfProfileMgrDxe.inf
-  INF SetupDataPkg/ConfDataSettingProvider/ConfDataSettingProvider.inf
 
   #
   # Frontpages
@@ -492,7 +490,6 @@ READ_LOCK_STATUS   = TRUE
 
   INF  SetupDataPkg/ConfDfciUnsignedListInit/ConfDfciUnsignedListInit.inf
   INF  PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
-  INF  QemuQ35Pkg/ConfigDataGfx/ConfigDataGfx.inf
 
 !if $(TPM2_ENABLE) == TRUE
   INF MdeModulePkg/Universal/ResetSystemPei/ResetSystemPei.inf
