@@ -1077,8 +1077,11 @@ InitializeQemuVideo (
                                  &PolicySize
                                  );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Failed to get USB policy from database - %r!\n", __FUNCTION__, Status));
-    return Status;
+    DEBUG ((DEBUG_WARN, "%a: Failed to get GFX policy from database, configuration is not setup properly - %r! Default to disabled state.\n", __FUNCTION__, Status));
+    mGfxPolicy[0].Power_State_Port = FALSE;
+    // don't return a failed status in this case
+    PolicySize = sizeof (mGfxPolicy);
+    Status     = EFI_SUCCESS;
   }
 
   if (PolicySize != sizeof (mGfxPolicy)) {

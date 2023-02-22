@@ -1,0 +1,13 @@
+<ConfigSchema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="configschema.xsd">
+
+  <Knobs namespace="{5E6A1994-E683-4D8C-9DC1-F1F63490FC60}">
+
+    <Knob type="uint32_t" name="DummyKnob1" default ="333" />
+    <Knob type="uint32_t" name="DummyKnob2" default ="444" />
+    <Knob type="bool" name="PowerOnPort0" default="True" />
+    <Knob type="uint32_t" name="DummyKnob3" default ="555" />
+
+  </Knobs>
+
+</ConfigSchema>

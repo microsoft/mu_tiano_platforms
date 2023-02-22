@@ -290,8 +290,6 @@ READ_LOCK_STATUS   = TRUE
   # Policy and configuration
   #
   INF PolicyServicePkg/PolicyService/Dxe/PolicyDxe.inf
-  INF SetupDataPkg/ConfProfileMgrDxe/ConfProfileMgrDxe.inf
-  INF SetupDataPkg/ConfDataSettingProvider/ConfDataSettingProvider.inf
 
   #
   # Frontpages
@@ -454,21 +452,6 @@ READ_LOCK_STATUS   = TRUE
   FILE FREEFORM = PCD(gOemPkgTokenSpaceGuid.PcdBootFailIndicatorFile ) {
     SECTION RAW = OemPkg/FrontPage/Resources/NoBoot.bmp
   }
-  FILE FREEFORM = gSetupDataPkgGenericProfileGuid {
-    SECTION RAW = $(CONF_BIN_FILE_0)
-  }
-  FILE FREEFORM = gQemuQ35PkgProfile1Guid {
-    SECTION RAW = $(CONF_BIN_FILE_1)
-  }
-  FILE FREEFORM = gQemuQ35PkgProfile2Guid {
-    SECTION RAW = $(CONF_BIN_FILE_2)
-  }
-  FILE FREEFORM = gQemuQ35PkgProfile3Guid {
-    SECTION RAW = $(CONF_BIN_FILE_3)
-  }
-  FILE FREEFORM = gQemuQ35PkgDfciUnsignedXmlGuid {
-        SECTION RAW = QemuQ35Pkg/UnsignedPermissions.xml
-  }
 
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 16
@@ -505,9 +488,7 @@ READ_LOCK_STATUS   = TRUE
   INF OemPkg/DeviceStatePei/DeviceStatePei.inf
   INF MfciPkg/MfciPei/MfciPei.inf
 
-  INF  SetupDataPkg/ConfDfciUnsignedListInit/ConfDfciUnsignedListInit.inf
   INF  PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
-  INF  QemuQ35Pkg/ConfigDataGfx/ConfigDataGfx.inf
 
 !if $(TPM2_ENABLE) == TRUE
   INF MdeModulePkg/Universal/ResetSystemPei/ResetSystemPei.inf

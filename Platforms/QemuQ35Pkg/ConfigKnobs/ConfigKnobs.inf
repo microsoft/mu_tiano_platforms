@@ -8,39 +8,44 @@
 
 [Defines]
   INF_VERSION         = 0x00010017
-  BASE_NAME           = ConfigDataGfx
+  BASE_NAME           = ConfigKnobs
   FILE_GUID           = 21A70D99-5FFE-4190-BCAA-5E6EDDA54951
   VERSION_STRING      = 1.0
   MODULE_TYPE         = PEIM
-  ENTRY_POINT         = ConfigDataGfxEntry
+  ENTRY_POINT         = ConfigKnobsEntry
 
 [Sources]
-  ConfigDataGfx.c
+  ConfigKnobs.c
+  ConfigKnobs.h
+  ConfigDataGfx/ConfigDataGfx.c
 
 [Packages]
   MdePkg/MdePkg.dec
   SetupDataPkg/SetupDataPkg.dec
   PolicyServicePkg/PolicyServicePkg.dec
   QemuQ35Pkg/QemuQ35Pkg.dec
+  OemPkg/OemPkg.dec
 
 [LibraryClasses]
   BaseLib
   DebugLib
   MemoryAllocationLib
-  ConfigBlobBaseLib
   PeimEntryPoint
   PeiServicesLib
   PrintLib
+  PcdLib
 
 [Guids]
-  gSetupConfigPolicyVariableGuid                # CONSUMES
   gPolicyDataGFXGuid                            # CONSUMES
+  gOemConfigPolicyGuid              ## CONSUMES
 
 [Ppis]
-  gEfiPeiReadOnlyVariable2PpiGuid   ## CONSUMES
   gPeiPolicyPpiGuid                 ## CONSUMES
 
-[Depex]
-  gEfiPeiReadOnlyVariable2PpiGuid AND
-  gPeiPolicyPpiGuid
+[Pcd]
+  gSetupDataPkgTokenSpaceGuid.PcdConfigurationPolicyGuid   ## CONSUMES in autogen header
 
+[Depex]
+  gPeiPolicyPpiGuid AND       ## Policy Service
+  gOemConfigPolicyGuid AND    ## Oem Published Config Policy
+  gPolicyDataGFXGuid          ## Gfx Module Published Silicon Policy

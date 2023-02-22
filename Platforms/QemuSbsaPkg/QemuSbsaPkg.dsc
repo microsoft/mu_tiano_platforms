@@ -336,12 +336,10 @@
   MsPlatformEarlyGraphicsLib|MsGraphicsPkg/Library/MsEarlyGraphicsLibNull/Dxe/MsEarlyGraphicsLibNull.inf
 
   # Setup variable libraries
-  ConfigBlobBaseLib         |SetupDataPkg/Library/ConfigBlobBaseLib/ConfigBlobBaseLib.inf
-  ConfigDataLib             |SetupDataPkg/Library/ConfigDataLib/ConfigDataLib.inf
   ConfigVariableListLib     |SetupDataPkg/Library/ConfigVariableListLib/ConfigVariableListLib.inf
   ConfigSystemModeLib       |QemuQ35Pkg/Library/ConfigSystemModeLibQ35/ConfigSystemModeLib.inf
-  ActiveProfileSelectorLib  |SetupDataPkg/Library/ActiveProfileSelectorLibNull/ActiveProfileSelectorLibNull.inf
   OemMfciLib|OemPkg/Library/OemMfciLib/OemMfciLibDxe.inf
+  SvdXmlSettingSchemaSupportLib |SetupDataPkg/Library/SvdXmlSettingSchemaSupportLib/SvdXmlSettingSchemaSupportLib.inf
 
   # DFCI / XML / JSON Libraries
   DfciUiSupportLib                  |DfciPkg/Library/DfciUiSupportLibNull/DfciUiSupportLibNull.inf # Supports DFCI Groups.
@@ -697,13 +695,6 @@
   #  enumeration to complete before installing ACPI tables.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|FALSE
 
-  gDfciPkgTokenSpaceGuid.PcdUnsignedListFormatAllow|FALSE
-
-  ## List of valid Profile GUIDs
-  ## gQemuQ35PkgProfile1Guid, gQemuQ35PkgProfile2Guid, and gQemuQ35PkgProfile3Guid are supported.
-  ## gSetupDataPkgGenericProfileGuid is defaulted to in case retrieved GUID is not in this list
-  gSetupDataPkgTokenSpaceGuid.PcdConfigurationProfileList|{ GUID("E34D00D0-6A10-44BE-B46C-BEE6302C6287"), GUID("848F7E93-C957-4797-8A11-F301ED9B2048"), GUID("454CFA58-6423-4F50-8B2B-744BDECE876A") }
-
   #
   # Network Pcds
   #
@@ -848,13 +839,6 @@
   #
   gArmTokenSpaceGuid.PcdMmBufferBase
 
-[PcdsDynamicExDefault]
-  # Default this to gSetupDataPkgGenericProfileGuid
-  gSetupDataPkgTokenSpaceGuid.PcdSetupConfigActiveProfileFile|{ GUID("8464A6FF-A984-4899-A375-3DC1DB3D4227") }
-
-  # Default this to gQemuQ35PkgDfciUnsignedXmlGuid
-  gDfciPkgTokenSpaceGuid.PcdUnsignedPermissionsFile|{GUID("62CF29AD-FEEE-4930-B71B-4806C787C6AA")}
-
 [PcdsDynamicHii]
   gArmVirtTokenSpaceGuid.PcdForceNoAcpi|L"ForceNoAcpi"|gArmVirtVariableGuid|0x0|FALSE|NV,BS
 
@@ -924,9 +908,7 @@
   OemPkg/DeviceStatePei/DeviceStatePei.inf
   MfciPkg/MfciPei/MfciPei.inf
 
-  SetupDataPkg/ConfDfciUnsignedListInit/ConfDfciUnsignedListInit.inf
   PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
-  QemuQ35Pkg/ConfigDataGfx/ConfigDataGfx.inf
 
   #
   # DXE
@@ -1081,11 +1063,7 @@
 
   # Configuration modules
   PolicyServicePkg/PolicyService/Dxe/PolicyDxe.inf
-  SetupDataPkg/ConfDataSettingProvider/ConfDataSettingProvider.inf {
-    <PcdsFixedAtBuild>
-      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
-  }
-  SetupDataPkg/ConfProfileMgrDxe/ConfProfileMgrDxe.inf
+
   SetupDataPkg/ConfApp/ConfApp.inf {
     <LibraryClasses>
       JsonLiteParserLib|MsCorePkg/Library/JsonLiteParser/JsonLiteParser.inf

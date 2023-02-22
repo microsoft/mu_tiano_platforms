@@ -265,9 +265,10 @@ INF  MsGraphicsPkg/MsUiTheme/Pei/MsUiThemePpi.inf
 INF  MsGraphicsPkg/MsEarlyGraphics/Pei/MsEarlyGraphics.inf
 INF  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTablePei/FirmwarePerformancePei.inf
 
-INF  SetupDataPkg/ConfDfciUnsignedListInit/ConfDfciUnsignedListInit.inf
 INF  PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
-INF  QemuQ35Pkg/ConfigDataGfx/ConfigDataGfx.inf
+INF  QemuQ35Pkg/PolicyDataGfx/PolicyDataGfx.inf
+INF  QemuQ35Pkg/ConfigKnobs/ConfigKnobs.inf
+INF  OemPkg/OemConfigPolicyCreatorPei/OemConfigPolicyCreatorPei.inf
 
 # Shared Crypto
 !if $(ENABLE_SHARED_CRYPTO) == TRUE
@@ -414,7 +415,6 @@ INF  QemuQ35Pkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.in
   INF  NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
 
   INF  PolicyServicePkg/PolicyService/Dxe/PolicyDxe.inf
-  INF  SetupDataPkg/ConfDataSettingProvider/ConfDataSettingProvider.inf
   INF  SetupDataPkg/ConfApp/ConfApp.inf
 
   INF  NetworkPkg/TlsDxe/TlsDxe.inf
@@ -501,7 +501,6 @@ INF  DfciPkg/Application/DfciMenu/DfciMenu.inf
 INF  MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
 INF  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
 INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
-INF  SetupDataPkg/ConfProfileMgrDxe/ConfProfileMgrDxe.inf
 
 #SHARED_CRYPTO Crypto Bin Modules
 !if $(ENABLE_SHARED_CRYPTO) == TRUE
@@ -581,21 +580,6 @@ FILE FREEFORM = PCD(gZeroTouchPkgTokenSpaceGuid.PcdZeroTouchCertificateFile) {
   }
   FILE FREEFORM = gMmSupervisorPolicyFileGuid {
     SECTION RAW = $(POLICY_BIN_PATH)
-  }
-  FILE FREEFORM = gSetupDataPkgGenericProfileGuid {
-    SECTION RAW = $(CONF_BIN_FILE_0)
-  }
-  FILE FREEFORM = gQemuQ35PkgProfile1Guid {
-    SECTION RAW = $(CONF_BIN_FILE_1)
-  }
-  FILE FREEFORM = gQemuQ35PkgProfile2Guid {
-    SECTION RAW = $(CONF_BIN_FILE_2)
-  }
-  FILE FREEFORM = gQemuQ35PkgProfile3Guid {
-    SECTION RAW = $(CONF_BIN_FILE_3)
-  }
-  FILE FREEFORM = gQemuQ35PkgDfciUnsignedXmlGuid {
-        SECTION RAW = QemuQ35Pkg/UnsignedPermissions.xml
   }
 
 ################################################################################
