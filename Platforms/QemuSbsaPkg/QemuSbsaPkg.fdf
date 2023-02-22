@@ -488,7 +488,6 @@ READ_LOCK_STATUS   = TRUE
   INF OemPkg/DeviceStatePei/DeviceStatePei.inf
   INF MfciPkg/MfciPei/MfciPei.inf
 
-  INF  SetupDataPkg/ConfDfciUnsignedListInit/ConfDfciUnsignedListInit.inf
   INF  PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
 
 !if $(TPM2_ENABLE) == TRUE
