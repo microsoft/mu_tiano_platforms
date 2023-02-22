@@ -60,7 +60,7 @@ ConfigKnobsEntry (
     goto Done;
   }
 
-  Status         = ApplyGfxConfigToPolicy (PolPpi, &GfxEnablePort0);
+  Status = ApplyGfxConfigToPolicy (PolPpi, &GfxEnablePort0);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a Failed to apply configuration data to the GFX silicon policy - %r\n", __FUNCTION__, Status));
     ASSERT (FALSE);
