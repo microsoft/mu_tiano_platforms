@@ -339,6 +339,7 @@
   ConfigVariableListLib     |SetupDataPkg/Library/ConfigVariableListLib/ConfigVariableListLib.inf
   ConfigSystemModeLib       |QemuQ35Pkg/Library/ConfigSystemModeLibQ35/ConfigSystemModeLib.inf
   OemMfciLib|OemPkg/Library/OemMfciLib/OemMfciLibDxe.inf
+  SvdXmlSettingSchemaSupportLib |SetupDataPkg/Library/SvdXmlSettingSchemaSupportLib/SvdXmlSettingSchemaSupportLib.inf
 
   # DFCI / XML / JSON Libraries
   DfciUiSupportLib                  |DfciPkg/Library/DfciUiSupportLibNull/DfciUiSupportLibNull.inf # Supports DFCI Groups.
