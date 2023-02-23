@@ -13,6 +13,6 @@
 ##
 
 edk2-pytool-library==0.14.0
-edk2-pytool-extensions==0.21.8
+edk2-pytool-extensions==0.22.0
 xmlschema==2.2.1
 regex==2022.10.31
