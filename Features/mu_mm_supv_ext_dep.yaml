@@ -9,6 +9,6 @@
   "name": "FEATURE_MM_SUPV",
   "var_name": "FEATURE_MM_SUPV_PATH",
   "source": "https://github.com/microsoft/mu_feature_mm_supv.git",
-  "version": "c9f9f7209a0e9a0b5ae72c457827e496fd8f0880",
+  "version": "1988ccfba722edb1eca4a3f7baf5034f5c7e2d8a",
   "flags": ["set_build_var"]
 }
