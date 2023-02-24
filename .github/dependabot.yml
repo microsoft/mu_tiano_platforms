@@ -11,6 +11,9 @@
 #         - Git Submodules (`gitsubmodule`)
 #         - Python PIP Modules (`pip`)
 #
+#       Dependabot does not update the microsoft/mu_devops version because that is updated once in mu_devops
+#       and then synced to all repos when the file sync occurs.
+#
 # - Mu DevOps Repo: https://github.com/microsoft/mu_devops
 # - File Sync Settings: https://github.com/microsoft/mu_devops/blob/main/.sync/Files.yml
 #
@@ -31,6 +34,8 @@ updates:
       day: "monday"
       timezone: "America/Los_Angeles"
       time: "06:00"
+    ignore:
+      - dependency-name: "microsoft/mu_devops"
     commit-message:
       prefix: "GitHub Action"
     labels:
