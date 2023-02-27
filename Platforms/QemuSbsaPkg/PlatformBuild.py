@@ -35,7 +35,17 @@ class CommonPlatform():
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
     Scopes = ('qemusbsa', 'gcc_aarch64_linux', 'edk2-build', 'cibuild')
     WorkspaceRoot = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    PackagesPath = ("Platforms", "MU_BASECORE", "Common/MU", "Common/MU_TIANO", "Common/MU_OEM_SAMPLE", "Common/MU_FEATURE_DFCI", "Silicon/Arm/MU_TIANO", "Silicon/Arm/TFA")
+    PackagesPath = (
+        "Platforms",
+        "MU_BASECORE",
+        "Common/MU",
+        "Common/MU_TIANO",
+        "Common/MU_OEM_SAMPLE",
+        "Silicon/Arm/MU_TIANO",
+        "Silicon/Arm/TFA",
+        "Features/DFCI",
+        "Features/CONFIG"
+    )
 
 
     # ####################################################################################### #
@@ -57,29 +67,21 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
         return CommonPlatform.TargetsSupported
 
     def GetRequiredSubmodules(self):
-        ''' return iterable containing RequiredSubmodule objects.
-        If no RequiredSubmodules return an empty iterable
-        '''
-        rs = []
-
-        # To avoid maintenance of this file for every new submodule
-        # lets just parse the .gitmodules and add each if not already in list.
-        # The GetRequiredSubmodules is designed to allow a build to optimize
-        # the desired submodules but it isn't necessary for this repository.
-        result = io.StringIO()
-        ret = RunCmd("git", "config --file .gitmodules --get-regexp path",
-                     workingdir=self.GetWorkspaceRoot(), outstream=result)
-        # Cmd output is expected to look like:
-        # submodule.CryptoPkg/Library/OpensslLib/openssl.path CryptoPkg/Library/OpensslLib/openssl
-        # submodule.SoftFloat.path ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3
-        if ret == 0:
-            for line in result.getvalue().splitlines():
-                _, _, path = line.partition(" ")
-                if path is not None:
-                    if path not in [x.path for x in rs]:
-                        # add it with recursive since we don't know
-                        rs.append(RequiredSubmodule(path, True))
-        return rs
+        """Return iterable containing RequiredSubmodule objects.
+        
+        !!! note
+            If no RequiredSubmodules return an empty iterable
+        """
+        return [
+            RequiredSubmodule("MU_BASECORE", True),
+            RequiredSubmodule("Common/MU", True),
+            RequiredSubmodule("Common/MU_TIANO", True),
+            RequiredSubmodule("Common/MU_OEM_SAMPLE", True),
+            RequiredSubmodule("Silicon/Arm/MU_TIANO", True),
+            RequiredSubmodule("Silicon/Arm/TFA", True),
+            RequiredSubmodule("Features/DFCI", True),
+            RequiredSubmodule("Features/CONFIG", True),
+        ]
 
     def SetArchitectures(self, list_of_requested_architectures):
         ''' Confirm the requests architecture list is valid and configure SettingsManager
@@ -137,12 +139,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
     def GetPackagesPath(self):
         ''' Return a list of paths that should be mapped as edk2 PackagesPath '''
-        result = [
-            shell_environment.GetBuildVars().GetValue("FEATURE_CONFIG_PATH", "")
-        ]
-        for a in CommonPlatform.PackagesPath:
-            result.append(a)
-        return result
+        return CommonPlatform.PackagesPath
 
     # ####################################################################################### #
     #                         Actual Configuration for Platform Build                         #
