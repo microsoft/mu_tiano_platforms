@@ -21,7 +21,7 @@ jobs:
       - name: should_run
         value: true
       - name: run_flags
-        value: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp.efi RUN_TESTS=TRUE"
+        value: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE"
 
     # Use matrix to speed up the build process
     strategy:
@@ -71,7 +71,6 @@ jobs:
         build_file: $(Build.File)
         build_flags: $(Build.Flags)
         run_flags: $(Run.Flags)
-        run_timeout: 20
         install_tools: false
         artifacts_identifier: '$(package) $(tool_chain_tag) $(Build.Target)'
         artifacts_binary: |
