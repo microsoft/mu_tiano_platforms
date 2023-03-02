@@ -94,3 +94,5 @@ exclude-labels:
 
 exclude-contributors:
   - 'uefibot'
+  - 'dependabot'
+  - 'dependabot[bot]'
