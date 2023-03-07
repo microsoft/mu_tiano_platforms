@@ -1309,7 +1309,7 @@
     # MdeModulePkg/Application/MpServicesTest/MpServicesTest.inf
     # MdeModulePkg/Application/SmiHandlerProfileInfo/SmiHandlerProfileAuditTestApp.inf # DOESN'T PRODUCE OUTPUT
     MdeModulePkg/Test/ShellTest/VariablePolicyFuncTestApp/VariablePolicyFuncTestApp.inf
-    MdePkg/Test/ShellTest/MemoryAttributeProtocolFuncTestApp/MemoryAttributeProtocolFuncTestApp.inf
+    # MdePkg/Test/ShellTest/MemoryAttributeProtocolFuncTestApp/MemoryAttributeProtocolFuncTestApp.inf # TEST IS MOVING TO MU_PLUS
     MdePkg/Test/UnitTest/Library/BaseLib/BaseLibUnitTestApp.inf
     MdePkg/Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLibTestApp.inf
     # ShellPkg/Application/ShellCTestApp/ShellCTestApp.inf # DOESN'T PRODUCE OUTPUT
