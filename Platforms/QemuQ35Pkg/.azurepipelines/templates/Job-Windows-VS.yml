@@ -21,7 +21,7 @@ jobs:
       - name: should_run
         value: true
       - name: run_flags
-        value: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE"
+        value: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp.efi RUN_TESTS=TRUE"
 
     #Use matrix to speed up the build process
     strategy:
@@ -68,6 +68,7 @@ jobs:
         build_file: $(Build.File)
         build_flags: $(Build.Flags)
         run_flags: $(Run.Flags)
+        run_timeout: 20
         extra_install_step:
         - powershell: choco install qemu --version=2022.8.31; Write-Host "##vso[task.prependpath]c:\Program Files\qemu"
           displayName: Install QEMU and Set QEMU on path # friendly name displayed in the UI

@@ -297,6 +297,15 @@
   MsNetworkDependencyLib |PcBdsPkg/Library/MsNetworkDependencyLib/MsNetworkDependencyLib.inf # Library that is attached to drivers that require networking.
   !include NetworkPkg/NetworkLibs.dsc.inc
 
+  PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestLibNull/PlatformSmmProtectionsTestLibNull.inf
+  FmpDependencyLib|FmpDevicePkg/Library/FmpDependencyLib/FmpDependencyLib.inf
+  DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+
+[LibraryClasses.common.PEI_CORE, LibraryClasses.common.PEIM, LibraryClasses.common.DXE_CORE, LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.DXE_RUNTIME_DRIVER, LibraryClasses.common.SMM_CORE, LibraryClasses.common.DXE_SMM_DRIVER, LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.UEFI_APPLICATION, LibraryClasses.common.MM_CORE_STANDALONE, LibraryClasses.common.MM_STANDALONE]
+!ifndef $(DEBUG_ON_SERIAL_PORT)
+  DebugLib|QemuQ35Pkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
+!endif
+
 ##MSCHANGE Begin
 !if $(TOOL_CHAIN_TAG) == VS2019 or $(TOOL_CHAIN_TAG) == VS2022
 [LibraryClasses.X64, LibraryClasses.IA32]
@@ -379,11 +388,11 @@
   CpuExceptionHandlerLib     |UefiCpuPkg/Library/CpuExceptionHandlerLib/SecPeiCpuExceptionHandlerLib.inf
   ReportStatusCodeLib        |MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
   ExtractGuidedSectionLib    |MdePkg/Library/BaseExtractGuidedSectionLib/BaseExtractGuidedSectionLib.inf
-!ifdef $(DEBUG_ON_SERIAL_PORT)
-  DebugLib                   |MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-!else
+
+!ifndef $(DEBUG_ON_SERIAL_PORT)
   DebugLib                   |QemuQ35Pkg/Library/PlatformDebugLibIoPort/PlatformRomDebugLibIoPort.inf
 !endif
+
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
   DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/SecPeiDebugAgentLib.inf
 !endif
@@ -408,11 +417,6 @@
   MemoryAllocationLib        |MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   ReportStatusCodeLib        |MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
   RngLib                     |MdePkg/Library/BaseRngLibNull/BaseRngLibNull.inf
-!ifdef $(DEBUG_ON_SERIAL_PORT)
-  DebugLib                   |MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-!else
-  DebugLib                   |QemuQ35Pkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
-!endif
   MemEncryptSevLib           |QemuQ35Pkg/Library/BaseMemEncryptSevLib/PeiMemEncryptSevLib.inf
 
 [LibraryClasses.common.PEI_CORE]
@@ -446,11 +450,6 @@
 !endif
 
 [LibraryClasses.X64.PEIM]
-!ifdef $(DEBUG_ON_SERIAL_PORT)
-  DebugLib                   |MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-!else
-  DebugLib                   |QemuQ35Pkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
-!endif
   CpuExceptionHandlerLib     |UefiCpuPkg/Library/CpuExceptionHandlerLib/SecPeiCpuExceptionHandlerLib.inf
 
 #########################################
@@ -470,11 +469,6 @@
   ReportStatusCodeLib           |MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   QemuFwCfgS3Lib                |QemuQ35Pkg/Library/QemuFwCfgS3Lib/DxeQemuFwCfgS3LibFwCfg.inf
   MmUnblockMemoryLib            |MmSupervisorPkg/Library/MmSupervisorUnblockMemoryLib/MmSupervisorUnblockMemoryLibDxe.inf
-  !ifdef $(DEBUG_ON_SERIAL_PORT)
-    DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-  !else
-    DebugLib|QemuQ35Pkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
-  !endif
 
 # Non DXE Core but everything else
 [LibraryClasses.common.DXE_RUNTIME_DRIVER, LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.UEFI_APPLICATION]
@@ -507,6 +501,9 @@
 [LibraryClasses.common.UEFI_DRIVER]
   RngLib|MdePkg/Library/DxeRngLib/DxeRngLib.inf
 
+[LibraryClasses.common.UEFI_APPLICATION]
+  CheckHwErrRecHeaderLib|MsWheaPkg/Library/CheckHwErrRecHeaderLib/CheckHwErrRecHeaderLib.inf
+
 [LibraryClasses.common.DXE_DRIVER]
   PlatformBootManagerLib|MsCorePkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   PlatformBmPrintScLib|QemuQ35Pkg/Library/PlatformBmPrintScLib/PlatformBmPrintScLib.inf
@@ -537,12 +534,6 @@
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   TimerLib|QemuQ35Pkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
 
-  !ifdef $(DEBUG_ON_SERIAL_PORT)
-    DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-  !else
-    DebugLib|QemuQ35Pkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
-  !endif
-
 [LibraryClasses.common.DXE_SMM_DRIVER]
   MemoryAllocationLib|MdePkg/Library/SmmMemoryAllocationLib/SmmMemoryAllocationLib.inf
   SmmMemLib|MdePkg/Library/SmmMemLib/SmmMemLib.inf
@@ -556,8 +547,6 @@
   DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/SmmDebugAgentLib.inf
 !endif
 
-PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestLibNull/PlatformSmmProtectionsTestLibNull.inf
-
 [LibraryClasses.common.SMM_CORE]
   SmmCorePlatformHookLib|MdeModulePkg/Library/SmmCorePlatformHookLibNull/SmmCorePlatformHookLibNull.inf
   MemoryAllocationLib|MdeModulePkg/Library/PiSmmCoreMemoryAllocationLib/PiSmmCoreMemoryAllocationLib.inf
@@ -565,11 +554,6 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   SmmServicesTableLib|MdeModulePkg/Library/PiSmmCoreSmmServicesTableLib/PiSmmCoreSmmServicesTableLib.inf
 
 [LibraryClasses.common.MM_CORE_STANDALONE]
-!ifdef $(DEBUG_ON_SERIAL_PORT)
-  DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-!else
-  DebugLib|QemuQ35Pkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
-!endif
   TimerLib|QemuQ35Pkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/BaseExtractGuidedSectionLib/BaseExtractGuidedSectionLib.inf
   FvLib|StandaloneMmPkg/Library/FvLib/FvLib.inf
@@ -588,11 +572,6 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   IhvSmmSaveStateSupervisionLib|MmSupervisorPkg/Library/IhvMmSaveStateSupervisionLib/IhvMmSaveStateSupervisionLib.inf
 
 [LibraryClasses.common.MM_STANDALONE]
-!ifdef $(DEBUG_ON_SERIAL_PORT)
-  DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-!else
-  DebugLib|QemuQ35Pkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
-!endif
   TimerLib|QemuQ35Pkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
   MmServicesTableLib|MmSupervisorPkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
   MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
@@ -1287,10 +1266,58 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
   SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
 
   ## Unit Tests
+  #
+  ## Powershell script to discover unit tests:
+  #
+  ## Get-ChildItem -Recurse -Force -File | Where-Object {($_.Name -like "*test*") -and ($_.Extension -eq ".inf")} | ^
+  ## Where-Object {(Select-String -InputObject $_ -Pattern "MODULE_TYPE\s*=\s*UEFI_APPLICATION")} | ^
+  ## ForEach-Object {$path = $_.FullName -replace '\\','/'; Write-Output $path}
   !if $(BUILD_UNIT_TESTS) == TRUE
-    UefiTestingPkg/FunctionalSystemTests/SmmPagingProtectionsTest/Smm/SmmPagingProtectionsTestSmm.inf
-    UefiTestingPkg/FunctionalSystemTests/MemoryProtectionTest/Smm/MemoryProtectionTestSmm.inf
+  
+    # TEST APPS
     UefiTestingPkg/FunctionalSystemTests/MemoryProtectionTest/App/MemoryProtectionTestApp.inf
+    AdvLoggerPkg/UnitTests/LineParser/LineParserTestApp.inf
+    DfciPkg/UnitTests/DeviceIdTest/DeviceIdTestApp.inf
+    # DfciPkg/UnitTests/DfciVarLockAudit/UEFI/DfciVarLockAuditTestApp.inf # DOESN'T PRODUCE OUTPUT
+    MfciPkg/UnitTests/MfciPolicyParsingUnitTest/MfciPolicyParsingUnitTestApp.inf
+    MsCorePkg/UnitTests/JsonTest/JsonTestApp.inf
+    MsCorePkg/UnitTests/MathLibUnitTest/MathLibUnitTestApp.inf
+    # MsGraphicsPkg/UnitTests/SpinnerTest/SpinnerTest.inf # DOESN'T PRODUCE OUTPUT
+    MsWheaPkg/Test/UnitTests/Library/LibraryClass/CheckHwErrRecHeaderTestApp.inf
+    MsWheaPkg/Test/UnitTests/MsWheaEarlyStorageUnitTestApp/MsWheaEarlyUnitTestApp.inf
+    MsWheaPkg/Test/UnitTests/MsWheaReportUnitTestApp/MsWheaReportUnitTestApp.inf
+    UefiTestingPkg/AuditTests/BootAuditTest/UEFI/BootAuditTestApp.inf
+    # UefiTestingPkg/AuditTests/DMAProtectionAudit/UEFI/DMAIVRSProtectionUnitTestApp.inf # NOT APPLICABLE TO Q35
+    UefiTestingPkg/AuditTests/PagingAudit/UEFI/DxePagingAuditTestApp.inf
+    # UefiTestingPkg/AuditTests/PagingAudit/UEFI/SmmPagingAuditTestApp.inf # DOESN'T PRODUCE OUTPUT
+    # UefiTestingPkg/AuditTests/TpmEventLogAudit/TpmEventLogAuditTestApp.inf # DOESN'T PRODUCE OUTPUT
+    # UefiTestingPkg/AuditTests/UefiVarLockAudit/UEFI/UefiVarLockAuditTestApp.inf # DOESN'T PRODUCE OUTPUT
+    UefiTestingPkg/FunctionalSystemTests/ExceptionPersistenceTestApp/ExceptionPersistenceTestApp.inf
+    UefiTestingPkg/FunctionalSystemTests/MemmapAndMatTestApp/MemmapAndMatTestApp.inf
+    UefiTestingPkg/FunctionalSystemTests/MorLockTestApp/MorLockTestApp.inf
+    # UefiTestingPkg/FunctionalSystemTests/SmmPagingProtectionsTest/App/SmmPagingProtectionsTestApp.inf # NOT APPLICABLE TO Q35
+    XmlSupportPkg/Test/UnitTest/XmlTreeLib/XmlTreeLibUnitTestApp.inf
+    XmlSupportPkg/Test/UnitTest/XmlTreeQueryLib/XmlTreeQueryLibUnitTestApp.inf {
+      <PcdsPatchableInModule>
+        #Turn off Halt on Assert and Print Assert so that libraries can
+        #be tested in more of a release mode environment
+        gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
+    }
+    FmpDevicePkg/Test/UnitTest/Library/FmpDependencyLib/FmpDependencyLibUnitTestApp.inf
+    MmSupervisorPkg/Test/MmSupvRequestUnitTestApp/MmSupvRequestUnitTestApp.inf
+    CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf
+    # MdeModulePkg/Application/MpServicesTest/MpServicesTest.inf
+    # MdeModulePkg/Application/SmiHandlerProfileInfo/SmiHandlerProfileAuditTestApp.inf # DOESN'T PRODUCE OUTPUT
+    MdeModulePkg/Test/ShellTest/VariablePolicyFuncTestApp/VariablePolicyFuncTestApp.inf
+    # MdePkg/Test/ShellTest/MemoryAttributeProtocolFuncTestApp/MemoryAttributeProtocolFuncTestApp.inf # TEST IS MOVING TO MU_PLUS
+    MdePkg/Test/UnitTest/Library/BaseLib/BaseLibUnitTestApp.inf
+    MdePkg/Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLibTestApp.inf
+    # ShellPkg/Application/ShellCTestApp/ShellCTestApp.inf # DOESN'T PRODUCE OUTPUT
+    # ShellPkg/Application/ShellSortTestApp/ShellSortTestApp.inf # DOESN'T PRODUCE OUTPUT
+    UnitTestFrameworkPkg/Library/UnitTestBootLibUsbClass/UnitTestBootLibUsbClass.inf
+    UnitTestFrameworkPkg/Library/UnitTestPersistenceLibSimpleFileSystem/UnitTestPersistenceLibSimpleFileSystem.inf
+    # UefiTestingPkg/FunctionalSystemTests/SmmPagingProtectionsTest/Smm/SmmPagingProtectionsTestSmm.inf # NOT APPLICABLE TO Q35
+    # UefiTestingPkg/FunctionalSystemTests/MemoryProtectionTest/Smm/MemoryProtectionTestSmm.inf # NOT APPLICABLE TO Q35
     MmSupervisorPkg/Test/MmPagingAuditTest/UEFI/MmPagingAuditApp.inf
     UefiTestingPkg/AuditTests/PagingAudit/UEFI/DxePagingAuditDriver.inf
     UefiTestingPkg/AuditTests/PagingAudit/UEFI/DxePagingAuditTestApp.inf
@@ -1307,19 +1334,14 @@ PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestL
         gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
     }
 
-    MsCorePkg/UnitTests/JsonTest/JsonTestApp.inf
-    XmlSupportPkg/Test/UnitTest/XmlTreeLib/XmlTreeLibUnitTestApp.inf
-    XmlSupportPkg/Test/UnitTest/XmlTreeQueryLib/XmlTreeQueryLibUnitTestApp.inf {
-      <PcdsPatchableInModule>
-        #Turn off Halt on Assert and Print Assert so that libraries can
-        #be tested in more of a release mode environment
-        gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
-    }
+    # OTHER TESTS
+    UnitTestFrameworkPkg/Library/UnitTestBootLibUsbClass/UnitTestBootLibUsbClass.inf
+    UnitTestFrameworkPkg/Library/UnitTestPersistenceLibSimpleFileSystem/UnitTestPersistenceLibSimpleFileSystem.inf
+    UefiTestingPkg/FunctionalSystemTests/SmmPagingProtectionsTest/Smm/SmmPagingProtectionsTestSmm.inf
+    UefiTestingPkg/FunctionalSystemTests/MemoryProtectionTest/Smm/MemoryProtectionTestSmm.inf
+    MmSupervisorPkg/Test/MmPagingAuditTest/UEFI/MmPagingAuditApp.inf
+    UefiTestingPkg/AuditTests/PagingAudit/UEFI/DxePagingAuditDriver.inf
 
-    # MemMap and MAT Test
-    UefiTestingPkg/FunctionalSystemTests/MemmapAndMatTestApp/MemmapAndMatTestApp.inf
-    # MorLock v1 and v2 Test
-    # this fails on QEMU - UefiTestingPkg/FunctionalSystemTests/MorLockTestApp/MorLockTestApp.inf
   !endif
   #########################################
   # SMM Phase modules
