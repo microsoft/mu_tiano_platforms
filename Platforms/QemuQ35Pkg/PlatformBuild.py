@@ -25,14 +25,14 @@ from typing import Tuple
 
 # Declare test whose failure will not return a non-zero exit code
 failure_exempt_tests = {}
-failure_exempt_tests["BaseCryptLibUnitTestApp.efi"] = datetime.datetime(2022, 3, 1, 0, 0, 0)
-failure_exempt_tests["BootAuditTestApp.efi"] = datetime.datetime(2022, 3, 1, 0, 0, 0)
-failure_exempt_tests["LineParserTestApp.efi"] = datetime.datetime(2022, 3, 1, 0, 0, 0)
-failure_exempt_tests["MorLockFunctionalTestApp.efi"] = datetime.datetime(2022, 3, 1, 0, 0, 0)
-failure_exempt_tests["MsWheaEarlyUnitTestApp.efi"] = datetime.datetime(2022, 3, 1, 0, 0, 0)
-failure_exempt_tests["VariablePolicyFuncTestApp.efi"] = datetime.datetime(2022, 3, 1, 0, 0, 0)
-failure_exempt_tests["DeviceIdTestApp.efi"] = datetime.datetime(2022, 3, 1, 0, 0, 0)
-failure_exempt_tests["DxePagingAuditTestApp.efi"] = datetime.datetime(2022, 3, 1, 0, 0, 0)
+failure_exempt_tests["BaseCryptLibUnitTestApp.efi"] = datetime.datetime(2023, 3, 7, 0, 0, 0)
+failure_exempt_tests["BootAuditTestApp.efi"] = datetime.datetime(2023, 3, 7, 0, 0, 0)
+failure_exempt_tests["LineParserTestApp.efi"] = datetime.datetime(2023, 3, 7, 0, 0, 0)
+failure_exempt_tests["MorLockFunctionalTestApp.efi"] = datetime.datetime(2023, 3, 7, 0, 0, 0)
+failure_exempt_tests["MsWheaEarlyUnitTestApp.efi"] = datetime.datetime(2023, 3, 7, 0, 0, 0)
+failure_exempt_tests["VariablePolicyFuncTestApp.efi"] = datetime.datetime(2023, 3, 7, 0, 0, 0)
+failure_exempt_tests["DeviceIdTestApp.efi"] = datetime.datetime(2023, 3, 7, 0, 0, 0)
+failure_exempt_tests["DxePagingAuditTestApp.efi"] = datetime.datetime(2023, 3, 7, 0, 0, 0)
 
 # Allow failure exempt tests to be ignored for 90 days
 FAILURE_EXEMPT_OMISSION_LENGTH = 90*24*60*60
@@ -422,7 +422,7 @@ class UnitTestSupport(object):
             if (os.path.basename(unit_test) in failure_exempt_tests.keys()):
                 now = datetime.datetime.now()
                 last_ignore_time = failure_exempt_tests[os.path.basename(unit_test)]
-                if (now - last_ignore_time).total_seconds() > FAILURE_EXEMPT_OMISSION_LENGTH:
+                if (now - last_ignore_time).total_seconds() < FAILURE_EXEMPT_OMISSION_LENGTH:
                     logging.info("Ignoring output of " + os.path.basename(unit_test))
                     ignore_failure = True
             xml_result_file = os.path.basename(unit_test)[:-4] + "_JUNIT.XML"
