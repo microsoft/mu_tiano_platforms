@@ -255,7 +255,7 @@
 
   # Base ARM libraries
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
-  ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf # BEEBE TODO?
+  ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
   MmuLib|ArmPkg/Library/MmuLib/BaseMmuLib.inf
   ArmSvcLib|ArmPkg/Library/ArmSvcLib/ArmSvcLib.inf
 
@@ -277,7 +277,6 @@
   PciSegmentLib|MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
   PciHostBridgeLib|QemuSbsaPkg/Library/SbsaQemuPciHostBridgeLib/SbsaQemuPciHostBridgeLib.inf
 
-  # BEEBE ADDED
   MemoryTypeInformationChangeLib|MdeModulePkg/Library/MemoryTypeInformationChangeLibNull/MemoryTypeInformationChangeLibNull.inf
   BaseBinSecurityLib|MdePkg/Library/BaseBinSecurityLibNull/BaseBinSecurityLibNull.inf
   DxeMemoryProtectionHobLib|MdeModulePkg/Library/MemoryProtectionHobLibNull/DxeMemoryProtectionHobLibNull.inf
@@ -424,11 +423,11 @@
   ArmVirtMemInfoLib|ArmVirtPkg/Library/QemuVirtMemInfoLib/QemuVirtMemInfoPeiLib.inf
   PcdDatabaseLoaderLib|MdeModulePkg/Library/PcdDatabaseLoaderLib/Pei/PcdDatabaseLoaderLibPei.inf
 
-  # BEEBE ADDED
   MsPlatformEarlyGraphicsLib |MsGraphicsPkg/Library/MsEarlyGraphicsLibNull/Pei/MsEarlyGraphicsLibNull.inf
   MsUiThemeLib               |MsGraphicsPkg/Library/MsUiThemeLib/Pei/MsUiThemeLib.inf
   ArmPlatformLib             |QemuSbsaPkg/Library/SbsaQemuLib/SbsaQemuLib.inf
   OemMfciLib                 |OemPkg/Library/OemMfciLib/OemMfciLibPei.inf
+  ConfigKnobShimLib          |SetupDataPkg/Library/ConfigKnobShimLib/ConfigKnobShimPeiLib/ConfigKnobShimPeiLib.inf
 
 !if $(TPM2_ENABLE) == TRUE
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
@@ -607,7 +606,6 @@
   #
 #   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy|0xC000000000007FD1
 
-  # BEEBE ADDED
   gMsGraphicsPkgTokenSpaceGuid.PcdUiThemeInDxe|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerInBootOrder|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformRecoverySupport|FALSE
@@ -751,6 +749,9 @@
   gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|27
   # PPI #10
   gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|26
+
+  # Set this to be gOemConfigPolicyGuid
+  gSetupDataPkgTokenSpaceGuid.PcdConfigurationPolicyGuid|{GUID("ba320ade-e132-4c99-a3df-74d673ea6f76")}
 
 [PcdsFixedAtBuild.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId|"Palindrome"
@@ -910,6 +911,14 @@
 
   PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
 
+  QemuSbsaPkg/PolicyDataGfx/PolicyDataGfx.inf
+  QemuSbsaPkg/ConfigKnobs/ConfigKnobs.inf
+  OemPkg/OemConfigPolicyCreatorPei/OemConfigPolicyCreatorPei.inf {
+    <LibraryClasses>
+      # producer of config data
+      NULL|QemuSbsaPkg/Library/SbsaConfigDataLib/SbsaConfigDataLib.inf
+  }
+
   #
   # DXE
   #
@@ -998,7 +1007,6 @@
   # Application that presents & manages the Boot Menu Setup on Front Page.
   OemPkg/BootMenu/BootMenu.inf
 
-  # BEEBE ADDED START
   # Manages windows and fonts to be drawn by the RenderingEngine.
   MsGraphicsPkg/SimpleWindowManagerDxe/SimpleWindowManagerDxe.inf
   # Produces EfiGraphicsOutputProtocol to draw graphics to the screen.
@@ -1013,8 +1021,7 @@
 
   # Produces FORM DISPLAY ENGINE protocol. Handles input, displays strings.
   MsGraphicsPkg/DisplayEngineDxe/DisplayEngineDxe.inf
-  QemuQ35Pkg/QemuVideoDxe/QemuVideoDxe.inf
-  # BEEBE ADDED END
+  QemuSbsaPkg/QemuVideoDxe/QemuVideoDxe.inf
 
   MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
   MsCorePkg/MuCryptoDxe/MuCryptoDxe.inf
