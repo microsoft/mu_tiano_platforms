@@ -1,6 +1,6 @@
 /** @file
   This driver is a sample implementation of the Graphics Output Protocol for
-  the QEMU (Cirrus Logic 5446) video controller.
+  the QEMU (Bochs) video controller.
 
   Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 
@@ -29,24 +29,6 @@ GFX_POLICY_DATA  mGfxPolicy[GFX_PORT_MAX_CNT];
 QEMU_VIDEO_CARD  gQemuVideoCardList[] = {
   {
     PCI_CLASS_DISPLAY_VGA,
-    CIRRUS_LOGIC_VENDOR_ID,
-    CIRRUS_LOGIC_5430_DEVICE_ID,
-    QEMU_VIDEO_CIRRUS_5430,
-    L"Cirrus 5430"
-  },{
-    PCI_CLASS_DISPLAY_VGA,
-    CIRRUS_LOGIC_VENDOR_ID,
-    CIRRUS_LOGIC_5430_ALTERNATE_DEVICE_ID,
-    QEMU_VIDEO_CIRRUS_5430,
-    L"Cirrus 5430"
-  },{
-    PCI_CLASS_DISPLAY_VGA,
-    CIRRUS_LOGIC_VENDOR_ID,
-    CIRRUS_LOGIC_5446_DEVICE_ID,
-    QEMU_VIDEO_CIRRUS_5446,
-    L"Cirrus 5446"
-  },{
-    PCI_CLASS_DISPLAY_VGA,
     0x1234,
     0x1111,
     QEMU_VIDEO_BOCHS_MMIO,
@@ -69,12 +51,6 @@ QEMU_VIDEO_CARD  gQemuVideoCardList[] = {
     0x1050,
     QEMU_VIDEO_BOCHS_MMIO,
     L"QEMU VirtIO VGA"
-  },{
-    PCI_CLASS_DISPLAY_VGA,
-    0x15ad,
-    0x0405,
-    QEMU_VIDEO_VMWARE_SVGA,
-    L"QEMU VMWare SVGA"
   },{
     0     /* end of list */
   }
@@ -368,14 +344,6 @@ QemuVideoControllerDriverStart (
   }
 
   //
-  // VMWare SVGA is handled like Bochs (with port IO only).
-  //
-  if (Private->Variant == QEMU_VIDEO_VMWARE_SVGA) {
-    Private->Variant                 = QEMU_VIDEO_BOCHS;
-    Private->FrameBufferVramBarIndex = PCI_BAR_IDX1;
-  }
-
-  //
   // Check if accessing the bochs interface works.
   //
   if ((Private->Variant == QEMU_VIDEO_BOCHS_MMIO) ||
@@ -437,10 +405,6 @@ QemuVideoControllerDriverStart (
   // Construct video mode buffer
   //
   switch (Private->Variant) {
-    case QEMU_VIDEO_CIRRUS_5430:
-    case QEMU_VIDEO_CIRRUS_5446:
-      Status = QemuVideoCirrusModeSetup (Private);
-      break;
     case QEMU_VIDEO_BOCHS_MMIO:
     case QEMU_VIDEO_BOCHS:
       Status = QemuVideoBochsModeSetup (Private, IsQxl);
@@ -859,68 +823,6 @@ DrawLogo (
 {
 }
 
-/**
-  TODO: Add function description
-
-  @param  Private TODO: add argument description
-  @param  ModeData TODO: add argument description
-
-  TODO: add return values
-
-**/
-VOID
-InitializeCirrusGraphicsMode (
-  QEMU_VIDEO_PRIVATE_DATA  *Private,
-  QEMU_VIDEO_CIRRUS_MODES  *ModeData
-  )
-{
-  UINT8  Byte;
-  UINTN  Index;
-
-  outw (Private, SEQ_ADDRESS_REGISTER, 0x1206);
-  outw (Private, SEQ_ADDRESS_REGISTER, 0x0012);
-
-  for (Index = 0; Index < 15; Index++) {
-    outw (Private, SEQ_ADDRESS_REGISTER, ModeData->SeqSettings[Index]);
-  }
-
-  if (Private->Variant == QEMU_VIDEO_CIRRUS_5430) {
-    outb (Private, SEQ_ADDRESS_REGISTER, 0x0f);
-    Byte = (UINT8)((inb (Private, SEQ_DATA_REGISTER) & 0xc7) ^ 0x30);
-    outb (Private, SEQ_DATA_REGISTER, Byte);
-  }
-
-  outb (Private, MISC_OUTPUT_REGISTER, ModeData->MiscSetting);
-  outw (Private, GRAPH_ADDRESS_REGISTER, 0x0506);
-  outw (Private, SEQ_ADDRESS_REGISTER, 0x0300);
-  outw (Private, CRTC_ADDRESS_REGISTER, 0x2011);
-
-  for (Index = 0; Index < 28; Index++) {
-    outw (Private, CRTC_ADDRESS_REGISTER, (UINT16)((ModeData->CrtcSettings[Index] << 8) | Index));
-  }
-
-  for (Index = 0; Index < 9; Index++) {
-    outw (Private, GRAPH_ADDRESS_REGISTER, (UINT16)((GraphicsController[Index] << 8) | Index));
-  }
-
-  inb (Private, INPUT_STATUS_1_REGISTER);
-
-  for (Index = 0; Index < 21; Index++) {
-    outb (Private, ATT_ADDRESS_REGISTER, (UINT8)Index);
-    outb (Private, ATT_ADDRESS_REGISTER, AttributeController[Index]);
-  }
-
-  outb (Private, ATT_ADDRESS_REGISTER, 0x20);
-
-  outw (Private, GRAPH_ADDRESS_REGISTER, 0x0009);
-  outw (Private, GRAPH_ADDRESS_REGISTER, 0x000a);
-  outw (Private, GRAPH_ADDRESS_REGISTER, 0x000b);
-  outb (Private, DAC_PIXEL_MASK_REGISTER, 0xff);
-
-  SetDefaultPalette (Private);
-  ClearScreen (Private);
-}
-
 VOID
 BochsWrite (
   QEMU_VIDEO_PRIVATE_DATA  *Private,
@@ -1071,7 +973,7 @@ InitializeQemuVideo (
 
   PolicySize = sizeof (mGfxPolicy);
   Status     = PolicyProtocol->GetPolicy (
-                                 &gPolicyDataGFXGuid,
+                                 &gSbsaPolicyDataGFXGuid,
                                  &PolicyAttribute,
                                  mGfxPolicy,
                                  &PolicySize

@@ -55,7 +55,7 @@
   UefiLib
 
 [Guids]
-  gPolicyDataGFXGuid                            # CONSUMES
+  gSbsaPolicyDataGFXGuid                            # CONSUMES
 
 [Protocols]
   gPolicyProtocolGuid                           ## CONSUMES
@@ -71,4 +71,5 @@
   gMsGraphicsPkgTokenSpaceGuid.PcdMsGopOverrideProtocolGuid   # MU_CHANGE use MsGopOverrideProtocolGuid
 
 [Depex]
-  gPolicyProtocolGuid
+  gPolicyProtocolGuid AND   ## Policy Service
+  gSbsaPolicyDataGFXGuid    ## GFX Silicon Policy

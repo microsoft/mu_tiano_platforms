@@ -69,7 +69,7 @@ ConvertGfxPolicyFromConfData (
     return EFI_BUFFER_TOO_SMALL;
   }
 
-  Status = PolicyInterface->GetPolicy (&gPolicyDataGFXGuid, NULL, GfxSiliconPolicy, PolicySize);
+  Status = PolicyInterface->GetPolicy (&gSbsaPolicyDataGFXGuid, NULL, GfxSiliconPolicy, PolicySize);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -117,7 +117,7 @@ ApplyGfxConfigToPolicy (
   // query autogen header to get config knob value
   GfxEnablePort0 = *(BOOLEAN *)ConfigBuffer;
   Size           = sizeof (GfxSiPol);
-  Status         = PolicyInterface->GetPolicy (&gPolicyDataGFXGuid, &Attr, GfxSiPol, &Size);
+  Status         = PolicyInterface->GetPolicy (&gSbsaPolicyDataGFXGuid, &Attr, GfxSiPol, &Size);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a Failed to get GFX policy - %r!!!\n", __FUNCTION__, Status));
     ASSERT (FALSE);
@@ -132,7 +132,7 @@ ApplyGfxConfigToPolicy (
   }
 
   if (CompareMem (GfxConfPol, GfxSiPol, Size) != 0) {
-    Status = PolicyInterface->SetPolicy (&gPolicyDataGFXGuid, (Attr | POLICY_ATTRIBUTE_FINALIZED), GfxConfPol, Size);
+    Status = PolicyInterface->SetPolicy (&gSbsaPolicyDataGFXGuid, (Attr | POLICY_ATTRIBUTE_FINALIZED), GfxConfPol, Size);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "%a Failed to update GFX policy per configuration data - %r!!!\n", __FUNCTION__, Status));
       ASSERT (FALSE);

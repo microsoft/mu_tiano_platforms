@@ -31,10 +31,10 @@
   PrintLib
 
 [Guids]
-  gPolicyDataGFXGuid                            # PRODUCES
+  gSbsaPolicyDataGFXGuid    ## PRODUCES
 
 [Ppis]
-  gPeiPolicyPpiGuid                 ## CONSUMES
+  gPeiPolicyPpiGuid         ## CONSUMES
 
 [Depex]
   gPeiPolicyPpiGuid

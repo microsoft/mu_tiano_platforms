@@ -178,10 +178,6 @@ Routine Description:
   ModeData = &Private->ModeData[ModeNumber];
 
   switch (Private->Variant) {
-    case QEMU_VIDEO_CIRRUS_5430:
-    case QEMU_VIDEO_CIRRUS_5446:
-      InitializeCirrusGraphicsMode (Private, &QemuVideoCirrusModes[ModeData->InternalModeIndex]);
-      break;
     case QEMU_VIDEO_BOCHS_MMIO:
     case QEMU_VIDEO_BOCHS:
       InitializeBochsGraphicsMode (Private, ModeData);
@@ -272,7 +268,7 @@ QemuVideoGraphicsOutputBlt (
 
 Routine Description:
 
-  Graphics Output protocol instance to block transfer for CirrusLogic device
+  Graphics Output protocol instance to block transfer for Bochs device
 
 Arguments:
 

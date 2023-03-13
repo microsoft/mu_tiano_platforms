@@ -36,7 +36,7 @@
   PcdLib
 
 [Guids]
-  gPolicyDataGFXGuid                            # CONSUMES
+  gSbsaPolicyDataGFXGuid            ## CONSUMES
   gOemConfigPolicyGuid              ## CONSUMES
 
 [Ppis]
@@ -48,4 +48,4 @@
 [Depex]
   gPeiPolicyPpiGuid AND       ## Policy Service
   gOemConfigPolicyGuid AND    ## Oem Published Config Policy
-  gPolicyDataGFXGuid          ## Gfx Module Published Silicon Policy
+  gSbsaPolicyDataGFXGuid      ## Gfx Module Published Silicon Policy

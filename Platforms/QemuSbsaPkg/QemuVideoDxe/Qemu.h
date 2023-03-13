@@ -150,7 +150,6 @@ extern UINT8                         Crtc_800_600_256_60[];
 extern UINT16                        Seq_800_600_256_60[];
 extern UINT8                         Crtc_1024_768_256_60[];
 extern UINT16                        Seq_1024_768_256_60[];
-extern QEMU_VIDEO_CIRRUS_MODES       QemuVideoCirrusModes[];
 extern EFI_DRIVER_BINDING_PROTOCOL   gQemuVideoDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL   gQemuVideoComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gQemuVideoComponentName2;
@@ -405,11 +404,6 @@ QemuVideoComponentNameGetControllerName (
 //
 // Local Function Prototypes
 //
-VOID
-InitializeCirrusGraphicsMode (
-  QEMU_VIDEO_PRIVATE_DATA  *Private,
-  QEMU_VIDEO_CIRRUS_MODES  *ModeData
-  );
 
 VOID
 InitializeBochsGraphicsMode (
@@ -485,20 +479,9 @@ VgaOutb (
   );
 
 EFI_STATUS
-QemuVideoCirrusModeSetup (
-  QEMU_VIDEO_PRIVATE_DATA  *Private
-  );
-
-EFI_STATUS
 QemuVideoBochsModeSetup (
   QEMU_VIDEO_PRIVATE_DATA  *Private,
   BOOLEAN                  IsQxl
-  );
-
-VOID
-InstallVbeShim (
-  IN CONST CHAR16          *CardName,
-  IN EFI_PHYSICAL_ADDRESS  FrameBufferBase
   );
 
 #endif

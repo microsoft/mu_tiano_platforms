@@ -61,7 +61,7 @@ PublishDefaultPolicyGfxEntry (
   }
 
   // Publish GFX policy
-  Status = PolPpi->SetPolicy (&gPolicyDataGFXGuid, 0, DefaultQemuGfxPolicy, sizeof (DefaultQemuGfxPolicy));
+  Status = PolPpi->SetPolicy (&gSbsaPolicyDataGFXGuid, 0, DefaultQemuGfxPolicy, sizeof (DefaultQemuGfxPolicy));
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a Failed to set GFX policy - %r\n", __FUNCTION__, Status));
   }
