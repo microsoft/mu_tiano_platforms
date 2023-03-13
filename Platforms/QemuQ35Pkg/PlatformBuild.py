@@ -224,7 +224,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         ''' Return a list of workspace relative paths that should be mapped as edk2 PackagesPath '''
         result = [
             shell_environment.GetBuildVars().GetValue("FEATURE_CONFIG_PATH", ""),
-            shell_environment.GetBuildVars().GetValue("FEATURE_MM_SUPV_PATH", "")
+            "Features\\FEATURE_MM_SUPV_extdep\\FEATURE_MM_SUPV"
         ]
         for a in CommonPlatform.PackagesPath:
             result.append(a)
