@@ -83,9 +83,6 @@ typedef struct {
 typedef enum {
   QEMU_VIDEO_CIRRUS_5430 = 1,
   QEMU_VIDEO_CIRRUS_5446,
-  QEMU_VIDEO_BOCHS,
-  QEMU_VIDEO_BOCHS_MMIO,
-  QEMU_VIDEO_VMWARE_SVGA,
 } QEMU_VIDEO_VARIANT;
 
 typedef struct {
@@ -130,11 +127,6 @@ typedef struct {
   UINT16    *SeqSettings;
   UINT8     MiscSetting;
 } QEMU_VIDEO_CIRRUS_MODES;
-
-typedef struct {
-  UINT32    Width;
-  UINT32    Height;
-} QEMU_VIDEO_BOCHS_MODES;
 
 #define QEMU_VIDEO_PRIVATE_DATA_FROM_GRAPHICS_OUTPUT_THIS(a) \
   CR(a, QEMU_VIDEO_PRIVATE_DATA, GraphicsOutput, QEMU_VIDEO_PRIVATE_DATA_SIGNATURE)
@@ -412,12 +404,6 @@ InitializeCirrusGraphicsMode (
   );
 
 VOID
-InitializeBochsGraphicsMode (
-  QEMU_VIDEO_PRIVATE_DATA  *Private,
-  QEMU_VIDEO_MODE_DATA     *ModeData
-  );
-
-VOID
 SetPaletteColor (
   QEMU_VIDEO_PRIVATE_DATA  *Private,
   UINTN                    Index,
@@ -464,35 +450,9 @@ inw (
   UINTN                    Address
   );
 
-VOID
-BochsWrite (
-  QEMU_VIDEO_PRIVATE_DATA  *Private,
-  UINT16                   Reg,
-  UINT16                   Data
-  );
-
-UINT16
-BochsRead (
-  QEMU_VIDEO_PRIVATE_DATA  *Private,
-  UINT16                   Reg
-  );
-
-VOID
-VgaOutb (
-  QEMU_VIDEO_PRIVATE_DATA  *Private,
-  UINTN                    Reg,
-  UINT8                    Data
-  );
-
 EFI_STATUS
 QemuVideoCirrusModeSetup (
   QEMU_VIDEO_PRIVATE_DATA  *Private
-  );
-
-EFI_STATUS
-QemuVideoBochsModeSetup (
-  QEMU_VIDEO_PRIVATE_DATA  *Private,
-  BOOLEAN                  IsQxl
   );
 
 VOID
