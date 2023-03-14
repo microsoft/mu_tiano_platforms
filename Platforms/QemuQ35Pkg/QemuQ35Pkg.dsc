@@ -1360,7 +1360,6 @@
   QemuQ35Pkg/SmmAccess/SmmAccess2Dxe.inf
   MmSupervisorPkg/Drivers/StandaloneMmIpl/PiSmmIpl.inf
 !endif
-  MmSupervisorPkg/Drivers/MmCommunicationBuffer/MmCommunicationBufferDxe.inf
   MmSupervisorPkg/Drivers/MmSupervisorErrorReport/MmSupervisorErrorReport.inf
   MmSupervisorPkg/Test/MmPagingAuditTest/UEFI/MmPagingAuditApp.inf
 
