@@ -1,6 +1,6 @@
 /** @file
   This driver is a sample implementation of the Graphics Output Protocol for
-  the QEMU (Cirrus Logic 5446) video controller.
+  the QEMU (Bochs) video controller.
 
   Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 
@@ -29,22 +29,28 @@ GFX_POLICY_DATA  mGfxPolicy[GFX_PORT_MAX_CNT];
 QEMU_VIDEO_CARD  gQemuVideoCardList[] = {
   {
     PCI_CLASS_DISPLAY_VGA,
-    CIRRUS_LOGIC_VENDOR_ID,
-    CIRRUS_LOGIC_5430_DEVICE_ID,
-    QEMU_VIDEO_CIRRUS_5430,
-    L"Cirrus 5430"
+    0x1234,
+    0x1111,
+    QEMU_VIDEO_BOCHS_MMIO,
+    L"QEMU Standard VGA"
+  },{
+    PCI_CLASS_DISPLAY_OTHER,
+    0x1234,
+    0x1111,
+    QEMU_VIDEO_BOCHS_MMIO,
+    L"QEMU Standard VGA (secondary)"
   },{
     PCI_CLASS_DISPLAY_VGA,
-    CIRRUS_LOGIC_VENDOR_ID,
-    CIRRUS_LOGIC_5430_ALTERNATE_DEVICE_ID,
-    QEMU_VIDEO_CIRRUS_5430,
-    L"Cirrus 5430"
+    0x1b36,
+    0x0100,
+    QEMU_VIDEO_BOCHS,
+    L"QEMU QXL VGA"
   },{
     PCI_CLASS_DISPLAY_VGA,
-    CIRRUS_LOGIC_VENDOR_ID,
-    CIRRUS_LOGIC_5446_DEVICE_ID,
-    QEMU_VIDEO_CIRRUS_5446,
-    L"Cirrus 5446"
+    0x1af4,
+    0x1050,
+    QEMU_VIDEO_BOCHS_MMIO,
+    L"QEMU VirtIO VGA"
   },{
     0     /* end of list */
   }
@@ -175,6 +181,7 @@ QemuVideoControllerDriverStart (
   EFI_TPL                   OldTpl;
   EFI_STATUS                Status;
   QEMU_VIDEO_PRIVATE_DATA   *Private;
+  BOOLEAN                   IsQxl;
   EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath;
   ACPI_ADR_DEVICE_PATH      AcpiDeviceNode;
   PCI_TYPE00                Pci;
@@ -239,6 +246,12 @@ QemuVideoControllerDriverStart (
   Private->Variant = Card->Variant;
 
   //
+  // IsQxl is based on the detected Card->Variant, which at a later point might
+  // not match Private->Variant.
+  //
+  IsQxl = (BOOLEAN)(Card->Variant == QEMU_VIDEO_BOCHS);
+
+  //
   // Save original PCI attributes
   //
   Status = Private->PciIo->Attributes (
@@ -301,6 +314,51 @@ QemuVideoControllerDriverStart (
   }
 
   //
+  // Check whenever the qemu stdvga mmio bar is present (qemu 1.3+).
+  //
+  if (Private->Variant == QEMU_VIDEO_BOCHS_MMIO) {
+    EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *MmioDesc;
+
+    Status = Private->PciIo->GetBarAttributes (
+                               Private->PciIo,
+                               PCI_BAR_IDX2,
+                               NULL,
+                               (VOID **)&MmioDesc
+                               );
+    if (EFI_ERROR (Status) ||
+        (MmioDesc->ResType != ACPI_ADDRESS_SPACE_TYPE_MEM))
+    {
+      DEBUG ((DEBUG_INFO, "QemuVideo: No mmio bar, fallback to port io\n"));
+      Private->Variant = QEMU_VIDEO_BOCHS;
+    } else {
+      DEBUG ((
+        DEBUG_INFO,
+        "QemuVideo: Using mmio bar @ 0x%lx\n",
+        MmioDesc->AddrRangeMin
+        ));
+    }
+
+    if (!EFI_ERROR (Status)) {
+      FreePool (MmioDesc);
+    }
+  }
+
+  //
+  // Check if accessing the bochs interface works.
+  //
+  if ((Private->Variant == QEMU_VIDEO_BOCHS_MMIO) ||
+      (Private->Variant == QEMU_VIDEO_BOCHS))
+  {
+    UINT16  BochsId;
+    BochsId = BochsRead (Private, VBE_DISPI_INDEX_ID);
+    if ((BochsId & 0xFFF0) != VBE_DISPI_ID0) {
+      DEBUG ((DEBUG_INFO, "QemuVideo: BochsID mismatch (got 0x%x)\n", BochsId));
+      Status = EFI_DEVICE_ERROR;
+      goto RestoreAttributes;
+    }
+  }
+
+  //
   // Get ParentDevicePath
   //
   Status = gBS->HandleProtocol (
@@ -347,9 +405,9 @@ QemuVideoControllerDriverStart (
   // Construct video mode buffer
   //
   switch (Private->Variant) {
-    case QEMU_VIDEO_CIRRUS_5430:
-    case QEMU_VIDEO_CIRRUS_5446:
-      Status = QemuVideoCirrusModeSetup (Private);
+    case QEMU_VIDEO_BOCHS_MMIO:
+    case QEMU_VIDEO_BOCHS:
+      Status = QemuVideoBochsModeSetup (Private, IsQxl);
       break;
     default:
       ASSERT (FALSE);
@@ -687,10 +745,10 @@ SetPaletteColor (
   UINT8                    Blue
   )
 {
-  outb (Private, PALETTE_INDEX_REGISTER, (UINT8)Index);
-  outb (Private, PALETTE_DATA_REGISTER, (UINT8)(Red >> 2));
-  outb (Private, PALETTE_DATA_REGISTER, (UINT8)(Green >> 2));
-  outb (Private, PALETTE_DATA_REGISTER, (UINT8)(Blue >> 2));
+  VgaOutb (Private, PALETTE_INDEX_REGISTER, (UINT8)Index);
+  VgaOutb (Private, PALETTE_DATA_REGISTER, (UINT8)(Red >> 2));
+  VgaOutb (Private, PALETTE_DATA_REGISTER, (UINT8)(Green >> 2));
+  VgaOutb (Private, PALETTE_DATA_REGISTER, (UINT8)(Blue >> 2));
 }
 
 /**
@@ -765,63 +823,115 @@ DrawLogo (
 {
 }
 
-/**
-  TODO: Add function description
-
-  @param  Private TODO: add argument description
-  @param  ModeData TODO: add argument description
-
-  TODO: add return values
-
-**/
 VOID
-InitializeCirrusGraphicsMode (
+BochsWrite (
   QEMU_VIDEO_PRIVATE_DATA  *Private,
-  QEMU_VIDEO_CIRRUS_MODES  *ModeData
+  UINT16                   Reg,
+  UINT16                   Data
   )
 {
-  UINT8  Byte;
-  UINTN  Index;
+  EFI_STATUS  Status;
 
-  outw (Private, SEQ_ADDRESS_REGISTER, 0x1206);
-  outw (Private, SEQ_ADDRESS_REGISTER, 0x0012);
+  if (Private->Variant == QEMU_VIDEO_BOCHS_MMIO) {
+    Status = Private->PciIo->Mem.Write (
+                                   Private->PciIo,
+                                   EfiPciIoWidthUint16,
+                                   PCI_BAR_IDX2,
+                                   0x500 + (Reg << 1),
+                                   1,
+                                   &Data
+                                   );
+    ASSERT_EFI_ERROR (Status);
+  } else {
+    outw (Private, VBE_DISPI_IOPORT_INDEX, Reg);
+    outw (Private, VBE_DISPI_IOPORT_DATA, Data);
+  }
+}
 
-  for (Index = 0; Index < 15; Index++) {
-    outw (Private, SEQ_ADDRESS_REGISTER, ModeData->SeqSettings[Index]);
+UINT16
+BochsRead (
+  QEMU_VIDEO_PRIVATE_DATA  *Private,
+  UINT16                   Reg
+  )
+{
+  EFI_STATUS  Status;
+  UINT16      Data;
+
+  if (Private->Variant == QEMU_VIDEO_BOCHS_MMIO) {
+    Status = Private->PciIo->Mem.Read (
+                                   Private->PciIo,
+                                   EfiPciIoWidthUint16,
+                                   PCI_BAR_IDX2,
+                                   0x500 + (Reg << 1),
+                                   1,
+                                   &Data
+                                   );
+    ASSERT_EFI_ERROR (Status);
+  } else {
+    outw (Private, VBE_DISPI_IOPORT_INDEX, Reg);
+    Data = inw (Private, VBE_DISPI_IOPORT_DATA);
   }
 
-  if (Private->Variant == QEMU_VIDEO_CIRRUS_5430) {
-    outb (Private, SEQ_ADDRESS_REGISTER, 0x0f);
-    Byte = (UINT8)((inb (Private, SEQ_DATA_REGISTER) & 0xc7) ^ 0x30);
-    outb (Private, SEQ_DATA_REGISTER, Byte);
+  return Data;
+}
+
+VOID
+VgaOutb (
+  QEMU_VIDEO_PRIVATE_DATA  *Private,
+  UINTN                    Reg,
+  UINT8                    Data
+  )
+{
+  EFI_STATUS  Status;
+
+  if (Private->Variant == QEMU_VIDEO_BOCHS_MMIO) {
+    Status = Private->PciIo->Mem.Write (
+                                   Private->PciIo,
+                                   EfiPciIoWidthUint8,
+                                   PCI_BAR_IDX2,
+                                   0x400 - 0x3c0 + Reg,
+                                   1,
+                                   &Data
+                                   );
+    ASSERT_EFI_ERROR (Status);
+  } else {
+    outb (Private, Reg, Data);
   }
+}
 
-  outb (Private, MISC_OUTPUT_REGISTER, ModeData->MiscSetting);
-  outw (Private, GRAPH_ADDRESS_REGISTER, 0x0506);
-  outw (Private, SEQ_ADDRESS_REGISTER, 0x0300);
-  outw (Private, CRTC_ADDRESS_REGISTER, 0x2011);
+VOID
+InitializeBochsGraphicsMode (
+  QEMU_VIDEO_PRIVATE_DATA  *Private,
+  QEMU_VIDEO_MODE_DATA     *ModeData
+  )
+{
+  DEBUG ((
+    DEBUG_INFO,
+    "InitializeBochsGraphicsMode: %dx%d @ %d\n",
+    ModeData->HorizontalResolution,
+    ModeData->VerticalResolution,
+    ModeData->ColorDepth
+    ));
 
-  for (Index = 0; Index < 28; Index++) {
-    outw (Private, CRTC_ADDRESS_REGISTER, (UINT16)((ModeData->CrtcSettings[Index] << 8) | Index));
-  }
+  /* unblank */
+  VgaOutb (Private, ATT_ADDRESS_REGISTER, 0x20);
 
-  for (Index = 0; Index < 9; Index++) {
-    outw (Private, GRAPH_ADDRESS_REGISTER, (UINT16)((GraphicsController[Index] << 8) | Index));
-  }
+  BochsWrite (Private, VBE_DISPI_INDEX_ENABLE, 0);
+  BochsWrite (Private, VBE_DISPI_INDEX_BANK, 0);
+  BochsWrite (Private, VBE_DISPI_INDEX_X_OFFSET, 0);
+  BochsWrite (Private, VBE_DISPI_INDEX_Y_OFFSET, 0);
 
-  inb (Private, INPUT_STATUS_1_REGISTER);
+  BochsWrite (Private, VBE_DISPI_INDEX_BPP, (UINT16)ModeData->ColorDepth);
+  BochsWrite (Private, VBE_DISPI_INDEX_XRES, (UINT16)ModeData->HorizontalResolution);
+  BochsWrite (Private, VBE_DISPI_INDEX_VIRT_WIDTH, (UINT16)ModeData->HorizontalResolution);
+  BochsWrite (Private, VBE_DISPI_INDEX_YRES, (UINT16)ModeData->VerticalResolution);
+  BochsWrite (Private, VBE_DISPI_INDEX_VIRT_HEIGHT, (UINT16)ModeData->VerticalResolution);
 
-  for (Index = 0; Index < 21; Index++) {
-    outb (Private, ATT_ADDRESS_REGISTER, (UINT8)Index);
-    outb (Private, ATT_ADDRESS_REGISTER, AttributeController[Index]);
-  }
-
-  outb (Private, ATT_ADDRESS_REGISTER, 0x20);
-
-  outw (Private, GRAPH_ADDRESS_REGISTER, 0x0009);
-  outw (Private, GRAPH_ADDRESS_REGISTER, 0x000a);
-  outw (Private, GRAPH_ADDRESS_REGISTER, 0x000b);
-  outb (Private, DAC_PIXEL_MASK_REGISTER, 0xff);
+  BochsWrite (
+    Private,
+    VBE_DISPI_INDEX_ENABLE,
+    VBE_DISPI_ENABLED | VBE_DISPI_LFB_ENABLED
+    );
 
   SetDefaultPalette (Private);
   ClearScreen (Private);
@@ -863,7 +973,7 @@ InitializeQemuVideo (
 
   PolicySize = sizeof (mGfxPolicy);
   Status     = PolicyProtocol->GetPolicy (
-                                 &gPolicyDataGFXGuid,
+                                 &gSbsaPolicyDataGFXGuid,
                                  &PolicyAttribute,
                                  mGfxPolicy,
                                  &PolicySize

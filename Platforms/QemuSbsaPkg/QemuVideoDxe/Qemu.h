@@ -83,6 +83,9 @@ typedef struct {
 typedef enum {
   QEMU_VIDEO_CIRRUS_5430 = 1,
   QEMU_VIDEO_CIRRUS_5446,
+  QEMU_VIDEO_BOCHS,
+  QEMU_VIDEO_BOCHS_MMIO,
+  QEMU_VIDEO_VMWARE_SVGA,
 } QEMU_VIDEO_VARIANT;
 
 typedef struct {
@@ -128,6 +131,11 @@ typedef struct {
   UINT8     MiscSetting;
 } QEMU_VIDEO_CIRRUS_MODES;
 
+typedef struct {
+  UINT32    Width;
+  UINT32    Height;
+} QEMU_VIDEO_BOCHS_MODES;
+
 #define QEMU_VIDEO_PRIVATE_DATA_FROM_GRAPHICS_OUTPUT_THIS(a) \
   CR(a, QEMU_VIDEO_PRIVATE_DATA, GraphicsOutput, QEMU_VIDEO_PRIVATE_DATA_SIGNATURE)
 
@@ -142,7 +150,6 @@ extern UINT8                         Crtc_800_600_256_60[];
 extern UINT16                        Seq_800_600_256_60[];
 extern UINT8                         Crtc_1024_768_256_60[];
 extern UINT16                        Seq_1024_768_256_60[];
-extern QEMU_VIDEO_CIRRUS_MODES       QemuVideoCirrusModes[];
 extern EFI_DRIVER_BINDING_PROTOCOL   gQemuVideoDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL   gQemuVideoComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gQemuVideoComponentName2;
@@ -397,10 +404,11 @@ QemuVideoComponentNameGetControllerName (
 //
 // Local Function Prototypes
 //
+
 VOID
-InitializeCirrusGraphicsMode (
+InitializeBochsGraphicsMode (
   QEMU_VIDEO_PRIVATE_DATA  *Private,
-  QEMU_VIDEO_CIRRUS_MODES  *ModeData
+  QEMU_VIDEO_MODE_DATA     *ModeData
   );
 
 VOID
@@ -450,15 +458,30 @@ inw (
   UINTN                    Address
   );
 
-EFI_STATUS
-QemuVideoCirrusModeSetup (
-  QEMU_VIDEO_PRIVATE_DATA  *Private
+VOID
+BochsWrite (
+  QEMU_VIDEO_PRIVATE_DATA  *Private,
+  UINT16                   Reg,
+  UINT16                   Data
+  );
+
+UINT16
+BochsRead (
+  QEMU_VIDEO_PRIVATE_DATA  *Private,
+  UINT16                   Reg
   );
 
 VOID
-InstallVbeShim (
-  IN CONST CHAR16          *CardName,
-  IN EFI_PHYSICAL_ADDRESS  FrameBufferBase
+VgaOutb (
+  QEMU_VIDEO_PRIVATE_DATA  *Private,
+  UINTN                    Reg,
+  UINT8                    Data
+  );
+
+EFI_STATUS
+QemuVideoBochsModeSetup (
+  QEMU_VIDEO_PRIVATE_DATA  *Private,
+  BOOLEAN                  IsQxl
   );
 
 #endif
