@@ -15,8 +15,8 @@ resources:
   repositories:
     - repository: mu_devops
       type: github
-      endpoint: microsoft
-      name: microsoft/mu_devops
+      endpoint: kuqin12
+      name: kuqin12/mu_devops
       ref: refs/tags/v2.2.0
 
 variables:
@@ -35,4 +35,4 @@ jobs:
     packages: QemuQ35Pkg
     target_list: NO-TARGET
     tool_chain_tag: $(tool_chain_tag)
-    vm_image: $(vm_image)
+    pool_name: $(pool_name)
