@@ -17,7 +17,7 @@ resources:
       type: github
       endpoint: kuqin12
       name: kuqin12/mu_devops
-      ref: refs/test_arm64
+      ref: test_arm64
 
 variables:
 - group: architectures-x86-64
