@@ -169,12 +169,9 @@ class Settings(CiSetupSettingsManager, CiBuildSettingsManager, UpdateSettingsMan
         ''' Return a list of workspace relative paths that should be mapped as edk2 PackagesPath '''
 
         # Include all submodule paths
-        result = []
+        result = ["Platforms"]
         for submodule in self.GetRequiredSubmodules():
             result.append(submodule.path)
-
-        # Include platform packages
-        result.append("Platforms")
 
         return result
 
