@@ -786,7 +786,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|1024
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution|768
   # Set video resolution source to be controlled by video driver
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdVideoResolutionSource|2
+  gQemuPkgTokenSpaceGuid.PcdVideoResolutionSource|2
 
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0
 

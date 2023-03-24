@@ -55,7 +55,7 @@
             "SourceLevelDebugPkg/SourceLevelDebugPkg.dec",
             "MsCorePkg/MsCorePkg.dec",
             "PcBdsPkg/PcBdsPkg.dec",
-            "QemuQ35Pkg/QemuQ35Pkg.dec",
+            "QemuPkg/QemuPkg.dec",
             "QemuSbsaPkg/QemuSbsaPkg.dec",
             "MsGraphicsPkg/MsGraphicsPkg.dec",
             "PolicyServicePkg/PolicyServicePkg.dec",

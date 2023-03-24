@@ -26,7 +26,6 @@
   MsCorePkg/MsCorePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   QemuPkg/QemuPkg.dec
-  QemuQ35Pkg/QemuQ35Pkg.dec
   SourceLevelDebugPkg/SourceLevelDebugPkg.dec
 
 [LibraryClasses]
