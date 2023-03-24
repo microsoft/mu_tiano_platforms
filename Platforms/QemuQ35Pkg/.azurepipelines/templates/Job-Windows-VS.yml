@@ -56,7 +56,7 @@ jobs:
       clean: all
 
     pool:
-      vmImage: $(vm_image)
+      name: test-arm64-build
 
     steps:
     - template: Steps/BuildPlatform.yml@mu_devops
