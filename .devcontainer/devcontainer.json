@@ -1,6 +1,17 @@
 {
-  "image": "ghcr.io/tianocore/containers/fedora-35-dev:latest",
-  "postCreateCommand": "git config --global --add safe.directory ${containerWorkspaceFolder} && pip install --upgrade -r pip-requirements.txt",
-  "forwardPorts": [5005, 5006, 5007, 5008], // For general use. EXDI, TCP Serial, etc.
-  "privileged": true
+  "image": "ghcr.io/tianocore/containers/fedora-37-dev:latest",
+  "postCreateCommand": "git config --global --add safe.directory '*' && pip install --upgrade -r pip-requirements.txt",
+  "forwardPorts": [ // For general use. EXDI, TCP Serial, etc.
+    5005,
+    5006,
+    5007,
+    5008
+  ],
+  "privileged": true,
+  "containerEnv": {
+    "DISPLAY": ":0"
+  },
+  "mounts": [
+    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=uncached"
+  ]
 }
