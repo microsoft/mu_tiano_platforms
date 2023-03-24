@@ -34,6 +34,7 @@
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
+  QemuPkg/QemuPkg.dec
   QemuQ35Pkg/QemuQ35Pkg.dec
   StandaloneMmPkg/StandaloneMmPkg.dec # MU_CHANGE: Added support for Standalone MM mode
 
@@ -53,7 +54,7 @@
   PeimEntryPoint
 
 [FeaturePcd]
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdSmmSmramRequire
+  gQemuPkgTokenSpaceGuid.PcdSmmSmramRequire
   gUefiQemuQ35PkgTokenSpaceGuid.PcdStandaloneMmEnable  # MU_CHANGE: Added support for Standalone MM mode
 
 [Pcd]

@@ -32,6 +32,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  QemuPkg/QemuPkg.dec
   QemuQ35Pkg/QemuQ35Pkg.dec
 
 [LibraryClasses]
@@ -43,7 +44,7 @@
   UefiDriverEntryPoint
 
 [Pcd]
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+  gQemuPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
   gUefiQemuQ35PkgTokenSpaceGuid.PcdQemuSmbiosValidated
 
 [Protocols]

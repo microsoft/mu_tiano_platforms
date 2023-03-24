@@ -24,10 +24,11 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  QemuPkg/QemuPkg.dec
   QemuQ35Pkg/QemuQ35Pkg.dec
 
 [Pcd]
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+  gQemuPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
 
 [LibraryClasses]
   BaseLib

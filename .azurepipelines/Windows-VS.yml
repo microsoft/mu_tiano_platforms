@@ -32,7 +32,7 @@ jobs:
     do_non_ci_build: false
     do_non_ci_setup: true
     do_pr_eval: true
-    packages: QemuQ35Pkg
+    packages: QemuQ35Pkg,QemuPkg
     target_list: NO-TARGET
     tool_chain_tag: $(tool_chain_tag)
     vm_image: $(vm_image)

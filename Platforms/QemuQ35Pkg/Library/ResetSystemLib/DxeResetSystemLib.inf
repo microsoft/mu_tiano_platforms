@@ -30,6 +30,7 @@
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
+  QemuPkg/QemuPkg.dec
   QemuQ35Pkg/QemuQ35Pkg.dec
 
 [LibraryClasses]
@@ -40,4 +41,4 @@
   TimerLib
 
 [Pcd]
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId ## CONSUMES
+  gQemuPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId ## CONSUMES
