@@ -86,7 +86,16 @@
             "sucess",
             "tolud",
             "vring",
-            "vscsi"
+            "vscsi",
+            "bhyve",
+            "cloudhv",
+            "cpuhp",
+            "microvm",
+            "pmiose",
+            "pmregmisc",
+            "pointee",
+            "ramfb",
+            "rebecca"
           ],
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
         "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)
