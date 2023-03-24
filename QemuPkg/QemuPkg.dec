@@ -82,7 +82,6 @@
   #  used by OVMF, the varstore pflash chip, LockBox etc).
   gQemuPkgTokenSpaceGuid.PcdSmmSmramRequire|FALSE|BOOLEAN|0x22
 
-
 [Ppis]
 
 [Protocols]
