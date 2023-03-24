@@ -13,8 +13,8 @@ resources:
   repositories:
     - repository: mu_devops
       type: github
-      endpoint: microsoft
-      name: microsoft/mu_devops
+      endpoint: kuqin12
+      name: kuqin12/mu_devops
       ref: main
 
 jobs:
