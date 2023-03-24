@@ -53,4 +53,4 @@
   gQemuQ35TpmMmioAccessiblePpiGuid
 
 [Depex.ARM, Depex.AARCH64]
-  gQemuQ35PkgTpmDiscoveredPpiGuid
+  gQemuPkgTpmDiscoveredPpiGuid
