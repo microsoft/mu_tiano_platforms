@@ -116,7 +116,7 @@
   MsBootPolicyLib          |OemPkg/Library/MsBootPolicyLib/MsBootPolicyLib.inf
   DeviceBootManagerLib     |OemPkg/Library/DeviceBootManagerLib/DeviceBootManagerLib.inf
   MsAltBootLib             |OemPkg/Library/MsAltBootLib/MsAltBootLib.inf # interfaces with alternate boot variable
-  MsBootOptionsLib         |QemuPkg/Library/MsBootOptionsLibQemuQ35/MsBootOptionsLib.inf # attached to BdsDxe to implement Microsoft extensions to UefiBootManagerLib.
+  MsBootOptionsLib         |QemuPkg/Library/MsBootOptionsLibQemu/MsBootOptionsLib.inf # attached to BdsDxe to implement Microsoft extensions to UefiBootManagerLib.
   MsBootManagerSettingsLib |OemPkg/Library/MsBootManagerSettingsDxeLib/MsBootManagerSettingsDxeLib.inf
 
   # UI and graphics
@@ -290,7 +290,7 @@
   # Setup variable libraries
   SvdXmlSettingSchemaSupportLib |SetupDataPkg/Library/SvdXmlSettingSchemaSupportLib/SvdXmlSettingSchemaSupportLib.inf
   ConfigVariableListLib         |SetupDataPkg/Library/ConfigVariableListLib/ConfigVariableListLib.inf
-  ConfigSystemModeLib           |QemuPkg/Library/ConfigSystemModeLibQ35/ConfigSystemModeLib.inf
+  ConfigSystemModeLib           |QemuPkg/Library/ConfigSystemModeLibQemu/ConfigSystemModeLib.inf
 
   # Network libraries
   NetLib                 |NetworkPkg/Library/DxeNetLib/DxeNetLib.inf

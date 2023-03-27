@@ -63,10 +63,10 @@
 [Components]
   QemuPkg/Library/BasePciCapLib/BasePciCapLib.inf
   QemuPkg/Library/BasePciCapPciSegmentLib/BasePciCapPciSegmentLib.inf
-  QemuPkg/Library/ConfigSystemModeLibQ35/ConfigSystemModeLib.inf
+  QemuPkg/Library/ConfigSystemModeLibQemu/ConfigSystemModeLib.inf
   QemuPkg/Library/LockBoxLib/LockBoxBaseLib.inf
   QemuPkg/Library/LockBoxLib/LockBoxDxeLib.inf
-  QemuPkg/Library/MsBootOptionsLibQemuQ35/MsBootOptionsLib.inf
+  QemuPkg/Library/MsBootOptionsLibQemu/MsBootOptionsLib.inf
   QemuPkg/Library/PlatformBmPrintScLib/PlatformBmPrintScLib.inf
   QemuPkg/Library/PlatformSecureLib/PlatformSecureLib.inf
   QemuPkg/Library/PlatformThemeLib/PlatformThemeLib.inf

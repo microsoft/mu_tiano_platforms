@@ -291,7 +291,7 @@
   DeviceBootManagerLib|OemPkg/Library/DeviceBootManagerLib/DeviceBootManagerLib.inf
   MsPlatformDevicesLib|QemuSbsaPkg/Library/MsPlatformDevicesLibQemuSbsa/MsPlatformDevicesLib.inf
   MsNetworkDependencyLib|PcBdsPkg/Library/MsNetworkDependencyLib/MsNetworkDependencyLib.inf
-  MsBootOptionsLib|QemuPkg/Library/MsBootOptionsLibQemuQ35/MsBootOptionsLib.inf
+  MsBootOptionsLib|QemuPkg/Library/MsBootOptionsLibQemu/MsBootOptionsLib.inf
   ConsoleMsgLib|PcBdsPkg/Library/ConsoleMsgLibNull/ConsoleMsgLibNull.inf
   MsBootPolicyLib|OemPkg/Library/MsBootPolicyLib/MsBootPolicyLib.inf
   MsBootManagerSettingsLib|OemPkg/Library/MsBootManagerSettingsDxeLib/MsBootManagerSettingsDxeLib.inf
@@ -336,7 +336,7 @@
 
   # Setup variable libraries
   ConfigVariableListLib     |SetupDataPkg/Library/ConfigVariableListLib/ConfigVariableListLib.inf
-  ConfigSystemModeLib       |QemuPkg/Library/ConfigSystemModeLibQ35/ConfigSystemModeLib.inf
+  ConfigSystemModeLib       |QemuPkg/Library/ConfigSystemModeLibQemu/ConfigSystemModeLib.inf
   OemMfciLib|OemPkg/Library/OemMfciLib/OemMfciLibDxe.inf
   SvdXmlSettingSchemaSupportLib |SetupDataPkg/Library/SvdXmlSettingSchemaSupportLib/SvdXmlSettingSchemaSupportLib.inf
 
