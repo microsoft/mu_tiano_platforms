@@ -8,7 +8,7 @@
 ##
 
 parameters:
-- name: arch_list # Intentionally ignored.
+- name: arch_list
   displayName: Architectures (e.g. IA32, X64)
   type: string
   default: ''
@@ -44,7 +44,7 @@ jobs:
       TARGET_QEMU:
         Build.Pkgs: 'QemuPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
-        Build.ArchList: IA32,X64,AARCH64
+        Build.ArchList: ${{ parameters.arch_list }}
       TARGET_Q35:
         Build.Pkgs: 'QemuQ35Pkg'
         Build.Targets: 'NO-TARGET'
