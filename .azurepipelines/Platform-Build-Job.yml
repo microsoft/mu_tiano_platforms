@@ -34,7 +34,7 @@ jobs:
         QemuQ35_DEBUG:
           Build.Package: QemuQ35Pkg
           Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-          Build.Arch: $(arch_list)
+          Build.Arch: IA32,X64
           Build.Flags: ""
           Build.Target: "DEBUG"
           Run.Flags: $(run_flags)
@@ -44,7 +44,7 @@ jobs:
         QemuQ35_RELEASE:
           Build.Package: QemuQ35Pkg
           Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-          Build.Arch: $(arch_list)
+          Build.Arch: IA32,X64
           Build.Flags: ""
           Build.Target: "RELEASE"
           Run.Flags: $(run_flags)
