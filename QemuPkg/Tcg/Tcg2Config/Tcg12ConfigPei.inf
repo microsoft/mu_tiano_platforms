@@ -50,7 +50,7 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid                 ## PRODUCES
 
 [Depex.IA32, Depex.X64]
-  gQemuQ35TpmMmioAccessiblePpiGuid
+  gQemuTpmMmioAccessiblePpiGuid
 
 [Depex.ARM, Depex.AARCH64]
   gQemuPkgTpmDiscoveredPpiGuid

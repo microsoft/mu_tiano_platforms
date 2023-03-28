@@ -36,6 +36,7 @@
             "MsGraphicsPkg/MsGraphicsPkg.dec",
             "SecurityPkg/SecurityPkg.dec",
             "ShellPkg/ShellPkg.dec",
+            "EmbeddedPkg/EmbeddedPkg.dec",
             "QemuPkg/QemuPkg.dec",
         ],
         # For host based unit tests
