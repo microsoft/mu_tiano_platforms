@@ -8,7 +8,7 @@
 ##
 
 parameters:
-- name: arch_list
+- name: arch_list # Intentionally ignored.
   displayName: Architectures (e.g. IA32, X64)
   type: string
   default: ''
@@ -44,13 +44,16 @@ jobs:
       TARGET_QEMU:
         Build.Pkgs: 'QemuPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        Build.ArchList: IA32,X64,AARCH64
       TARGET_Q35:
         Build.Pkgs: 'QemuQ35Pkg'
         Build.Targets: 'NO-TARGET'
+        Build.ArchList: IA32,X64
       ${{ if eq(parameters.tool_chain_tag, 'GCC5') }}:
         TARGET_SBSA:
           Build.Pkgs: 'QemuSbsaPkg'
           Build.Targets: 'NO-TARGET'
+          Build.ArchList: AARCH64
 
   workspace:
     clean: all
@@ -68,7 +71,7 @@ jobs:
   - template: Steps/PrGate.yml@mu_devops
     parameters:
       artifacts_identifier: '$(Build.Pkgs) $(Build.Targets)'
-      build_archs: ${{ parameters.arch_list }}
+      build_archs: $(Build.ArchList)
       build_pkgs: $(Build.Pkgs)
       build_targets: $(Build.Targets)
       do_ci_build: true
