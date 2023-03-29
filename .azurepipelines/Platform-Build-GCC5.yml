@@ -22,6 +22,6 @@ variables:
 jobs:
 - template: Platform-Build-Job.yml
   parameters:
-    tool_chain_tag: 'GCC5''
+    tool_chain_tag: 'GCC5'
     vm_image: $(vm_image)
     container_image: linux-gcc
