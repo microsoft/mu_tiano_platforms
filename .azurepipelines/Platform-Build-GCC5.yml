@@ -22,6 +22,6 @@ variables:
 jobs:
 - template: Platform-Build-Job.yml
   parameters:
-    tool_chain_tag: ${{ variables.tool_chain_tag }}
+    tool_chain_tag: $(tool_chain_tag)
     vm_image: $(vm_image)
     container_image: linux-gcc
