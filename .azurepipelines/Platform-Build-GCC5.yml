@@ -1,0 +1,30 @@
+## @file
+# Azure Pipeline build file for building platforms with GCC.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+resources:
+  repositories:
+    - repository: mu_devops
+      type: github
+      endpoint: microsoft
+      name: microsoft/mu_devops
+      ref: main
+  containers:
+    - container: linux-gcc
+      image: ghcr.io/tianocore/containers/fedora-37-test:54e5bd1
+
+variables:
+- group: tool-chain-ubuntu-gcc
+
+jobs:
+- template: Platform-Build-Job.yml
+  parameters:
+    tool_chain_tag: 'GCC5'
+    vm_image: $(vm_image)
+    container_image: linux-gcc
+    extra_install_step:
+          - script: sudo dnf --assumeyes install openssl-devel
+            displayName: Install openssl

@@ -253,10 +253,10 @@ READ_LOCK_STATUS   = TRUE
   #
   # Platform Driver
   #
-  INF QemuQ35Pkg/VirtioBlkDxe/VirtioBlk.inf
-  INF QemuQ35Pkg/VirtioNetDxe/VirtioNet.inf
-  INF QemuQ35Pkg/VirtioScsiDxe/VirtioScsi.inf
-  INF QemuQ35Pkg/VirtioRngDxe/VirtioRng.inf
+  INF QemuPkg/VirtioBlkDxe/VirtioBlk.inf
+  INF QemuPkg/VirtioNetDxe/VirtioNet.inf
+  INF QemuPkg/VirtioScsiDxe/VirtioScsi.inf
+  INF QemuPkg/VirtioRngDxe/VirtioRng.inf
 
   # Rng Protocol producer
   INF SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
@@ -268,7 +268,7 @@ READ_LOCK_STATUS   = TRUE
   INF ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
   INF ShellPkg/DynamicCommand/HttpDynamicCommand/HttpDynamicCommand.inf
   INF ShellPkg/DynamicCommand/VariablePolicyDynamicCommand/VariablePolicyDynamicCommand.inf
-  INF QemuQ35Pkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
+  INF QemuPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
 
   INF MsGraphicsPkg/SimpleWindowManagerDxe/SimpleWindowManagerDxe.inf
   INF MsGraphicsPkg/RenderingEngineDxe/RenderingEngineDxe.inf
@@ -311,7 +311,7 @@ READ_LOCK_STATUS   = TRUE
 !include NetworkPkg/Network.fdf.inc
 
   # IDE/AHCI Support
-  INF QemuQ35Pkg/SataControllerDxe/SataControllerDxe.inf
+  INF QemuPkg/SataControllerDxe/SataControllerDxe.inf
   INF MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
   INF MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
 
@@ -364,9 +364,9 @@ READ_LOCK_STATUS   = TRUE
   INF ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
   INF MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
   INF MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
-  INF QemuQ35Pkg/PciHotPlugInitDxe/PciHotPlugInit.inf
-  INF QemuQ35Pkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
-  INF QemuQ35Pkg/Virtio10Dxe/Virtio10.inf
+  INF QemuPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
+  INF QemuPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
+  INF QemuPkg/Virtio10Dxe/Virtio10.inf
 
   #
   # USB Support
@@ -496,7 +496,7 @@ READ_LOCK_STATUS   = TRUE
 
 !if $(TPM2_ENABLE) == TRUE
   INF MdeModulePkg/Universal/ResetSystemPei/ResetSystemPei.inf
-  INF QemuQ35Pkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
+  INF QemuPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
   INF SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
 !endif
 

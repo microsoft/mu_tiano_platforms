@@ -42,6 +42,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   QemuQ35Pkg/QemuQ35Pkg.dec
+  QemuPkg/QemuPkg.dec
   StandaloneMmPkg/StandaloneMmPkg.dec
 
 [LibraryClasses]
@@ -75,7 +76,7 @@
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable
 
 [FeaturePcd]
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdSmmSmramRequire
+  gQemuPkgTokenSpaceGuid.PcdSmmSmramRequire
 
 [Depex]
   TRUE

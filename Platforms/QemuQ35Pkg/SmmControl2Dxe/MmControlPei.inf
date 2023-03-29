@@ -39,6 +39,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  QemuPkg/QemuPkg.dec
   QemuQ35Pkg/QemuQ35Pkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
@@ -62,7 +63,7 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode      ## SOMETIMES_PRODUCES
 
 [FeaturePcd]
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdSmmSmramRequire
+  gQemuPkgTokenSpaceGuid.PcdSmmSmramRequire
   gUefiQemuQ35PkgTokenSpaceGuid.PcdStandaloneMmEnable
 
 [Depex]

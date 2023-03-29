@@ -26,6 +26,7 @@
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
+  QemuPkg/QemuPkg.dec
   QemuQ35Pkg/QemuQ35Pkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
@@ -54,7 +55,7 @@
   VmgExitLib
 
 [FeaturePcd]
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdSmmSmramRequire
+  gQemuPkgTokenSpaceGuid.PcdSmmSmramRequire
 
 [FixedPcd]
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase

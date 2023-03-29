@@ -12,7 +12,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <IndustryStandard/Virtio095.h>
 
 #include <Guid/DebugAgentGuid.h>
-#include <Guid/QemuRamfb.h>
 #include <Guid/SerialPortLibVendor.h>
 
 #include <Protocol/DevicePath.h>

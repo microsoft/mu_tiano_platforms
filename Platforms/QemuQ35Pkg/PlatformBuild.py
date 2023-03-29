@@ -118,7 +118,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
     def GetRequiredSubmodules(self):
         """Return iterable containing RequiredSubmodule objects.
-        
+
         !!! note
             If no RequiredSubmodules return an empty iterable
         """

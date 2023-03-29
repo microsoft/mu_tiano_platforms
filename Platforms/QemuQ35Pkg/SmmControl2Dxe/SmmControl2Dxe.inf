@@ -40,6 +40,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  QemuPkg/QemuPkg.dec
   QemuQ35Pkg/QemuQ35Pkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
@@ -66,7 +67,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable
 
 [FeaturePcd]
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdSmmSmramRequire
+  gQemuPkgTokenSpaceGuid.PcdSmmSmramRequire
   gUefiQemuQ35PkgTokenSpaceGuid.PcdStandaloneMmEnable  # MU_CHANGE: Added support for Standalone MM
 
 [Depex]

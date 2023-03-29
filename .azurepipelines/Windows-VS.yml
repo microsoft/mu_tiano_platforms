@@ -1,5 +1,8 @@
 ## @file
-# Azure Pipeline build file for a build using Windows and Visual Studio.
+# Azure Pipeline build file for a build using Windows and the latest Visual Studio toolchain supported.
+#
+# IMPORTANT: This file requires the local repo to contain a .azurepipelines/Matrix-Build-Job.yml file that
+#            performs the actual build steps for the configurations and packages supported by the repo.
 #
 # NOTE: This file is automatically synchronized from Mu DevOps. Update the original file there
 #       instead of the file in this repo.
@@ -24,15 +27,9 @@ variables:
 - group: tool-chain-windows-visual-studio-latest
 
 jobs:
-- template: Jobs/PrGate.yml@mu_devops
+- template: Matrix-Build-Job.yml
   parameters:
     arch_list: $(arch_list)
-    do_ci_build: true
-    do_ci_setup: false
-    do_non_ci_build: false
-    do_non_ci_setup: true
-    do_pr_eval: true
-    packages: QemuQ35Pkg
-    target_list: NO-TARGET
+    extra_build_args: CODE_COVERAGE=TRUE
     tool_chain_tag: $(tool_chain_tag)
     vm_image: $(vm_image)

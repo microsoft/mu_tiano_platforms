@@ -33,6 +33,7 @@
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
+  QemuPkg/QemuPkg.dec
   QemuQ35Pkg/QemuQ35Pkg.dec
 
 [LibraryClasses]
@@ -46,7 +47,7 @@
   gEfiSmmAccess2ProtocolGuid   ## PRODUCES
 
 [FeaturePcd]
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdSmmSmramRequire
+  gQemuPkgTokenSpaceGuid.PcdSmmSmramRequire
 
 [Pcd]
   gUefiQemuQ35PkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase
