@@ -25,3 +25,6 @@ jobs:
     tool_chain_tag: 'GCC5'
     vm_image: $(vm_image)
     container_image: linux-gcc
+    extra_install_step:
+          - script: sudo dnf --assumeyes install openssl-devel
+            displayName: Install openssl

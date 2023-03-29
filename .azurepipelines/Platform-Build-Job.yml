@@ -6,6 +6,11 @@
 ##
 
 parameters:
+- name: extra_install_step
+  displayName: Extra Install Steps
+  type: stepList
+  default:
+    - script: echo No extra steps provided
 - name: tool_chain_tag
   displayName: Tool Chain (e.g. VS2022)
   type: string
@@ -96,6 +101,7 @@ jobs:
         build_file: $(Build.File)
         build_flags: $(Build.Flags)
         run_flags: $(Run.Flags)
+        extra_install_step: ${{ parameters.extra_install_step }}
         install_tools: ${{ eq(parameters.container_image, '') }}
         artifacts_identifier: '$(Build.Package) $(tool_chain_tag) $(Build.Target)'
         artifacts_binary: $(Build.ArtifactsBinary)
