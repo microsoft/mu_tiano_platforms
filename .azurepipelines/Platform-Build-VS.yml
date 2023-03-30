@@ -23,5 +23,5 @@ jobs:
     - powershell: choco install qemu --version=2022.8.31; Write-Host "##vso[task.prependpath]c:\Program Files\qemu"
       displayName: Install QEMU and Set QEMU on path # friendly name displayed in the UI
       condition: and(gt(variables.pkg_count, 0), succeeded())
-    tool_chain_tag: $(tool_chain_tag)
+    tool_chain_tag: 'VS2022'
     vm_image: $(vm_image)
