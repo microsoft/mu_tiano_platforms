@@ -67,6 +67,7 @@ jobs:
         build_arch: $(Build.Arch)
         build_file: $(Build.File)
         build_flags: $(Build.Flags)
+        install_tools: false
         run_flags: $(Run.Flags)
         extra_install_step:
         - powershell: choco install qemu --version=2022.8.31; Write-Host "##vso[task.prependpath]c:\Program Files\qemu"
