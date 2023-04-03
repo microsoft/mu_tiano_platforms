@@ -79,7 +79,7 @@ jobs:
     container: ${{ parameters.container_image }}
 
   pool:
-    ${{ if eq(parameters.self_host_agent, true) }}:
+    ${{ if eq($(Build.SelfHostAgent), true) }}:
       vmImage: ${{ parameters.vm_image }}
     ${{ else }}:
       name: ${{ parameters.pool_name }}
