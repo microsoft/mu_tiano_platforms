@@ -30,6 +30,7 @@
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
+  QemuPkg/QemuPkg.dec
   QemuQ35Pkg/QemuQ35Pkg.dec
 
 [LibraryClasses]
@@ -38,7 +39,7 @@
   PciHostBridgeUtilityLib
 
 [Pcd]
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+  gQemuPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
   gUefiQemuQ35PkgTokenSpaceGuid.PcdPciIoBase
   gUefiQemuQ35PkgTokenSpaceGuid.PcdPciIoSize
   gUefiQemuQ35PkgTokenSpaceGuid.PcdPciMmio32Base

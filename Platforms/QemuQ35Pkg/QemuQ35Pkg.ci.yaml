@@ -43,6 +43,7 @@
             "SetupDataPkg/SetupDataPkg.dec",
             "MfciPkg/MfciPkg.dec",
             "OemPkg/OemPkg.dec",
+            "QemuPkg/QemuPkg.dec",
             "QemuQ35Pkg/QemuQ35Pkg.dec"
         ],
         # For host based unit tests

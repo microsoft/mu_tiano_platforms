@@ -1,0 +1,112 @@
+## @file
+# CI configuration for QemuPkg
+#
+# Copyright (c) Microsoft Corporation
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+{
+    "LicenseCheck": {
+        "IgnoreFiles": []
+    },
+    "EccCheck": {
+        ## Exception sample looks like below:
+        ## "ExceptionList": [
+        ##     "<ErrorID>", "<KeyWord>"
+        ## ]
+        "ExceptionList": [
+        ],
+        ## Both file path and directory path are accepted.
+        "IgnoreFiles": [
+        ]
+    },
+    "CompilerPlugin": {
+        "DscPath": "QemuPkg.dsc"
+    },
+    "CharEncodingCheck": {
+        "IgnoreFiles": []
+    },
+    "DependencyCheck": {
+        "AcceptableDependencies": [
+            "MdePkg/MdePkg.dec",
+            "MdeModulePkg/MdeModulePkg.dec",
+            "MfciPkg/MfciPkg.dec",
+            "OemPkg/OemPkg.dec",
+            "PcBdsPkg/PcBdsPkg.dec",
+            "MsGraphicsPkg/MsGraphicsPkg.dec",
+            "SecurityPkg/SecurityPkg.dec",
+            "ShellPkg/ShellPkg.dec",
+            "EmbeddedPkg/EmbeddedPkg.dec",
+            "QemuPkg/QemuPkg.dec",
+        ],
+        # For host based unit tests
+        "AcceptableDependencies-HOST_APPLICATION":[],
+        # For UEFI shell based apps
+        "AcceptableDependencies-UEFI_APPLICATION":[],
+        "IgnoreInf": []
+    },
+    "DscCompleteCheck": {
+        "DscPath": "QemuPkg.dsc",
+        "IgnoreInf": []
+    },
+    "GuidCheck": {
+        "IgnoreGuidName": [],
+        "IgnoreGuidValue": [],
+        "IgnoreFoldersAndFiles": [],
+        "IgnoreDuplicates": []
+    },
+    "LibraryClassCheck": {
+        "IgnoreHeaderFile": []
+    },
+    "SpellCheck": {
+        "AuditOnly": False,
+        "ExtendWords": [
+            "capbility",
+            "comms",
+            "csprd",
+            "disqulified",
+            "dramc",
+            "enumer",
+            "esmramc",
+            "fwcfg",
+            "implementaion",
+            "iomem",
+            "pciexbar",
+            "pflash",
+            "pmbase",
+            "pmcon",
+            "preos",
+            "requestq",
+            "rpmsg",
+            "rxbuf",
+            "satadpa",
+            "smerr",
+            "smrame",
+            "somlo",
+            "strictry",
+            "sucess",
+            "tolud",
+            "vring",
+            "vscsi",
+            "bhyve",
+            "cloudhv",
+            "cpuhp",
+            "microvm",
+            "pmiose",
+            "pmregmisc",
+            "pointee",
+            "ramfb",
+            "rebecca"
+          ],
+        "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
+        "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)
+    },
+    "MarkdownLintCheck": {
+        "IgnoreFiles": [
+        ]            # package root relative file, folder, or glob pattern to ignore
+    },
+    "UncrustifyCheck": {
+        "IgnoreFiles": [
+        ]    # Standard Plugin defined paths that should be ignored.
+    }
+}

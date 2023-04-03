@@ -130,5 +130,5 @@ command-line would be:
 
 ## References
 
-- [Installing and using Pytools](https://github.com/tianocore/edk2-pytool-extensions/blob/master/docs/using.md#installing)
+- [Installing and using Pytools](https://www.tianocore.org/edk2-pytool-extensions/using/install/)
 - More on [python virtual environments](https://docs.python.org/3/library/venv.html)

@@ -41,6 +41,7 @@
   MdeModulePkg/MdeModulePkg.dec
   SecurityPkg/SecurityPkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
+  QemuPkg/QemuPkg.dec
   QemuQ35Pkg/QemuQ35Pkg.dec
 
 [Guids]
@@ -81,10 +82,10 @@
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecGhcbPageTableSize
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecGhcbBase
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecGhcbSize
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize
+  gQemuPkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase
+  gQemuPkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize
   gUefiQemuQ35PkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+  gQemuPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
   gUefiQemuQ35PkgTokenSpaceGuid.PcdPciIoBase
   gUefiQemuQ35PkgTokenSpaceGuid.PcdPciIoSize
   gUefiQemuQ35PkgTokenSpaceGuid.PcdPciMmio32Base
@@ -136,7 +137,7 @@
 
 [FeaturePcd]
   gUefiQemuQ35PkgTokenSpaceGuid.PcdCsmEnable
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdSmmSmramRequire
+  gQemuPkgTokenSpaceGuid.PcdSmmSmramRequire
 
 [Ppis]
   gEfiPeiMasterBootModePpiGuid

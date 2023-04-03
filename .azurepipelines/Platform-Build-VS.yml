@@ -1,0 +1,23 @@
+## @file
+# Azure Pipeline build file for building platforms with VS.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+resources:
+  repositories:
+    - repository: mu_devops
+      type: github
+      endpoint: microsoft
+      name: microsoft/mu_devops
+      ref: main
+
+variables:
+- group: tool-chain-windows-visual-studio-latest
+
+jobs:
+- template: Platform-Build-Job.yml
+  parameters:
+    tool_chain_tag: $(tool_chain_tag)
+    vm_image: $(vm_image)

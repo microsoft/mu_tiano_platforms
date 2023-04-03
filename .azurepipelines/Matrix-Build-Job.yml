@@ -1,0 +1,85 @@
+## @file
+# Template file for generating a build job matrix for the packages currently supported for
+# build in Mu Tiano Platforms.
+#
+# Copyright (c) Microsoft Corporation.
+# Copyright (c) 2020 - 2021, ARM Limited. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+parameters:
+- name: arch_list # intentionally ignored
+  displayName: Architectures (e.g. IA32, X64)
+  type: string
+  default: ''
+- name: extra_build_args
+  displayName: Extra Build Command Arguments
+  type: string
+  default: ''
+- name: extra_install_step
+  displayName: Extra Install Steps
+  type: stepList
+  default:
+    - script: echo No extra steps provided
+- name: tool_chain_tag
+  displayName: Tool Chain (e.g. VS2022)
+  type: string
+  default: ''
+- name: vm_image
+  displayName: Virtual Machine Image (e.g. windows-latest)
+  type: string
+  default: 'windows-latest'
+- name: container_image
+  displayName: Container Image
+  type: string
+  default: ''
+
+jobs:
+
+- job: Build
+  timeoutInMinutes: 120
+  # Use matrix to speed up the build process
+  strategy:
+    matrix:
+      TARGET_QEMU:
+        Build.Pkgs: 'QemuPkg'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        Build.ArchList: IA32,X64,AARCH64
+      TARGET_Q35:
+        Build.Pkgs: 'QemuQ35Pkg'
+        Build.Targets: 'NO-TARGET'
+        Build.ArchList: IA32,X64
+      ${{ if eq(parameters.tool_chain_tag, 'GCC5') }}:
+        TARGET_SBSA:
+          Build.Pkgs: 'QemuSbsaPkg'
+          Build.Targets: 'NO-TARGET'
+          Build.ArchList: AARCH64
+
+  workspace:
+    clean: all
+
+  ${{ if ne(parameters.container_image, '') }}:
+    container: ${{ parameters.container_image }}
+
+  pool:
+    vmImage: ${{ parameters.vm_image }}
+
+  steps:
+  - ${{ if and(ne(parameters.container_image, ''), not(contains(parameters.vm_image, 'windows'))) }}:
+    - script: echo "##vso[task.prependpath]/home/vsts_azpcontainer/.local/bin"
+      displayName: Add User Local Bin to Path
+  - template: Steps/PrGate.yml@mu_devops
+    parameters:
+      artifacts_identifier: '$(Build.Pkgs) $(Build.Targets)'
+      build_archs: $(Build.ArchList)
+      build_pkgs: $(Build.Pkgs)
+      build_targets: $(Build.Targets)
+      do_ci_build: true
+      do_ci_setup: true
+      do_non_ci_build: false
+      do_non_ci_setup: true
+      do_pr_eval: true
+      extra_build_args: ${{ parameters.extra_build_args }}
+      extra_install_step: ${{ parameters.extra_install_step }}
+      install_tools: ${{ eq(parameters.container_image, '') }}
+      tool_chain_tag: ${{ parameters.tool_chain_tag }}

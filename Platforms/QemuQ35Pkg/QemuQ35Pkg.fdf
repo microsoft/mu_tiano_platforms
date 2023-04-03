@@ -153,7 +153,7 @@ NumBlocks     = 0xD0
 gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecPageTablesBase|gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecPageTablesSize
 
 0x006000|0x001000
-gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase|gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize
+gQemuPkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase|gQemuPkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize
 
 0x007000|0x001000
 gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress|gUefiQemuQ35PkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
@@ -246,7 +246,7 @@ INF  MmSupervisorPkg/Drivers/MmCommunicationBuffer/MmCommunicationBufferPei.inf
 INF  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 
 !if $(TPM_ENABLE) == TRUE
-INF  QemuQ35Pkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
+INF  QemuPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
 INF  SecurityPkg/Tcg/TcgPei/TcgPei.inf
 INF  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
 !endif
@@ -322,18 +322,18 @@ INF  UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
 INF  UefiCpuPkg/CpuDxe/CpuDxe.inf
 INF  QemuQ35Pkg/8254TimerDxe/8254Timer.inf
 INF  QemuQ35Pkg/IncompatiblePciDeviceSupportDxe/IncompatiblePciDeviceSupport.inf
-INF  QemuQ35Pkg/PciHotPlugInitDxe/PciHotPlugInit.inf
+INF  QemuPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
 INF  MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
 INF  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
 INF  MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
 INF  MdeModulePkg/Universal/Metronome/Metronome.inf
 INF  PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
 
-INF  QemuQ35Pkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
-INF  QemuQ35Pkg/Virtio10Dxe/Virtio10.inf
-INF  QemuQ35Pkg/VirtioBlkDxe/VirtioBlk.inf
-INF  QemuQ35Pkg/VirtioScsiDxe/VirtioScsi.inf
-INF  QemuQ35Pkg/VirtioRngDxe/VirtioRng.inf
+INF  QemuPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
+INF  QemuPkg/Virtio10Dxe/Virtio10.inf
+INF  QemuPkg/VirtioBlkDxe/VirtioBlk.inf
+INF  QemuPkg/VirtioScsiDxe/VirtioScsi.inf
+INF  QemuPkg/VirtioRngDxe/VirtioRng.inf
 
 # Rng Protocol producer
 INF  SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
@@ -358,7 +358,7 @@ INF  MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
 INF  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 INF  MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
 INF  MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
-INF  QemuQ35Pkg/SataControllerDxe/SataControllerDxe.inf
+INF  QemuPkg/SataControllerDxe/SataControllerDxe.inf
 INF  MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
 INF  MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
 INF  MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
@@ -386,7 +386,7 @@ INF  MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
 
 INF  ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
 INF  ShellPkg/DynamicCommand/VariablePolicyDynamicCommand/VariablePolicyDynamicCommand.inf
-INF  QemuQ35Pkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
+INF  QemuPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
 
 #
 # Network modules
@@ -423,7 +423,7 @@ INF  QemuQ35Pkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.in
   INF  NetworkPkg/HttpUtilitiesDxe/HttpUtilitiesDxe.inf
   INF  NetworkPkg/HttpBootDxe/HttpBootDxe.inf
 
-  INF  QemuQ35Pkg/VirtioNetDxe/VirtioNet.inf
+  INF  QemuPkg/VirtioNetDxe/VirtioNet.inf
 
 #
 # Usb Support
@@ -451,7 +451,6 @@ INF  QemuQ35Pkg/CpuS3DataDxe/CpuS3DataDxe.inf
   INF  QemuQ35Pkg/SmmAccess/SmmAccess2Dxe.inf
   INF  MmSupervisorPkg/Drivers/StandaloneMmIpl/PiSmmIpl.inf
 !endif
-INF  MmSupervisorPkg/Drivers/MmCommunicationBuffer/MmCommunicationBufferDxe.inf
 INF  MmSupervisorPkg/Core/MmSupervisorCore.inf
 INF  UefiCpuPkg/CpuIo2Smm/CpuIo2StandaloneMm.inf
 INF  MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.inf

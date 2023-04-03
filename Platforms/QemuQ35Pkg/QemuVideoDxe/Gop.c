@@ -182,10 +182,6 @@ Routine Description:
     case QEMU_VIDEO_CIRRUS_5446:
       InitializeCirrusGraphicsMode (Private, &QemuVideoCirrusModes[ModeData->InternalModeIndex]);
       break;
-    case QEMU_VIDEO_BOCHS_MMIO:
-    case QEMU_VIDEO_BOCHS:
-      InitializeBochsGraphicsMode (Private, ModeData);
-      break;
     default:
       ASSERT (FALSE);
       return EFI_DEVICE_ERROR;
