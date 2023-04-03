@@ -32,7 +32,7 @@ parameters:
 - name: pool_name
   displayName: Pool Name
   type: string
-  default: 'Default'
+  default: ''
 - name: container_image
   displayName: Container Image
   type: string
@@ -49,12 +49,12 @@ jobs:
         Build.Pkgs: 'QemuPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
         Build.ArchList: IA32,X64,AARCH64
-        Build.AgentPool: 'Default'
+        Build.AgentPool: ''
       TARGET_Q35:
         Build.Pkgs: 'QemuQ35Pkg'
         Build.Targets: 'NO-TARGET'
         Build.ArchList: IA32,X64
-        Build.AgentPool: 'Default'
+        Build.AgentPool: ''
       TARGET_QEMU_ARM:
         Build.Pkgs: 'QemuPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
@@ -70,7 +70,7 @@ jobs:
           Build.Pkgs: 'QemuSbsaPkg'
           Build.Targets: 'NO-TARGET'
           Build.ArchList: AARCH64
-          Build.AgentPool: 'Default'
+          Build.AgentPool: ''
 
   workspace:
     clean: all
