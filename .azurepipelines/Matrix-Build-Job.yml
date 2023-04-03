@@ -29,6 +29,10 @@ parameters:
   displayName: Virtual Machine Image (e.g. windows-latest)
   type: string
   default: 'windows-latest'
+- name: pool_name
+  displayName: Pool Name
+  type: string
+  default: ''
 - name: container_image
   displayName: Container Image
   type: string
@@ -45,15 +49,28 @@ jobs:
         Build.Pkgs: 'QemuPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
         Build.ArchList: IA32,X64,AARCH64
+        Build.SelfHostAgent: false
       TARGET_Q35:
         Build.Pkgs: 'QemuQ35Pkg'
         Build.Targets: 'NO-TARGET'
         Build.ArchList: IA32,X64
+        Build.SelfHostAgent: false
+      TARGET_QEMU_ARM:
+        Build.Pkgs: 'QemuPkg'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        Build.ArchList: IA32,X64,AARCH64
+        Build.SelfHostAgent: true
+      TARGET_Q35_ARM:
+        Build.Pkgs: 'QemuQ35Pkg'
+        Build.Targets: 'NO-TARGET'
+        Build.ArchList: IA32,X64
+        Build.SelfHostAgent: true
       ${{ if eq(parameters.tool_chain_tag, 'GCC5') }}:
         TARGET_SBSA:
           Build.Pkgs: 'QemuSbsaPkg'
           Build.Targets: 'NO-TARGET'
           Build.ArchList: AARCH64
+          Build.SelfHostAgent: false
 
   workspace:
     clean: all
@@ -62,7 +79,10 @@ jobs:
     container: ${{ parameters.container_image }}
 
   pool:
-    vmImage: ${{ parameters.vm_image }}
+    ${{ if eq(parameters.self_host_agent, true) }}:
+      vmImage: ${{ parameters.vm_image }}
+    ${{ else }}:
+      name: ${{ parameters.pool_name }}
 
   steps:
   - ${{ if and(ne(parameters.container_image, ''), not(contains(parameters.vm_image, 'windows'))) }}:
