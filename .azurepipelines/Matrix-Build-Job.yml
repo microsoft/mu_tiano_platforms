@@ -101,5 +101,8 @@ jobs:
       do_pr_eval: true
       extra_build_args: ${{ parameters.extra_build_args }}
       extra_install_step: ${{ parameters.extra_install_step }}
-      install_tools: or(${{ eq(parameters.container_image, '') }}, eq(variables['Build.SelfHostAgent'], 'false'))
+      ${{ if or(eq(parameters.container_image, ''), eq(variables['Build.SelfHostAgent'], 'false')) }}:
+        install_tools: true
+      ${{ else }}:
+        install_tools: false
       tool_chain_tag: ${{ parameters.tool_chain_tag }}
