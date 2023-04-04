@@ -19,6 +19,10 @@ parameters:
   displayName: Virtual Machine Image (e.g. windows-latest)
   type: string
   default: 'windows-latest'
+- name: pool_name
+  displayName: Pool Name
+  type: string
+  default: ""
 - name: container_image
   displayName: Container Image
   type: string
@@ -42,6 +46,7 @@ jobs:
           Build.Arch: IA32,X64
           Build.Flags: ""
           Build.Target: "DEBUG"
+          Build.AgentPool: ""
           Run.Flags: $(run_flags)
           Build.ArtifactsBinary: |
             **/QEMUQ35_*.fd
@@ -52,6 +57,29 @@ jobs:
           Build.Arch: IA32,X64
           Build.Flags: ""
           Build.Target: "RELEASE"
+          Build.AgentPool: ""
+          Run.Flags: $(run_flags)
+          Build.ArtifactsBinary: |
+            **/QEMUQ35_*.fd
+
+        QemuQ35_DEBUG_ARM:
+          Build.Package: QemuQ35Pkg
+          Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+          Build.Arch: IA32,X64
+          Build.Flags: ""
+          Build.Target: "DEBUG"
+          Build.AgentPool: ${{ parameters.pool_name }}
+          Run.Flags: $(run_flags)
+          Build.ArtifactsBinary: |
+            **/QEMUQ35_*.fd
+
+        QemuQ35_RELEASE_ARM:
+          Build.Package: QemuQ35Pkg
+          Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+          Build.Arch: IA32,X64
+          Build.Flags: ""
+          Build.Target: "RELEASE"
+          Build.AgentPool: ${{ parameters.pool_name }}
           Run.Flags: $(run_flags)
           Build.ArtifactsBinary: |
             **/QEMUQ35_*.fd
@@ -63,6 +91,7 @@ jobs:
             Build.Arch: AARCH64
             Build.Flags: ""
             Build.Target: "DEBUG"
+            Build.AgentPool: ""
             Run.Flags: $(run_flags)
             Build.ArtifactsBinary: |
               **/QEMU_EFI.fd
@@ -74,6 +103,7 @@ jobs:
             Build.Arch: AARCH64
             Build.Flags: ""
             Build.Target: "RELEASE"
+            Build.AgentPool: ""
             Run.Flags: $(run_flags)
             Build.ArtifactsBinary: |
               **/QEMU_EFI.fd
