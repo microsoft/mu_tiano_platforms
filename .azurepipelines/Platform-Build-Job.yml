@@ -46,6 +46,7 @@ jobs:
           Build.Arch: IA32,X64
           Build.Flags: ""
           Build.Target: "DEBUG"
+          Run: true
           Build.AgentPool: ""
           Run.Flags: $(run_flags)
           Build.ArtifactsBinary: |
@@ -57,6 +58,7 @@ jobs:
           Build.Arch: IA32,X64
           Build.Flags: ""
           Build.Target: "RELEASE"
+          Run: true
           Build.AgentPool: ""
           Run.Flags: $(run_flags)
           Build.ArtifactsBinary: |
@@ -68,6 +70,7 @@ jobs:
           Build.Arch: IA32,X64
           Build.Flags: ""
           Build.Target: "DEBUG"
+          Run: true
           Build.AgentPool: ${{ parameters.pool_name }}
           Run.Flags: $(run_flags)
           Build.ArtifactsBinary: |
@@ -79,6 +82,7 @@ jobs:
           Build.Arch: IA32,X64
           Build.Flags: ""
           Build.Target: "RELEASE"
+          Run: true
           Build.AgentPool: ${{ parameters.pool_name }}
           Run.Flags: $(run_flags)
           Build.ArtifactsBinary: |
@@ -91,6 +95,7 @@ jobs:
             Build.Arch: AARCH64
             Build.Flags: ""
             Build.Target: "DEBUG"
+            Run: true
             Build.AgentPool: ""
             Run.Flags: $(run_flags)
             Build.ArtifactsBinary: |
@@ -103,6 +108,7 @@ jobs:
             Build.Arch: AARCH64
             Build.Flags: ""
             Build.Target: "RELEASE"
+            Run: true
             Build.AgentPool: ""
             Run.Flags: $(run_flags)
             Build.ArtifactsBinary: |
