@@ -169,7 +169,7 @@ jobs:
       clean: true
       fetchDepth: 1
 
-    - template: Steps/SetupPythonPreReqs.yml
+    - template: Steps/SetupPythonPreReqs.yml@mu_devops
       parameters:
         install_python: true
 
