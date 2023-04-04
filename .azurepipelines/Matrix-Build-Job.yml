@@ -54,7 +54,7 @@ jobs:
         Build.Pkgs: 'QemuPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
         Build.ArchList: IA32,X64,AARCH64
-        Build.AgentPool: "${{ parameters.pool_name }}"
+        Build.AgentPool: ${{ parameters.pool_name }}
       TARGET_Q35:
         Build.Pkgs: 'QemuQ35Pkg'
         Build.Targets: 'NO-TARGET'
@@ -64,7 +64,7 @@ jobs:
         Build.Pkgs: 'QemuQ35Pkg'
         Build.Targets: 'NO-TARGET'
         Build.ArchList: IA32,X64
-        Build.AgentPool: "${{ parameters.pool_name }}"
+        Build.AgentPool: ${{ parameters.pool_name }}
       ${{ if eq(parameters.tool_chain_tag, 'GCC5') }}:
         TARGET_SBSA:
           Build.Pkgs: 'QemuSbsaPkg'
