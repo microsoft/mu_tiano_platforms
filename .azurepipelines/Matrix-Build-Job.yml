@@ -99,6 +99,5 @@ jobs:
       do_pr_eval: true
       extra_build_args: ${{ parameters.extra_build_args }}
       extra_install_step: ${{ parameters.extra_install_step }}
-      ${{ if or(eq(parameters.container_image, ''), eq(variables['Build.SelfHostAgent'], 'false')) }}:
-        install_tools: true
+      install_tools: ${{ if or(eq(parameters.container_image, ''), eq(parameters.pool_name, '')) }}:
       tool_chain_tag: ${{ parameters.tool_chain_tag }}

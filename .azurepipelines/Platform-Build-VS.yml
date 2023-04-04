@@ -9,9 +9,9 @@ resources:
   repositories:
     - repository: mu_devops
       type: github
-      endpoint: microsoft
-      name: microsoft/mu_devops
-      ref: main
+      endpoint: kuqin12
+      name: kuqin12/mu_devops
+      ref: test_arm64
 
 variables:
 - group: tool-chain-windows-visual-studio-latest
@@ -21,3 +21,4 @@ jobs:
   parameters:
     tool_chain_tag: $(tool_chain_tag)
     vm_image: $(vm_image)
+    pool_name: $(pool_name)
