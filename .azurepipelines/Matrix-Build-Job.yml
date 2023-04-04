@@ -32,11 +32,11 @@ parameters:
 - name: pool_name
   displayName: Pool Name
   type: string
-  default: ''
+  default: ""
 - name: container_image
   displayName: Container Image
   type: string
-  default: ''
+  default: ""
 
 jobs:
 
@@ -49,28 +49,28 @@ jobs:
         Build.Pkgs: 'QemuPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
         Build.ArchList: IA32,X64,AARCH64
-        Build.AgentPool: ''
-      TARGET_Q35:
-        Build.Pkgs: 'QemuQ35Pkg'
-        Build.Targets: 'NO-TARGET'
-        Build.ArchList: IA32,X64
-        Build.AgentPool: ''
+        Build.AgentPool: ""
       TARGET_QEMU_ARM:
         Build.Pkgs: 'QemuPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
         Build.ArchList: IA32,X64,AARCH64
-        Build.AgentPool: ${{ parameters.pool_name }}
+        Build.AgentPool: "${{ parameters.pool_name }}"
+      TARGET_Q35:
+        Build.Pkgs: 'QemuQ35Pkg'
+        Build.Targets: 'NO-TARGET'
+        Build.ArchList: IA32,X64
+        Build.AgentPool: ""
       TARGET_Q35_ARM:
         Build.Pkgs: 'QemuQ35Pkg'
         Build.Targets: 'NO-TARGET'
         Build.ArchList: IA32,X64
-        Build.AgentPool: ${{ parameters.pool_name }}
+        Build.AgentPool: "${{ parameters.pool_name }}"
       ${{ if eq(parameters.tool_chain_tag, 'GCC5') }}:
         TARGET_SBSA:
           Build.Pkgs: 'QemuSbsaPkg'
           Build.Targets: 'NO-TARGET'
           Build.ArchList: AARCH64
-          Build.AgentPool: ''
+          Build.AgentPool: ""
 
   workspace:
     clean: all
