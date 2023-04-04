@@ -27,6 +27,10 @@ parameters:
   displayName: Container Image
   type: string
   default: ''
+- name: run_timeout
+  displayName: Run Timeout (in minutes)
+  type: number
+  default: 5
 
 jobs:
   - job: PlatformBuild
@@ -70,7 +74,7 @@ jobs:
           Build.Arch: IA32,X64
           Build.Flags: ""
           Build.Target: "DEBUG"
-          Run: true
+          Run: false
           Build.AgentPool: ${{ parameters.pool_name }}
           Run.Flags: $(run_flags)
           Build.ArtifactsBinary: |
@@ -82,7 +86,7 @@ jobs:
           Build.Arch: IA32,X64
           Build.Flags: ""
           Build.Target: "RELEASE"
-          Run: true
+          Run: false
           Build.AgentPool: ${{ parameters.pool_name }}
           Run.Flags: $(run_flags)
           Build.ArtifactsBinary: |
@@ -146,7 +150,7 @@ jobs:
         artifacts_identifier: '$(Build.Package) $(tool_chain_tag) $(Build.Target)'
         artifacts_binary: $(Build.ArtifactsBinary)
 
-  - job: c
+  - job: Run Qemu Builds
     dependsOn: PlatformBuild
     condition: and(succeeded(), ne(${{ parameters.tool_chain_tag }}, 'GCC5'))
     strategy:
@@ -163,7 +167,7 @@ jobs:
     steps:
     - checkout: self
       clean: true
-      shallow: 1
+      fetchDepth: 1
 
     - template: SetupPythonPreReqs.yml
       parameters:
@@ -184,3 +188,8 @@ jobs:
         script: stuart_build -c ${{ parameters.build_file }} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} TARGET=${{ parameters.build_target}} -a ${{ parameters.build_arch}} ${{ parameters.build_flags}} ${{ parameters.run_flags }} --FlashOnly
       condition: and(and(gt(variables.pkg_count, 0), succeeded()), eq(variables['Run'], true))
       timeoutInMinutes: ${{ parameters.run_timeout }}
+
+    # Copy build logs to the artifact staging directory
+    - template: CommonLogCopyAndPublish.yml
+      parameters:
+        artifacts_identifier: $(Build.ArtifactId)
