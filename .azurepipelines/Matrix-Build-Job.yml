@@ -91,11 +91,11 @@ jobs:
     displayName: Evaluate Tool Installation
     name: EvalToolInstall
     inputs:
-    targetType: 'inline'
-    script: |
-      if (('$(Build.AgentPool)' -ne '') -or (${{ parameters.container_image }} -ne '')) {
-        Write-Output "##vso[task.setvariable variable=CONFIG_UPDATED;isOutput=true]True"
-      }
+      targetType: 'inline'
+      script: |
+        if (('$(Build.AgentPool)' -ne '') -or (${{ parameters.container_image }} -ne '')) {
+          Write-Output "##vso[task.setvariable variable=CONFIG_UPDATED;isOutput=true]True"
+        }
 
   - template: Steps/PrGate.yml@mu_devops
     parameters:
