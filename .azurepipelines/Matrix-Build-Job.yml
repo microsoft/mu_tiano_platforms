@@ -86,6 +86,17 @@ jobs:
   - ${{ if and(ne(parameters.container_image, ''), not(contains(parameters.vm_image, 'windows'))) }}:
     - script: echo "##vso[task.prependpath]/home/vsts_azpcontainer/.local/bin"
       displayName: Add User Local Bin to Path
+
+  - task: PowerShell@2
+    displayName: Evaluate Tool Installation
+    name: EvalToolInstall
+    inputs:
+    targetType: 'inline'
+    script: |
+      if (('$(Build.AgentPool)' -ne '') -or (${{ parameters.container_image }} -ne '')) {
+        Write-Output "##vso[task.setvariable variable=CONFIG_UPDATED;isOutput=true]True"
+      }
+
   - template: Steps/PrGate.yml@mu_devops
     parameters:
       artifacts_identifier: '$(Build.Pkgs) $(Build.Targets)'
@@ -99,5 +110,5 @@ jobs:
       do_pr_eval: true
       extra_build_args: ${{ parameters.extra_build_args }}
       extra_install_step: ${{ parameters.extra_install_step }}
-      install_tools: ${{ if or(eq(parameters.container_image, ''), eq(parameters.pool_name, '')) }}:
+      install_tools: $variables['CheckFileUpdate.CONFIG_UPDATED']
       tool_chain_tag: ${{ parameters.tool_chain_tag }}
