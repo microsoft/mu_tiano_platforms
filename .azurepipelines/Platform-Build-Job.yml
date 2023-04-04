@@ -156,10 +156,20 @@ jobs:
     strategy:
       matrix:
         Run_QemuQ35_DEBUG_ARM:
-          Build.ArtifactId: 'Binaries QemuQ35Pkg $(tool_chain_tag) DEBUG'
+          Build.Package: QemuQ35Pkg
+          Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+          Build.Arch: IA32,X64
+          Build.Flags: ""
+          Build.Target: "DEBUG"
+          Build.ArtifactId: 'Binaries $(Build.Package) $(tool_chain_tag) $(Build.Target)'
 
         Run_QemuQ35_RELEASE_ARM:
-          Build.ArtifactId: 'Binaries QemuQ35Pkg $(tool_chain_tag) RELEASE'
+          Build.Package: QemuQ35Pkg
+          Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+          Build.Arch: IA32,X64
+          Build.Flags: ""
+          Build.Target: "RELEASE"
+          Build.ArtifactId: 'Binaries $(Build.Package) $(tool_chain_tag) $(Build.Target)'
 
     pool:
       vmImage: ${{ parameters.vm_image }}
@@ -179,17 +189,17 @@ jobs:
       inputs:
         buildType: 'current'
         artifactName: $(vs_artifact_name)
-        targetPath: '$(Build.ArtifactStagingDirectory)'
+        targetPath: 'Build/$(Build.Package)/$(Build.Target)_$(tool_chain_tag)/FV/'
 
     # Run
     - task: CmdLine@2
       displayName: Run to Shell
       inputs:
-        script: stuart_build -c ${{ parameters.build_file }} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} TARGET=${{ parameters.build_target}} -a ${{ parameters.build_arch}} ${{ parameters.build_flags}} ${{ parameters.run_flags }} --FlashOnly
+        script: stuart_build -c $(Build.File) TOOL_CHAIN_TAG=$(tool_chain_tag) TARGET=$(Build.Target) -a $(Build.Arch) ${{ parameters.build_flags}} variables['run_flags'] --FlashOnly
       condition: and(and(gt(variables.pkg_count, 0), succeeded()), eq(variables['Run'], true))
       timeoutInMinutes: ${{ parameters.run_timeout }}
 
     # Copy build logs to the artifact staging directory
     - template: CommonLogCopyAndPublish.yml
       parameters:
-        artifacts_identifier: $(Build.ArtifactId)
+        artifacts_identifier: 'Binaries $(Build.Package) $(tool_chain_tag) $(Build.Target)'
