@@ -169,7 +169,7 @@ jobs:
       clean: true
       fetchDepth: 1
 
-    - template: SetupPythonPreReqs.yml
+    - template: Steps/SetupPythonPreReqs.yml
       parameters:
         install_python: true
 
