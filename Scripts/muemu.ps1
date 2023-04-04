@@ -153,5 +153,8 @@ if ($SerialPort -ne "") {
 # Start the QEMU process
 #
 
-Write-Output $ArgumentList
+if ($Verbose) {
+  Write-Output $ArgumentList
+}
+
 Start-Process -FilePath $QemuCommand -ArgumentList $ArgumentList -NoNewWindow -Wait
