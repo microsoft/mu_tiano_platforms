@@ -95,6 +95,8 @@ jobs:
       script: |
         if (('$(Build.AgentPool)' -ne '') -or (${{ parameters.container_image }} -ne '')) {
           Write-Output "##vso[task.setvariable variable=CONFIG_UPDATED;isOutput=true]True"
+        } else {
+          Write-Output "##vso[task.setvariable variable=CONFIG_UPDATED;isOutput=true]False"
         }
 
   - template: Steps/PrGate.yml@mu_devops
