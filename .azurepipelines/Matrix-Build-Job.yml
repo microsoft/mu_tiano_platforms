@@ -99,5 +99,8 @@ jobs:
       do_pr_eval: true
       extra_build_args: ${{ parameters.extra_build_args }}
       extra_install_step: ${{ parameters.extra_install_step }}
-      install_tools: and(eq(${{ parameters.container_image }}, ''), eq(variables['Build.AgentPool'], ''))
+      ${{ eq(parameters.container_image, '') }}:
+        install_tools: eq(variables['Build.AgentPool'], '')
+      ${{ else }}:
+        install_tools: 'false'
       tool_chain_tag: ${{ parameters.tool_chain_tag }}
