@@ -145,3 +145,42 @@ jobs:
           install_tools: 'false'
         artifacts_identifier: '$(Build.Package) $(tool_chain_tag) $(Build.Target)'
         artifacts_binary: $(Build.ArtifactsBinary)
+
+  - job: c
+    dependsOn: PlatformBuild
+    condition: and(succeeded(), ne(${{ parameters.tool_chain_tag }}, 'GCC5'))
+    strategy:
+      matrix:
+        Run_QemuQ35_DEBUG_ARM:
+          Build.ArtifactId: 'Binaries QemuQ35Pkg $(tool_chain_tag) DEBUG'
+
+        Run_QemuQ35_RELEASE_ARM:
+          Build.ArtifactId: 'Binaries QemuQ35Pkg $(tool_chain_tag) RELEASE'
+
+    pool:
+      vmImage: ${{ parameters.vm_image }}
+
+    steps:
+    - checkout: self
+      clean: true
+      shallow: 1
+
+    - template: SetupPythonPreReqs.yml
+      parameters:
+        install_python: true
+
+    - task: DownloadPipelineArtifact@2
+      name: DownloadVisualStudioArtifacts
+      displayName: Download Visual Studio Artifacts
+      inputs:
+        buildType: 'current'
+        artifactName: $(vs_artifact_name)
+        targetPath: '$(Build.ArtifactStagingDirectory)'
+
+    # Run
+    - task: CmdLine@2
+      displayName: Run to Shell
+      inputs:
+        script: stuart_build -c ${{ parameters.build_file }} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} TARGET=${{ parameters.build_target}} -a ${{ parameters.build_arch}} ${{ parameters.build_flags}} ${{ parameters.run_flags }} --FlashOnly
+      condition: and(and(gt(variables.pkg_count, 0), succeeded()), eq(variables['Run'], true))
+      timeoutInMinutes: ${{ parameters.run_timeout }}
