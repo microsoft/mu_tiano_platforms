@@ -44,29 +44,29 @@ jobs:
     strategy:
       matrix:
 
-        # QemuQ35_DEBUG:
-        #   Build.Package: QemuQ35Pkg
-        #   Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-        #   Build.Arch: IA32,X64
-        #   Build.Flags: ""
-        #   Build.Target: "DEBUG"
-        #   Run: true
-        #   Build.AgentPool: ""
-        #   Run.Flags: ${{ parameters.run_flags }}
-        #   Build.ArtifactsBinary: |
-        #     **/QEMUQ35_*.fd
+        QemuQ35_DEBUG:
+          Build.Package: QemuQ35Pkg
+          Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+          Build.Arch: IA32,X64
+          Build.Flags: ""
+          Build.Target: "DEBUG"
+          Run: true
+          Build.AgentPool: ""
+          Run.Flags: ${{ parameters.run_flags }}
+          Build.ArtifactsBinary: |
+            **/QEMUQ35_*.fd
 
-        # QemuQ35_RELEASE:
-        #   Build.Package: QemuQ35Pkg
-        #   Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-        #   Build.Arch: IA32,X64
-        #   Build.Flags: ""
-        #   Build.Target: "RELEASE"
-        #   Run: true
-        #   Build.AgentPool: ""
-        #   Run.Flags: ${{ parameters.run_flags }}
-        #   Build.ArtifactsBinary: |
-        #     **/QEMUQ35_*.fd
+        QemuQ35_RELEASE:
+          Build.Package: QemuQ35Pkg
+          Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+          Build.Arch: IA32,X64
+          Build.Flags: ""
+          Build.Target: "RELEASE"
+          Run: true
+          Build.AgentPool: ""
+          Run.Flags: ${{ parameters.run_flags }}
+          Build.ArtifactsBinary: |
+            **/QEMUQ35_*.fd
 
         QemuQ35_DEBUG_ARM:
           Build.Package: QemuQ35Pkg
