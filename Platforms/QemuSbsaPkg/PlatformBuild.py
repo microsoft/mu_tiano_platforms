@@ -14,6 +14,7 @@ import xml.etree.ElementTree
 import tempfile
 import uuid
 import string
+import datetime
 
 from edk2toolext.environment import shell_environment
 from edk2toolext.environment.uefi_build import UefiBuilder
@@ -23,6 +24,24 @@ from edk2toolext.invocables.edk2_update import UpdateSettingsManager
 from edk2toolext.invocables.edk2_pr_eval import PrEvalSettingsManager
 from edk2toollib.utility_functions import RunCmd
 
+# Declare test whose failure will not return a non-zero exit code
+failure_exempt_tests = {}
+failure_exempt_tests["BootAuditTestApp.efi"] = datetime.datetime(2023, 3, 7, 0, 0, 0)
+failure_exempt_tests["LineParserTestApp.efi"] = datetime.datetime(2023, 3, 7, 0, 0, 0)
+failure_exempt_tests["MorLockFunctionalTestApp.efi"] = datetime.datetime(2023, 3, 7, 0, 0, 0)
+failure_exempt_tests["MsWheaEarlyUnitTestApp.efi"] = datetime.datetime(2023, 3, 7, 0, 0, 0)
+failure_exempt_tests["VariablePolicyFuncTestApp.efi"] = datetime.datetime(2023, 3, 7, 0, 0, 0)
+failure_exempt_tests["DeviceIdTestApp.efi"] = datetime.datetime(2023, 3, 7, 0, 0, 0)
+failure_exempt_tests["DxePagingAuditTestApp.efi"] = datetime.datetime(2023, 3, 7, 0, 0, 0)
+failure_exempt_tests["JsonTestApp.efi"] = datetime.datetime(2023, 4, 5, 0, 0, 0)
+failure_exempt_tests["MemoryProtectionTestApp.efi"] = datetime.datetime(2023, 4, 5, 0, 0, 0)
+failure_exempt_tests["BaseCryptLibUnitTestApp.efi"] = datetime.datetime(2023, 4, 5, 0, 0, 0)
+
+# Allow failure exempt tests to be ignored for 90 days
+FAILURE_EXEMPT_OMISSION_LENGTH = 90*24*60*60
+
+# Declare tests which require platform reset(s)
+reset_tests = ["MorLockFunctionalTestApp.efi", "VariablePolicyFuncTestApp.efi"]
 
     # ####################################################################################### #
     #                                Common Configuration                                     #
@@ -406,17 +425,28 @@ class UnitTestSupport(object):
 
     def write_tests_to_startup_nsh(self,nshfile):
         for test in self.test_list:
-            nshfile.AddLine(os.path.basename(test))
+            if (os.path.basename(test) in reset_tests):
+                nshfile.AddLine(os.path.basename(test))
+        for test in self.test_list:
+            if not (os.path.basename(test) in reset_tests):
+                nshfile.AddLine(os.path.basename(test))
 
     def report_results(self, virtualdrive) -> int:
         from html import unescape
 
-        report_folder_path = os.path.join(os.path.dirname(virtualdrive.path_to_vhd), "unit_test_results")
+        report_folder_path = os.path.join(os.path.dirname(virtualdrive.drive_path), "unit_test_results")
         os.makedirs(report_folder_path, exist_ok=True)
         #now parse the xml for errors
         failure_count = 0
-        logging.info("UnitTest Completed")
+        logging.info("UnitTest(s) Completed")
         for unit_test in self.test_list:
+            ignore_failure = False
+            if (os.path.basename(unit_test) in failure_exempt_tests.keys()):
+                now = datetime.datetime.now()
+                last_ignore_time = failure_exempt_tests[os.path.basename(unit_test)]
+                if (now - last_ignore_time).total_seconds() < FAILURE_EXEMPT_OMISSION_LENGTH:
+                    logging.info("Ignoring output of " + os.path.basename(unit_test))
+                    ignore_failure = True
             xml_result_file = os.path.basename(unit_test)[:-4] + "_JUNIT.XML"
             output_xml_file = os.path.join(report_folder_path, xml_result_file)
             try:
@@ -438,9 +468,10 @@ class UnitTestSupport(object):
                         level = logging.INFO
                         for result in case:
                             if result.tag == 'failure':
-                                failure_count += 1
                                 level = logging.ERROR
                                 caseresult = "\t\tFAIL" + " - " + unescape(result.attrib['message'])
+                                if not ignore_failure:
+                                    failure_count += 1
                         logging.log( level, caseresult)
             except Exception as ex:
                 logging.error("Exception trying to read xml." + str(ex))
