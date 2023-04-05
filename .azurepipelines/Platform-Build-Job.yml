@@ -150,7 +150,8 @@ jobs:
         artifacts_identifier: '$(Build.Package) $(tool_chain_tag) $(Build.Target)'
         artifacts_binary: $(Build.ArtifactsBinary)
 
-  - job: Run Qemu Builds
+  - job: RunQemuBuilds
+    displayName: Run Qemu Builds
     dependsOn: PlatformBuild
     condition: and(succeeded(), ne(variables['tool_chain_tag'], 'GCC5'))
     strategy:
