@@ -32,13 +32,13 @@ parameters:
   type: number
   default: 5
 
+variables:
+  - name: run_flags
+    value: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp.efi RUN_TESTS=TRUE"
+
 jobs:
   - job: PlatformBuild
     displayName: Build Platforms
-
-    variables:
-      - name: run_flags
-        value: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp.efi RUN_TESTS=TRUE"
 
     # Use matrix to speed up the build process
     strategy:
