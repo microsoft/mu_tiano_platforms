@@ -30,7 +30,7 @@ parameters:
 - name: run_timeout
   displayName: Run Timeout (in minutes)
   type: number
-  default: 5
+  default: 25
 - name: run_flags
   displayName: Run script flag
   type: string
@@ -144,7 +144,7 @@ jobs:
         build_file: $(Build.File)
         build_flags: $(Build.Flags)
         run_flags: $(Run.Flags)
-        run_timeout: 25
+        run_timeout: ${{ parameters.run_timeout }}
         extra_install_step: ${{ parameters.extra_install_step }}
         ${{ if eq(parameters.container_image, '') }}:
           install_tools: eq(variables['Build.AgentPool'], '')
