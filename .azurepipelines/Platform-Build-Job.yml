@@ -152,7 +152,7 @@ jobs:
 
   - job: Run Qemu Builds
     dependsOn: PlatformBuild
-    condition: and(succeeded(), ne(${{ parameters.tool_chain_tag }}, 'GCC5'))
+    condition: and(succeeded(), ne(variables['tool_chain_tag'], 'GCC5'))
     strategy:
       matrix:
         Run_QemuQ35_DEBUG_ARM:
