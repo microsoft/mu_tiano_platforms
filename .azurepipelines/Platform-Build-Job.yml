@@ -188,6 +188,13 @@ jobs:
     - powershell:
         Write-Host "##vso[task.setvariable variable=pkg_count]${{ 1 }}"
 
+    # Setup repo
+    - task: CmdLine@2
+      displayName: Setup
+      inputs:
+        script: stuart_setup -c $(Build.File) TOOL_CHAIN_TAG=$(tool_chain_tag) -t $(Build.Target) -a $(Build.Arch) $(Build.Flags)
+      condition: and(gt(variables.pkg_count, 0), succeeded())
+
     # Stuart Update
     - task: CmdLine@2
       displayName: Update
