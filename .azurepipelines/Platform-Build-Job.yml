@@ -186,7 +186,7 @@ jobs:
 
     # Set default
     - powershell:
-      Write-Host "##vso[task.setvariable variable=pkg_count]${{ 1 }}"
+        Write-Host "##vso[task.setvariable variable=pkg_count]${{ 1 }}"
 
     - task: DownloadPipelineArtifact@2
       name: DownloadVisualStudioArtifacts
