@@ -200,6 +200,6 @@ jobs:
       timeoutInMinutes: ${{ parameters.run_timeout }}
 
     # Copy build logs to the artifact staging directory
-    - template: CommonLogCopyAndPublish.yml
+    - template: Steps/CommonLogCopyAndPublish.yml@mu_devops
       parameters:
         artifacts_identifier: 'Binaries $(Build.Package) $(tool_chain_tag) $(Build.Target)'
