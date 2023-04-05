@@ -192,7 +192,7 @@ jobs:
     - task: CmdLine@2
       displayName: Setup
       inputs:
-        script: git submodule update --init --depth 1 MU_BASECORE
+        script: git submodule update --init --depth 1
       condition: and(gt(variables.pkg_count, 0), succeeded())
 
     # Stuart Update
