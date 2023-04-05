@@ -34,7 +34,7 @@ parameters:
 - name: run_flags
   displayName: Run script flag
   type: string
-  default: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp.efi RUN_TESTS=TRUE"
+  default: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
 
 jobs:
   - job: PlatformBuild
@@ -144,6 +144,7 @@ jobs:
         build_file: $(Build.File)
         build_flags: $(Build.Flags)
         run_flags: $(Run.Flags)
+        run_timeout: 25
         extra_install_step: ${{ parameters.extra_install_step }}
         ${{ if eq(parameters.container_image, '') }}:
           install_tools: eq(variables['Build.AgentPool'], '')
