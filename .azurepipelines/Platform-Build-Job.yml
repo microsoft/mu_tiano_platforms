@@ -192,7 +192,7 @@ jobs:
     - task: CmdLine@2
       displayName: Setup
       inputs:
-        script: stuart_setup -c $(Build.File) TOOL_CHAIN_TAG=$(tool_chain_tag) -t $(Build.Target) -a $(Build.Arch) $(Build.Flags)
+        script: git submodule update --init --depth 1 MU_BASECORE
       condition: and(gt(variables.pkg_count, 0), succeeded())
 
     # Stuart Update
