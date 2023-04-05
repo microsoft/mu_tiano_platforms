@@ -31,10 +31,10 @@ parameters:
   displayName: Run Timeout (in minutes)
   type: number
   default: 5
-
-variables:
-  - name: run_flags
-    value: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp.efi RUN_TESTS=TRUE"
+- name: run_flags
+  displayName: Run script flag
+  type: number
+  default: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp.efi RUN_TESTS=TRUE"
 
 jobs:
   - job: PlatformBuild
@@ -52,7 +52,7 @@ jobs:
         #   Build.Target: "DEBUG"
         #   Run: true
         #   Build.AgentPool: ""
-        #   Run.Flags: $(run_flags)
+        #   Run.Flags: ${{ parameters.run_flags }}
         #   Build.ArtifactsBinary: |
         #     **/QEMUQ35_*.fd
 
@@ -64,7 +64,7 @@ jobs:
         #   Build.Target: "RELEASE"
         #   Run: true
         #   Build.AgentPool: ""
-        #   Run.Flags: $(run_flags)
+        #   Run.Flags: ${{ parameters.run_flags }}
         #   Build.ArtifactsBinary: |
         #     **/QEMUQ35_*.fd
 
@@ -76,7 +76,7 @@ jobs:
           Build.Target: "DEBUG"
           Run: false
           Build.AgentPool: ${{ parameters.pool_name }}
-          Run.Flags: $(run_flags)
+          Run.Flags: ${{ parameters.run_flags }}
           Build.ArtifactsBinary: |
             **/QEMUQ35_*.fd
 
@@ -88,7 +88,7 @@ jobs:
         #   Build.Target: "RELEASE"
         #   Run: false
         #   Build.AgentPool: ${{ parameters.pool_name }}
-        #   Run.Flags: $(run_flags)
+        #   Run.Flags: ${{ parameters.run_flags }}
         #   Build.ArtifactsBinary: |
         #     **/QEMUQ35_*.fd
 
@@ -101,7 +101,7 @@ jobs:
         #     Build.Target: "DEBUG"
         #     Run: true
         #     Build.AgentPool: ""
-        #     Run.Flags: $(run_flags)
+        #     Run.Flags: ${{ parameters.run_flags }}
         #     Build.ArtifactsBinary: |
         #       **/QEMU_EFI.fd
         #       **/SECURE_FLASH0.fd
@@ -114,7 +114,7 @@ jobs:
         #     Build.Target: "RELEASE"
         #     Run: true
         #     Build.AgentPool: ""
-        #     Run.Flags: $(run_flags)
+        #     Run.Flags: ${{ parameters.run_flags }}
         #     Build.ArtifactsBinary: |
         #       **/QEMU_EFI.fd
         #       **/SECURE_FLASH0.fd
@@ -217,7 +217,7 @@ jobs:
     - task: CmdLine@2
       displayName: Run to Shell
       inputs:
-        script: stuart_build -c $(Build.File) TOOL_CHAIN_TAG=$(tool_chain_tag) TARGET=$(Build.Target) -a $(Build.Arch) $(Build.Flags) variables['run_flags'] --FlashOnly
+        script: stuart_build -c $(Build.File) TOOL_CHAIN_TAG=$(tool_chain_tag) TARGET=$(Build.Target) -a $(Build.Arch) $(Build.Flags) ${{ parameters.run_flags }} --FlashOnly
       condition: and(gt(variables.pkg_count, 0), succeeded())
       timeoutInMinutes: ${{ parameters.run_timeout }}
 
