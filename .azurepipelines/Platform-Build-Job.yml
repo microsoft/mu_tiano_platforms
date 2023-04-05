@@ -184,6 +184,10 @@ jobs:
       parameters:
         install_python: true
 
+    # Set default
+    - powershell:
+      Write-Host "##vso[task.setvariable variable=pkg_count]${{ 1 }}"
+
     - task: DownloadPipelineArtifact@2
       name: DownloadVisualStudioArtifacts
       displayName: Download Visual Studio Artifacts
@@ -200,7 +204,7 @@ jobs:
       displayName: Run to Shell
       inputs:
         script: stuart_build -c $(Build.File) TOOL_CHAIN_TAG=$(tool_chain_tag) TARGET=$(Build.Target) -a $(Build.Arch) $(Build.Flags) variables['run_flags'] --FlashOnly
-      condition: and(succeeded(), eq(variables['Run'], true))
+      condition: and(gt(variables.pkg_count, 0), succeeded())
       timeoutInMinutes: ${{ parameters.run_timeout }}
 
     # Copy build logs to the artifact staging directory
