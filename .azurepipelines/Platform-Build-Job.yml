@@ -33,7 +33,7 @@ parameters:
   default: 5
 - name: run_flags
   displayName: Run script flag
-  type: number
+  type: string
   default: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp.efi RUN_TESTS=TRUE"
 
 jobs:
