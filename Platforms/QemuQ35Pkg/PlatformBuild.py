@@ -13,6 +13,7 @@ import datetime
 import xml.etree.ElementTree
 import tempfile
 import uuid
+import string
 
 from edk2toolext.environment import shell_environment
 from edk2toolext.environment.uefi_build import UefiBuilder
@@ -314,60 +315,43 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         output_base = self.env.GetValue("BUILD_OUTPUT_BASE")
         shutdown_after_run = (self.env.GetValue("SHUTDOWN_AFTER_RUN", "FALSE").upper() == "TRUE")
         empty_drive = (self.env.GetValue("EMPTY_DRIVE", "FALSE").upper() == "TRUE")
+        test_regex = self.env.GetValue("TEST_REGEX", "")
 
         if os.name == 'nt':
             VirtualDrivePath = self.env.GetValue("VIRTUAL_DRIVE_PATH", os.path.join(output_base, "VirtualDrive.vhd"))
-            VirtualDrive = VirtualDriveManager(VirtualDrivePath, self.env)
-            self.env.SetValue("VIRTUAL_DRIVE_PATH", VirtualDrivePath, "Set Virtual Drive path in case not set")
-            ut = UnitTestSupport(os.path.join(output_base, "X64"))
-
-            if empty_drive and os.path.isfile(VirtualDrivePath):
-                    os.remove(VirtualDrivePath)
-
-            if not os.path.isfile(VirtualDrivePath):
-                VirtualDrive.MakeDrive()
-
-            test_regex = self.env.GetValue("TEST_REGEX", "")
-
-            if test_regex != "":
-                ut.set_test_regex(test_regex)
-                ut.find_tests()
-                ut.copy_tests_to_virtual_drive(VirtualDrive)
-
-            if run_tests:
-                if test_regex == "":
-                    logging.warning("No tests specified using TEST_REGEX flag but RUN_TESTS is TRUE")
-                elif not empty_drive:
-                    logging.info("EMPTY_DRIVE=FALSE. This could impact your test results")
-
-                if not shutdown_after_run:
-                    logging.info("SHUTDOWN_AFTER_RUN=FALSE (default). XML test results will not be \
-                        displayed until after the QEMU instance ends")
-                ut.write_tests_to_startup_nsh(startup_nsh)
-
-            nshpath = os.path.join(output_base, "startup.nsh")
-            startup_nsh.WriteOut(nshpath, shutdown_after_run)
-
-            VirtualDrive.AddFile(nshpath)
-
+            VirtualDrive = WindowsVirtualDriveManager(VirtualDrivePath, self.env)
         else:
-            VirtualDrivePath = self.env.GetValue("VIRTUAL_DRIVE_PATH", os.path.join(output_base, "VirtualDrive"))
-            logging.warning("Linux currently isn't supported for the virtual drive. Falling back to an older method")
+            VirtualDrivePath = self.env.GetValue("VIRTUAL_DRIVE_PATH", os.path.join(output_base, "VirtualDrive.img"))
+            VirtualDrive = LinuxVirtualDriveManager (VirtualDrivePath)
 
-            test_regex = self.env.GetValue("TEST_REGEX", "")
+        self.env.SetValue("VIRTUAL_DRIVE_PATH", VirtualDrivePath, "Set Virtual Drive path in case not set")
 
-            if run_tests:
-                logging.critical("Linux doesn't support running unit tests due to lack of VHD support")
+        if empty_drive and os.path.isfile(VirtualDrivePath):
+            os.remove(VirtualDrivePath)
 
-            if os.path.exists(VirtualDrivePath) and empty_drive:
-                shutil.rmtree(VirtualDrivePath)
+        if not os.path.isfile(VirtualDrivePath):
+            VirtualDrive.MakeDrive()
 
-            if not os.path.exists(VirtualDrivePath):
-                os.makedirs(VirtualDrivePath)
+        ut = UnitTestSupport(os.path.join(output_base, "X64"))
+        if test_regex != "":
+            ut.set_test_regex(test_regex)
+            ut.find_tests()
+            ut.copy_tests_to_virtual_drive(VirtualDrive)
 
-            nshpath = os.path.join(VirtualDrivePath, "startup.nsh")
-            self.env.SetValue("VIRTUAL_DRIVE_PATH", VirtualDrivePath, "Set Virtual Drive path in case not set")
-            startup_nsh.WriteOut(nshpath, shutdown_after_run)
+        if run_tests:
+            if test_regex == "":
+                logging.warning("No tests specified using TEST_REGEX flag but RUN_TESTS is TRUE")
+            elif not empty_drive:
+                logging.info("EMPTY_DRIVE=FALSE. This could impact your test results")
+
+            if not shutdown_after_run:
+                logging.info("SHUTDOWN_AFTER_RUN=FALSE (default). XML test results will not be \
+                    displayed until after the QEMU instance ends")
+            ut.write_tests_to_startup_nsh(startup_nsh)
+
+        nshpath = os.path.join(output_base, "startup.nsh")
+        startup_nsh.WriteOut(nshpath, shutdown_after_run)
+        VirtualDrive.AddFile(nshpath)
 
         ret = self.Helper.QemuRun(self.env)
         if ret != 0:
@@ -375,7 +359,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             return ret
 
         failures = 0
-        if run_tests and os.name == 'nt':
+        if run_tests:
             failures = ut.report_results(VirtualDrive)
 
         # do stuff with unit test results here
@@ -412,7 +396,7 @@ class UnitTestSupport(object):
     def report_results(self, virtualdrive) -> int:
         from html import unescape
 
-        report_folder_path = os.path.join(os.path.dirname(virtualdrive.path_to_vhd), "unit_test_results")
+        report_folder_path = os.path.join(os.path.dirname(virtualdrive.drive_path), "unit_test_results")
         os.makedirs(report_folder_path, exist_ok=True)
         #now parse the xml for errors
         failure_count = 0
@@ -458,19 +442,19 @@ class UnitTestSupport(object):
 
 
 
-class VirtualDriveManager(object):
+class WindowsVirtualDriveManager(object):
 
     def __init__(self, vhd_path:os.PathLike, env:object):
-        self.path_to_vhd = os.path.abspath(vhd_path)
+        self.drive_path = os.path.abspath(vhd_path)
         self._env = env
 
     def MakeDrive(self, size: int=60):
-        ret = RunCmd("VHDCreate", f'-sz {size}MB {self.path_to_vhd}')
+        ret = RunCmd("VHDCreate", f'-sz {size}MB {self.drive_path}')
         if ret != 0:
             logging.error("Failed to create VHD")
             return ret
 
-        ret = RunCmd("DiskFormat", f"-ft fat -ptt bios {self.path_to_vhd}")
+        ret = RunCmd("DiskFormat", f"-ft fat -ptt bios {self.drive_path}")
         if ret != 0:
             logging.error("Failed to format VHD")
             return ret
@@ -478,7 +462,7 @@ class VirtualDriveManager(object):
 
     def AddFile(self, HostFilePath:os.PathLike):
         file_name = os.path.basename(HostFilePath)
-        ret = RunCmd("FileInsert", f"{HostFilePath} {file_name} {self.path_to_vhd}")
+        ret = RunCmd("FileInsert", f"{HostFilePath} {file_name} {self.drive_path}")
         return ret
 
     def GetFileContent(self, VirtualFilePath, HostFilePath: os.PathLike=None):
@@ -493,9 +477,63 @@ class VirtualDriveManager(object):
             return f.read()
 
     def ExtractFile(self, VirtualFilePath, HostFilePath:os.PathLike):
-        ret = RunCmd("FileExtract", f"{VirtualFilePath} {HostFilePath} {self.path_to_vhd}")
+        ret = RunCmd("FileExtract", f"{VirtualFilePath} {HostFilePath} {self.drive_path}")
         return ret
 
+class LinuxVirtualDriveManager(object):
+
+    def __init__(self, img_path:os.PathLike):
+        self.drive_path = os.path.abspath(img_path)
+        self.drive_letter = self.find_unused_drive_letter()
+
+    def find_unused_drive_letter(self):
+        for drive_letter in string.ascii_lowercase:
+            mtab_content = os.popen(f"grep -i '/mnt/{drive_letter} ' /etc/mtab").read()
+            if mtab_content:
+                continue
+            return drive_letter
+
+        raise ValueError("No unused drive letters available")
+
+    def MakeDrive(self, size: int=60):
+        # Create an image
+        ret = RunCmd("dd", f"if=/dev/zero of={self.drive_path} bs=1M count={size}")
+        if ret != 0:
+            logging.error("Failed to create IMG")
+            return ret
+        
+        # Format the image as FAT32
+        ret = RunCmd("mkfs.vfat", f"{self.drive_path}")
+        if ret != 0:
+            logging.error("Failed to format IMG")
+            return ret
+        
+        # Create an mtools config file to virtually map the image to a drive letter
+        RunCmd("echo", "mtools_skip_check=1 > ~/.mtoolsrc")
+        RunCmd("echo", f"drive {self.drive_letter}: >> ~/.mtoolsrc")
+        RunCmd("echo", f"\"  file=\\\"{self.drive_path}\\\" exclusive\" >> ~/.mtoolsrc")
+
+        return 0
+
+    def AddFile(self, HostFilePath:os.PathLike):
+        ret = RunCmd("mcopy", f"-n -i {self.drive_path} {HostFilePath} {self.drive_letter}:")
+        return ret
+
+    def GetFileContent(self, VirtualFilePath, HostFilePath: os.PathLike=None):
+        temp_extract_path = HostFilePath
+        if temp_extract_path == None:
+            temp_extract_path = tempfile.mktemp()
+        logging.info(f"Extracting {VirtualFilePath} to {temp_extract_path}")
+        full_path = os.path.join(self.drive_letter + ":", VirtualFilePath)
+        ret = self.ExtractFile(full_path, temp_extract_path)
+        if ret != 0:
+            raise FileNotFoundError(VirtualFilePath)
+        with open(temp_extract_path, "rb") as f:
+            return f.read()
+
+    def ExtractFile(self, VirtualFilePath, HostFilePath:os.PathLike):
+        ret = RunCmd("mcopy", f"-n -i {self.drive_path} {VirtualFilePath} {HostFilePath}")
+        return ret
 
 class StartUpScriptManager(object):
 
