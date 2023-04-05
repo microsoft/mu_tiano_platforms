@@ -81,45 +81,45 @@ jobs:
             **/QEMUQ35_*.fd
             **/*/*TestApp.efi
 
-        # QemuQ35_RELEASE_ARM:
-        #   Build.Package: QemuQ35Pkg
-        #   Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-        #   Build.Arch: IA32,X64
-        #   Build.Flags: ""
-        #   Build.Target: "RELEASE"
-        #   Run: false
-        #   Build.AgentPool: ${{ parameters.pool_name }}
-        #   Run.Flags: ${{ parameters.run_flags }}
-        #   Build.ArtifactsBinary: |
-        #     **/QEMUQ35_*.fd
-        #     **/*/*TestApp.efi
+        QemuQ35_RELEASE_ARM:
+          Build.Package: QemuQ35Pkg
+          Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+          Build.Arch: IA32,X64
+          Build.Flags: ""
+          Build.Target: "RELEASE"
+          Run: false
+          Build.AgentPool: ${{ parameters.pool_name }}
+          Run.Flags: ${{ parameters.run_flags }}
+          Build.ArtifactsBinary: |
+            **/QEMUQ35_*.fd
+            **/*/*TestApp.efi
 
-        # ${{ if eq(parameters.tool_chain_tag, 'GCC5') }}:
-        #   QemuSbsa_DEBUG:
-        #     Build.Package: QemuSbsaPkg
-        #     Build.File: "Platforms/QemuSbsaPkg/PlatformBuild.py"
-        #     Build.Arch: AARCH64
-        #     Build.Flags: ""
-        #     Build.Target: "DEBUG"
-        #     Run: true
-        #     Build.AgentPool: ""
-        #     Run.Flags: ${{ parameters.run_flags }}
-        #     Build.ArtifactsBinary: |
-        #       **/QEMU_EFI.fd
-        #       **/SECURE_FLASH0.fd
+        ${{ if eq(parameters.tool_chain_tag, 'GCC5') }}:
+          QemuSbsa_DEBUG:
+            Build.Package: QemuSbsaPkg
+            Build.File: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+            Build.Arch: AARCH64
+            Build.Flags: ""
+            Build.Target: "DEBUG"
+            Run: true
+            Build.AgentPool: ""
+            Run.Flags: ${{ parameters.run_flags }}
+            Build.ArtifactsBinary: |
+              **/QEMU_EFI.fd
+              **/SECURE_FLASH0.fd
 
-        #   QemuSbsa_RELEASE:
-        #     Build.Package: QemuSbsaPkg
-        #     Build.File: "Platforms/QemuSbsaPkg/PlatformBuild.py"
-        #     Build.Arch: AARCH64
-        #     Build.Flags: ""
-        #     Build.Target: "RELEASE"
-        #     Run: true
-        #     Build.AgentPool: ""
-        #     Run.Flags: ${{ parameters.run_flags }}
-        #     Build.ArtifactsBinary: |
-        #       **/QEMU_EFI.fd
-        #       **/SECURE_FLASH0.fd
+          QemuSbsa_RELEASE:
+            Build.Package: QemuSbsaPkg
+            Build.File: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+            Build.Arch: AARCH64
+            Build.Flags: ""
+            Build.Target: "RELEASE"
+            Run: true
+            Build.AgentPool: ""
+            Run.Flags: ${{ parameters.run_flags }}
+            Build.ArtifactsBinary: |
+              **/QEMU_EFI.fd
+              **/SECURE_FLASH0.fd
 
     workspace:
       clean: all
@@ -167,13 +167,13 @@ jobs:
           Build.Target: "DEBUG"
           Build.ArtifactId: 'Binaries $(Build.Package) $(tool_chain_tag) $(Build.Target)'
 
-        # Run_QemuQ35_RELEASE_ARM:
-        #   Build.Package: QemuQ35Pkg
-        #   Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-        #   Build.Arch: IA32,X64
-        #   Build.Flags: ""
-        #   Build.Target: "RELEASE"
-        #   Build.ArtifactId: 'Binaries $(Build.Package) $(tool_chain_tag) $(Build.Target)'
+        Run_QemuQ35_RELEASE_ARM:
+          Build.Package: QemuQ35Pkg
+          Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+          Build.Arch: IA32,X64
+          Build.Flags: ""
+          Build.Target: "RELEASE"
+          Build.ArtifactId: 'Binaries $(Build.Package) $(tool_chain_tag) $(Build.Target)'
 
     pool:
       vmImage: ${{ parameters.vm_image }}
