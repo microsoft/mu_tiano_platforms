@@ -188,6 +188,16 @@ jobs:
     - powershell:
         Write-Host "##vso[task.setvariable variable=pkg_count]${{ 1 }}"
 
+    # Stuart Update
+    - task: CmdLine@2
+      displayName: Update
+      inputs:
+        script: stuart_update -c $(Build.File) TOOL_CHAIN_TAG=$(tool_chain_tag) -t $(Build.Target) -a $(Build.Arch) $(Build.Flags)
+      condition: and(gt(variables.pkg_count, 0), succeeded())
+
+    # Potential Extra steps
+    - ${{ parameters.extra_install_step }}
+
     - task: DownloadPipelineArtifact@2
       name: DownloadVisualStudioArtifacts
       displayName: Download Visual Studio Artifacts
@@ -195,9 +205,6 @@ jobs:
         buildType: 'current'
         artifactName: $(Build.ArtifactId)
         targetPath: 'Build/$(Build.Package)/$(Build.Target)_$(tool_chain_tag)/FV/'
-
-    # Potential Extra steps
-    - ${{ parameters.extra_install_step }}
 
     # Run
     - task: CmdLine@2
