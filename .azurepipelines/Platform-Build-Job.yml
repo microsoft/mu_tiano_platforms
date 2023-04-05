@@ -42,6 +42,7 @@ jobs:
           Build.Arch: IA32,X64
           Build.Flags: ""
           Build.Target: "DEBUG"
+          Run: true
           Run.Flags: $(run_flags)
           Build.ArtifactsBinary: |
             **/QEMUQ35_*.fd
@@ -52,6 +53,7 @@ jobs:
           Build.Arch: IA32,X64
           Build.Flags: ""
           Build.Target: "RELEASE"
+          Run: true
           Run.Flags: $(run_flags)
           Build.ArtifactsBinary: |
             **/QEMUQ35_*.fd
@@ -63,6 +65,7 @@ jobs:
             Build.Arch: AARCH64
             Build.Flags: ""
             Build.Target: "DEBUG"
+            Run: true
             Run.Flags: $(run_flags)
             Build.ArtifactsBinary: |
               **/QEMU_EFI.fd
@@ -74,6 +77,7 @@ jobs:
             Build.Arch: AARCH64
             Build.Flags: ""
             Build.Target: "RELEASE"
+            Run: true
             Run.Flags: $(run_flags)
             Build.ArtifactsBinary: |
               **/QEMU_EFI.fd
