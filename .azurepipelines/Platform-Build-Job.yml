@@ -200,7 +200,7 @@ jobs:
       displayName: Run to Shell
       inputs:
         script: stuart_build -c $(Build.File) TOOL_CHAIN_TAG=$(tool_chain_tag) TARGET=$(Build.Target) -a $(Build.Arch) $(Build.Flags) variables['run_flags'] --FlashOnly
-      condition: and(and(gt(variables.pkg_count, 0), succeeded()), eq(variables['Run'], true))
+      condition: and(succeeded(), eq(variables['Run'], true))
       timeoutInMinutes: ${{ parameters.run_timeout }}
 
     # Copy build logs to the artifact staging directory
