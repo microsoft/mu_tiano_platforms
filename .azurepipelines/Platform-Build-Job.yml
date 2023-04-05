@@ -208,12 +208,22 @@ jobs:
     - ${{ parameters.extra_install_step }}
 
     - task: DownloadPipelineArtifact@2
-      name: DownloadVisualStudioArtifacts
-      displayName: Download Visual Studio Artifacts
+      name: DownloadVisualStudioFds
+      displayName: Download Visual Studio FD files
       inputs:
         buildType: 'current'
         artifactName: $(Build.ArtifactId)
+        itemPattern: '**/*.fd'
         targetPath: 'Build/$(Build.Package)/$(Build.Target)_$(tool_chain_tag)/FV/'
+
+    - task: DownloadPipelineArtifact@2
+      name: DownloadVisualStudioTests
+      displayName: Download Visual Studio Test Files
+      inputs:
+        buildType: 'current'
+        artifactName: $(Build.ArtifactId)
+        itemPattern: '**/*.efi'
+        targetPath: 'Build/$(Build.Package)/$(Build.Target)_$(tool_chain_tag)/X64/'
 
     # Run
     - task: CmdLine@2
