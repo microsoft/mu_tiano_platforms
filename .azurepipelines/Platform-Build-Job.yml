@@ -79,6 +79,7 @@ jobs:
           Run.Flags: ${{ parameters.run_flags }}
           Build.ArtifactsBinary: |
             **/QEMUQ35_*.fd
+            **/*/*TestApp.efi
 
         QemuQ35_RELEASE_ARM:
           Build.Package: QemuQ35Pkg
@@ -91,6 +92,7 @@ jobs:
           Run.Flags: ${{ parameters.run_flags }}
           Build.ArtifactsBinary: |
             **/QEMUQ35_*.fd
+            **/*/*TestApp.efi
 
         ${{ if eq(parameters.tool_chain_tag, 'GCC5') }}:
           QemuSbsa_DEBUG:
