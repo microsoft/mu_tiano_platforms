@@ -189,8 +189,11 @@ jobs:
       displayName: Download Visual Studio Artifacts
       inputs:
         buildType: 'current'
-        artifactName: $(vs_artifact_name)
+        artifactName: $(Build.ArtifactId)
         targetPath: 'Build/$(Build.Package)/$(Build.Target)_$(tool_chain_tag)/FV/'
+
+    # Potential Extra steps
+    - ${{ parameters.extra_install_step }}
 
     # Run
     - task: CmdLine@2
