@@ -90,7 +90,7 @@ GetIdString (
     }
 
     SmbiosType   = SMBIOS_TYPE_SYSTEM_INFORMATION;
-    SmbiosHandle = 0xFFFe;
+    SmbiosHandle = SMBIOS_HANDLE_PI_RESERVED;
 
     // -smbios type=1, manufacturer=Palindrome, product=MuQemuQ35, serial=42-42-42-42"
 
