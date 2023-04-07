@@ -1,0 +1,51 @@
+## @file
+# DfciUiSupportLib.inf
+#
+# This library contains NULL routines to support UI operations associated with DFCI.
+#
+# Copyright (C) Microsoft Corporation. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION         = 0x00010017
+  BASE_NAME           = DfciUiSupportLib
+  FILE_GUID           = be58fdc0-2190-4ef8-9e5d-d4e3232e1338
+  VERSION_STRING      = 1.0
+  MODULE_TYPE         = DXE_DRIVER
+  LIBRARY_CLASS       = DfciUiSupportLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+
+[Sources]
+  DfciUiSupportLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  DfciPkg/DfciPkg.dec
+  MsGraphicsPkg/MsGraphicsPkg.dec
+
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  SwmDialogsLib
+  UefiLib
+
+[Protocols]
+  gMsSWMProtocolGuid
+
+
+[Guids]
+  gEfiEventPreReadyToBootGuid
+  gDfciStartOfBdsNotifyGuid
+
+[Depex]
+  TRUE
