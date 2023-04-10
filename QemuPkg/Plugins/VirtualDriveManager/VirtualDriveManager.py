@@ -55,7 +55,7 @@ endfor
                 nsh.write("reset -s\n")
         
     def add_line(self, line: str):
-        self._lines.append(line.strip())
+        self._lines.append(line.rstrip())
         self._use_fs_finder = True
 
 
@@ -354,10 +354,9 @@ class VirtualDriveManager(IUefiHelperPlugin):
 
         if auto_run:
             tests = []
-            # TODO: Make it so we don't have to do this
             for test in test_list:
                 tests.append(f"if not exist {test.stem}_JUNIT.XML then")
-                tests.append(test.name)
+                tests.append(f"    {test.name}")
                 tests.append("endif")
 
         drive.add_startup_script(tests, auto_shutdown = auto_shutdown)
