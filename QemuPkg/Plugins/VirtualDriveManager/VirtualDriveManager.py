@@ -20,9 +20,6 @@ from edk2toollib.utility_functions import RunCmd
 from html import unescape
 
 
-RESET_TESTS = ["MorLockFunctionalTestApp.efi", "VariablePolicyFuncTestApp.efi"]
-
-
 logger = logging.getLogger(__name__)
 
 
@@ -358,11 +355,11 @@ class VirtualDriveManager(IUefiHelperPlugin):
         if auto_run:
             tests = []
             # TODO: Make it so we don't have to do this
-            for file in filter(lambda file: file.name in RESET_TESTS, test_list):
-                tests.append(file.name)
-            
-            for file in filter(lambda file: file.name not in RESET_TESTS, test_list):
-                tests.append(file.name)
+            for test in test_list:
+                tests.append(f"if not exist {test.stem}_JUNIT.XML then")
+                tests.append(test.name)
+                tests.append("endif")
+
         drive.add_startup_script(tests, auto_shutdown = auto_shutdown)
     
     @staticmethod
