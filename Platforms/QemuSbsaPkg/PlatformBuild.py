@@ -253,6 +253,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         # self.env.SetValue("BLD_*_BUILDID_STRING", "Unknown", "Default")
         # # Default turn on build reporting.
         self.env.SetValue("BUILDREPORTING", "TRUE", "Enabling build report")
+        self.env.SetValue("BLD_*_MEMORY_PROTECTION", "TRUE", "Default")
         self.env.SetValue("BUILDREPORT_TYPES", "PCD DEPEX FLASH BUILD_FLAGS LIBRARY FIXED_ADDRESS HASH", "Setting build report types")
         self.env.SetValue("ARM_TFA_PATH", os.path.join (self.GetWorkspaceRoot (), "Silicon/Arm/TFA"), "Platform hardcoded")
         self.env.SetValue("BLD_*_QEMU_CORE_NUM", "4", "Default")
