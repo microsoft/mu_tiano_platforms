@@ -122,7 +122,7 @@ class VirtualDrive:
         """
         raise NotImplementedError
 
-    def get_file_content(self, virtual_path: PathLike, local_path: PathLike = None) -> str:
+    def get_file_contents(self, virtual_path: PathLike, local_path: PathLike = None) -> str:
         """Gets a contents from a file from the virtual drive. Optionally save the file too.
         
         Args:
@@ -217,7 +217,6 @@ class LinuxVirtualDrive(VirtualDrive):
         if local_path is None:
             local_path = tempfile.mktemp()
         virtual_path = str(Path(self.drive_letter + ":", virtual_path))
-
         self.get_file(virtual_path, local_path)
 
         with open(local_path, "rb") as f:
@@ -364,8 +363,6 @@ class VirtualDriveManager(IUefiHelperPlugin):
             
             for file in filter(lambda file: file.name not in RESET_TESTS, test_list):
                 tests.append(file.name)
-        logging.error("JAVAGEDES")
-        logging.error(tests)
         drive.add_startup_script(tests, auto_shutdown = auto_shutdown)
     
     @staticmethod
@@ -378,7 +375,7 @@ class VirtualDriveManager(IUefiHelperPlugin):
             result_file = test.stem + "_JUNIT.XML"
             local_file_path = result_output_dir / result_file
             try:
-                data = drive.get_file_content(result_file, local_file_path)
+                data = drive.get_file_contents(result_file, local_file_path)
             except:
                 logging.error(f"unit test ({test}) produced no result file.")
                 failure_count += 1
