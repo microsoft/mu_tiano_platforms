@@ -1,0 +1,11 @@
+## @file QemuTestRunner_plug_in.yaml
+# Plugin to load tests onto a virtual harddrive and run them in Qemu.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "qemu",
+  "name": "Virtual Drive Manager",
+  "module": "VirtualDriveManager"
+}
