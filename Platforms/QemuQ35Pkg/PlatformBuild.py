@@ -21,10 +21,9 @@ from edk2toolext.invocables.edk2_platform_build import BuildSettingsManager
 from edk2toolext.invocables.edk2_setup import SetupSettingsManager, RequiredSubmodule
 from edk2toolext.invocables.edk2_update import UpdateSettingsManager
 from edk2toolext.invocables.edk2_pr_eval import PrEvalSettingsManager
-from edk2toollib.utility_functions import RunCmd, GetHostInfo
+from edk2toollib.utility_functions import GetHostInfo
 from typing import Tuple
 from pathlib import Path
-from html import unescape
 
 FAILURE_EXEMPT_OMISSION_LENGTH = 90*24*60*60
 
@@ -40,6 +39,9 @@ FAILURE_EXEMPT_TESTS = {
     "MemoryProtectionTestApp.efi": datetime.datetime(2023, 4, 5, 0, 0, 0),
     "MemoryAttributeProtocolFuncTestApp.efi": datetime.datetime(2023, 4, 5, 0, 0, 0)
 }
+
+# Allow failure exempt tests to be ignored for 90 days
+FAILURE_EXEMPT_OMISSION_LENGTH = 90*24*60*60
 
     # ####################################################################################### #
     #                                Common Configuration                                     #
@@ -281,6 +283,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         self.env.SetValue('POLICY_REPORT_FOLDER', self.mws.join(self.ws, "QemuQ35Pkg", "PolicyData"), "Platform Defined")
         self.env.SetValue('MU_SCHEMA_DIR', self.mws.join(self.ws, "Platforms", "QemuQ35Pkg", "CfgData"), "Platform Defined")
         self.env.SetValue('MU_SCHEMA_FILE_NAME', "QemuQ35PkgCfgData.xml", "Platform Hardcoded")
+
         # Globally set CodeQL failures to be ignored in this repo.
         # Note: This has no impact if CodeQL is not active/enabled.
         self.env.SetValue("STUART_CODEQL_AUDIT_ONLY", "true", "Platform Defined")
