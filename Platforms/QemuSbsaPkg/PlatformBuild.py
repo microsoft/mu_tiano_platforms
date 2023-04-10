@@ -36,7 +36,7 @@ FAILURE_EXEMPT_TESTS = {
     "DxePagingAuditTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
     "JsonTestApp.efi": datetime.datetime(2023, 4, 5, 0, 0, 0),
     "MemoryProtectionTestApp.efi": datetime.datetime(2023, 4, 5, 0, 0, 0),
-    "BaseCryptLibUnitTestApp.efi": datetime.datetime(2023, 4, 5, 0, 0, 0)
+    "BaseCryptLibUnitTestApp.efi": datetime.datetime(2023, 4, 5, 0, 0, 0),
 }
 
 # Allow failure exempt tests to be ignored for 90 days

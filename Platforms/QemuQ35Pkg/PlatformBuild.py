@@ -25,8 +25,6 @@ from edk2toollib.utility_functions import GetHostInfo
 from typing import Tuple
 from pathlib import Path
 
-FAILURE_EXEMPT_OMISSION_LENGTH = 90*24*60*60
-
 # Declare test whose failure will not return a non-zero exit code
 FAILURE_EXEMPT_TESTS = {
     "BootAuditTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
@@ -37,7 +35,7 @@ FAILURE_EXEMPT_TESTS = {
     "DeviceIdTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
     "DxePagingAuditTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
     "MemoryProtectionTestApp.efi": datetime.datetime(2023, 4, 5, 0, 0, 0),
-    "MemoryAttributeProtocolFuncTestApp.efi": datetime.datetime(2023, 4, 5, 0, 0, 0)
+    "MemoryAttributeProtocolFuncTestApp.efi": datetime.datetime(2023, 4, 5, 0, 0, 0),
 }
 
 # Allow failure exempt tests to be ignored for 90 days
