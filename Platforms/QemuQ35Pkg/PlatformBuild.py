@@ -289,7 +289,10 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
     
     def SetPlatformEnvAfterTarget(self):
         logging.debug("PlatformBuilder SetPlatformEnvAfterTarget")
-        self.env.SetValue("VIRTUAL_DRIVE_PATH", Path(self.env.GetValue("BUILD_OUTPUT_BASE"), "VirtualDrive.vhd"), "Platform Hardcoded.")
+        if os.name == 'nt':
+            self.env.SetValue("VIRTUAL_DRIVE_PATH", Path(self.env.GetValue("BUILD_OUTPUT_BASE"), "VirtualDrive.vhd"), "Platform Hardcoded.")
+        else:
+            self.env.SetValue("VIRTUAL_DRIVE_PATH", Path(self.env.GetValue("BUILD_OUTPUT_BASE"), "VirtualDrive.img"), "Platform Hardcoded.")
 
         return 0
 

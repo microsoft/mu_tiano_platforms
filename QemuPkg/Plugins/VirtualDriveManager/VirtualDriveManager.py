@@ -78,7 +78,7 @@ class VirtualDrive:
 
     def wipe(self, size: int = 60):
         """Deletes the virtual drive and creates an empty one at the same location."""
-        self.drive_path.unlink(missing_ok=False)
+        self.drive_path.unlink(missing_ok=True)
         self.make_drive(size)
     
     def add_startup_script(self, lines: list[str] = [], auto_shutdown = True):
@@ -227,19 +227,21 @@ class LinuxVirtualDrive(VirtualDrive):
         for drive_letter in string.ascii_lowercase:
             cmd = "grep"
             args = f"-i '/mnt/{drive_letter} ' /etc/mtab"
-            out = StringIO()
+            result = RunCmd(cmd, args)
             
-            result = RunCmd(cmd, args, outstream=out)
-            if result != 0:
+            # per man grep, ret 1 is no lines matched, so we can return
+            if result == 1: 
+                return drive_letter
+            
+            # per man grep, ret 0 is lines were matched
+            elif result == 0:
+                continue
+           
+            else:
                 e = f"[{cmd} {args}] Result: {result}"
                 logger.error("Failed to check if drive letter is in use.")
                 logger.error(e)
                 raise RuntimeError(e)
-            
-            mtab_content = out.getvalue()
-            if mtab_content:
-                continue
-            return drive_letter
 
         raise ValueError("No unused drive letters available")
 
