@@ -1214,7 +1214,7 @@ GetPlatformConnectList (
   // Since this is the best place to do this, let's connect the VirtioRng
   // This is in BeforeConsole in Qemu, and this is function that's called in Q35 AfterConsole
   // So there might be some slight timing differences between when Rng comes up on Ovmf vs Q35
-  // From Platforms/Temp/Library/PlatformBootManagerLib/BdsPlatform.c:433 (as of 202005 or a47822d46)
+  // From edk2 OvmfPkg/Library/PlatformBootManagerLib/BdsPlatform.c:433 (as of 202005 or a47822d46)
   // Install both VIRTIO_DEVICE_PROTOCOL and (dependent) EFI_RNG_PROTOCOL
   // instances on Virtio PCI RNG devices.
   //

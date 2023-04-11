@@ -2,7 +2,7 @@
 
 ## About
 
-This library is derived from DebugLib in Temp.
+This library is derived from DebugLib in OvmfPkg.
 It corrected several typos from the original library and added support for DEBUG_BUFFER function.
 
 ## Copyright
