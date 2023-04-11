@@ -37,6 +37,9 @@
   #                  (scalar) data types.
   QemuFwCfgSimpleParserLib|Include/Library/QemuFwCfgSimpleParserLib.h
 
+  ##  @libraryclass  Customize FVB2 protocol member functions for a platform.
+  PlatformFvbLib|Include/Library/PlatformFvbLib.h
+
 [Guids]
   ## Policy GUID for GFX policy data
   #
@@ -227,6 +230,10 @@
   ## This PCD adds a communication channel between OVMF's SmmCpuFeaturesLib
   #  instance in PiSmmCpuDxeSmm, and CpuHotplugSmm.
   gUefiQemuQ35PkgTokenSpaceGuid.PcdCpuHotEjectDataAddress|0|UINT64|0x46
+
+  ## This PCD specifies the event signaled by the EmuVariable library when FVB
+  #  data is written.
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
 
 [PcdsFeatureFlag]
   ## Informs modules (including pre-DXE-phase modules) whether the platform
