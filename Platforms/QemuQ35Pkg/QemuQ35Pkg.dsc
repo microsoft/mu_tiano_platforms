@@ -690,6 +690,10 @@
 
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber|$(QEMU_CORE_NUM)
 
+!if $(SMM_ENABLED) == FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|TRUE
+!endif
+
 [PcdsFixedAtBuild.common]
   # a PCD that controls the enumeration and connection of ConIn's. When true, ConIn is only connected once a console input is requests
   gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand|TRUE
@@ -1381,7 +1385,6 @@
   #
   # Variable driver stack (NO SMM)
   #
-  QemuQ35Pkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
     <LibraryClasses>
@@ -1389,8 +1392,6 @@
       TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
       IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
-    <PcdsFixedAtBuild>
-      !include CryptoPkg/Driver/Bin/Crypto.pcd.STANDARD.inc.dsc
   }
 
   #

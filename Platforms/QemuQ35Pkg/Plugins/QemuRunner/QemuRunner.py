@@ -57,7 +57,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         OutputPath_FV = os.path.join(env.GetValue("BUILD_OUTPUT_BASE"), "FV")
 
         # Check if QEMU is on the path, if not find it
-        executable = "qemu-system-x86_64"
+        executable = "C:\\src\\qemu_wsl\\qemu-system-x86_64w.exe"
 
         # First query the version
         ver = QemuRunner.QueryQemuVersion(executable)
@@ -85,11 +85,11 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
         accel = ""
         if env.GetValue("QEMU_ACCEL") is not None:
-            if (env.GetValue("QEMU_ACCEL").lower() == "kvm"):
+            if env.GetValue("QEMU_ACCEL").lower() == "kvm":
                 accel = ",accel=kvm"
-            elif (env.GetValue("QEMU_ACCEL").lower() == "tcg"):
+            elif env.GetValue("QEMU_ACCEL").lower() == "tcg":
                 accel = ",accel=tcg"
-            elif (env.GetValue("QEMU_ACCEL").lower() == "whpx"):
+            elif env.GetValue("QEMU_ACCEL").lower() == "whpx":
                 accel = ",accel=whpx"
 
         args += " -machine q35,smm=" + smm_enabled + accel

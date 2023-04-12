@@ -469,7 +469,6 @@ INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteStandaloneMm
 INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStandaloneMm.inf
 INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
 !else
-INF  QemuQ35Pkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
 INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 !endif
