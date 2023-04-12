@@ -26,6 +26,7 @@
   ArmVirtPkg/ArmVirtPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
+  QemuPkg/QemuPkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
@@ -35,6 +36,11 @@
   FdtLib
   MemoryAllocationLib
   PcdLib
+  HobLib
+
+[Guids]
+  gMmMemoryProtectionSettingsGuid
+  gDxeMemoryProtectionSettingsGuid
 
 [Pcd]
   gArmTokenSpaceGuid.PcdSystemMemoryBase
@@ -48,6 +54,9 @@
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
   gArmTokenSpaceGuid.PcdArmPrimaryCore
   gArmTokenSpaceGuid.PcdMmBufferSize
+
+[FeaturePcd]
+  gQemuPkgTokenSpaceGuid.PcdEnableMemoryProtection
 
 [Ppis]
   gArmMpCoreInfoPpiGuid

@@ -7,6 +7,7 @@
 
 **/
 
+#include <PiPei.h>
 #include <Base.h>
 #include <Library/ArmLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -14,6 +15,9 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <libfdt.h>
+#include <Library/HobLib.h>
+#include <Guid/DxeMemoryProtectionSettings.h>
+#include <Guid/MmMemoryProtectionSettings.h>
 
 // Number of Virtual Memory Map Descriptors
 #define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS  5
@@ -47,14 +51,41 @@ SbsaQemuLibConstructor (
   VOID
   )
 {
-  VOID           *DeviceTreeBase;
-  INT32          Node, Prev;
-  UINT64         NewBase, CurBase;
-  UINT64         NewSize, CurSize;
-  CONST CHAR8    *Type;
-  INT32          Len;
-  CONST UINT64   *RegProp;
-  RETURN_STATUS  PcdStatus;
+  VOID                            *DeviceTreeBase;
+  INT32                           Node, Prev;
+  UINT64                          NewBase, CurBase;
+  UINT64                          NewSize, CurSize;
+  CONST CHAR8                     *Type;
+  INT32                           Len;
+  CONST UINT64                    *RegProp;
+  RETURN_STATUS                   PcdStatus;
+  DXE_MEMORY_PROTECTION_SETTINGS  DxeSettings;
+  MM_MEMORY_PROTECTION_SETTINGS   MmSettings;
+
+  if (FeaturePcdGet (PcdEnableMemoryProtection) == TRUE) {
+    DxeSettings = (DXE_MEMORY_PROTECTION_SETTINGS)DXE_MEMORY_PROTECTION_SETTINGS_DEBUG;
+    MmSettings  = (MM_MEMORY_PROTECTION_SETTINGS)MM_MEMORY_PROTECTION_SETTINGS_DEBUG;
+
+    MmSettings.HeapGuardPolicy.Fields.MmPageGuard                    = 1;
+    MmSettings.HeapGuardPolicy.Fields.MmPoolGuard                    = 1;
+    DxeSettings.ImageProtectionPolicy.Fields.ProtectImageFromUnknown = 1;
+    // THE /NXCOMPAT DLL flag cannot be set using non MinGW GCC
+ #ifdef __GNUC__
+    DxeSettings.ImageProtectionPolicy.Fields.BlockImagesWithoutNxFlag = 0;
+ #endif
+
+    BuildGuidDataHob (
+      &gDxeMemoryProtectionSettingsGuid,
+      &DxeSettings,
+      sizeof (DxeSettings)
+      );
+
+    BuildGuidDataHob (
+      &gMmMemoryProtectionSettingsGuid,
+      &MmSettings,
+      sizeof (MmSettings)
+      );
+  }
 
   NewBase = 0;
   NewSize = 0;

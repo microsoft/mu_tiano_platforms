@@ -271,7 +271,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         # Default turn on build reporting.
         self.env.SetValue("BUILDREPORTING", "TRUE", "Enabling build report")
         self.env.SetValue("BUILDREPORT_TYPES", "PCD DEPEX FLASH BUILD_FLAGS LIBRARY FIXED_ADDRESS HASH", "Setting build report types")
-        self.env.SetValue("BLD_*_QEMU_CORE_NUM", "2", "Default")
+        self.env.SetValue("BLD_*_QEMU_CORE_NUM", "4", "Default")
         self.env.SetValue("BLD_*_MEMORY_PROTECTION", "TRUE", "Default")
         # Include the MFCI test cert by default, override on the commandline with "BLD_*_SHIP_MODE=TRUE" if you want the retail MFCI cert
         self.env.SetValue("BLD_*_SHIP_MODE", "FALSE", "Default")
@@ -505,13 +505,13 @@ class LinuxVirtualDriveManager(object):
         if ret != 0:
             logging.error("Failed to create IMG")
             return ret
-        
+
         # Format the image as FAT32
         ret = RunCmd("mkfs.vfat", f"{self.drive_path}")
         if ret != 0:
             logging.error("Failed to format IMG")
             return ret
-        
+
         # Create an mtools config file to virtually map the image to a drive letter
         RunCmd("echo", "mtools_skip_check=1 > ~/.mtoolsrc")
         RunCmd("echo", f"drive {self.drive_letter}: >> ~/.mtoolsrc")

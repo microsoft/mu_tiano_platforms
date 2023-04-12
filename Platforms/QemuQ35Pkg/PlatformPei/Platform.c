@@ -823,7 +823,7 @@ InitializePlatform (
   DXE_MEMORY_PROTECTION_SETTINGS  DxeSettings;
   MM_MEMORY_PROTECTION_SETTINGS   MmSettings;
 
-  if (FixedPcdGetBool (PcdEnableMemoryProtection) == TRUE) {
+  if (FeaturePcdGet (PcdEnableMemoryProtection) == TRUE) {
     DxeSettings = (DXE_MEMORY_PROTECTION_SETTINGS)DXE_MEMORY_PROTECTION_SETTINGS_DEBUG;
     MmSettings  = (MM_MEMORY_PROTECTION_SETTINGS)MM_MEMORY_PROTECTION_SETTINGS_DEBUG;
 
