@@ -43,7 +43,7 @@ jobs:
           Build.Flags: ""
           Build.Target: "DEBUG"
           Run: true
-          Run.Flags: $(run_flags)
+          Run.Flags: $(run_flags) BLD_*_QEMU_CORE_NUM=2
           Build.ArtifactsBinary: |
             **/QEMUQ35_*.fd
 
@@ -54,7 +54,7 @@ jobs:
           Build.Flags: ""
           Build.Target: "RELEASE"
           Run: true
-          Run.Flags: $(run_flags)
+          Run.Flags: $(run_flags) BLD_*_QEMU_CORE_NUM=2
           Build.ArtifactsBinary: |
             **/QEMUQ35_*.fd
 
