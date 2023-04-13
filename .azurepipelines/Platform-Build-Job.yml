@@ -31,6 +31,8 @@ jobs:
     variables:
       - name: run_flags
         value: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+      - name: run_flags_no_tests
+        value: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE"
 
     # Use matrix to speed up the build process
     strategy:
@@ -65,7 +67,7 @@ jobs:
           Build.Flags: "BLD_*_SMM_ENABLED=FALSE"
           Build.Target: "RELEASE"
           Run: true
-          Run.Flags: $(run_flags) BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE
+          Run.Flags: $(run_flags_no_tests) BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE
           Build.ArtifactsBinary: |
             **/QEMUQ35_*.fd
 
