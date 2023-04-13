@@ -12,7 +12,6 @@ import os
 import xml.etree.ElementTree
 
 from os import PathLike
-from io import StringIO
 from pathlib import Path
 
 from edk2toolext.environment.plugintypes.uefi_helper_plugin import IUefiHelperPlugin
@@ -90,7 +89,6 @@ class VirtualDrive:
         """
         nsh = StartupScript()
         for line in lines:
-            logging.error(str(line))
             nsh.add_line(str(line))
         
         nsh_path = self.drive_path.parent / "startup.nsh"
@@ -354,11 +352,23 @@ class VirtualDriveManager(IUefiHelperPlugin):
 
         if auto_run:
             tests = []
+            # Execute all tests
             for test in test_list:
                 tests.append(f"if not exist {test.stem}_JUNIT.XML then")
                 tests.append(f"    {test.name}")
                 tests.append("endif")
-
+            
+            # Remove any old test results
+            tests.append("*_JUNIT_RESULT.XML")
+            
+            # Rename test results to what we expect
+            for test in test_list:
+                tests.append(f"if exist {test.stem}_JUNIT.XML then")
+                tests.append(f"    mv {test.stem}_JUNIT.XML {test.stem}_JUNIT_RESULT.XML")
+                tests.append("endif")
+            
+            # Reset test status by deleting dat files (so future runs will not skip)
+            tests.append("rm *.dat")
         drive.add_startup_script(tests, auto_shutdown = auto_shutdown)
     
     @staticmethod
@@ -368,7 +378,7 @@ class VirtualDriveManager(IUefiHelperPlugin):
 
         failure_count = 0
         for test in test_list:
-            result_file = test.stem + "_JUNIT.XML"
+            result_file = test.stem + "_JUNIT_RESULT.XML"
             local_file_path = result_output_dir / result_file
             try:
                 data = drive.get_file_contents(result_file, local_file_path)
