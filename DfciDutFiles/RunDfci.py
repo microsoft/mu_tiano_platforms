@@ -60,7 +60,7 @@ if __name__ == "__main__":
         args += " ALT_BOOT_ENABLE=TRUE"
 
     args += " BLD_*_QEMU_CORE_NUM=4"
-    args += " BLD_*_SMM_ENABLED=FALSE"
+    args += " BLD_*_SMM_ENABLED=TRUE"
 
     cmd = platformbuild + args
     os.system(cmd)

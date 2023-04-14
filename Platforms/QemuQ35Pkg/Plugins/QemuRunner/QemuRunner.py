@@ -86,7 +86,8 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
                 accel = ",accel=whpx"
 
         args += " -machine q35,smm=" + smm_enabled + accel
-        if env.GetValue("PATH_TO_OS") is not None:
+        path_to_os = env.GetValue("PATH_TO_OS")
+        if path_to_os is not None:
             # Potentially dealing with big daddy, give it more juice...
             args += " -m 8192"
             #args += " -hda \"" + path_to_os + "\""
