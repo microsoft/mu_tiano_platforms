@@ -44,7 +44,7 @@ updates:
   - package-ecosystem: "gitsubmodule"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
       timezone: "America/Los_Angeles"
       time: "23:00"
     labels:
