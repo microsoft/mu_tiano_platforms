@@ -31,6 +31,8 @@ jobs:
     variables:
       - name: run_flags
         value: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+      - name: run_flags_no_tests
+        value: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE"
 
     # Use matrix to speed up the build process
     strategy:
@@ -42,6 +44,7 @@ jobs:
           Build.Arch: IA32,X64
           Build.Flags: ""
           Build.Target: "DEBUG"
+          Build.ExtraTag: ""
           Run: true
           Run.Flags: $(run_flags) BLD_*_QEMU_CORE_NUM=2
           Build.ArtifactsBinary: |
@@ -53,8 +56,21 @@ jobs:
           Build.Arch: IA32,X64
           Build.Flags: ""
           Build.Target: "RELEASE"
+          Build.ExtraTag: ""
           Run: true
           Run.Flags: $(run_flags) BLD_*_QEMU_CORE_NUM=2
+          Build.ArtifactsBinary: |
+            **/QEMUQ35_*.fd
+
+        QemuQ35_NO_SMM_RELEASE:
+          Build.Package: QemuQ35Pkg
+          Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+          Build.Arch: IA32,X64
+          Build.Flags: "BLD_*_SMM_ENABLED=FALSE"
+          Build.Target: "RELEASE"
+          Build.ExtraTag: "NO_SMM"
+          Run: true
+          Run.Flags: $(run_flags_no_tests) BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE
           Build.ArtifactsBinary: |
             **/QEMUQ35_*.fd
 
@@ -65,6 +81,7 @@ jobs:
             Build.Arch: AARCH64
             Build.Flags: ""
             Build.Target: "DEBUG"
+            Build.ExtraTag: ""
             Run: true
             Run.Flags: $(run_flags)
             Build.ArtifactsBinary: |
@@ -77,6 +94,7 @@ jobs:
             Build.Arch: AARCH64
             Build.Flags: ""
             Build.Target: "RELEASE"
+            Build.ExtraTag: ""
             Run: true
             Run.Flags: $(run_flags)
             Build.ArtifactsBinary: |
@@ -110,5 +128,5 @@ jobs:
         run_timeout: 25
         extra_install_step: ${{ parameters.extra_install_step }}
         install_tools: ${{ eq(parameters.container_image, '') }}
-        artifacts_identifier: '$(Build.Package) $(tool_chain_tag) $(Build.Target)'
+        artifacts_identifier: '$(Build.Package) $(tool_chain_tag) $(Build.Target) $(Build.ExtraTag)'
         artifacts_binary: $(Build.ArtifactsBinary)
