@@ -44,6 +44,7 @@ jobs:
           Build.Arch: IA32,X64
           Build.Flags: ""
           Build.Target: "DEBUG"
+          Build.ExtraTag: ""
           Run: true
           Run.Flags: $(run_flags) BLD_*_QEMU_CORE_NUM=2
           Build.ArtifactsBinary: |
@@ -55,6 +56,7 @@ jobs:
           Build.Arch: IA32,X64
           Build.Flags: ""
           Build.Target: "RELEASE"
+          Build.ExtraTag: ""
           Run: true
           Run.Flags: $(run_flags) BLD_*_QEMU_CORE_NUM=2
           Build.ArtifactsBinary: |
@@ -66,6 +68,7 @@ jobs:
           Build.Arch: IA32,X64
           Build.Flags: "BLD_*_SMM_ENABLED=FALSE"
           Build.Target: "RELEASE"
+          Build.ExtraTag: "NO_SMM"
           Run: true
           Run.Flags: $(run_flags_no_tests) BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE
           Build.ArtifactsBinary: |
@@ -78,6 +81,7 @@ jobs:
             Build.Arch: AARCH64
             Build.Flags: ""
             Build.Target: "DEBUG"
+            Build.ExtraTag: ""
             Run: true
             Run.Flags: $(run_flags)
             Build.ArtifactsBinary: |
@@ -90,6 +94,7 @@ jobs:
             Build.Arch: AARCH64
             Build.Flags: ""
             Build.Target: "RELEASE"
+            Build.ExtraTag: ""
             Run: true
             Run.Flags: $(run_flags)
             Build.ArtifactsBinary: |
@@ -123,5 +128,5 @@ jobs:
         run_timeout: 25
         extra_install_step: ${{ parameters.extra_install_step }}
         install_tools: ${{ eq(parameters.container_image, '') }}
-        artifacts_identifier: '$(Build.Package) $(tool_chain_tag) $(Build.Target)'
+        artifacts_identifier: '$(Build.Package) $(tool_chain_tag) $(Build.Target) $(Build.ExtraTag)'
         artifacts_binary: $(Build.ArtifactsBinary)
