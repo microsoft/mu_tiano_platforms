@@ -33,10 +33,15 @@ typedef enum {
 #define SMBIOS_VOLUP    "Vol+"
 #define SMBIOS_VOLDOWN  "Vol-"
 
-BUTTON_STATE  ButtonState = NoButtons;
+BUTTON_STATE  gButtonState = NoButtons;
 
 /*
-Say volume button is pressed because we wan to go to frontpage.
+Say volume up button is pressed because we want to go to frontpage.
+
+@param[in]     - Button Services protocol pointer
+@param[out]    - Pointer to a boolean value to receive the button state
+
+@retval        - EFI_SUCCESS;
 */
 EFI_STATUS
 EFIAPI
@@ -46,12 +51,17 @@ PreBootVolumeUpButtonThenPowerButtonCheck (
   )
 {
   DEBUG ((DEBUG_ERROR, "%a \n", __FUNCTION__));
-  *PreBootVolumeUpButtonThenPowerButton = (ButtonState == VolUpButton);
+  *PreBootVolumeUpButtonThenPowerButton = (gButtonState == VolUpButton);
   return EFI_SUCCESS;
 }
 
 /*
-Say no because we don't want alt boot.
+Say volume down button is pressed because we want alt boot.
+
+@param[in]     - Button Services protocol pointer
+@param[out]    - Pointer to a boolean value to receive the button state
+
+@retval        - EFI_SUCCESS;
 */
 EFI_STATUS
 EFIAPI
@@ -61,10 +71,17 @@ PreBootVolumeDownButtonThenPowerButtonCheck (
   )
 {
   DEBUG ((DEBUG_ERROR, "%a \n", __FUNCTION__));
-  *PreBootVolumeDownButtonThenPowerButton = (ButtonState == VolDownButton);
+  *PreBootVolumeDownButtonThenPowerButton = (gButtonState == VolDownButton);
   return EFI_SUCCESS;
 }
 
+/*
+Clear current button state.
+
+@param[in]     - Button Services protocol pointer
+
+@retval        - EFI_SUCCESS;
+*/
 EFI_STATUS
 EFIAPI
 PreBootClearVolumeButtonState (
@@ -72,7 +89,7 @@ PreBootClearVolumeButtonState (
   )
 {
   DEBUG ((DEBUG_ERROR, "%a \n", __FUNCTION__));
-  ButtonState = NoButtons;
+  gButtonState = NoButtons;
 
   return EFI_SUCCESS;
 }
@@ -104,7 +121,8 @@ GetBiosString (
 }
 
 /**
-  GetButtonState   - Get the sate of the Vol+/Vol- button
+GetButtonState gets the button state of the Vol+/Vol- buttons from the SMBIOS Table, and stores that
+state in gButtonState.
 
 @return EFI_SUCCESS - String buffer returned to caller
 @return EFI_ERROR   - Error the string
@@ -160,19 +178,19 @@ GetButtonState (
     if ((StrLen == AsciiStrLen (SMBIOS_VOLUP))  &&
         (0 == AsciiStrCmp (BiosString, SMBIOS_VOLUP)))
     {
-      ButtonState = VolUpButton;
+      gButtonState = VolUpButton;
       DEBUG ((DEBUG_INFO, "%a: Vol+ Button Detected\n", __FUNCTION__));
     }
 
     if ((StrLen == AsciiStrLen (SMBIOS_VOLDOWN)) &&
         (0 == AsciiStrCmp (BiosString, SMBIOS_VOLDOWN)))
     {
-      ButtonState = VolDownButton;
+      gButtonState = VolDownButton;
       DEBUG ((DEBUG_INFO, "%a: Vol- Button Detected\n", __FUNCTION__));
     }
   }
 
-  if (ButtonState == NoButtons) {
+  if (gButtonState == NoButtons) {
     DEBUG ((DEBUG_INFO, "%a: Neither Vol+ nor Vol- detected\n", __FUNCTION__));
   }
 
@@ -181,8 +199,13 @@ Exit:
 }
 
 /**
- Init routine to install protocol and init anything related to buttons
+ Constructor routine to install button services protocol and initialize anything related to buttons
 
+
+@param[in]     - Image Handle of the process loading this module
+@param[in]     - Efi System Table pointer
+
+@retval        - EFI_SUCCESS (always for a constructor)
  **/
 EFI_STATUS
 EFIAPI
@@ -204,7 +227,7 @@ ButtonsInit (
   Protocol = AllocateZeroPool (sizeof (MS_BUTTON_SERVICES_PROTOCOL));
   if (Protocol == NULL) {
     DEBUG ((DEBUG_ERROR, "Failed to allocate memory for button service protocol.\n"));
-    return EFI_OUT_OF_RESOURCES;
+    return EFI_SUCCESS;
   }
 
   Protocol->PreBootVolumeDownButtonThenPowerButtonCheck = PreBootVolumeDownButtonThenPowerButtonCheck;
@@ -222,9 +245,9 @@ ButtonsInit (
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Button Services Protocol Publisher: install protocol error, Status = %r.\n", Status));
     FreePool (Protocol);
-    return Status;
+    return EFI_SUCCESS;
   }
 
   DEBUG ((DEBUG_INFO, "Button Services Protocol Installed!\n"));
-  return Status;
+  return EFI_SUCCESS;
 }
