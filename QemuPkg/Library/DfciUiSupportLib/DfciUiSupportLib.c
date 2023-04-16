@@ -1,7 +1,7 @@
 /** @file
-DfciUiSupportLibNull.c
+DfciUiSupportLib.c
 
-NULL instance of the UiSupportLib.
+Qemu instance of the UiSupportLib.
 
 Copyright (C) Microsoft Corporation. All rights reserved.
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -37,6 +37,11 @@ DfciUiIsManufacturingMode (
 
   This routine indicates if the UI is ready and can be used.
 
+  @param   ManufacturingMode - Platforms may have a manufacturing mode.
+                               DFCI Auto opt-in's the management cert included
+                               in the firmware volume in Manufacturing Mode.
+                               TRUE if the device is in Manufacturing Mode
+
   @retval  TRUE if the UI is ready to use, else FALSE.
 
 **/
@@ -49,6 +54,20 @@ DfciUiIsUiAvailable (
   return SwmDialogsReady ();
 }
 
+/**
+ * Display a Message Box
+ *
+ * NOTE: The UI must be available
+ *
+ * @param[in] TitleBarText
+ * @param[in] Text
+ * @param[in] Caption
+ * @param[in] Type
+ * @param[in] Timeout
+ * @param[out] Result
+ *
+ * @return EFI_STATUS EFIAPI
+ */
 EFI_STATUS
 EFIAPI
 DfciUiDisplayMessageBox (
@@ -81,6 +100,20 @@ DfciUiDisplayMessageBox (
   return Status;
 }
 
+/**
+ * Display a Message Box
+ *
+ * NOTE: The UI must be available
+ *
+ * @param[in] TitleText
+ * @param[in] CapionText
+ * @param[in] BodyText
+ * @param[in] ErrorText
+ * @param[out] Result
+ * @param[out] Password
+ *
+ * @return EFI_STATUS EFIAPI
+ */
 EFI_STATUS
 EFIAPI
 DfciUiDisplayPasswordDialog (
@@ -117,16 +150,16 @@ DfciUiDisplayPasswordDialog (
 /**
  * DfciUiDisplayDfciAuthDialog
  *
- * @param TitleText
- * @param CaptionText
- * @param BodyText
- * @param CertText
- * @param ConfirmText
- * @param ErrorText
- * @param PasswordType
- * @param Result
- * @param OPTIONAL
- * @param OPTIONAL
+ * @param[in] TitleText
+ * @param[in] CaptionText
+ * @param[in] BodyText
+ * @param[in] CertText
+ * @param[in] ConfirmText
+ * @param[in] ErrorText
+ * @param[in] PasswordType
+ * @param[in] Result
+ * @param[out] OPTIONAL
+ * @param[out] OPTIONAL
  *
  * @return EFI_STATUS EFIAPI
  */

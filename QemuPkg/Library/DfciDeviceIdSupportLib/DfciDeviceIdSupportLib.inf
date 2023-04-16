@@ -1,7 +1,7 @@
 ## @file
 # DfciDeviceIdSupportLib.inf
 #
-# NULL Library for DfciDeviceIdSupportLib.
+# Return the device ID for this platform.
 #
 # Copyright (C) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -9,7 +9,7 @@
 ##
 
 [Defines]
-  INF_VERSION                    = 0x00010005
+  INF_VERSION                    = 1.27
   BASE_NAME                      = DfciDeviceIdSupportLib
   FILE_GUID                      = 191d0ad4-469a-4d62-b526-29abe84d6af2
   MODULE_TYPE                    = DXE_DRIVER
