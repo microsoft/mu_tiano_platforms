@@ -11,7 +11,7 @@
 [Defines]
   INF_VERSION         = 1.27
   BASE_NAME           = DfciUiSupportLib
-  FILE_GUID           = be58fdc0-2190-4ef8-9e5d-d4e3232e1338
+  FILE_GUID           = 17d2a9ea-84b0-4e8c-82de-c5ee60708ce6
   VERSION_STRING      = 1.0
   MODULE_TYPE         = DXE_DRIVER
   LIBRARY_CLASS       = DfciUiSupportLib
