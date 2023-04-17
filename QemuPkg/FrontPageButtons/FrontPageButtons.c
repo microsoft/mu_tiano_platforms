@@ -30,8 +30,8 @@ typedef enum {
   VolDownButton = 2
 } BUTTON_STATE;
 
-#define SMBIOS_VOLUP    "Vol+"
-#define SMBIOS_VOLDOWN  "Vol-"
+#define SMBIOS_VOLUME_UP    "Vol+"
+#define SMBIOS_VOLUME_DOWN  "Vol-"
 
 BUTTON_STATE  gButtonState = NoButtons;
 
@@ -175,15 +175,15 @@ GetButtonState (
   if (BiosString != NULL) {
     StrLen = AsciiStrLen (BiosString);
 
-    if ((StrLen == AsciiStrLen (SMBIOS_VOLUP))  &&
-        (0 == AsciiStrCmp (BiosString, SMBIOS_VOLUP)))
+    if ((StrLen == AsciiStrLen (SMBIOS_VOLUME_UP))  &&
+        (0 == AsciiStrCmp (BiosString, SMBIOS_VOLUME_UP)))
     {
       gButtonState = VolUpButton;
       DEBUG ((DEBUG_INFO, "%a: Vol+ Button Detected\n", __FUNCTION__));
     }
 
-    if ((StrLen == AsciiStrLen (SMBIOS_VOLDOWN)) &&
-        (0 == AsciiStrCmp (BiosString, SMBIOS_VOLDOWN)))
+    if ((StrLen == AsciiStrLen (SMBIOS_VOLUME_DOWN)) &&
+        (0 == AsciiStrCmp (BiosString, SMBIOS_VOLUME_DOWN)))
     {
       gButtonState = VolDownButton;
       DEBUG ((DEBUG_INFO, "%a: Vol- Button Detected\n", __FUNCTION__));
