@@ -40,4 +40,5 @@ jobs:
       displayName: Install Windows Resource Compiler for Linux
     tool_chain_tag: 'GCC5'
     vm_image: $(vm_image)
+    pool_name: $(pool_name)
     container_image: linux-gcc
