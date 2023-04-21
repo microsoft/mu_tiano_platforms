@@ -71,6 +71,11 @@ jobs:
           Build.Targets: 'NO-TARGET'
           Build.ArchList: AARCH64
           Build.AgentPool: ""
+        TARGET_SBSA_ARM:
+          Build.Pkgs: 'QemuSbsaPkg'
+          Build.Targets: 'NO-TARGET'
+          Build.ArchList: AARCH64
+          Build.AgentPool: ${{ parameters.pool_name }}
 
   workspace:
     clean: all
@@ -100,7 +105,5 @@ jobs:
       extra_build_args: ${{ parameters.extra_build_args }}
       extra_install_step: ${{ parameters.extra_install_step }}
       ${{ if eq(parameters.container_image, '') }}:
-        install_tools: eq(variables['Build.AgentPool'], '')
-      ${{ else }}:
-        install_tools: 'false'
+      install_tools: and(eq(variables['Build.AgentPool'], ''), eq(${{ parameters.container_image }}, ''))
       tool_chain_tag: ${{ parameters.tool_chain_tag }}
