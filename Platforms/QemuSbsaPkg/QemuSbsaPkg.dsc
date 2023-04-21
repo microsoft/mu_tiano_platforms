@@ -338,7 +338,7 @@
   ConfigSystemModeLib           |QemuPkg/Library/ConfigSystemModeLibQemu/ConfigSystemModeLib.inf
   OemMfciLib                    |OemPkg/Library/OemMfciLib/OemMfciLibDxe.inf
   SvdXmlSettingSchemaSupportLib |SetupDataPkg/Library/SvdXmlSettingSchemaSupportLib/SvdXmlSettingSchemaSupportLib.inf
-  ActiveProfileIndexSelectorLib |OemPkg/Library/ActiveProfileIndexSelectorLib/ActiveProfileIndexSelectorLib.inf
+  ActiveProfileIndexSelectorLib |OemPkg/Library/ActiveProfileIndexSelectorPcdLib/ActiveProfileIndexSelectorPcdLib.inf
 
   # DFCI / XML / JSON Libraries
   DfciUiSupportLib                  |DfciPkg/Library/DfciUiSupportLibNull/DfciUiSupportLibNull.inf # Supports DFCI Groups.
