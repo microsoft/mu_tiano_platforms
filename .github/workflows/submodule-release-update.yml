@@ -1,0 +1,33 @@
+# This workflow automatically creates a pull request for any submodule in the repo
+# that has a new GitHub release available. The release must follow semantic versioning.
+#
+# NOTE: This file is automatically synchronized from Mu DevOps. Update the original file there
+#       instead of the file in this repo.
+#
+# - Mu DevOps Repo: https://github.com/microsoft/mu_devops
+# - File Sync Settings: https://github.com/microsoft/mu_devops/blob/main/.sync/Files.yml
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+name: Update Submodules to Latest Release
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # https://crontab.guru/every-day
+  workflow_dispatch:
+
+jobs:
+  repo_submodule_update:
+    name: Check for Submodule Releases
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Update Submodules to Latest Release
+        uses: microsoft/mu_devops/.github/actions/submodule-release-updater@v2.4.0
+        with:
+          GH_PAT: ${{ secrets.SUBMODULE_UPDATER_TOKEN }}
+          GH_USER: "ProjectMuBot"
+          GIT_EMAIL: "mubot@microsoft.com"
+          GIT_NAME: "Project Mu Bot"
