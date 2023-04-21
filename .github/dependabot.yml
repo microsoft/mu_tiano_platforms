@@ -40,6 +40,7 @@ updates:
       prefix: "GitHub Action"
     labels:
       - "type:dependencies"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "gitsubmodule"
     directory: "/"
@@ -50,6 +51,7 @@ updates:
     labels:
       - "type:submodules"
       - "type:dependencies"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "pip"
     directory: "/"
@@ -62,3 +64,4 @@ updates:
     labels:
       - "language:python"
       - "type:dependencies"
+    rebase-strategy: "disabled"
