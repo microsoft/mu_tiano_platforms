@@ -295,7 +295,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         args += " ARCH=" + self.env.GetValue("TARGET_ARCH").lower()
         args += " DEBUG=" + str(1 if self.env.GetValue("TARGET").lower() == 'debug' else 0)
         args += " SPM_MM=1 EL3_EXCEPTION_HANDLING=1"
-        args += " ENABLE_FEAT_HCX=1 ENABLE_FEAT_FGT=1" # Features used by hypervisor
+        args += " ENABLE_FEAT_HCX=1" # Features used by hypervisor
         # args += " FEATURE_DETECTION=1" # Enforces support for features enabled.
         args += " BL32=" + os.path.join(op_fv, "BL32_AP_MM.fd")
         args += " all fip"
