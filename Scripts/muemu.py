@@ -8,11 +8,22 @@
 from typing import List
 import argparse
 import os
+import requests
 import shutil
 import subprocess
 import sys
 import urllib.request
 import zipfile
+
+#
+# Constants
+#
+
+DEFAULT_VERSION = "1.1.4"
+
+#
+# Setup and parse arguments.
+#
 
 parser = argparse.ArgumentParser()
 
@@ -33,7 +44,7 @@ parser.add_argument("--vnc",
                     help="Provides the VNC port to use. E.g. ':1' for localhost:5901")
 parser.add_argument("--accel", default="tcg",
                     choices=["tcg", "kvm", "whpx"], help="Acceleration back-end to use in QEMU.")
-parser.add_argument("--version", default="1.1.4",
+parser.add_argument("--version", default=DEFAULT_VERSION,
                     help="The Project MU firmware version to use.")
 parser.add_argument("--qemudir", default="",
                     help="Path to a custom QEMU install directory.")
@@ -45,6 +56,10 @@ parser.add_argument("--verbose", action="store_true",
                     help="Enabled verbose script prints.")
 
 args = parser.parse_args()
+
+#
+# Script routines.
+#
 
 
 def main():
@@ -139,11 +154,18 @@ def run_qemu(qemu_args: List[str]):
 
 
 def update_firmware():
+    # Check if this is the newest version fore awareness.
+    latest_version = get_latest_version()
+    if args.version != latest_version:
+        print("#############################################################")
+        print(f"NOTE: A newer version of firmware available! {latest_version}")
+        print("#############################################################\n")
+
     #
     # Updates the firmware to the following configuration.
     #     <root>/<arch>/<platform>/<build_toolchain>/<files>
     #
-    print("Updating firmware...")
+    print(f"Updating firmware to version {args.version}...")
 
     build_type = "DEBUG" if args.debugfw else "RELEASE"
     fw_info_list = [["QemuQ35", "x64"],
@@ -151,7 +173,7 @@ def update_firmware():
 
     for fw_info in fw_info_list:
         url = f"https://github.com/microsoft/mu_tiano_platforms/releases/download/v{args.version}/Mu.{fw_info[0]}.FW.{build_type}-{args.version}.zip"
-        zip_path = f"{fw_info[0]}.zip"
+        zip_path = f"{args.firmwaredir}/{fw_info[0]}.zip"
 
         print(f"Downloading {fw_info[0]}")
         urllib.request.urlretrieve(url, zip_path)
@@ -161,6 +183,17 @@ def update_firmware():
         with zipfile.ZipFile(zip_path, "r") as zip:
             zip.extractall(unzip_path)
         os.remove(zip_path)
+
+    print("Done.")
+
+
+def get_latest_version():
+    response = requests.get(
+        "https://api.github.com/repos/microsoft/mu_tiano_platforms/releases/latest")
+
+    version = response.json()["name"]
+    assert version[0] == 'v'
+    return version[1:]
 
 
 try:
