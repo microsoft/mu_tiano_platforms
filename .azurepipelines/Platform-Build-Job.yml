@@ -35,205 +35,184 @@ parameters:
   displayName: Run script flag
   type: string
   default: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+- name: build_matrix
+  type: object
+  default:
+    QemuQ35_DEBUG:
+      Build.Package: QemuQ35Pkg
+      Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+      Build.Arch: IA32,X64
+      Build.Flags: ""
+      Build.Target: "DEBUG"
+      Run: true
+      Build.SelfHostAgent: false
+      Build.ArtifactsBinary: |
+        **/QEMUQ35_*.fd
+
+    QemuQ35_RELEASE:
+      Build.Package: QemuQ35Pkg
+      Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+      Build.Arch: IA32,X64
+      Build.Flags: ""
+      Build.Target: "RELEASE"
+      Run: true
+      Build.SelfHostAgent: false
+      Build.ArtifactsBinary: |
+        **/QEMUQ35_*.fd
+
+    QemuQ35_DEBUG_ARM:
+      Build.Package: QemuQ35Pkg
+      Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+      Build.Arch: IA32,X64
+      Build.Flags: ""
+      Build.Target: "DEBUG"
+      Run: false
+      Build.SelfHostAgent: true
+      Build.ArtifactsBinary: |
+        **/QEMUQ35_*.fd
+        **/*/*TestApp.efi
+
+    QemuQ35_RELEASE_ARM:
+      Build.Package: QemuQ35Pkg
+      Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+      Build.Arch: IA32,X64
+      Build.Flags: ""
+      Build.Target: "RELEASE"
+      Run: false
+      Build.SelfHostAgent: true
+      Build.ArtifactsBinary: |
+        **/QEMUQ35_*.fd
+        **/*/*TestApp.efi
+
+    QemuSbsa_DEBUG:
+      Build.Package: QemuSbsaPkg
+      Build.File: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+      Build.Arch: AARCH64
+      Build.Flags: ""
+      Build.Target: "DEBUG"
+      Run: true
+      Build.SelfHostAgent: false
+      Build.ArtifactsBinary: |
+        **/QEMU_EFI.fd
+        **/SECURE_FLASH0.fd
+
+    QemuSbsa_RELEASE:
+      Build.Package: QemuSbsaPkg
+      Build.File: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+      Build.Arch: AARCH64
+      Build.Flags: ""
+      Build.Target: "RELEASE"
+      Run: true
+      Build.SelfHostAgent: false
+      Build.ArtifactsBinary: |
+        **/QEMU_EFI.fd
+        **/SECURE_FLASH0.fd
 
 jobs:
-  - job: PlatformBuild
-    displayName: Build Platforms
+  - ${{ each item in parameters.build_matrix }}:
+    - job: PlatformBuild_${{ item.Key }}
+      displayName: Build Platforms
+      condition: or(eq(variables['tool_chain_tag'], 'GCC5'), not(startsWith(${{ item.Key }}, QemuSbsa)))
 
-    # Use matrix to speed up the build process
-    strategy:
-      matrix:
+      workspace:
+        clean: all
 
-        QemuQ35_DEBUG:
-          Build.Package: QemuQ35Pkg
-          Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-          Build.Arch: IA32,X64
-          Build.Flags: ""
-          Build.Target: "DEBUG"
-          Run: true
-          Build.AgentPool: ""
-          Run.Flags: ${{ parameters.run_flags }}
-          Build.ArtifactsBinary: |
-            **/QEMUQ35_*.fd
+      ${{ if and(ne(parameters.container_image, ''), not(${{ item.Value.Build.SelfHostAgent }})) }}:
+        container: ${{ parameters.container_image }}
 
-        QemuQ35_RELEASE:
-          Build.Package: QemuQ35Pkg
-          Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-          Build.Arch: IA32,X64
-          Build.Flags: ""
-          Build.Target: "RELEASE"
-          Run: true
-          Build.AgentPool: ""
-          Run.Flags: ${{ parameters.run_flags }}
-          Build.ArtifactsBinary: |
-            **/QEMUQ35_*.fd
+      pool:
+        name: $(Build.AgentPool)
+        vmImage: ${{ parameters.vm_image }}
 
-        QemuQ35_DEBUG_ARM:
-          Build.Package: QemuQ35Pkg
-          Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-          Build.Arch: IA32,X64
-          Build.Flags: ""
-          Build.Target: "DEBUG"
-          Run: false
-          Build.AgentPool: ${{ parameters.pool_name }}
-          Run.Flags: ${{ parameters.run_flags }}
-          Build.ArtifactsBinary: |
-            **/QEMUQ35_*.fd
-            **/*/*TestApp.efi
+      steps:
+      - ${{ if and(ne(parameters.container_image, ''), not(contains(parameters.vm_image, 'windows'))) }}:
+        - script: echo "##vso[task.prependpath]/home/vsts_azpcontainer/.local/bin"
+          displayName: Add User Local Bin to Path
+        - script: sudo dnf install -y mtools dosfstools
+          displayName: Install mtools and dosfstools
+      - template: Steps/BuildPlatform.yml@mu_devops
+        parameters:
+          tool_chain_tag: $(tool_chain_tag)
+          build_pkg: $(Build.Package)
+          build_target: $(Build.Target)
+          build_arch: $(Build.Arch)
+          build_file: $(Build.File)
+          build_flags: $(Build.Flags)
+          run_flags: ${{ parameters.run_flags }}
+          run_timeout: ${{ parameters.run_timeout }}
+          extra_install_step: ${{ parameters.extra_install_step }}
+          install_tools: and(ne(${{ item.Value.Build.SelfHostAgent }}), eq('${{ parameters.container_image }}', ''))
+          artifacts_identifier: '$(Build.Package) $(tool_chain_tag) $(Build.Target)'
+          artifacts_binary: $(Build.ArtifactsBinary)
 
-        QemuQ35_RELEASE_ARM:
-          Build.Package: QemuQ35Pkg
-          Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-          Build.Arch: IA32,X64
-          Build.Flags: ""
-          Build.Target: "RELEASE"
-          Run: false
-          Build.AgentPool: ${{ parameters.pool_name }}
-          Run.Flags: ${{ parameters.run_flags }}
-          Build.ArtifactsBinary: |
-            **/QEMUQ35_*.fd
-            **/*/*TestApp.efi
+    - job: RunQemuBuilds_${{ item.Key }}
+      displayName: Run Qemu Builds
+      dependsOn: PlatformBuild_${{ item.Key }}
+      condition: and(succeeded(), |
+                     and(ne(variables['tool_chain_tag'], 'GCC5'), |
+                         and(StartsWith(${{ item.Key }}, QemuQ35Pkg), |
+                             EndsWith(${{ item.Key }}, ARM)))
 
-        ${{ if eq(parameters.tool_chain_tag, 'GCC5') }}:
-          QemuSbsa_DEBUG:
-            Build.Package: QemuSbsaPkg
-            Build.File: "Platforms/QemuSbsaPkg/PlatformBuild.py"
-            Build.Arch: AARCH64
-            Build.Flags: ""
-            Build.Target: "DEBUG"
-            Run: true
-            Build.AgentPool: ""
-            Run.Flags: ${{ parameters.run_flags }}
-            Build.ArtifactsBinary: |
-              **/QEMU_EFI.fd
-              **/SECURE_FLASH0.fd
+      pool:
+        vmImage: ${{ parameters.vm_image }}
 
-          QemuSbsa_RELEASE:
-            Build.Package: QemuSbsaPkg
-            Build.File: "Platforms/QemuSbsaPkg/PlatformBuild.py"
-            Build.Arch: AARCH64
-            Build.Flags: ""
-            Build.Target: "RELEASE"
-            Run: true
-            Build.AgentPool: ""
-            Run.Flags: ${{ parameters.run_flags }}
-            Build.ArtifactsBinary: |
-              **/QEMU_EFI.fd
-              **/SECURE_FLASH0.fd
+      steps:
+      - checkout: self
+        clean: true
+        fetchDepth: 1
 
-    workspace:
-      clean: all
+      - template: Steps/SetupPythonPreReqs.yml@mu_devops
+        parameters:
+          install_python: true
 
-    ${{ if ne(parameters.container_image, '') }}:
-      container: ${{ parameters.container_image }}
+      # Set default
+      - powershell:
+          Write-Host "##vso[task.setvariable variable=pkg_count]${{ 1 }}"
 
-    pool:
-      name: $(Build.AgentPool)
-      vmImage: ${{ parameters.vm_image }}
+      # Setup repo
+      - task: CmdLine@2
+        displayName: Setup
+        inputs:
+          script: git submodule update --init --depth 1
+        condition: and(gt(variables.pkg_count, 0), succeeded())
 
-    steps:
-    - ${{ if and(ne(parameters.container_image, ''), not(contains(parameters.vm_image, 'windows'))) }}:
-      - script: echo "##vso[task.prependpath]/home/vsts_azpcontainer/.local/bin"
-        displayName: Add User Local Bin to Path
-      - script: sudo dnf install -y mtools dosfstools
-        displayName: Install mtools and dosfstools
-    - template: Steps/BuildPlatform.yml@mu_devops
-      parameters:
-        tool_chain_tag: $(tool_chain_tag)
-        build_pkg: $(Build.Package)
-        build_target: $(Build.Target)
-        build_arch: $(Build.Arch)
-        build_file: $(Build.File)
-        build_flags: $(Build.Flags)
-        run_flags: $(Run.Flags)
-        run_timeout: ${{ parameters.run_timeout }}
-        extra_install_step: ${{ parameters.extra_install_step }}
-        install_tools: and(eq(variables['Build.AgentPool'], ''), eq('${{ parameters.container_image }}', ''))
-        artifacts_identifier: '$(Build.Package) $(tool_chain_tag) $(Build.Target)'
-        artifacts_binary: $(Build.ArtifactsBinary)
+      # Stuart Update
+      - task: CmdLine@2
+        displayName: Update
+        inputs:
+          script: stuart_update -c $(Build.File) TOOL_CHAIN_TAG=$(tool_chain_tag) -t $(Build.Target) -a $(Build.Arch) $(Build.Flags)
+        condition: and(gt(variables.pkg_count, 0), succeeded())
 
-  - job: RunQemuBuilds
-    displayName: Run Qemu Builds
-    dependsOn: PlatformBuild
-    condition: and(succeeded(), ne(variables['tool_chain_tag'], 'GCC5'))
-    strategy:
-      matrix:
-        Run_QemuQ35_DEBUG_ARM:
-          Build.Package: QemuQ35Pkg
-          Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-          Build.Arch: IA32,X64
-          Build.Flags: ""
-          Build.Target: "DEBUG"
-          Build.ArtifactId: 'Binaries $(Build.Package) $(tool_chain_tag) $(Build.Target)'
+      # Potential Extra steps
+      - ${{ parameters.extra_install_step }}
 
-        Run_QemuQ35_RELEASE_ARM:
-          Build.Package: QemuQ35Pkg
-          Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-          Build.Arch: IA32,X64
-          Build.Flags: ""
-          Build.Target: "RELEASE"
-          Build.ArtifactId: 'Binaries $(Build.Package) $(tool_chain_tag) $(Build.Target)'
+      - task: DownloadPipelineArtifact@2
+        name: DownloadVisualStudioFds
+        displayName: Download Visual Studio FD files
+        inputs:
+          buildType: 'current'
+          artifactName: 'Binaries $(Build.Package) $(tool_chain_tag) $(Build.Target)'
+          itemPattern: '**/*.fd'
+          targetPath: 'Build/$(Build.Package)/$(Build.Target)_$(tool_chain_tag)/FV/'
 
-    pool:
-      vmImage: ${{ parameters.vm_image }}
+      - task: DownloadPipelineArtifact@2
+        name: DownloadVisualStudioTests
+        displayName: Download Visual Studio Test Files
+        inputs:
+          buildType: 'current'
+          artifactName: 'Binaries $(Build.Package) $(tool_chain_tag) $(Build.Target)'
+          itemPattern: '**/*.efi'
+          targetPath: 'Build/$(Build.Package)/$(Build.Target)_$(tool_chain_tag)/X64/'
 
-    steps:
-    - checkout: self
-      clean: true
-      fetchDepth: 1
+      # Run
+      - task: CmdLine@2
+        displayName: Run to Shell
+        inputs:
+          script: stuart_build -c $(Build.File) TOOL_CHAIN_TAG=$(tool_chain_tag) TARGET=$(Build.Target) -a $(Build.Arch) $(Build.Flags) ${{ parameters.run_flags }} --FlashOnly
+        condition: and(gt(variables.pkg_count, 0), succeeded())
+        timeoutInMinutes: ${{ parameters.run_timeout }}
 
-    - template: Steps/SetupPythonPreReqs.yml@mu_devops
-      parameters:
-        install_python: true
-
-    # Set default
-    - powershell:
-        Write-Host "##vso[task.setvariable variable=pkg_count]${{ 1 }}"
-
-    # Setup repo
-    - task: CmdLine@2
-      displayName: Setup
-      inputs:
-        script: git submodule update --init --depth 1
-      condition: and(gt(variables.pkg_count, 0), succeeded())
-
-    # Stuart Update
-    - task: CmdLine@2
-      displayName: Update
-      inputs:
-        script: stuart_update -c $(Build.File) TOOL_CHAIN_TAG=$(tool_chain_tag) -t $(Build.Target) -a $(Build.Arch) $(Build.Flags)
-      condition: and(gt(variables.pkg_count, 0), succeeded())
-
-    # Potential Extra steps
-    - ${{ parameters.extra_install_step }}
-
-    - task: DownloadPipelineArtifact@2
-      name: DownloadVisualStudioFds
-      displayName: Download Visual Studio FD files
-      inputs:
-        buildType: 'current'
-        artifactName: $(Build.ArtifactId)
-        itemPattern: '**/*.fd'
-        targetPath: 'Build/$(Build.Package)/$(Build.Target)_$(tool_chain_tag)/FV/'
-
-    - task: DownloadPipelineArtifact@2
-      name: DownloadVisualStudioTests
-      displayName: Download Visual Studio Test Files
-      inputs:
-        buildType: 'current'
-        artifactName: $(Build.ArtifactId)
-        itemPattern: '**/*.efi'
-        targetPath: 'Build/$(Build.Package)/$(Build.Target)_$(tool_chain_tag)/X64/'
-
-    # Run
-    - task: CmdLine@2
-      displayName: Run to Shell
-      inputs:
-        script: stuart_build -c $(Build.File) TOOL_CHAIN_TAG=$(tool_chain_tag) TARGET=$(Build.Target) -a $(Build.Arch) $(Build.Flags) ${{ parameters.run_flags }} --FlashOnly
-      condition: and(gt(variables.pkg_count, 0), succeeded())
-      timeoutInMinutes: ${{ parameters.run_timeout }}
-
-    # Copy build logs to the artifact staging directory
-    - template: Steps/CommonLogCopyAndPublish.yml@mu_devops
-      parameters:
-        artifacts_identifier: 'Binaries $(Build.Package) $(tool_chain_tag) $(Build.Target)'
+      # Copy build logs to the artifact staging directory
+      - template: Steps/CommonLogCopyAndPublish.yml@mu_devops
+        parameters:
+          artifacts_identifier: 'Binaries $(Build.Package) $(tool_chain_tag) $(Build.Target)'
