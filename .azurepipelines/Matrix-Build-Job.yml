@@ -42,34 +42,34 @@ parameters:
   default:
     # Use matrix to speed up the build process
     TARGET_QEMU:
-      Build.Pkgs: 'QemuPkg'
-      Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
-      Build.ArchList: IA32,X64,AARCH64
+      Pkgs: 'QemuPkg'
+      Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+      ArchList: IA32,X64,AARCH64
       SelfHostAgent: false
     TARGET_QEMU_ARM:
-      Build.Pkgs: 'QemuPkg'
-      Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
-      Build.ArchList: IA32,X64,AARCH64
+      Pkgs: 'QemuPkg'
+      Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+      ArchList: IA32,X64,AARCH64
       SelfHostAgent: true
     TARGET_Q35:
-      Build.Pkgs: 'QemuQ35Pkg'
-      Build.Targets: 'NO-TARGET'
-      Build.ArchList: IA32,X64
+      Pkgs: 'QemuQ35Pkg'
+      Targets: 'NO-TARGET'
+      ArchList: IA32,X64
       SelfHostAgent: false
     TARGET_Q35_ARM:
-      Build.Pkgs: 'QemuQ35Pkg'
-      Build.Targets: 'NO-TARGET'
-      Build.ArchList: IA32,X64
+      Pkgs: 'QemuQ35Pkg'
+      Targets: 'NO-TARGET'
+      ArchList: IA32,X64
       SelfHostAgent: true
     TARGET_SBSA:
-      Build.Pkgs: 'QemuSbsaPkg'
-      Build.Targets: 'NO-TARGET'
-      Build.ArchList: AARCH64
+      Pkgs: 'QemuSbsaPkg'
+      Targets: 'NO-TARGET'
+      ArchList: AARCH64
       SelfHostAgent: false
     TARGET_SBSA_ARM:
-      Build.Pkgs: 'QemuSbsaPkg'
-      Build.Targets: 'NO-TARGET'
-      Build.ArchList: AARCH64
+      Pkgs: 'QemuSbsaPkg'
+      Targets: 'NO-TARGET'
+      ArchList: AARCH64
       SelfHostAgent: true
 
 
@@ -99,10 +99,10 @@ jobs:
         displayName: Add User Local Bin to Path
     - template: Steps/PrGate.yml@mu_devops
       parameters:
-        artifacts_identifier: '${{ item.Value.Build.Pkg }} ${{ item.Value.Build.Targets }}'
-        build_archs: ${{ item.Value.Build.ArchList }}
-        build_pkgs: ${{ item.Value.Build.Pkg }}
-        build_targets: ${{ item.Value.Build.Targets }}
+        artifacts_identifier: '${{ item.Value.Pkg }} ${{ item.Value.Targets }}'
+        build_archs: ${{ item.Value.ArchList }}
+        build_pkgs: ${{ item.Value.Pkg }}
+        build_targets: ${{ item.Value.Targets }}
         do_ci_build: true
         do_ci_setup: true
         do_non_ci_build: false
