@@ -73,9 +73,9 @@ jobs:
     - checkout: none
 
     - task: UsePythonVersion@0
-      displayName: Use Python 3.10.x
+      displayName: Use Python 3.11.x
       inputs:
-        versionSpec: 3.10.x
+        versionSpec: 3.11.x
         architecture: x64
 
     - script: python -m pip install edk2-pytool-extensions==0.*
