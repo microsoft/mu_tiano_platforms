@@ -52,6 +52,9 @@ updates:
       - "type:submodules"
       - "type:dependencies"
     rebase-strategy: "disabled"
+    ignore:
+      - dependency-name: "MU_BASECORE"
+      - dependency-name: "Features/DFCI"
 
   - package-ecosystem: "pip"
     directory: "/"
