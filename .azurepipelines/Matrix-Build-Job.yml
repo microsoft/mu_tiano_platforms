@@ -99,9 +99,9 @@ jobs:
         displayName: Add User Local Bin to Path
     - template: Steps/PrGate.yml@mu_devops
       parameters:
-        artifacts_identifier: '${{ item.Value.Pkg }} ${{ item.Value.Targets }}'
+        artifacts_identifier: '${{ item.Value.Pkgs }} ${{ item.Value.Targets }}'
         build_archs: ${{ item.Value.ArchList }}
-        build_pkgs: ${{ item.Value.Pkg }}
+        build_pkgs: ${{ item.Value.Pkgs }}
         build_targets: ${{ item.Value.Targets }}
         do_ci_build: true
         do_ci_setup: true
