@@ -53,7 +53,7 @@ def main():
         update_firmware()
         return
 
-    # Build the platform specific list.
+    # Build the platform specific arguments.
     qemu_args = []
     if args.arch == "x64":
         build_args_x64(qemu_args)
