@@ -35,6 +35,9 @@ parameters:
   displayName: Run script flag
   type: string
   default: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+- name: run_flags_no_tests
+  displayName: Run script flag
+  value: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE"
 - name: build_matrix
   type: object
   default:
@@ -44,7 +47,9 @@ parameters:
       Build.Arch: IA32,X64
       Build.Flags: ""
       Build.Target: "DEBUG"
+      Build.ExtraTag: ""
       Run: true
+      Run.Flags: ${{ parameters.run_flags }}
       Build.SelfHostAgent: false
       Build.ArtifactsBinary: |
         **/QEMUQ35_*.fd
@@ -55,7 +60,9 @@ parameters:
       Build.Arch: IA32,X64
       Build.Flags: ""
       Build.Target: "RELEASE"
+      Build.ExtraTag: ""
       Run: true
+      Run.Flags: ${{ parameters.run_flags }}
       Build.SelfHostAgent: false
       Build.ArtifactsBinary: |
         **/QEMUQ35_*.fd
@@ -66,7 +73,9 @@ parameters:
       Build.Arch: IA32,X64
       Build.Flags: ""
       Build.Target: "DEBUG"
+      Build.ExtraTag: ""
       Run: false
+      Run.Flags: ${{ parameters.run_flags }}
       Build.SelfHostAgent: true
       Build.ArtifactsBinary: |
         **/QEMUQ35_*.fd
@@ -78,11 +87,25 @@ parameters:
       Build.Arch: IA32,X64
       Build.Flags: ""
       Build.Target: "RELEASE"
+      Build.ExtraTag: ""
       Run: false
+      Run.Flags: ${{ parameters.run_flags }}
       Build.SelfHostAgent: true
       Build.ArtifactsBinary: |
         **/QEMUQ35_*.fd
         **/*/*TestApp.efi
+
+    QemuQ35_NO_SMM_RELEASE:
+      Build.Package: QemuQ35Pkg
+      Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+      Build.Arch: IA32,X64
+      Build.Flags: "BLD_*_SMM_ENABLED=FALSE"
+      Build.Target: "RELEASE"
+      Build.ExtraTag: "NO_SMM"
+      Run: true
+      Run.Flags: $(run_flags_no_tests) BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE
+      Build.ArtifactsBinary: |
+        **/QEMUQ35_*.fd
 
     QemuSbsa_DEBUG:
       Build.Package: QemuSbsaPkg
@@ -90,7 +113,9 @@ parameters:
       Build.Arch: AARCH64
       Build.Flags: ""
       Build.Target: "DEBUG"
+      Build.ExtraTag: ""
       Run: true
+      Run.Flags: ${{ parameters.run_flags }}
       Build.SelfHostAgent: false
       Build.ArtifactsBinary: |
         **/QEMU_EFI.fd
@@ -102,7 +127,9 @@ parameters:
       Build.Arch: AARCH64
       Build.Flags: ""
       Build.Target: "RELEASE"
+      Build.ExtraTag: ""
       Run: true
+      Run.Flags: ${{ parameters.run_flags }}
       Build.SelfHostAgent: false
       Build.ArtifactsBinary: |
         **/QEMU_EFI.fd
@@ -138,11 +165,11 @@ jobs:
           build_arch: $(Build.Arch)
           build_file: $(Build.File)
           build_flags: $(Build.Flags)
-          run_flags: ${{ parameters.run_flags }}
+          run_flags: $(Run.Flags)
           run_timeout: ${{ parameters.run_timeout }}
           extra_install_step: ${{ parameters.extra_install_step }}
           install_tools: and(ne(${{ item.Value.Build.SelfHostAgent }}), eq('${{ parameters.container_image }}', ''))
-          artifacts_identifier: '$(Build.Package) $(tool_chain_tag) $(Build.Target)'
+          artifacts_identifier: '$(Build.Package) $(tool_chain_tag) $(Build.Target) $(Build.ExtraTag)'
           artifacts_binary: $(Build.ArtifactsBinary)
 
     - job: RunQemuBuilds_${{ item.Key }}
@@ -215,4 +242,4 @@ jobs:
       # Copy build logs to the artifact staging directory
       - template: Steps/CommonLogCopyAndPublish.yml@mu_devops
         parameters:
-          artifacts_identifier: 'Binaries $(Build.Package) $(tool_chain_tag) $(Build.Target)'
+          artifacts_identifier: 'Binaries $(Build.Package) $(tool_chain_tag) $(Build.Target) $(Build.ExtraTag)'

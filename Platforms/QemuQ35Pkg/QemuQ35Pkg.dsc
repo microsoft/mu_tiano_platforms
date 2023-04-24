@@ -494,6 +494,7 @@
   HwResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeRuntimeCapsuleLib.inf
+  VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
 
 [LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_DRIVER]
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
@@ -609,12 +610,12 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol|TRUE
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|TRUE
 
-  #gUefiTempTokenSpaceGuid.PcdSmmSmramRequire|TRUE
-  gQemuPkgTokenSpaceGuid.PcdSmmSmramRequire|TRUE
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdStandaloneMmEnable|TRUE
+  gQemuPkgTokenSpaceGuid.PcdSmmSmramRequire|$(SMM_ENABLED)
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdStandaloneMmEnable|$(SMM_ENABLED)
   gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugSupport|FALSE
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdRequireIommu|FALSE # don't require IOMMU
+  gQemuPkgTokenSpaceGuid.PcdEnableMemoryProtection|$(MEMORY_PROTECTION)
 
   !if $(BUILD_UNIT_TESTS) == TRUE
     gUefiCpuPkgTokenSpaceGuid.PcdSmmExceptionTestModeSupport|TRUE
@@ -690,6 +691,10 @@
 
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber|$(QEMU_CORE_NUM)
 
+!if $(SMM_ENABLED) == FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|TRUE
+!endif
+
 [PcdsFixedAtBuild.common]
   # a PCD that controls the enumeration and connection of ConIn's. When true, ConIn is only connected once a console input is requests
   gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand|TRUE
@@ -739,7 +744,6 @@
 
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|TRUE
   gQemuPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0x29C0
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdEnableMemoryProtection|$(MEMORY_PROTECTION)
 
 [PcdsFixedAtBuild.IA32]
   #
@@ -796,6 +800,7 @@
   gUefiQemuQ35PkgTokenSpaceGuid.PcdPciMmio64Base|0x0
   gUefiQemuQ35PkgTokenSpaceGuid.PcdPciMmio64Size|0x800000000
 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
 
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0
 
@@ -1376,6 +1381,18 @@
       NULL|MdeModulePkg/Library/VarCheckPolicyLib/VarCheckPolicyLibStandaloneMm.inf
   }
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
+
+  #
+  # Variable driver stack (NO SMM)
+  #
+  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
+    <LibraryClasses>
+      BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
+      TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
+      IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
+  }
 
   #
   # TPM support

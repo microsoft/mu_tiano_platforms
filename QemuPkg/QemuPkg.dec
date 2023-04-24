@@ -93,6 +93,7 @@
   #  runtime OS from tampering with firmware structures (special memory ranges
   #  used by OVMF, the varstore pflash chip, LockBox etc).
   gQemuPkgTokenSpaceGuid.PcdSmmSmramRequire|FALSE|BOOLEAN|0x22
+  gQemuPkgTokenSpaceGuid.PcdEnableMemoryProtection|TRUE|BOOLEAN|0x23
 
 [Ppis]
   # PPI whose presence in the PPI database signals that the TPM base address

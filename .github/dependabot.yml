@@ -40,16 +40,21 @@ updates:
       prefix: "GitHub Action"
     labels:
       - "type:dependencies"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "gitsubmodule"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
       timezone: "America/Los_Angeles"
       time: "23:00"
     labels:
       - "type:submodules"
       - "type:dependencies"
+    rebase-strategy: "disabled"
+    ignore:
+      - dependency-name: "MU_BASECORE"
+      - dependency-name: "Features/DFCI"
 
   - package-ecosystem: "pip"
     directory: "/"
@@ -62,3 +67,4 @@ updates:
     labels:
       - "language:python"
       - "type:dependencies"
+    rebase-strategy: "disabled"
