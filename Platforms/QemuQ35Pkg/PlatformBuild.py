@@ -23,6 +23,7 @@ from edk2toolext.invocables.edk2_update import UpdateSettingsManager
 from edk2toolext.invocables.edk2_pr_eval import PrEvalSettingsManager
 from edk2toollib.utility_functions import RunCmd, GetHostInfo
 from typing import Tuple
+from io import StringIO
 
 # Declare test whose failure will not return a non-zero exit code
 failure_exempt_tests = {}
@@ -355,6 +356,19 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         nshpath = os.path.join(output_base, "startup.nsh")
         startup_nsh.WriteOut(nshpath, shutdown_after_run)
         VirtualDrive.AddFile(nshpath)
+
+        # Get the version number (repo release)
+        outstream = StringIO()
+        version = "Unknown"
+        ret = RunCmd('git', "rev-parse HEAD", outstream=outstream)
+        if ret == 0:
+            commithash = outstream.getvalue().strip()
+            outstream = StringIO()
+            ret = RunCmd("git", f'describe {commithash} --tags', outstream=outstream)
+            if ret == 0:
+                version = outstream.getvalue().strip()
+
+        self.env.SetValue("VERSION", version, "Set Version value")
 
         ret = self.Helper.QemuRun(self.env)
         if ret != 0:
