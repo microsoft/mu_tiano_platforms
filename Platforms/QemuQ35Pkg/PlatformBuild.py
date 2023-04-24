@@ -384,6 +384,10 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         return failures
 
 class UnitTestSupport(object):
+    paging_audit_data_files = ["1G.dat", "2M.dat", "4K.dat", "PDE.dat", "MAT.dat", 
+                               "GuardPage.dat", "MemoryInfoDatabase.dat"]
+    paging_audit_generator_path = os.path.join("Common", "MU", "UefiTestingPkg", "AuditTests", 
+                                               "PagingAudit", "Windows", "PagingReportGenerator.py")
 
     def __init__(self, host_efi_build_output_path: os.PathLike):
         self.test_list = []
@@ -410,6 +414,16 @@ class UnitTestSupport(object):
         for test in self.test_list:
             if not (os.path.basename(test) in reset_tests):
                 nshfile.AddLine(os.path.basename(test))
+                # Also run DxePagingAuditTestApp.efi with the -d option
+                if ("DxePagingAuditTestApp" in os.path.basename(test)):
+                    nshfile.AddLine(f"{os.path.basename(test)} -d")
+    
+    def generate_paging_audit(self, virtualdrive, report_folder_path):
+        for file in self.paging_audit_data_files:
+            virtualdrive.ExtractFile(file, os.path.join(report_folder_path, file))
+        RunCmd("python", f"{self.paging_audit_generator_path} -i {report_folder_path} \
+-o {report_folder_path}\\pagingaudit.html -p Q35 -t DXE --debug \
+-l {report_folder_path}\\pagingauditdebug.txt -a X64")
 
     def report_results(self, virtualdrive) -> int:
         from html import unescape
@@ -420,6 +434,11 @@ class UnitTestSupport(object):
         failure_count = 0
         logging.info("UnitTest(s) Completed")
         for unit_test in self.test_list:
+
+            # If the test is DxePagingAuditTestApp.efi, run the paging audit generator
+            if (os.path.basename(unit_test) == "DxePagingAuditTestApp.efi"):
+                self.generate_paging_audit(virtualdrive, report_folder_path)
+
             ignore_failure = False
             if (os.path.basename(unit_test) in failure_exempt_tests.keys()):
                 now = datetime.datetime.now()
