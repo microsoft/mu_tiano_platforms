@@ -23,6 +23,7 @@ from edk2toolext.invocables.edk2_setup import SetupSettingsManager, RequiredSubm
 from edk2toolext.invocables.edk2_update import UpdateSettingsManager
 from edk2toolext.invocables.edk2_pr_eval import PrEvalSettingsManager
 from edk2toollib.utility_functions import RunCmd
+from io import StringIO
 
 # Declare test whose failure will not return a non-zero exit code
 failure_exempt_tests = {}
@@ -31,7 +32,6 @@ failure_exempt_tests["LineParserTestApp.efi"] = datetime.datetime(2023, 3, 7, 0,
 failure_exempt_tests["MorLockFunctionalTestApp.efi"] = datetime.datetime(2023, 3, 7, 0, 0, 0)
 failure_exempt_tests["MsWheaEarlyUnitTestApp.efi"] = datetime.datetime(2023, 3, 7, 0, 0, 0)
 failure_exempt_tests["VariablePolicyFuncTestApp.efi"] = datetime.datetime(2023, 3, 7, 0, 0, 0)
-failure_exempt_tests["DeviceIdTestApp.efi"] = datetime.datetime(2023, 3, 7, 0, 0, 0)
 failure_exempt_tests["DxePagingAuditTestApp.efi"] = datetime.datetime(2023, 3, 7, 0, 0, 0)
 failure_exempt_tests["JsonTestApp.efi"] = datetime.datetime(2023, 4, 5, 0, 0, 0)
 failure_exempt_tests["MemoryProtectionTestApp.efi"] = datetime.datetime(2023, 4, 5, 0, 0, 0)
@@ -391,6 +391,19 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         nshpath = os.path.join(output_base, "startup.nsh")
         startup_nsh.WriteOut(nshpath, shutdown_after_run)
         VirtualDrive.AddFile(nshpath)
+
+        # Get the version number (repo release)
+        outstream = StringIO()
+        version = "Unknown"
+        ret = RunCmd('git', "rev-parse HEAD", outstream=outstream)
+        if ret == 0:
+            commithash = outstream.getvalue().strip()
+            outstream = StringIO()
+            ret = RunCmd("git", f'describe {commithash} --tags', outstream=outstream)
+            if ret == 0:
+                version = outstream.getvalue().strip()
+
+        self.env.SetValue("VERSION", version, "Set Version value")
 
         ret = self.Helper.QemuRun(self.env)
         if ret != 0:
