@@ -378,7 +378,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         failures = 0
         if run_tests:
-            failures = ut.report_results(VirtualDrive)
+            failures = ut.report_results(VirtualDrive, self.env)
 
         # do stuff with unit test results here
         return failures
@@ -418,14 +418,16 @@ class UnitTestSupport(object):
                 if ("DxePagingAuditTestApp" in os.path.basename(test)):
                     nshfile.AddLine(f"{os.path.basename(test)} -d")
     
-    def generate_paging_audit(self, virtualdrive, report_folder_path):
+    def generate_paging_audit(self, virtualdrive, report_folder_path, env):
+        version = env.GetValue("VERSION", "Unknown")
+
         for file in self.paging_audit_data_files:
             virtualdrive.ExtractFile(file, os.path.join(report_folder_path, file))
         RunCmd("python", f"{self.paging_audit_generator_path} -i {report_folder_path} \
 -o {report_folder_path}\\pagingaudit.html -p Q35 -t DXE --debug \
--l {report_folder_path}\\pagingauditdebug.txt -a X64")
+-l {report_folder_path}\\pagingauditdebug.txt -a X64 --PlatformVersion {version}")
 
-    def report_results(self, virtualdrive) -> int:
+    def report_results(self, virtualdrive, env) -> int:
         from html import unescape
 
         report_folder_path = os.path.join(os.path.dirname(virtualdrive.drive_path), "unit_test_results")
@@ -437,7 +439,7 @@ class UnitTestSupport(object):
 
             # If the test is DxePagingAuditTestApp.efi, run the paging audit generator
             if (os.path.basename(unit_test) == "DxePagingAuditTestApp.efi"):
-                self.generate_paging_audit(virtualdrive, report_folder_path)
+                self.generate_paging_audit(virtualdrive, report_folder_path, env)
 
             ignore_failure = False
             if (os.path.basename(unit_test) in failure_exempt_tests.keys()):
