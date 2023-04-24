@@ -46,6 +46,14 @@ jobs:
             vs_artifact_name: 'Binaries QemuQ35Pkg VS2022 RELEASE'
             vs_folder_name: VisualStudio-x64
 
+          QEMU Q35 No SMM Release:
+            gcc_artifact_name: 'Binaries QemuQ35Pkg GCC5 RELEASE NO_SMM'
+            gcc_folder_name: GCC-NoSmm-x64
+            nuget_package_config_file: >-
+              Platforms/QemuQ35Pkg/NugetPublishing/ReleaseNoSmmConfig.yaml
+            vs_artifact_name: 'Binaries QemuQ35Pkg VS2022 RELEASE NO_SMM'
+            vs_folder_name: VisualStudio-NoSmm-x64
+
         ${{ if eq(parameters.publish_sbsa_binaries, true) }}:
           QEMU SBSA Debug:
             gcc_artifact_name: 'Binaries QemuSbsaPkg GCC5 DEBUG'
