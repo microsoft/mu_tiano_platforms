@@ -19,7 +19,7 @@ import zipfile
 # Constants
 #
 
-DEFAULT_VERSION = "1.1.4"
+DEFAULT_VERSION = "2.1.0"
 
 #
 # Setup and parse arguments.
@@ -54,6 +54,8 @@ parser.add_argument("--debugfw", action="store_true",
                     help="Enables update to use the DEBUG firmware binaries.")
 parser.add_argument("--verbose", action="store_true",
                     help="Enabled verbose script prints.")
+parser.add_argument("--force", action="store_true",
+                    help="Disables automatic correction of VM configurations.")
 
 args = parser.parse_args()
 
@@ -121,14 +123,21 @@ def build_args_x64(qemu_args: List[str]):
     qemu_args += ["-vga", "cirrus"]
 
     # Flash storage
-    code_fd = f"{args.firmwaredir}/x64/QemuQ35/VisualStudio-x64/QEMUQ35_CODE.fd"
-    data_fd = f"{args.firmwaredir}/x64/QemuQ35/VisualStudio-x64/QEMUQ35_VARS.fd"
-    qemu_args += ["-global", "driver=cfi.pflash01,property=secure,value=on"]
+    if args.accel != "whpx":
+        code_fd = f"{args.firmwaredir}/x64/QemuQ35/VisualStudio-x64/QEMUQ35_CODE.fd"
+        data_fd = f"{args.firmwaredir}/x64/QemuQ35/VisualStudio-x64/QEMUQ35_VARS.fd"
+        qemu_args += ["-global",
+                      "driver=cfi.pflash01,property=secure,value=on"]
+    else:
+        print("Switching to no-SMM firmware for WHPX.")
+        code_fd = f"{args.firmwaredir}/x64/QemuQ35.NoSmm/VisualStudio-NoSmm-x64/QEMUQ35_CODE.fd"
+        data_fd = f"{args.firmwaredir}/x64/QemuQ35.NoSmm/VisualStudio-NoSmm-x64/QEMUQ35_VARS.fd"
+
     qemu_args += ["-drive",
                   f"if=pflash,format=raw,unit=0,file={code_fd},readonly=on"]
     qemu_args += ["-drive", f"if=pflash,format=raw,unit=1,file={data_fd}"]
 
-    if args.cores > 4:
+    if args.cores > 4 and not args.force:
         print("Only 4 core currently supported for ARM64, setting cores to 4.")
         args.cores = 4
 
@@ -147,7 +156,7 @@ def build_args_arm64(qemu_args: List[str]):
     qemu_args += ["-drive",
                   f"if=pflash,format=raw,unit=1,file={efi_fd},readonly=on"]
 
-    if args.cores > 1:
+    if args.cores > 1 and not args.force:
         print("Only one core currently supported for ARM64, setting cores to 1.")
         args.cores = 1
 
@@ -177,6 +186,7 @@ def update_firmware():
 
     build_type = "DEBUG" if args.debugfw else "RELEASE"
     fw_info_list = [["QemuQ35", "x64"],
+                    ["QemuQ35.NoSmm", "x64"],
                     ["QemuSbsa", "aarch64"]]
 
     for fw_info in fw_info_list:
