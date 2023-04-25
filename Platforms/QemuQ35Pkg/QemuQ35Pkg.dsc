@@ -291,6 +291,7 @@
   SvdXmlSettingSchemaSupportLib |SetupDataPkg/Library/SvdXmlSettingSchemaSupportLib/SvdXmlSettingSchemaSupportLib.inf
   ConfigVariableListLib         |SetupDataPkg/Library/ConfigVariableListLib/ConfigVariableListLib.inf
   ConfigSystemModeLib           |QemuPkg/Library/ConfigSystemModeLibQemu/ConfigSystemModeLib.inf
+  ActiveProfileIndexSelectorLib |OemPkg/Library/ActiveProfileIndexSelectorPcdLib/ActiveProfileIndexSelectorPcdLib.inf
 
   # Network libraries
   NetLib                 |NetworkPkg/Library/DxeNetLib/DxeNetLib.inf
@@ -694,6 +695,9 @@
 !if $(SMM_ENABLED) == FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|TRUE
 !endif
+
+  # Use profile index 1
+  gOemPkgTokenSpaceGuid.PcdActiveProfileIndex|0x1
 
 [PcdsFixedAtBuild.common]
   # a PCD that controls the enumeration and connection of ConIn's. When true, ConIn is only connected once a console input is requests

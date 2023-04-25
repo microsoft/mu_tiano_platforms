@@ -282,6 +282,11 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         self.env.SetValue('POLICY_REPORT_FOLDER', self.mws.join(self.ws, "QemuQ35Pkg", "PolicyData"), "Platform Defined")
         self.env.SetValue('MU_SCHEMA_DIR', self.mws.join(self.ws, "Platforms", "QemuQ35Pkg", "CfgData"), "Platform Defined")
         self.env.SetValue('MU_SCHEMA_FILE_NAME', "QemuQ35PkgCfgData.xml", "Platform Hardcoded")
+        self.env.SetValue('CONF_PROFILE_PATHS',
+                          self.mws.join(self.ws, 'Platforms', 'QemuQ35Pkg', 'CfgData', 'Profile0QemuQ35PkgCfgData.csv') + " " +
+                          self.mws.join(self.ws, 'Platforms', 'QemuQ35Pkg', 'CfgData', 'Profile1QemuQ35PkgCfgData.csv'),
+                          "Platform Hardcoded"
+        )
 
         # Globally set CodeQL failures to be ignored in this repo.
         # Note: This has no impact if CodeQL is not active/enabled.

@@ -13,3 +13,4 @@
 #define CONFIG_INCLUDE_CACHE
 #include <Generated/ConfigClientGenerated.h>
 #include <Generated/ConfigDataGenerated.h>
+#include <Generated/ConfigProfilesGenerated.h>
