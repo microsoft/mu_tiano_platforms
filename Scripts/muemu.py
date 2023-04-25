@@ -116,7 +116,7 @@ def build_args_x64(qemu_args: List[str]):
     qemu_args += ["-machine", "q35,smm=on"]
     qemu_args += ["-cpu", "qemu64,+rdrand,umip,+smep"]
     qemu_args += ["-global", "ICH9-LPC.disable_s3=1"]
-    qemu_args += ["-debugcon", "file:uefi-x64.log"]
+    qemu_args += ["-debugcon", "stdio"]  # file:uefi-x64.log
     qemu_args += ["-global", "isa-debugcon.iobase=0x402"]
     qemu_args += ["-vga", "cirrus"]
 
@@ -128,12 +128,16 @@ def build_args_x64(qemu_args: List[str]):
                   f"if=pflash,format=raw,unit=0,file={code_fd},readonly=on"]
     qemu_args += ["-drive", f"if=pflash,format=raw,unit=1,file={data_fd}"]
 
+    if args.cores > 4:
+        print("Only 4 core currently supported for ARM64, setting cores to 4.")
+        args.cores = 4
+
 
 def build_args_arm64(qemu_args: List[str]):
     qemu_args += [f"{args.qemudir}qemu-system-aarch64"]
     qemu_args += ["-machine", "sbsa-ref"]
     qemu_args += ["-cpu", "max"]
-    qemu_args += ["-serial", "file:uefi-arm64.log"]
+    qemu_args += ["-serial", "stdio"]  # file:uefi-arm64.log
 
     # Flash storage
     sec_fd = f"{args.firmwaredir}/aarch64/QemuSbsa/GCC-AARCH64/SECURE_FLASH0.fd"
@@ -143,12 +147,16 @@ def build_args_arm64(qemu_args: List[str]):
     qemu_args += ["-drive",
                   f"if=pflash,format=raw,unit=1,file={efi_fd},readonly=on"]
 
+    if args.cores > 1:
+        print("Only one core currently supported for ARM64, setting cores to 1.")
+        args.cores = 1
+
 
 def run_qemu(qemu_args: List[str]):
     if args.verbose:
         print(qemu_args)
     try:
-        subprocess.run(qemu_args, shell=True)
+        subprocess.run(qemu_args)
     except Exception as e:
         raise e
 
