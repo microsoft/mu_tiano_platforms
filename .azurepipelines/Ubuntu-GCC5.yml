@@ -36,7 +36,7 @@ jobs:
     extra_build_args: CODE_COVERAGE=TRUE
     extra_install_step:
     - script: |
-              sudo dnf install --assumeyes mingw64-gcc
+              sudo apt-get install --assumeyes mingw-w64
       displayName: Install Windows Resource Compiler for Linux
     tool_chain_tag: 'GCC5'
     vm_image: $(vm_image)
