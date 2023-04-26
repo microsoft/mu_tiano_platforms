@@ -663,6 +663,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x8400
   gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize|0x1000
   gPcBdsPkgTokenSpaceGuid.PcdEnableMemMapOutput|0x1
+  gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedFileLoggerFlush|3
+
 !if $(NETWORK_TLS_ENABLE) == FALSE
   # match PcdFlashNvStorageVariableSize purely for convenience
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x40000
