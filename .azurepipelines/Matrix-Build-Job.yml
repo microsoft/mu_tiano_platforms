@@ -109,6 +109,6 @@ jobs:
         do_non_ci_setup: true
         do_pr_eval: true
         extra_build_args: ${{ parameters.extra_build_args }}
-        extra_install_step: ${{ parameters.extra_install_step }}
+        # extra_install_step: ${{ parameters.extra_install_step }}
         install_tools: ${{ and(not(eq(item.Value.SelfHostAgent, true)), eq(parameters.container_image, '')) }}
         tool_chain_tag: ${{ parameters.tool_chain_tag }}
