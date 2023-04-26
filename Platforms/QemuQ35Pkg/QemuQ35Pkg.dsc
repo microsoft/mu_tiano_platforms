@@ -385,6 +385,8 @@
 
 !ifndef $(DEBUG_ON_SERIAL_PORT)
   DebugLib                   |QemuQ35Pkg/Library/PlatformDebugLibIoPort/PlatformRomDebugLibIoPort.inf
+!else
+  DebugLib                   |MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !endif
 
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
@@ -597,10 +599,14 @@
   DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
   AdvancedLoggerHdwPortLib|AdvLoggerPkg/Library/AdvancedLoggerHdwPortLib/AdvancedLoggerHdwPortLib.inf
   AssertLib|AdvLoggerPkg/Library/AssertLib/AssertLib.inf
-  AdvancedLoggerAccessLib |AdvLoggerPkg/Library/AdvancedLoggerAccessLib/AdvancedLoggerAccessLib.inf
+  AdvancedLoggerAccessLib|AdvLoggerPkg/Library/AdvancedLoggerAccessLib/AdvancedLoggerAccessLib.inf
 
 [LibraryClasses.common.MM_CORE_STANDALONE, LibraryClasses.common.MM_STANDALONE, LibraryClasses.common.PEIM, LibraryClasses.common.PEI_CORE]
+!ifndef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|QemuQ35Pkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
+!else
+  DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+!endif
 
 [LibraryClasses.X64]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Dxe/AdvancedLoggerLib.inf
