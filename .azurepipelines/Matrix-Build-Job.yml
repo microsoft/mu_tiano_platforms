@@ -46,31 +46,37 @@ parameters:
       Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
       ArchList: IA32,X64,AARCH64
       SelfHostAgent: false
+      TargetSpecificFlags: ''
     TARGET_QEMU_ARM:
       Pkgs: 'QemuPkg'
       Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
       ArchList: IA32,X64,AARCH64
       SelfHostAgent: true
+      TargetSpecificFlags: 'GCC5_BIN=x86_64-linux-gnu-'
     TARGET_Q35:
       Pkgs: 'QemuQ35Pkg'
       Targets: 'NO-TARGET'
       ArchList: IA32,X64
       SelfHostAgent: false
+      TargetSpecificFlags: ''
     TARGET_Q35_ARM:
       Pkgs: 'QemuQ35Pkg'
       Targets: 'NO-TARGET'
       ArchList: IA32,X64
       SelfHostAgent: true
+      TargetSpecificFlags: 'GCC5_BIN=x86_64-linux-gnu-'
     TARGET_SBSA:
       Pkgs: 'QemuSbsaPkg'
       Targets: 'NO-TARGET'
       ArchList: AARCH64
       SelfHostAgent: false
+      TargetSpecificFlags: ''
     TARGET_SBSA_ARM:
       Pkgs: 'QemuSbsaPkg'
       Targets: 'NO-TARGET'
       ArchList: AARCH64
       SelfHostAgent: true
+      TargetSpecificFlags: 'GCC5_AARCH64_PREFIX=gcc'
 
 
 jobs:
