@@ -385,8 +385,6 @@
 
 !ifndef $(DEBUG_ON_SERIAL_PORT)
   DebugLib                   |QemuQ35Pkg/Library/PlatformDebugLibIoPort/PlatformRomDebugLibIoPort.inf
-!else
-  DebugLib                   |MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !endif
 
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
@@ -596,7 +594,11 @@
 # Advanced Logger Libraries
 #########################################
 [LibraryClasses]
+!ifndef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
+!else
+  DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+!endif
   AdvancedLoggerHdwPortLib|AdvLoggerPkg/Library/AdvancedLoggerHdwPortLib/AdvancedLoggerHdwPortLib.inf
   AssertLib|AdvLoggerPkg/Library/AssertLib/AssertLib.inf
   AdvancedLoggerAccessLib|AdvLoggerPkg/Library/AdvancedLoggerAccessLib/AdvancedLoggerAccessLib.inf
@@ -604,8 +606,6 @@
 [LibraryClasses.common.MM_CORE_STANDALONE, LibraryClasses.common.MM_STANDALONE, LibraryClasses.common.PEIM, LibraryClasses.common.PEI_CORE]
 !ifndef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|QemuQ35Pkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
-!else
-  DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !endif
 
 [LibraryClasses.X64]
@@ -614,19 +614,27 @@
 
 [LibraryClasses.X64.DXE_CORE]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/DxeCore/AdvancedLoggerLib.inf
+!ifndef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
+!endif
 
 [LibraryClasses.X64.DXE_SMM_DRIVER]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Smm/AdvancedLoggerLib.inf
+!ifndef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
+!endif
 
 [LibraryClasses.X64.SMM_CORE]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Smm/AdvancedLoggerLib.inf
+!ifndef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
+!endif
 
 [LibraryClasses.X64.DXE_RUNTIME_DRIVER]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Runtime/AdvancedLoggerLib.inf
+!ifndef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
+!endif
 
 ################################################################################
 #
