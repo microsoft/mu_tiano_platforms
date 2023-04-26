@@ -49,6 +49,8 @@ jobs:
           Run.Flags: $(run_flags) BLD_*_QEMU_CORE_NUM=2
           Build.ArtifactsBinary: |
             **/QEMUQ35_*.fd
+          Build.ArtifactsOther: |
+              **/unit_test_results/*
 
         QemuQ35_RELEASE:
           Build.Package: QemuQ35Pkg
@@ -61,6 +63,8 @@ jobs:
           Run.Flags: $(run_flags) BLD_*_QEMU_CORE_NUM=2
           Build.ArtifactsBinary: |
             **/QEMUQ35_*.fd
+          Build.ArtifactsOther: |
+              **/unit_test_results/*
 
         QemuQ35_NO_SMM_RELEASE:
           Build.Package: QemuQ35Pkg
@@ -87,6 +91,8 @@ jobs:
             Build.ArtifactsBinary: |
               **/QEMU_EFI.fd
               **/SECURE_FLASH0.fd
+            Build.ArtifactsOther: |
+              **/unit_test_results/*
 
           QemuSbsa_RELEASE:
             Build.Package: QemuSbsaPkg
@@ -100,6 +106,8 @@ jobs:
             Build.ArtifactsBinary: |
               **/QEMU_EFI.fd
               **/SECURE_FLASH0.fd
+            Build.ArtifactsOther: |
+              **/unit_test_results/*
 
     workspace:
       clean: all
@@ -130,3 +138,4 @@ jobs:
         install_tools: ${{ eq(parameters.container_image, '') }}
         artifacts_identifier: '$(Build.Package) ${{ parameters.tool_chain_tag }} $(Build.Target) $(Build.ExtraTag)'
         artifacts_binary: $(Build.ArtifactsBinary)
+        artifacts_other: $(Build.ArtifactsOther)

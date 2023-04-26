@@ -153,14 +153,6 @@ jobs:
         contents: '**'
         flattenFolders: true
       condition: and(ne(variables.vs_artifact_name, ''), ne(variables.vs_folder_name, ''))
-    
-    - task: CopyFiles@2
-      displayName: Copy Unit Test Results
-      inputs:
-        targetFolder: "$(Build.ArtifactStagingDirectory)/unit_test_results"
-        SourceFolder: "Build"
-        contents: |
-          **/unit_test_results/*
 
     - task: Bash@3
       name: PackAndPublishNugetPackage
