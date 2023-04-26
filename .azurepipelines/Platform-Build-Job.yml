@@ -25,7 +25,7 @@ parameters:
   default: ''
 
 jobs:
-  - job: PlatformBuild
+  - job: PlatformBuild_${{ parameters.tool_chain_tag }}
     displayName: Build Platforms
 
     variables:
@@ -118,7 +118,7 @@ jobs:
         displayName: Install mtools and dosfstools
     - template: Steps/BuildPlatform.yml@mu_devops
       parameters:
-        tool_chain_tag: $(tool_chain_tag)
+        tool_chain_tag: ${{ parameters.tool_chain_tag }}
         build_pkg: $(Build.Package)
         build_target: $(Build.Target)
         build_arch: $(Build.Arch)
@@ -128,5 +128,5 @@ jobs:
         run_timeout: 25
         extra_install_step: ${{ parameters.extra_install_step }}
         install_tools: ${{ eq(parameters.container_image, '') }}
-        artifacts_identifier: '$(Build.Package) $(tool_chain_tag) $(Build.Target) $(Build.ExtraTag)'
+        artifacts_identifier: '$(Build.Package) ${{ parameters.tool_chain_tag }} $(Build.Target) $(Build.ExtraTag)'
         artifacts_binary: $(Build.ArtifactsBinary)
