@@ -205,6 +205,10 @@ jobs:
           displayName: Add User Local Bin to Path
         - script: sudo dnf install -y mtools dosfstools
           displayName: Install mtools and dosfstools
+
+      # Potential Extra steps from specific build targets
+      ${{ item.Value.BuildExtraStep }}
+
       - template: Steps/BuildPlatform.yml@mu_devops
         parameters:
           tool_chain_tag: $(tool_chain_tag)
@@ -215,7 +219,7 @@ jobs:
           build_flags: ${{ item.Value.BuildFlags }}
           run_flags: ${{ item.Value.RunFlags }}
           run_timeout: ${{ parameters.run_timeout }}
-          extra_install_step: ${{ parameters.extra_install_step }} ${{ item.Value.BuildExtraStep }}
+          extra_install_step: ${{ parameters.extra_install_step }}
           install_tools: ${{ and(not(eq(item.Value.SelfHostAgent, true)), eq(parameters.container_image, '')) }}
           artifacts_identifier: '${{ item.Value.BuildPackage }} $(tool_chain_tag) ${{ item.Value.BuildTarget }} ${{ item.Value.BuildExtraTag }}'
           artifacts_binary: ${{ item.Value.BuildArtifactsBinary }}
