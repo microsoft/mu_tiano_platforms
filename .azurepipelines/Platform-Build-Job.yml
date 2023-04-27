@@ -43,7 +43,7 @@ parameters:
       Build.ExtraTag: ""
       Run: true
       Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-      Build.SelfHostAgent: false
+      SelfHostAgent: false
       Build.ArtifactsBinary: |
         **/QEMUQ35_*.fd
 
@@ -56,7 +56,7 @@ parameters:
       Build.ExtraTag: ""
       Run: true
       Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-      Build.SelfHostAgent: false
+      SelfHostAgent: false
       Build.ArtifactsBinary: |
         **/QEMUQ35_*.fd
 
@@ -69,7 +69,7 @@ parameters:
       Build.ExtraTag: ""
       Run: false
       Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-      Build.SelfHostAgent: true
+      SelfHostAgent: true
       Build.ArtifactsBinary: |
         **/QEMUQ35_*.fd
         **/*/*TestApp.efi
@@ -83,7 +83,7 @@ parameters:
       Build.ExtraTag: ""
       Run: false
       Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-      Build.SelfHostAgent: true
+      SelfHostAgent: true
       Build.ArtifactsBinary: |
         **/QEMUQ35_*.fd
         **/*/*TestApp.efi
@@ -109,7 +109,7 @@ parameters:
       Build.ExtraTag: ""
       Run: true
       Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-      Build.SelfHostAgent: false
+      SelfHostAgent: false
       Build.ArtifactsBinary: |
         **/QEMU_EFI.fd
         **/SECURE_FLASH0.fd
@@ -123,7 +123,7 @@ parameters:
       Build.ExtraTag: ""
       Run: true
       Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-      Build.SelfHostAgent: false
+      SelfHostAgent: false
       Build.ArtifactsBinary: |
         **/QEMU_EFI.fd
         **/SECURE_FLASH0.fd
@@ -137,7 +137,7 @@ jobs:
       workspace:
         clean: all
 
-      ${{ if and(ne(parameters.container_image, ''), not(${{ item.Value.Build.SelfHostAgent }})) }}:
+      ${{ if and(ne(parameters.container_image, ''), not(${{ item.Value.SelfHostAgent }})) }}:
         container: ${{ parameters.container_image }}
 
       pool:
@@ -161,7 +161,7 @@ jobs:
           run_flags: $(Run.Flags)
           run_timeout: ${{ parameters.run_timeout }}
           extra_install_step: ${{ parameters.extra_install_step }}
-          install_tools: and(ne(${{ item.Value.Build.SelfHostAgent }}), eq('${{ parameters.container_image }}', ''))
+          install_tools: and(ne(${{ item.Value.SelfHostAgent }}), eq('${{ parameters.container_image }}', ''))
           artifacts_identifier: '$(Build.Package) $(tool_chain_tag) $(Build.Target) $(Build.ExtraTag)'
           artifacts_binary: $(Build.ArtifactsBinary)
 
