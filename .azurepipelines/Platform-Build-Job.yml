@@ -207,7 +207,7 @@ jobs:
           displayName: Install mtools and dosfstools
 
       # Potential Extra steps from specific build targets
-      ${{ item.Value.BuildExtraStep }}
+      - ${{ item.Value.BuildExtraStep }}
 
       - template: Steps/BuildPlatform.yml@mu_devops
         parameters:
