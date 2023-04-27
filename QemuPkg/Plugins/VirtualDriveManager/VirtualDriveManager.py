@@ -343,6 +343,24 @@ class VirtualDriveManager(IUefiHelperPlugin):
     def add_tests(drive: VirtualDrive, test_list: list[str], auto_run = True, auto_shutdown = True):
         """Adds tests to the virtual drive and optionally adds them to the startup script.
         
+        !!! note
+            Typically, to run a test, one must only run the test efi, however to automate this process, we have added
+            slightly more complex logic to the startup.nsh to ensure the tests will run and provide a fresh set of 
+            results each time tests are added to the it.
+
+            1. We conditionally run a test based off of the presence of a <TestName>_JUNIT.XML. When this file is
+               present, it means that the test has completely finished and the results have been recorded. Once the
+               tests have finished, we rename them to _JUNIT_RESULT.XML so that the presence of these files will not
+               stop tests from running again.
+            
+            2. After all tests have finished, we delete two types of files. The first is a previous run's
+               _JUNIT_RESULT.XML. This is necessary as the mv cannot overwrite a file. The second is that we delete
+               a test's _Cache.dat file. This is important because if we do not delete this file, the efi will execute,
+               but the test will not run. This is because a test uses the _Cache.dat file to see the current status
+               of the test (important for tests that require restarts)
+            
+            3. We finally rename the current test results to _JUNIT_RESULT.XML to reset test progress and also allow
+               for test results to be read after Qemu has shut down.
         Args:
             drive (VirtualDrive): The virtual drive to add the tests to.
             auto_run (Boolean): Whether or not to run tests automatically.
@@ -353,6 +371,17 @@ class VirtualDriveManager(IUefiHelperPlugin):
         if auto_run:
             tests = []
             # Execute all tests
+            tests.append("# 1. We conditionally run a test based off of the presence of a <TestName>_JUNIT.XML. When this file is")
+            tests.append("#    present, it means that the test has completely finished and the results have been recorded. Once the")
+            tests.append("#    tests have finished, we rename them to _JUNIT_RESULT.XML so that the presence of these files will not")
+            tests.append("#    stop tests from running again.")
+            tests.append("# 2. After all tests have finished, we delete two types of files. The first is a previous run's")
+            tests.append("#    _JUNIT_RESULT.XML. This is necessary as the mv cannot overwrite a file. The second is that we delete")
+            tests.append("#    a test's _Cache.dat file. This is important because if we do not delete this file, the efi will execute,")
+            tests.append("#    but the test will not run. This is because a test uses the _Cache.dat file to see the current status")
+            tests.append("#    of the test (important for tests that require restarts)")
+            tests.append("# 3. We finally rename the current test results to _JUNIT_RESULT.XML to reset test progress and also allow")
+            tests.append("#    for test results to be read after Qemu has shut down.")
             for test in test_list:
                 tests.append(f"if not exist {test.stem}_JUNIT.XML then")
                 tests.append(f"    {test.name}")
