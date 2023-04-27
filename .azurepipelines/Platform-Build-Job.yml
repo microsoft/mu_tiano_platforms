@@ -137,6 +137,10 @@ jobs:
       workspace:
         clean: all
 
+      variables:
+      - name: Run
+        value: ${{ item.Value.Run }}
+
       ${{ if and(ne(parameters.container_image, ''), not( item.Value.SelfHostAgent )) }}:
         container: ${{ parameters.container_image }}
 
