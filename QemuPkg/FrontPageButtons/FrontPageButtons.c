@@ -30,10 +30,15 @@ typedef enum {
   VolDownButton = 2
 } BUTTON_STATE;
 
+typedef struct {
+  MS_BUTTON_SERVICES_PROTOCOL    ButtonServicesProtocol;
+  BUTTON_STATE                   ButtonState;
+} FRONT_PAGE_BUTTON_SERVICES_PROTOCOL;
+
+#define MS_BSP_FROM_BSP(a)  BASE_CR (a, FRONT_PAGE_BUTTON_SERVICES_PROTOCOL, ButtonServicesProtocol)
+
 #define SMBIOS_VOLUME_UP    "Vol+"
 #define SMBIOS_VOLUME_DOWN  "Vol-"
-
-BUTTON_STATE  gButtonState = NoButtons;
 
 /*
 Say volume up button is pressed because we want to go to Front Page.
@@ -50,8 +55,12 @@ PreBootVolumeUpButtonThenPowerButtonCheck (
   OUT BOOLEAN                      *PreBootVolumeUpButtonThenPowerButton // TRUE if button combo set else FALSE
   )
 {
+  FRONT_PAGE_BUTTON_SERVICES_PROTOCOL  *Bsp;
+
   DEBUG ((DEBUG_ERROR, "%a \n", __FUNCTION__));
-  *PreBootVolumeUpButtonThenPowerButton = (gButtonState == VolUpButton);
+
+  Bsp                                   = MS_BSP_FROM_BSP (This);
+  *PreBootVolumeUpButtonThenPowerButton = (Bsp->ButtonState == VolUpButton);
   return EFI_SUCCESS;
 }
 
@@ -71,7 +80,10 @@ PreBootVolumeDownButtonThenPowerButtonCheck (
   )
 {
   DEBUG ((DEBUG_ERROR, "%a \n", __FUNCTION__));
-  *PreBootVolumeDownButtonThenPowerButton = (gButtonState == VolDownButton);
+  FRONT_PAGE_BUTTON_SERVICES_PROTOCOL  *Bsp;
+
+  Bsp                                     = MS_BSP_FROM_BSP (This);
+  *PreBootVolumeDownButtonThenPowerButton = (Bsp->ButtonState == VolDownButton);
   return EFI_SUCCESS;
 }
 
@@ -85,11 +97,14 @@ Clear current button state.
 EFI_STATUS
 EFIAPI
 PreBootClearVolumeButtonState (
-  MS_BUTTON_SERVICES_PROTOCOL  *This
+  IN  MS_BUTTON_SERVICES_PROTOCOL  *This
   )
 {
   DEBUG ((DEBUG_ERROR, "%a \n", __FUNCTION__));
-  gButtonState = NoButtons;
+  FRONT_PAGE_BUTTON_SERVICES_PROTOCOL  *Bsp;
+
+  Bsp              = MS_BSP_FROM_BSP (This);
+  Bsp->ButtonState = NoButtons;
 
   return EFI_SUCCESS;
 }
@@ -124,13 +139,15 @@ GetBiosString (
 GetButtonState gets the button state of the Vol+/Vol- buttons from the SMBIOS Table, and stores that
 state in gButtonState.
 
+@param[in]    - Front Page Button Services Protocol pointer
+
 @return EFI_SUCCESS - String buffer returned to caller
 @return EFI_ERROR   - Error the string
 
 **/
 EFI_STATUS
 GetButtonState (
-  VOID
+  IN  FRONT_PAGE_BUTTON_SERVICES_PROTOCOL  *Bsp
   )
 {
   CHAR8                *BiosString;
@@ -145,7 +162,7 @@ GetButtonState (
 
   Status = EFI_SUCCESS;
 
-  DEBUG ((DEBUG_ERROR, "%a: Entry\n", __FUNCTION__));
+  DEBUG ((DEBUG_VERBOSE, "%a: Entry\n", __FUNCTION__));
 
   Status = gBS->LocateProtocol (&gEfiSmbiosProtocolGuid, NULL, (VOID *)&Smbios);
   if (EFI_ERROR (Status)) {
@@ -154,9 +171,9 @@ GetButtonState (
   }
 
   SmbiosType   = SMBIOS_TYPE_SYSTEM_ENCLOSURE;
-  SmbiosHandle = 0xFFFe;
+  SmbiosHandle = SMBIOS_HANDLE_PI_RESERVED;
 
-  // -smbios type=3,version=V+
+  // -SMBIOS type=3,version=V+ or version=V-
 
   Status = Smbios->GetNext (Smbios, &SmbiosHandle, &SmbiosType, &SmbiosRecord, NULL);
   if (EFI_ERROR (Status)) {
@@ -168,7 +185,7 @@ GetButtonState (
   StringPtr   = (CHAR8 *)SmbiosType3 + SmbiosType3->Hdr.Length;
 
   DEBUG ((DEBUG_INFO, "Type 3 = %p, Size=0x%x, String = %p\n", SmbiosType3, SmbiosType3->Hdr.Length, StringPtr));
-  DUMP_HEX (DEBUG_INFO, 0, SmbiosType3, ((UINTN)StringPtr | 0xFFF) - (UINTN)SmbiosType3, "");
+  DUMP_HEX (DEBUG_INFO, (UINTN)SmbiosType3, SmbiosType3, ((UINTN)StringPtr | 0xFFF) - (UINTN)SmbiosType3, "Type3 ");
 
   BiosString = GetBiosString (StringPtr, SmbiosType3->Version);
 
@@ -178,19 +195,19 @@ GetButtonState (
     if ((StrLen == AsciiStrLen (SMBIOS_VOLUME_UP))  &&
         (0 == AsciiStrCmp (BiosString, SMBIOS_VOLUME_UP)))
     {
-      gButtonState = VolUpButton;
+      Bsp->ButtonState = VolUpButton;
       DEBUG ((DEBUG_INFO, "%a: Vol+ Button Detected\n", __FUNCTION__));
     }
 
     if ((StrLen == AsciiStrLen (SMBIOS_VOLUME_DOWN)) &&
         (0 == AsciiStrCmp (BiosString, SMBIOS_VOLUME_DOWN)))
     {
-      gButtonState = VolDownButton;
+      Bsp->ButtonState = VolDownButton;
       DEBUG ((DEBUG_INFO, "%a: Vol- Button Detected\n", __FUNCTION__));
     }
   }
 
-  if (gButtonState == NoButtons) {
+  if (Bsp->ButtonState == NoButtons) {
     DEBUG ((DEBUG_INFO, "%a: Neither Vol+ nor Vol- detected\n", __FUNCTION__));
   }
 
@@ -214,38 +231,40 @@ ButtonsInit (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  MS_BUTTON_SERVICES_PROTOCOL  *Protocol = NULL;
-  EFI_STATUS                   Status    = EFI_SUCCESS;
+  FRONT_PAGE_BUTTON_SERVICES_PROTOCOL  *Bsp   = NULL;
+  EFI_STATUS                           Status = EFI_SUCCESS;
 
-  DEBUG ((DEBUG_ERROR, "%a \n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a \n", __FUNCTION__));
 
-  Status = GetButtonState ();
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Protocol = AllocateZeroPool (sizeof (MS_BUTTON_SERVICES_PROTOCOL));
-  if (Protocol == NULL) {
+  Bsp = AllocateZeroPool (sizeof (FRONT_PAGE_BUTTON_SERVICES_PROTOCOL));
+  if (Bsp == NULL) {
     DEBUG ((DEBUG_ERROR, "Failed to allocate memory for button service protocol.\n"));
     return EFI_SUCCESS;
   }
 
-  Protocol->PreBootVolumeDownButtonThenPowerButtonCheck = PreBootVolumeDownButtonThenPowerButtonCheck;
-  Protocol->PreBootVolumeUpButtonThenPowerButtonCheck   = PreBootVolumeUpButtonThenPowerButtonCheck;
-  Protocol->PreBootClearVolumeButtonState               = PreBootClearVolumeButtonState;
+  Bsp->ButtonServicesProtocol.PreBootVolumeDownButtonThenPowerButtonCheck = PreBootVolumeDownButtonThenPowerButtonCheck;
+  Bsp->ButtonServicesProtocol.PreBootVolumeUpButtonThenPowerButtonCheck   = PreBootVolumeUpButtonThenPowerButtonCheck;
+  Bsp->ButtonServicesProtocol.PreBootClearVolumeButtonState               = PreBootClearVolumeButtonState;
+  Bsp->ButtonState                                                        = NoButtons;
+
+  Status = GetButtonState (Bsp);
+  if (EFI_ERROR (Status)) {
+    FreePool (Bsp);
+    return Status;
+  }
 
   // Install the protocol
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &ImageHandle,
                   &gMsButtonServicesProtocolGuid,
-                  Protocol,
+                  Bsp,
                   NULL
                   );
 
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Button Services Protocol Publisher: install protocol error, Status = %r.\n", Status));
-    FreePool (Protocol);
-    return EFI_SUCCESS;
+    FreePool (Bsp);
+    return Status;
   }
 
   DEBUG ((DEBUG_INFO, "Button Services Protocol Installed!\n"));
