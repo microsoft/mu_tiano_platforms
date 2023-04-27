@@ -16,7 +16,7 @@ import uuid
 import string
 import datetime
 
-from edk2toolext.environment import shell_environment, repo_resolver
+from edk2toolext.environment import shell_environment
 from edk2toolext.environment.uefi_build import UefiBuilder
 from edk2toolext.invocables.edk2_platform_build import BuildSettingsManager
 from edk2toolext.invocables.edk2_setup import SetupSettingsManager, RequiredSubmodule
@@ -401,15 +401,14 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         # Helper located at Platforms/QemuQ35Pkg/Plugins/QemuRunner
 
         # Get the version number (repo release)
-        head = repo_resolver.repo_details(self.GetWorkspaceRoot()).get("Head", None)
-        if head:
+        outstream = StringIO()
+        version = "Unknown"
+        ret = RunCmd('git', "rev-parse HEAD", outstream=outstream)
+        if ret == 0:
             outstream = StringIO()
-            ret = RunCmd("git", f'describe {head["HexSha"]} --tags', outstream=outstream)
+            ret = RunCmd("git", f'describe {version} --tags', outstream=outstream)
             if ret == 0:
                 version = outstream.getvalue().strip()
-        else:
-            version = "unknown"
-        self.env.SetValue("VERSION", version, "Set Version value")
 
         ret = self.Helper.QemuRun(self.env)
         if ret != 0:
