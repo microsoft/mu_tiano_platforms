@@ -459,7 +459,7 @@ class UnitTestSupport(object):
         version = env.GetValue("VERSION", "Unknown")
 
         for file in self.paging_audit_data_files:
-            file_path = os.path.join(self.drive_letter + ":", file)
+            file_path = os.path.join(virtualdrive.drive_letter + ":", file)
             virtualdrive.ExtractFile(file_path, os.path.join(report_folder_path, file))
         RunCmd("python", f"{self.paging_audit_generator_path} -i {report_folder_path} \
 -o {report_folder_path}\\pagingaudit.html -p SBSA -t DXE --debug \
