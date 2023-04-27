@@ -49,8 +49,7 @@ jobs:
           Run.Flags: $(run_flags) BLD_*_QEMU_CORE_NUM=2
           Build.ArtifactsBinary: |
             **/QEMUQ35_*.fd
-          Build.ArtifactsOther: |
-              **/unit_test_results/*
+          Build.ArtifactsOther: "**/unit_test_results/*"
 
         QemuQ35_RELEASE:
           Build.Package: QemuQ35Pkg
@@ -63,8 +62,7 @@ jobs:
           Run.Flags: $(run_flags) BLD_*_QEMU_CORE_NUM=2
           Build.ArtifactsBinary: |
             **/QEMUQ35_*.fd
-          Build.ArtifactsOther: |
-              **/unit_test_results/*
+          Build.ArtifactsOther: "**/unit_test_results/*"
 
         QemuQ35_NO_SMM_RELEASE:
           Build.Package: QemuQ35Pkg
@@ -77,6 +75,7 @@ jobs:
           Run.Flags: $(run_flags_no_tests) BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE
           Build.ArtifactsBinary: |
             **/QEMUQ35_*.fd
+          Build.ArtifactsOther: ""
 
         ${{ if eq(parameters.tool_chain_tag, 'GCC5') }}:
           QemuSbsa_DEBUG:
@@ -91,8 +90,7 @@ jobs:
             Build.ArtifactsBinary: |
               **/QEMU_EFI.fd
               **/SECURE_FLASH0.fd
-            Build.ArtifactsOther: |
-              **/unit_test_results/*
+            Build.ArtifactsOther: "**/unit_test_results/*"
 
           QemuSbsa_RELEASE:
             Build.Package: QemuSbsaPkg
@@ -106,8 +104,7 @@ jobs:
             Build.ArtifactsBinary: |
               **/QEMU_EFI.fd
               **/SECURE_FLASH0.fd
-            Build.ArtifactsOther: |
-              **/unit_test_results/*
+            Build.ArtifactsOther: "**/unit_test_results/*"
 
     workspace:
       clean: all
@@ -133,7 +130,7 @@ jobs:
         build_file: $(Build.File)
         build_flags: $(Build.Flags)
         run_flags: $(Run.Flags)
-        run_timeout: 25
+        run_timeout: 10
         extra_install_step: ${{ parameters.extra_install_step }}
         install_tools: ${{ eq(parameters.container_image, '') }}
         artifacts_identifier: '$(Build.Package) ${{ parameters.tool_chain_tag }} $(Build.Target) $(Build.ExtraTag)'
