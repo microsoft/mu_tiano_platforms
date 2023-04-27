@@ -187,7 +187,10 @@ jobs:
 
       variables:
       - name: Run
-        value: or(${{ item.Value.Run }}, ne(${{ parameters.container_image }}, ''))
+        ${{ if or(item.Value.Run, ne(parameters.container_image, '')) }}:
+          value: true
+        ${{ else }}:
+          value: false
 
       ${{ if and(ne(parameters.container_image, ''), not(eq(item.Value.SelfHostAgent, true))) }}:
         container: ${{ parameters.container_image }}
