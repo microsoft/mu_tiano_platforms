@@ -169,8 +169,7 @@ jobs:
       displayName: Run Qemu Builds
       dependsOn: PlatformBuild_${{ item.Key }}
       condition: |
-        and(succeeded(), and(ne(variables['tool_chain_tag'], 'GCC5'),
-        and(StartsWith('${{ item.Key }}', 'QemuQ35Pkg'), EndsWith('${{ item.Key }}', 'ARM')))
+        and(succeeded(), and(ne(variables['tool_chain_tag'], 'GCC5'), and(StartsWith('${{ item.Key }}', 'QemuQ35Pkg'), EndsWith('${{ item.Key }}', 'ARM')))
 
       pool:
         vmImage: ${{ parameters.vm_image }}
