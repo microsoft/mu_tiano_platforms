@@ -1309,7 +1309,7 @@
     <PcdsFixedAtBuild>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
     <BuildOptions>
-      GCC:*_*_AARCH64_CC_FLAGS = -fpic
+      *_*_AARCH64_CC_FLAGS = -fpic
   }
 
   ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf {
