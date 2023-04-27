@@ -422,11 +422,11 @@ class UnitTestSupport(object):
         version = env.GetValue("VERSION", "Unknown")
 
         for file in self.paging_audit_data_files:
-            file_path = os.path.join(virtualdrive.drive_letter + ":", file)
-            virtualdrive.ExtractFile(file_path, os.path.join(report_folder_path, file))
+            virtualdrive.ExtractFile(file, os.path.join(report_folder_path, file))
+        output_audit = os.path.join(report_folder_path, "pagingaudit.html")
+        output_debug = os.path.join(report_folder_path, "pagingauditdebug.txt")
         RunCmd("python", f"{self.paging_audit_generator_path} -i {report_folder_path} \
--o {report_folder_path}\\pagingaudit.html -p Q35 -t DXE --debug \
--l {report_folder_path}\\pagingauditdebug.txt -a X64 --PlatformVersion {version}")
+-o {output_audit} -p Q35 -t DXE --debug -l {output_debug} -a X64 --PlatformVersion {version}")
 
     def report_results(self, virtualdrive, env) -> int:
         from html import unescape
@@ -564,15 +564,15 @@ class LinuxVirtualDriveManager(object):
         if temp_extract_path == None:
             temp_extract_path = tempfile.mktemp()
         logging.info(f"Extracting {VirtualFilePath} to {temp_extract_path}")
-        full_path = os.path.join(self.drive_letter + ":", VirtualFilePath)
-        ret = self.ExtractFile(full_path, temp_extract_path)
+        ret = self.ExtractFile(VirtualFilePath, temp_extract_path)
         if ret != 0:
             raise FileNotFoundError(VirtualFilePath)
         with open(temp_extract_path, "rb") as f:
             return f.read()
 
     def ExtractFile(self, VirtualFilePath, HostFilePath:os.PathLike):
-        ret = RunCmd("mcopy", f"-n -i {self.drive_path} {VirtualFilePath} {HostFilePath}")
+        full_path = os.path.join(self.drive_letter + ":", VirtualFilePath)
+        ret = RunCmd("mcopy", f"-n -i {self.drive_path} {full_path} {HostFilePath}")
         return ret
 
 class StartUpScriptManager(object):
