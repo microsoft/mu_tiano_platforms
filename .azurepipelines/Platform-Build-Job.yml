@@ -137,7 +137,7 @@ jobs:
       workspace:
         clean: all
 
-      ${{ if and(ne(parameters.container_image, ''), not(${{ item.Value.SelfHostAgent }})) }}:
+      ${{ if and(ne(parameters.container_image, ''), not( item.Value.SelfHostAgent )) }}:
         container: ${{ parameters.container_image }}
 
       pool:
