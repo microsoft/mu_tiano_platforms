@@ -172,7 +172,7 @@ class LinuxVirtualDrive(VirtualDrive):
     def add_file(self, filepath: PathLike):
         """Adds a file to the virtual drive."""
         cmd = "mcopy"
-        args = f"-n -i {str(self.drive_path)} {filepath} {self.drive_letter}:"
+        args = f"-D overwrite -i {str(self.drive_path)} {filepath} {self.drive_letter}:"
         result = RunCmd(cmd, args)
         if result != 0:
             e = f"[{cmd} {args}] Result: {result}"
@@ -358,8 +358,10 @@ class VirtualDriveManager(IUefiHelperPlugin):
                 tests.append(f"    {test.name}")
                 tests.append("endif")
             
-            # Remove any old test results
-            tests.append("*_JUNIT_RESULT.XML")
+            # Tests have finished, no more restarts
+            # Remove any old test results and reset test status
+            tests.append("rm *_JUNIT_RESULT.XML")
+            tests.append("rm *_Cache.dat")
             
             # Rename test results to what we expect
             for test in test_list:
@@ -367,8 +369,6 @@ class VirtualDriveManager(IUefiHelperPlugin):
                 tests.append(f"    mv {test.stem}_JUNIT.XML {test.stem}_JUNIT_RESULT.XML")
                 tests.append("endif")
             
-            # Reset test status by deleting dat files (so future runs will not skip)
-            tests.append("rm *.dat")
         drive.add_startup_script(tests, auto_shutdown = auto_shutdown)
     
     @staticmethod
