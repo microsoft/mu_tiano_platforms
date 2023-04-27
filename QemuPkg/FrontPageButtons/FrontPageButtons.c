@@ -1,4 +1,4 @@
-/** @file FrontpageButtons.c
+/** @file FrontPageButtons.c
 
  This module installs the MsButtonServicesProtocol and reports the requested state of Vol+ and
  Vol- as indicated by the smbios table type3 record version string.
@@ -36,7 +36,7 @@ typedef enum {
 BUTTON_STATE  gButtonState = NoButtons;
 
 /*
-Say volume up button is pressed because we want to go to frontpage.
+Say volume up button is pressed because we want to go to Front Page.
 
 @param[in]     - Button Services protocol pointer
 @param[out]    - Pointer to a boolean value to receive the button state
