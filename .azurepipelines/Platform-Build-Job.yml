@@ -140,9 +140,12 @@ jobs:
       ${{ if and(ne(parameters.container_image, ''), not( item.Value.SelfHostAgent )) }}:
         container: ${{ parameters.container_image }}
 
-      pool:
-        name: $(Build.AgentPool)
-        vmImage: ${{ parameters.vm_image }}
+      ${{ if eq(item.Value.SelfHostAgent, true) }}:
+        pool:
+          name: ${{ parameters.pool_name }}
+      ${{ else }}:
+        pool:
+          vmImage: ${{ parameters.vm_image }}
 
       steps:
       - ${{ if and(ne(parameters.container_image, ''), not(contains(parameters.vm_image, 'windows'))) }}:
@@ -166,7 +169,7 @@ jobs:
           artifacts_binary: $(Build.ArtifactsBinary)
 
     - job: RunQemuBuilds_${{ item.Key }}
-      displayName: Run Qemu Builds
+      displayName: Run Qemu Builds ${{ item.Key }}
       dependsOn: PlatformBuild_${{ item.Key }}
       condition: |
         and(succeeded(),
