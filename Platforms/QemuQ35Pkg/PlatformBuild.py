@@ -344,7 +344,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
             if not shutdown_after_run:
                 logging.info("SHUTDOWN_AFTER_RUN=FALSE. You will need to close qemu manually to gather test results.")
-       
 
         # Get a reference to the virtual drive, creating / wiping as necessary
         # Helper located at QemuPkg/Plugins/VirtualDriveManager
@@ -368,8 +367,9 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         version = "Unknown"
         ret = RunCmd('git', "rev-parse HEAD", outstream=outstream)
         if ret == 0:
+            commithash = outstream.getvalue().strip
             outstream = StringIO()
-            ret = RunCmd("git", f'describe {version} --tags', outstream=outstream)
+            ret = RunCmd("git", f'describe {commithash} --tags', outstream=outstream)
             if ret == 0:
                 version = outstream.getvalue().strip()
 

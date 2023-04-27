@@ -368,7 +368,6 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         test_regex = self.env.GetValue("TEST_REGEX", "")
         drive_path = self.env.GetValue("VIRTUAL_DRIVE_PATH")
 
-
         # General debugging information for users
         if run_tests:
             if test_regex == "":
@@ -405,8 +404,9 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         version = "Unknown"
         ret = RunCmd('git', "rev-parse HEAD", outstream=outstream)
         if ret == 0:
+            commithash = outstream.getvalue().strip()
             outstream = StringIO()
-            ret = RunCmd("git", f'describe {version} --tags', outstream=outstream)
+            ret = RunCmd("git", f'describe {commithash} --tags', outstream=outstream)
             if ret == 0:
                 version = outstream.getvalue().strip()
 
