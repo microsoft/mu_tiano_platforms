@@ -31,13 +31,6 @@ parameters:
   displayName: Run Timeout (in minutes)
   type: number
   default: 25
-- name: run_flags
-  displayName: Run script flag
-  type: string
-  default: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-- name: run_flags_no_tests
-  displayName: Run script flag
-  value: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE"
 - name: build_matrix
   type: object
   default:
@@ -49,7 +42,7 @@ parameters:
       Build.Target: "DEBUG"
       Build.ExtraTag: ""
       Run: true
-      Run.Flags: ${{ parameters.run_flags }}
+      Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       Build.SelfHostAgent: false
       Build.ArtifactsBinary: |
         **/QEMUQ35_*.fd
@@ -62,7 +55,7 @@ parameters:
       Build.Target: "RELEASE"
       Build.ExtraTag: ""
       Run: true
-      Run.Flags: ${{ parameters.run_flags }}
+      Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       Build.SelfHostAgent: false
       Build.ArtifactsBinary: |
         **/QEMUQ35_*.fd
@@ -75,7 +68,7 @@ parameters:
       Build.Target: "DEBUG"
       Build.ExtraTag: ""
       Run: false
-      Run.Flags: ${{ parameters.run_flags }}
+      Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       Build.SelfHostAgent: true
       Build.ArtifactsBinary: |
         **/QEMUQ35_*.fd
@@ -89,7 +82,7 @@ parameters:
       Build.Target: "RELEASE"
       Build.ExtraTag: ""
       Run: false
-      Run.Flags: ${{ parameters.run_flags }}
+      Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       Build.SelfHostAgent: true
       Build.ArtifactsBinary: |
         **/QEMUQ35_*.fd
@@ -103,7 +96,7 @@ parameters:
       Build.Target: "RELEASE"
       Build.ExtraTag: "NO_SMM"
       Run: true
-      Run.Flags: $(run_flags_no_tests) BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE
+      Run.Flags: SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE
       Build.ArtifactsBinary: |
         **/QEMUQ35_*.fd
 
@@ -115,7 +108,7 @@ parameters:
       Build.Target: "DEBUG"
       Build.ExtraTag: ""
       Run: true
-      Run.Flags: ${{ parameters.run_flags }}
+      Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       Build.SelfHostAgent: false
       Build.ArtifactsBinary: |
         **/QEMU_EFI.fd
@@ -129,7 +122,7 @@ parameters:
       Build.Target: "RELEASE"
       Build.ExtraTag: ""
       Run: true
-      Run.Flags: ${{ parameters.run_flags }}
+      Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       Build.SelfHostAgent: false
       Build.ArtifactsBinary: |
         **/QEMU_EFI.fd
@@ -235,7 +228,7 @@ jobs:
       - task: CmdLine@2
         displayName: Run to Shell
         inputs:
-          script: stuart_build -c $(Build.File) TOOL_CHAIN_TAG=$(tool_chain_tag) TARGET=$(Build.Target) -a $(Build.Arch) $(Build.Flags) ${{ parameters.run_flags }} --FlashOnly
+          script: stuart_build -c $(Build.File) TOOL_CHAIN_TAG=$(tool_chain_tag) TARGET=$(Build.Target) -a $(Build.Arch) $(Build.Flags) $(Run.Flags) --FlashOnly
         condition: and(gt(variables.pkg_count, 0), succeeded())
         timeoutInMinutes: ${{ parameters.run_timeout }}
 
