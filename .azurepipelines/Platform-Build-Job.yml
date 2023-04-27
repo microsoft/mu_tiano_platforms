@@ -42,7 +42,7 @@ parameters:
       BuildTarget: "DEBUG"
       BuildExtraTag: ""
       Run: true
-      Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: false
       BuildArtifactsBinary: |
         **/QEMUQ35_*.fd
@@ -55,7 +55,7 @@ parameters:
       BuildTarget: "RELEASE"
       BuildExtraTag: ""
       Run: true
-      Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: false
       BuildArtifactsBinary: |
         **/QEMUQ35_*.fd
@@ -68,7 +68,7 @@ parameters:
       BuildTarget: "DEBUG"
       BuildExtraTag: ""
       Run: false
-      Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: true
       BuildArtifactsBinary: |
         **/QEMUQ35_*.fd
@@ -82,7 +82,7 @@ parameters:
       BuildTarget: "RELEASE"
       BuildExtraTag: ""
       Run: false
-      Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: true
       BuildArtifactsBinary: |
         **/QEMUQ35_*.fd
@@ -96,7 +96,7 @@ parameters:
       BuildTarget: "RELEASE"
       BuildExtraTag: "NO_SMM"
       Run: true
-      Run.Flags: SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE
+      RunFlags: SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE
       BuildArtifactsBinary: |
         **/QEMUQ35_*.fd
 
@@ -108,7 +108,7 @@ parameters:
       BuildTarget: "DEBUG"
       BuildExtraTag: ""
       Run: true
-      Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: false
       BuildArtifactsBinary: |
         **/QEMU_EFI.fd
@@ -122,7 +122,7 @@ parameters:
       BuildTarget: "RELEASE"
       BuildExtraTag: ""
       Run: true
-      Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: false
       BuildArtifactsBinary: |
         **/QEMU_EFI.fd
@@ -161,7 +161,7 @@ jobs:
           build_arch: ${{ item.Value.BuildArch }}
           build_file: ${{ item.Value.BuildFile }}
           build_flags: ${{ item.Value.BuildFlags }}
-          run_flags: $(Run.Flags)
+          run_flags: ${{ item.Value.RunFlags }}
           run_timeout: ${{ parameters.run_timeout }}
           extra_install_step: ${{ parameters.extra_install_step }}
           install_tools: ${{ and(not(eq(item.Value.SelfHostAgent, true)), eq(parameters.container_image, '')) }}
@@ -231,7 +231,7 @@ jobs:
       - task: CmdLine@2
         displayName: Run to Shell
         inputs:
-          script: stuart_build -c ${{ item.Value.BuildFile }} TOOL_CHAIN_TAG=$(tool_chain_tag) TARGET=${{ item.Value.BuildTarget }} -a ${{ item.Value.BuildArch }} ${{ item.Value.BuildFlags }} $(Run.Flags) --FlashOnly
+          script: stuart_build -c ${{ item.Value.BuildFile }} TOOL_CHAIN_TAG=$(tool_chain_tag) TARGET=${{ item.Value.BuildTarget }} -a ${{ item.Value.BuildArch }} ${{ item.Value.BuildFlags }} ${{ item.Value.RunFlags }} --FlashOnly
         condition: and(gt(variables.pkg_count, 0), succeeded())
         timeoutInMinutes: ${{ parameters.run_timeout }}
 
