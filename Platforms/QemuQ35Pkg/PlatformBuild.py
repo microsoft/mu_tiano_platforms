@@ -15,15 +15,16 @@ import tempfile
 import uuid
 import string
 
-from edk2toolext.environment import shell_environment
+from edk2toolext.environment import shell_environment, repo_resolver
 from edk2toolext.environment.uefi_build import UefiBuilder
 from edk2toolext.invocables.edk2_platform_build import BuildSettingsManager
 from edk2toolext.invocables.edk2_setup import SetupSettingsManager, RequiredSubmodule
 from edk2toolext.invocables.edk2_update import UpdateSettingsManager
 from edk2toolext.invocables.edk2_pr_eval import PrEvalSettingsManager
-from edk2toollib.utility_functions import GetHostInfo
+from edk2toollib.utility_functions import RunCmd, GetHostInfo
 from typing import Tuple
 from pathlib import Path
+from io import StringIO
 
 # Declare test whose failure will not return a non-zero exit code
 FAILURE_EXEMPT_TESTS = {
@@ -363,16 +364,14 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             self.Helper.add_tests(virtual_drive, test_list, auto_run = run_tests, auto_shutdown = shutdown_after_run)
 
         # Get the version number (repo release)
-        outstream = StringIO()
-        version = "Unknown"
-        ret = RunCmd('git', "rev-parse HEAD", outstream=outstream)
-        if ret == 0:
-            commithash = outstream.getvalue().strip()
+        head = repo_resolver.repo_details(self.GetWorkspaceRoot()).get("Head", None)
+        if head:
             outstream = StringIO()
-            # See git-describe docs for a breakdown of this command output
-            ret = RunCmd("git", f'describe {commithash} --tags', outstream=outstream)
+            ret = RunCmd("git", f'describe {head["HexSha"]} --tags', outstream=outstream)
             if ret == 0:
                 version = outstream.getvalue().strip()
+        else:
+            version = "unknown"
 
         self.env.SetValue("VERSION", version, "Set Version value")
 
