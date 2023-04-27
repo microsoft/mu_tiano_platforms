@@ -167,9 +167,9 @@ jobs:
 
       variables:
       - name: Run
-        value: ${{ item.Value.Run }}
+        value: or(${{ item.Value.Run }}, eq(variables['tool_chain_tag'], 'GCC5'))
 
-      ${{ if and(ne(parameters.container_image, ''), not( item.Value.SelfHostAgent )) }}:
+      ${{ if and(ne(parameters.container_image, ''), ne(item.Value.SelfHostAgent, true)) }}:
         container: ${{ parameters.container_image }}
 
       ${{ if eq(item.Value.SelfHostAgent, true) }}:
@@ -180,7 +180,7 @@ jobs:
           vmImage: ${{ parameters.vm_image }}
 
       steps:
-      - ${{ if and(ne(parameters.container_image, ''), not(contains(parameters.vm_image, 'windows'))) }}:
+      - ${{ if and(and(ne(parameters.container_image, ''), ne(item.Value.SelfHostAgent, true)), not(contains(parameters.vm_image, 'windows'))) }}:
         - script: echo "##vso[task.prependpath]/home/vsts_azpcontainer/.local/bin"
           displayName: Add User Local Bin to Path
         - script: sudo dnf install -y mtools dosfstools
