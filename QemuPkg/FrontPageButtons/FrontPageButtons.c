@@ -112,12 +112,18 @@ PreBootClearVolumeButtonState (
 /**
   Get Bios String  - Return address of Bios String
 
+@param[in]  StringPtr  - Pointer to the SMBIOS Multi-string
+@param[in]  Index      - Index of the string requested (1 based)
+
+@retval                - Pointer to the SMBIOS string[index] at index requested.
+                         If index causes traversal of the end of string, the pointer
+                         to the NULL byte is returned.
 **/
 STATIC
 CHAR8 *
 GetBiosString (
-  CHAR8  *StringPtr,
-  INTN   Index
+  IN  CHAR8  *StringPtr,
+  IN  INTN   Index
   )
 {
   CHAR8  *TempPtr;
