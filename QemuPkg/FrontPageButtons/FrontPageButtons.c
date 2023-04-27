@@ -57,7 +57,7 @@ PreBootVolumeUpButtonThenPowerButtonCheck (
 {
   FRONT_PAGE_BUTTON_SERVICES_PROTOCOL  *Bsp;
 
-  DEBUG ((DEBUG_INFO, "%a \n", __FUNCTION__));
+  DEBUG ((DEBUG_VERBOSE, "%a \n", __FUNCTION__));
 
   Bsp                                   = MS_BSP_FROM_BSP (This);
   *PreBootVolumeUpButtonThenPowerButton = (Bsp->ButtonState == VolUpButton);
