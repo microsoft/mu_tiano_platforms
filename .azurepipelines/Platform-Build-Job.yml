@@ -66,7 +66,7 @@ parameters:
       BuildArch: IA32,X64
       BuildFlags: ""
       BuildTarget: "DEBUG"
-      BuildExtraTag: ""
+      BuildExtraTag: "ON_ARM"
       Run: false
       RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: true
@@ -80,7 +80,7 @@ parameters:
       BuildArch: IA32,X64
       BuildFlags: ""
       BuildTarget: "RELEASE"
-      BuildExtraTag: ""
+      BuildExtraTag: "ON_ARM"
       Run: false
       RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: true
@@ -174,7 +174,7 @@ jobs:
       condition: |
         and(succeeded(),
             and(ne(variables['tool_chain_tag'], 'GCC5'),
-                and(StartsWith('${{ item.Key }}', 'QemuQ35Pkg'), EndsWith('${{ item.Key }}', 'ARM'))))
+                and(StartsWith('${{ item.Key }}', 'QemuQ35'), EndsWith('${{ item.Key }}', 'ARM'))))
 
       pool:
         vmImage: ${{ parameters.vm_image }}
