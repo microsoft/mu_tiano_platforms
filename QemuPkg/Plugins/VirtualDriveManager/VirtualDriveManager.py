@@ -436,4 +436,3 @@ class VirtualDriveManager(IUefiHelperPlugin):
                 logging.error("Exception trying to read xml." + str(ex))
                 failure_count += 1
         return failure_count
-    
