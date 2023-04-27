@@ -57,7 +57,7 @@ PreBootVolumeUpButtonThenPowerButtonCheck (
 {
   FRONT_PAGE_BUTTON_SERVICES_PROTOCOL  *Bsp;
 
-  DEBUG ((DEBUG_ERROR, "%a \n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a \n", __FUNCTION__));
 
   Bsp                                   = MS_BSP_FROM_BSP (This);
   *PreBootVolumeUpButtonThenPowerButton = (Bsp->ButtonState == VolUpButton);
@@ -79,9 +79,9 @@ PreBootVolumeDownButtonThenPowerButtonCheck (
   OUT BOOLEAN                      *PreBootVolumeDownButtonThenPowerButton // TRUE if button combo set else FALSE
   )
 {
-  DEBUG ((DEBUG_ERROR, "%a \n", __FUNCTION__));
   FRONT_PAGE_BUTTON_SERVICES_PROTOCOL  *Bsp;
 
+  DEBUG ((DEBUG_VERBOSE, "%a \n", __FUNCTION__));
   Bsp                                     = MS_BSP_FROM_BSP (This);
   *PreBootVolumeDownButtonThenPowerButton = (Bsp->ButtonState == VolDownButton);
   return EFI_SUCCESS;
@@ -100,9 +100,9 @@ PreBootClearVolumeButtonState (
   IN  MS_BUTTON_SERVICES_PROTOCOL  *This
   )
 {
-  DEBUG ((DEBUG_ERROR, "%a \n", __FUNCTION__));
   FRONT_PAGE_BUTTON_SERVICES_PROTOCOL  *Bsp;
 
+  DEBUG ((DEBUG_VERBOSE, "%a \n", __FUNCTION__));
   Bsp              = MS_BSP_FROM_BSP (This);
   Bsp->ButtonState = NoButtons;
 
