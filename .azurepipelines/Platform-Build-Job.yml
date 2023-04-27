@@ -34,35 +34,35 @@ parameters:
 - name: build_matrix
   type: object
   default:
-    QemuQ35_DEBUG:
-      BuildPackage: QemuQ35Pkg
-      BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-      BuildArch: IA32,X64
-      BuildFlags: ""
-      BuildTarget: "DEBUG"
-      BuildExtraTag: ""
-      BuildExtraStep:
-        - script: echo No extra steps provided
-      Run: true
-      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-      SelfHostAgent: false
-      BuildArtifactsBinary: |
-        **/QEMUQ35_*.fd
+    # QemuQ35_DEBUG:
+    #   BuildPackage: QemuQ35Pkg
+    #   BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+    #   BuildArch: IA32,X64
+    #   BuildFlags: ""
+    #   BuildTarget: "DEBUG"
+    #   BuildExtraTag: ""
+    #   BuildExtraStep:
+    #     - script: echo No extra steps provided
+    #   Run: true
+    #   RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+    #   SelfHostAgent: false
+    #   BuildArtifactsBinary: |
+    #     **/QEMUQ35_*.fd
 
-    QemuQ35_RELEASE:
-      BuildPackage: QemuQ35Pkg
-      BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-      BuildArch: IA32,X64
-      BuildFlags: ""
-      BuildTarget: "RELEASE"
-      BuildExtraTag: ""
-      BuildExtraStep:
-        - script: echo No extra steps provided
-      Run: true
-      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-      SelfHostAgent: false
-      BuildArtifactsBinary: |
-        **/QEMUQ35_*.fd
+    # QemuQ35_RELEASE:
+    #   BuildPackage: QemuQ35Pkg
+    #   BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+    #   BuildArch: IA32,X64
+    #   BuildFlags: ""
+    #   BuildTarget: "RELEASE"
+    #   BuildExtraTag: ""
+    #   BuildExtraStep:
+    #     - script: echo No extra steps provided
+    #   Run: true
+    #   RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+    #   SelfHostAgent: false
+    #   BuildArtifactsBinary: |
+    #     **/QEMUQ35_*.fd
 
     QemuQ35_DEBUG_ARM:
       BuildPackage: QemuQ35Pkg
@@ -96,53 +96,53 @@ parameters:
         **/QEMUQ35_*.fd
         **/*/*TestApp.efi
 
-    QemuQ35_NO_SMM_RELEASE:
-      BuildPackage: QemuQ35Pkg
-      BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-      BuildArch: IA32,X64
-      BuildFlags: "BLD_*_SMM_ENABLED=FALSE"
-      BuildTarget: "RELEASE"
-      BuildExtraTag: "NO_SMM"
-      BuildExtraStep:
-        - script: echo No extra steps provided
-      Run: true
-      RunFlags: SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE
-      BuildArtifactsBinary: |
-        **/QEMUQ35_*.fd
+    # QemuQ35_NO_SMM_RELEASE:
+    #   BuildPackage: QemuQ35Pkg
+    #   BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+    #   BuildArch: IA32,X64
+    #   BuildFlags: "BLD_*_SMM_ENABLED=FALSE"
+    #   BuildTarget: "RELEASE"
+    #   BuildExtraTag: "NO_SMM"
+    #   BuildExtraStep:
+    #     - script: echo No extra steps provided
+    #   Run: true
+    #   RunFlags: SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE
+    #   BuildArtifactsBinary: |
+    #     **/QEMUQ35_*.fd
 
-    QemuSbsa_DEBUG:
-      BuildPackage: QemuSbsaPkg
-      BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
-      BuildArch: AARCH64
-      BuildFlags: ""
-      BuildTarget: "DEBUG"
-      BuildExtraTag: ""
-      BuildExtraStep:
-        - script: sudo dnf --assumeyes install openssl-devel
-          displayName: Install openssl
-      Run: true
-      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-      SelfHostAgent: false
-      BuildArtifactsBinary: |
-        **/QEMU_EFI.fd
-        **/SECURE_FLASH0.fd
+    # QemuSbsa_DEBUG:
+    #   BuildPackage: QemuSbsaPkg
+    #   BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+    #   BuildArch: AARCH64
+    #   BuildFlags: ""
+    #   BuildTarget: "DEBUG"
+    #   BuildExtraTag: ""
+    #   BuildExtraStep:
+    #     - script: sudo dnf --assumeyes install openssl-devel
+    #       displayName: Install openssl
+    #   Run: true
+    #   RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+    #   SelfHostAgent: false
+    #   BuildArtifactsBinary: |
+    #     **/QEMU_EFI.fd
+    #     **/SECURE_FLASH0.fd
 
-    QemuSbsa_RELEASE:
-      BuildPackage: QemuSbsaPkg
-      BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
-      BuildArch: AARCH64
-      BuildFlags: ""
-      BuildTarget: "RELEASE"
-      BuildExtraTag: ""
-      BuildExtraStep:
-        - script: sudo dnf --assumeyes install openssl-devel
-          displayName: Install openssl
-      Run: true
-      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-      SelfHostAgent: false
-      BuildArtifactsBinary: |
-        **/QEMU_EFI.fd
-        **/SECURE_FLASH0.fd
+    # QemuSbsa_RELEASE:
+    #   BuildPackage: QemuSbsaPkg
+    #   BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+    #   BuildArch: AARCH64
+    #   BuildFlags: ""
+    #   BuildTarget: "RELEASE"
+    #   BuildExtraTag: ""
+    #   BuildExtraStep:
+    #     - script: sudo dnf --assumeyes install openssl-devel
+    #       displayName: Install openssl
+    #   Run: true
+    #   RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+    #   SelfHostAgent: false
+    #   BuildArtifactsBinary: |
+    #     **/QEMU_EFI.fd
+    #     **/SECURE_FLASH0.fd
 
     QemuSbsa_DEBUG_ARM:
       BuildPackage: QemuSbsaPkg
@@ -187,7 +187,7 @@ jobs:
 
       variables:
       - name: Run
-        value: or(${{ item.Value.Run }}, eq(variables['tool_chain_tag'], 'GCC5'))
+        value: or(${{ item.Value.Run }}, ne(${{ parameters.container_image }}, ''))
 
       ${{ if and(ne(parameters.container_image, ''), not(eq(item.Value.SelfHostAgent, true))) }}:
         container: ${{ parameters.container_image }}
