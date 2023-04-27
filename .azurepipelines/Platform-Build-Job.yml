@@ -35,103 +35,103 @@ parameters:
   type: object
   default:
     QemuQ35_DEBUG:
-      Build.Package: QemuQ35Pkg
-      Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-      Build.Arch: IA32,X64
-      Build.Flags: ""
-      Build.Target: "DEBUG"
-      Build.ExtraTag: ""
+      BuildPackage: QemuQ35Pkg
+      BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+      BuildArch: IA32,X64
+      BuildFlags: ""
+      BuildTarget: "DEBUG"
+      BuildExtraTag: ""
       Run: true
       Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: false
-      Build.ArtifactsBinary: |
+      BuildArtifactsBinary: |
         **/QEMUQ35_*.fd
 
     QemuQ35_RELEASE:
-      Build.Package: QemuQ35Pkg
-      Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-      Build.Arch: IA32,X64
-      Build.Flags: ""
-      Build.Target: "RELEASE"
-      Build.ExtraTag: ""
+      BuildPackage: QemuQ35Pkg
+      BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+      BuildArch: IA32,X64
+      BuildFlags: ""
+      BuildTarget: "RELEASE"
+      BuildExtraTag: ""
       Run: true
       Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: false
-      Build.ArtifactsBinary: |
+      BuildArtifactsBinary: |
         **/QEMUQ35_*.fd
 
     QemuQ35_DEBUG_ARM:
-      Build.Package: QemuQ35Pkg
-      Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-      Build.Arch: IA32,X64
-      Build.Flags: ""
-      Build.Target: "DEBUG"
-      Build.ExtraTag: ""
+      BuildPackage: QemuQ35Pkg
+      BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+      BuildArch: IA32,X64
+      BuildFlags: ""
+      BuildTarget: "DEBUG"
+      BuildExtraTag: ""
       Run: false
       Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: true
-      Build.ArtifactsBinary: |
+      BuildArtifactsBinary: |
         **/QEMUQ35_*.fd
         **/*/*TestApp.efi
 
     QemuQ35_RELEASE_ARM:
-      Build.Package: QemuQ35Pkg
-      Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-      Build.Arch: IA32,X64
-      Build.Flags: ""
-      Build.Target: "RELEASE"
-      Build.ExtraTag: ""
+      BuildPackage: QemuQ35Pkg
+      BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+      BuildArch: IA32,X64
+      BuildFlags: ""
+      BuildTarget: "RELEASE"
+      BuildExtraTag: ""
       Run: false
       Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: true
-      Build.ArtifactsBinary: |
+      BuildArtifactsBinary: |
         **/QEMUQ35_*.fd
         **/*/*TestApp.efi
 
     QemuQ35_NO_SMM_RELEASE:
-      Build.Package: QemuQ35Pkg
-      Build.File: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-      Build.Arch: IA32,X64
-      Build.Flags: "BLD_*_SMM_ENABLED=FALSE"
-      Build.Target: "RELEASE"
-      Build.ExtraTag: "NO_SMM"
+      BuildPackage: QemuQ35Pkg
+      BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+      BuildArch: IA32,X64
+      BuildFlags: "BLD_*_SMM_ENABLED=FALSE"
+      BuildTarget: "RELEASE"
+      BuildExtraTag: "NO_SMM"
       Run: true
       Run.Flags: SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE
-      Build.ArtifactsBinary: |
+      BuildArtifactsBinary: |
         **/QEMUQ35_*.fd
 
     QemuSbsa_DEBUG:
-      Build.Package: QemuSbsaPkg
-      Build.File: "Platforms/QemuSbsaPkg/PlatformBuild.py"
-      Build.Arch: AARCH64
-      Build.Flags: ""
-      Build.Target: "DEBUG"
-      Build.ExtraTag: ""
+      BuildPackage: QemuSbsaPkg
+      BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+      BuildArch: AARCH64
+      BuildFlags: ""
+      BuildTarget: "DEBUG"
+      BuildExtraTag: ""
       Run: true
       Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: false
-      Build.ArtifactsBinary: |
+      BuildArtifactsBinary: |
         **/QEMU_EFI.fd
         **/SECURE_FLASH0.fd
 
     QemuSbsa_RELEASE:
-      Build.Package: QemuSbsaPkg
-      Build.File: "Platforms/QemuSbsaPkg/PlatformBuild.py"
-      Build.Arch: AARCH64
-      Build.Flags: ""
-      Build.Target: "RELEASE"
-      Build.ExtraTag: ""
+      BuildPackage: QemuSbsaPkg
+      BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+      BuildArch: AARCH64
+      BuildFlags: ""
+      BuildTarget: "RELEASE"
+      BuildExtraTag: ""
       Run: true
       Run.Flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: false
-      Build.ArtifactsBinary: |
+      BuildArtifactsBinary: |
         **/QEMU_EFI.fd
         **/SECURE_FLASH0.fd
 
 jobs:
   - ${{ each item in parameters.build_matrix }}:
     - job: PlatformBuild_${{ item.Key }}
-      displayName: Build Platforms
+      displayName: Build Platforms ${{ item.Key }}
       condition: or(eq(variables['tool_chain_tag'], 'GCC5'), not(startsWith('${{ item.Key }}', 'QemuSbsa')))
 
       workspace:
@@ -156,17 +156,17 @@ jobs:
       - template: Steps/BuildPlatform.yml@mu_devops
         parameters:
           tool_chain_tag: $(tool_chain_tag)
-          build_pkg: $(Build.Package)
-          build_target: $(Build.Target)
-          build_arch: $(Build.Arch)
-          build_file: $(Build.File)
-          build_flags: $(Build.Flags)
+          build_pkg: ${{ item.Value.BuildPackage }}
+          build_target: ${{ item.Value.BuildTarget }}
+          build_arch: ${{ item.Value.BuildArch }}
+          build_file: ${{ item.Value.BuildFile }}
+          build_flags: ${{ item.Value.BuildFlags }}
           run_flags: $(Run.Flags)
           run_timeout: ${{ parameters.run_timeout }}
           extra_install_step: ${{ parameters.extra_install_step }}
           install_tools: ${{ and(not(eq(item.Value.SelfHostAgent, true)), eq(parameters.container_image, '')) }}
-          artifacts_identifier: '$(Build.Package) $(tool_chain_tag) $(Build.Target) $(Build.ExtraTag)'
-          artifacts_binary: $(Build.ArtifactsBinary)
+          artifacts_identifier: '${{ item.Value.BuildPackage }} $(tool_chain_tag) ${{ item.Value.BuildTarget }} ${{ item.Value.BuildExtraTag }}'
+          artifacts_binary: ${{ item.Value.BuildArtifactsBinary }}
 
     - job: RunQemuBuilds_${{ item.Key }}
       displayName: Run Qemu Builds ${{ item.Key }}
@@ -203,7 +203,7 @@ jobs:
       - task: CmdLine@2
         displayName: Update
         inputs:
-          script: stuart_update -c $(Build.File) TOOL_CHAIN_TAG=$(tool_chain_tag) -t $(Build.Target) -a $(Build.Arch) $(Build.Flags)
+          script: stuart_update -c ${{ item.Value.BuildFile }} TOOL_CHAIN_TAG=$(tool_chain_tag) -t ${{ item.Value.BuildTarget }} -a ${{ item.Value.BuildArch }} ${{ item.Value.BuildFlags }}
         condition: and(gt(variables.pkg_count, 0), succeeded())
 
       # Potential Extra steps
@@ -214,28 +214,28 @@ jobs:
         displayName: Download Visual Studio FD files
         inputs:
           buildType: 'current'
-          artifactName: 'Binaries $(Build.Package) $(tool_chain_tag) $(Build.Target)'
+          artifactName: 'Binaries ${{ item.Value.BuildPackage }} $(tool_chain_tag) ${{ item.Value.BuildTarget }}'
           itemPattern: '**/*.fd'
-          targetPath: 'Build/$(Build.Package)/$(Build.Target)_$(tool_chain_tag)/FV/'
+          targetPath: 'Build/${{ item.Value.BuildPackage }}/${{ item.Value.BuildTarget }}_$(tool_chain_tag)/FV/'
 
       - task: DownloadPipelineArtifact@2
         name: DownloadVisualStudioTests
         displayName: Download Visual Studio Test Files
         inputs:
           buildType: 'current'
-          artifactName: 'Binaries $(Build.Package) $(tool_chain_tag) $(Build.Target)'
+          artifactName: 'Binaries ${{ item.Value.BuildPackage }} $(tool_chain_tag) ${{ item.Value.BuildTarget }}'
           itemPattern: '**/*.efi'
-          targetPath: 'Build/$(Build.Package)/$(Build.Target)_$(tool_chain_tag)/X64/'
+          targetPath: 'Build/${{ item.Value.BuildPackage }}/${{ item.Value.BuildTarget }}_$(tool_chain_tag)/X64/'
 
       # Run
       - task: CmdLine@2
         displayName: Run to Shell
         inputs:
-          script: stuart_build -c $(Build.File) TOOL_CHAIN_TAG=$(tool_chain_tag) TARGET=$(Build.Target) -a $(Build.Arch) $(Build.Flags) $(Run.Flags) --FlashOnly
+          script: stuart_build -c ${{ item.Value.BuildFile }} TOOL_CHAIN_TAG=$(tool_chain_tag) TARGET=${{ item.Value.BuildTarget }} -a ${{ item.Value.BuildArch }} ${{ item.Value.BuildFlags }} $(Run.Flags) --FlashOnly
         condition: and(gt(variables.pkg_count, 0), succeeded())
         timeoutInMinutes: ${{ parameters.run_timeout }}
 
       # Copy build logs to the artifact staging directory
       - template: Steps/CommonLogCopyAndPublish.yml@mu_devops
         parameters:
-          artifacts_identifier: 'Binaries $(Build.Package) $(tool_chain_tag) $(Build.Target) $(Build.ExtraTag)'
+          artifacts_identifier: 'Binaries ${{ item.Value.BuildPackage }} $(tool_chain_tag) ${{ item.Value.BuildTarget }} ${{ item.Value.BuildExtraTag }}'
