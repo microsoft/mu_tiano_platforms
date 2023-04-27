@@ -410,6 +410,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             ret = RunCmd("git", f'describe {commithash} --tags', outstream=outstream)
             if ret == 0:
                 version = outstream.getvalue().strip()
+
         self.env.SetValue("VERSION", version, "Set Version value")
 
         ret = self.Helper.QemuRun(self.env)
