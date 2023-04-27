@@ -13,3 +13,6 @@
 #define CONFIG_INCLUDE_CACHE
 #include <Generated/ConfigClientGenerated.h>
 #include <Generated/ConfigDataGenerated.h>
+
+PROFILE  gProfileData = { 0 };
+UINTN    gNumProfiles = 0;

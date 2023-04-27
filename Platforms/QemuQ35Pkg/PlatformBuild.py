@@ -281,10 +281,18 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         self.env.SetValue('POLICY_REPORT_FOLDER', self.mws.join(self.ws, "QemuQ35Pkg", "PolicyData"), "Platform Defined")
         self.env.SetValue('MU_SCHEMA_DIR', self.mws.join(self.ws, "Platforms", "QemuQ35Pkg", "CfgData"), "Platform Defined")
         self.env.SetValue('MU_SCHEMA_FILE_NAME', "QemuQ35PkgCfgData.xml", "Platform Hardcoded")
+        self.env.SetValue('CONF_PROFILE_PATHS',
+                          self.mws.join(self.ws, 'Platforms', 'QemuQ35Pkg', 'CfgData', 'Profile0QemuQ35PkgCfgData.csv') + " " +
+                          self.mws.join(self.ws, 'Platforms', 'QemuQ35Pkg', 'CfgData', 'Profile1QemuQ35PkgCfgData.csv'),
+                          "Platform Hardcoded"
+        )
 
         # Globally set CodeQL failures to be ignored in this repo.
         # Note: This has no impact if CodeQL is not active/enabled.
         self.env.SetValue("STUART_CODEQL_AUDIT_ONLY", "true", "Platform Defined")
+
+        # Enabled all of the SMM modules
+        self.env.SetValue("BLD_*_SMM_ENABLED", "TRUE", "Default")
 
         return 0
     
@@ -353,7 +361,21 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                 test_list.extend(Path(output_base, "X64").glob(pattern))
             
             self.Helper.add_tests(virtual_drive, test_list, auto_run = run_tests, auto_shutdown = shutdown_after_run)
-        
+
+        # Get the version number (repo release)
+        outstream = StringIO()
+        version = "Unknown"
+        ret = RunCmd('git', "rev-parse HEAD", outstream=outstream)
+        if ret == 0:
+            commithash = outstream.getvalue().strip()
+            outstream = StringIO()
+            # See git-describe docs for a breakdown of this command output
+            ret = RunCmd("git", f'describe {commithash} --tags', outstream=outstream)
+            if ret == 0:
+                version = outstream.getvalue().strip()
+
+        self.env.SetValue("VERSION", version, "Set Version value")
+
         # Run Qemu
         # Helper located at Platforms/QemuQ35Pkg/Plugins/QemuRunner
         ret = self.Helper.QemuRun(self.env)

@@ -23,6 +23,7 @@ from edk2toolext.invocables.edk2_setup import SetupSettingsManager, RequiredSubm
 from edk2toolext.invocables.edk2_update import UpdateSettingsManager
 from edk2toolext.invocables.edk2_pr_eval import PrEvalSettingsManager
 from edk2toollib.utility_functions import RunCmd
+from io import StringIO
 from pathlib import Path
 
 # Declare test whose failure will not return a non-zero exit code
@@ -87,7 +88,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
     def GetRequiredSubmodules(self):
         """Return iterable containing RequiredSubmodule objects.
-        
+
         !!! note
             If no RequiredSubmodules return an empty iterable
         """
@@ -303,6 +304,8 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         args += " ARCH=" + self.env.GetValue("TARGET_ARCH").lower()
         args += " DEBUG=" + str(1 if self.env.GetValue("TARGET").lower() == 'debug' else 0)
         args += " SPM_MM=1 EL3_EXCEPTION_HANDLING=1"
+        args += " ENABLE_FEAT_HCX=1" # Features used by hypervisor
+        # args += " FEATURE_DETECTION=1" # Enforces support for features enabled.
         args += " BL32=" + os.path.join(op_fv, "BL32_AP_MM.fd")
         args += " all fip"
         args += " -j $(nproc)"
@@ -395,6 +398,21 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         
         # Run Qemu
         # Helper located at Platforms/QemuQ35Pkg/Plugins/QemuRunner
+
+        # Get the version number (repo release)
+        outstream = StringIO()
+        version = "Unknown"
+        ret = RunCmd('git', "rev-parse HEAD", outstream=outstream)
+        if ret == 0:
+            commithash = outstream.getvalue().strip()
+            outstream = StringIO()
+            # See git-describe docs for a breakdown of this command output
+            ret = RunCmd("git", f'describe {commithash} --tags', outstream=outstream)
+            if ret == 0:
+                version = outstream.getvalue().strip()
+
+        self.env.SetValue("VERSION", version, "Set Version value")
+
         ret = self.Helper.QemuRun(self.env)
         if ret != 0:
             logging.critical("Failed running Qemu")
