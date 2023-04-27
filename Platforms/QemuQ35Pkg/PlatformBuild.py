@@ -367,8 +367,9 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         version = "Unknown"
         ret = RunCmd('git', "rev-parse HEAD", outstream=outstream)
         if ret == 0:
-            commithash = outstream.getvalue().strip
+            commithash = outstream.getvalue().strip()
             outstream = StringIO()
+            # See git-describe docs for a breakdown of this command output
             ret = RunCmd("git", f'describe {commithash} --tags', outstream=outstream)
             if ret == 0:
                 version = outstream.getvalue().strip()
