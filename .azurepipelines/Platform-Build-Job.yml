@@ -41,6 +41,8 @@ parameters:
       BuildFlags: ""
       BuildTarget: "DEBUG"
       BuildExtraTag: ""
+      BuildExtraStep:
+        - script: echo No extra steps provided
       Run: true
       RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: false
@@ -54,6 +56,8 @@ parameters:
       BuildFlags: ""
       BuildTarget: "RELEASE"
       BuildExtraTag: ""
+      BuildExtraStep:
+        - script: echo No extra steps provided
       Run: true
       RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: false
@@ -67,6 +71,8 @@ parameters:
       BuildFlags: ""
       BuildTarget: "DEBUG"
       BuildExtraTag: "ON_ARM"
+      BuildExtraStep:
+        - script: echo No extra steps provided
       Run: false
       RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: true
@@ -81,6 +87,8 @@ parameters:
       BuildFlags: ""
       BuildTarget: "RELEASE"
       BuildExtraTag: "ON_ARM"
+      BuildExtraStep:
+        - script: echo No extra steps provided
       Run: false
       RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: true
@@ -95,6 +103,8 @@ parameters:
       BuildFlags: "BLD_*_SMM_ENABLED=FALSE"
       BuildTarget: "RELEASE"
       BuildExtraTag: "NO_SMM"
+      BuildExtraStep:
+        - script: echo No extra steps provided
       Run: true
       RunFlags: SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE
       BuildArtifactsBinary: |
@@ -107,6 +117,9 @@ parameters:
       BuildFlags: ""
       BuildTarget: "DEBUG"
       BuildExtraTag: ""
+      BuildExtraStep:
+        - script: sudo dnf --assumeyes install openssl-devel
+          displayName: Install openssl
       Run: true
       RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: false
@@ -121,6 +134,9 @@ parameters:
       BuildFlags: ""
       BuildTarget: "RELEASE"
       BuildExtraTag: ""
+      BuildExtraStep:
+        - script: sudo dnf --assumeyes install openssl-devel
+          displayName: Install openssl
       Run: true
       RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: false
@@ -135,6 +151,8 @@ parameters:
       BuildFlags: ""
       BuildTarget: "DEBUG"
       BuildExtraTag: "ON_ARM"
+      BuildExtraStep:
+        - script: echo No extra steps provided
       Run: true
       RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: true
@@ -149,6 +167,8 @@ parameters:
       BuildFlags: ""
       BuildTarget: "RELEASE"
       BuildExtraTag: "ON_ARM"
+      BuildExtraStep:
+        - script: echo No extra steps provided
       Run: true
       RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: true
@@ -195,7 +215,9 @@ jobs:
           build_flags: ${{ item.Value.BuildFlags }}
           run_flags: ${{ item.Value.RunFlags }}
           run_timeout: ${{ parameters.run_timeout }}
-          extra_install_step: ${{ parameters.extra_install_step }}
+          extra_install_step: |
+            ${{ parameters.extra_install_step }}
+            ${{ item.Value.BuildExtraStep }}
           install_tools: ${{ and(not(eq(item.Value.SelfHostAgent, true)), eq(parameters.container_image, '')) }}
           artifacts_identifier: '${{ item.Value.BuildPackage }} $(tool_chain_tag) ${{ item.Value.BuildTarget }} ${{ item.Value.BuildExtraTag }}'
           artifacts_binary: ${{ item.Value.BuildArtifactsBinary }}

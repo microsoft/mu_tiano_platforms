@@ -26,6 +26,3 @@ jobs:
     vm_image: $(vm_image)
     pool_name: $(pool_name)
     container_image: linux-gcc
-    extra_install_step:
-          - script: sudo dnf --assumeyes install openssl-devel
-            displayName: Install openssl
