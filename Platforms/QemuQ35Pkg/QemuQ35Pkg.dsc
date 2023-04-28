@@ -257,11 +257,12 @@
   BcfgCommandLib   |ShellPkg/Library/UefiShellBcfgCommandLib/UefiShellBcfgCommandLib.inf
 
   # DFCI / XML / JSON Libraries
-  DfciUiSupportLib                  |DfciPkg/Library/DfciUiSupportLibNull/DfciUiSupportLibNull.inf # Supports DFCI Groups.
+  DfciUiSupportLib                  |QemuPkg/Library/DfciUiSupportLib/DfciUiSupportLib.inf # Supports DFCI Groups.
   DfciV1SupportLib                  |DfciPkg/Library/DfciV1SupportLibNull/DfciV1SupportLibNull.inf # Backwards compatibility with DFCI V1 functions.
-  DfciDeviceIdSupportLib            |OemPkg/Library/DfciDeviceIdSupportLib/DfciDeviceIdSupportLib.inf
+  DfciDeviceIdSupportLib            |QemuPkg/Library/DfciDeviceIdSupportLib/DfciDeviceIdSupportLib.inf
   DfciGroupLib                      |DfciPkg/Library/DfciGroupLibNull/DfciGroups.inf
   DfciRecoveryLib                   |DfciPkg/Library/DfciRecoveryLib/DfciRecoveryLib.inf
+  SwmDialogsLib                     |MsGraphicsPkg/Library/SwmDialogsLib/SwmDialogs.inf
    # Zero Touch is part of DFCI
   ZeroTouchSettingsLib              |ZeroTouchPkg/Library/ZeroTouchSettings/ZeroTouchSettings.inf
    # Libraries that understands the MsXml Settings Schema and providers helper functions
