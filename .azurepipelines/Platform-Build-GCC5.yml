@@ -9,9 +9,9 @@ resources:
   repositories:
     - repository: mu_devops
       type: github
-      endpoint: microsoft
-      name: microsoft/mu_devops
-      ref: main
+      endpoint: makubacki
+      name: makubacki/mu_devops
+      ref: allow_empty_string_in_copy_and_publish
   containers:
     - container: linux-gcc
       image: ghcr.io/tianocore/containers/fedora-37-test:54e5bd1

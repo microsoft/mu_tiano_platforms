@@ -9,9 +9,9 @@ resources:
   repositories:
     - repository: mu_devops
       type: github
-      endpoint: microsoft
-      name: microsoft/mu_devops
-      ref: main
+      endpoint: makubacki
+      name: makubacki/mu_devops
+      ref: allow_empty_string_in_copy_and_publish
 
 variables:
 - group: tool-chain-windows-visual-studio-latest

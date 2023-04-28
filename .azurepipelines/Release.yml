@@ -15,9 +15,9 @@ resources:
   repositories:
     - repository: mu_devops
       type: github
-      endpoint: microsoft
-      name: microsoft/mu_devops
-      ref: refs/tags/v2.3.0
+      endpoint: makubacki
+      name: makubacki/mu_devops
+      ref: allow_empty_string_in_copy_and_publish
 
 name: $(Date:yyyyMMdd)$(Rev:.r) Mu Tiano Platforms Release
 
