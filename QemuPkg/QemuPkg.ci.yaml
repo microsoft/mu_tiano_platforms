@@ -30,6 +30,7 @@
         "AcceptableDependencies": [
             "MdePkg/MdePkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
+            "DfciPkg/DfciPkg.dec",
             "MfciPkg/MfciPkg.dec",
             "OemPkg/OemPkg.dec",
             "PcBdsPkg/PcBdsPkg.dec",
