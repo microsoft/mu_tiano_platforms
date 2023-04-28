@@ -556,6 +556,7 @@ FILE FREEFORM = PCD(gZeroTouchPkgTokenSpaceGuid.PcdZeroTouchCertificateFile) {
   INF MsGraphicsPkg/RenderingEngineDxe/RenderingEngineDxe.inf
   INF MsGraphicsPkg/DisplayEngineDxe/DisplayEngineDxe.inf
   INF OemPkg/BootMenu/BootMenu.inf
+  INF QemuPkg/FrontPageButtons/FrontPageButtons.inf
   INF OemPkg/FrontPage/FrontPage.inf
   INF PcBdsPkg/MsBootPolicy/MsBootPolicy.inf
   INF MdeModulePkg/Universal/BootManagerPolicyDxe/BootManagerPolicyDxe.inf
