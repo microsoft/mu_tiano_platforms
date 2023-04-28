@@ -389,15 +389,16 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             virtual_drive.make_drive()
 
         # Add tests if requested, auto run if requested
+        # Creates a startup script with the requested tests
         if test_regex != "":
             test_list = []
             for pattern in test_regex.split(","):
                 test_list.extend(Path(output_base, "AARCH64").glob(pattern))
             
             self.Helper.add_tests(virtual_drive, test_list, auto_run = run_tests, auto_shutdown = shutdown_after_run)
-        
-        # Run Qemu
-        # Helper located at Platforms/QemuQ35Pkg/Plugins/QemuRunner
+        # Otherwise add an empty startup script
+        else:
+            virtual_drive.add_startup_script([], auto_shutdown=shutdown_after_run)
 
         # Get the version number (repo release)
         outstream = StringIO()
@@ -413,6 +414,8 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 
         self.env.SetValue("VERSION", version, "Set Version value")
 
+        # Run Qemu
+        # Helper located at Platforms/QemuQ35Pkg/Plugins/QemuRunner
         ret = self.Helper.QemuRun(self.env)
         if ret != 0:
             logging.critical("Failed running Qemu")
