@@ -1011,8 +1011,8 @@
   #########################################
   # DXE Phase modules
   #########################################
-  # Spoofs button press to automatically boot to FrontPage.
-  OemPkg/FrontpageButtonsVolumeUp/FrontpageButtonsVolumeUp.inf
+  # Reads smbios type 3 to determine volume button state.
+  QemuPkg/FrontPageButtons/FrontPageButtons.inf
 
   # Application that presents and manages FrontPage.
   OemPkg/FrontPage/FrontPage.inf
