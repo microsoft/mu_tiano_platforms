@@ -792,6 +792,9 @@
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|TRUE
   gQemuPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0x29C0
 
+  # CMOS region is 128 bytes
+  gMsWheaPkgTokenSpaceGuid.PcdMsWheaReportEarlyStorageCapacity|0x80
+
 [PcdsFixedAtBuild.IA32]
   #
   # The NumberOfPages values below are ad-hoc. They are updated sporadically at
@@ -1348,7 +1351,7 @@
   MsCorePkg/UnitTests/MathLibUnitTest/MathLibUnitTestApp.inf
   # MsGraphicsPkg/UnitTests/SpinnerTest/SpinnerTest.inf # DOESN'T PRODUCE OUTPUT
   MsWheaPkg/Test/UnitTests/Library/LibraryClass/CheckHwErrRecHeaderTestApp.inf
-  MsWheaPkg/Test/UnitTests/MsWheaEarlyStorageUnitTestApp/MsWheaEarlyUnitTestApp.inf
+  # MsWheaPkg/Test/UnitTests/MsWheaEarlyStorageUnitTestApp/MsWheaEarlyUnitTestApp.inf # CMOS REGION TOO SMALL TO STORE DATA
   MsWheaPkg/Test/UnitTests/MsWheaReportUnitTestApp/MsWheaReportUnitTestApp.inf
   MmSupervisorPkg/Test/MmPagingAuditTest/UEFI/MmPagingAuditApp.inf
   MmSupervisorPkg/Test/MmSupvRequestUnitTestApp/MmSupvRequestUnitTestApp.inf
