@@ -458,5 +458,5 @@ class VirtualDriveManager(IUefiHelperPlugin):
         result = RunCmd(cmd, args)
         if result != 0:
             e = f"[{cmd} {args}] Result: {result}"
-            logger.error("Drive could not be created.")
+            logger.error("Paging audit could not be created.")
             logger.error(e)
