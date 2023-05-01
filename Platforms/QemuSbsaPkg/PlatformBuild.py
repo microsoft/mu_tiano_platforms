@@ -367,6 +367,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         empty_drive = (self.env.GetValue("EMPTY_DRIVE", "FALSE").upper() == "TRUE")
         test_regex = self.env.GetValue("TEST_REGEX", "")
         drive_path = self.env.GetValue("VIRTUAL_DRIVE_PATH")
+        run_paging_audit = False
 
         # General debugging information for users
         if run_tests:
@@ -394,7 +395,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             test_list = []
             for pattern in test_regex.split(","):
                 test_list.extend(Path(output_base, "AARCH64").glob(pattern))
-            run_paging_audit = False
+
             if any("DxePagingAuditTestApp.efi" in os.path.basename(test) for test in test_list):
                 run_paging_audit = True
             
@@ -435,8 +436,8 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         # Filter out tests that are exempt
         tests = list(filter(lambda file: file.name not in FET or not (now - FET.get(file.name)).total_seconds() < FEOL, test_list))
         
-        if paging_audit:
-                tests.append("DxePagingAuditTestApp.efi -d")
+        if run_paging_audit:
+            self.Helper.generate_paging_audit (virtual_drive, Path(drive_path).parent / "unit_test_results", self.env.GetValue("VERSION"))
 
         # Helper located at QemuPkg/Plugins/VirtualDriveManager
         return self.Helper.report_results(virtual_drive, tests, Path(drive_path).parent / "unit_test_results")
