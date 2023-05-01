@@ -1197,7 +1197,7 @@
   MsCorePkg/UnitTests/MathLibUnitTest/MathLibUnitTestApp.inf
   # MsGraphicsPkg/UnitTests/SpinnerTest/SpinnerTest.inf # DOESN'T PRODUCE OUTPUT
   MsWheaPkg/Test/UnitTests/Library/LibraryClass/CheckHwErrRecHeaderTestApp.inf
-  MsWheaPkg/Test/UnitTests/MsWheaEarlyStorageUnitTestApp/MsWheaEarlyUnitTestApp.inf
+  # MsWheaPkg/Test/UnitTests/MsWheaEarlyStorageUnitTestApp/MsWheaEarlyUnitTestApp.inf # NO EARLY STORE METHOD AVAILABLE ON ARM
   MsWheaPkg/Test/UnitTests/MsWheaReportUnitTestApp/MsWheaReportUnitTestApp.inf
   # MmSupervisorPkg/Test/MmPagingAuditTest/UEFI/MmPagingAuditApp.inf # NOT APPLICABLE TO SBSA
   # MmSupervisorPkg/Test/MmSupvRequestUnitTestApp/MmSupvRequestUnitTestApp.inf # NOT APPLICABLE TO SBSA

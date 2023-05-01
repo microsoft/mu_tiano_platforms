@@ -30,7 +30,6 @@ from io import StringIO
 FAILURE_EXEMPT_TESTS = {
     "BootAuditTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
     "LineParserTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
-    "MsWheaEarlyUnitTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
     "VariablePolicyFuncTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
     "DeviceIdTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
     "DxePagingAuditTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
