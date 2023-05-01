@@ -447,7 +447,7 @@ class VirtualDriveManager(IUefiHelperPlugin):
                                    "GuardPage.dat", "MemoryInfoDatabase.dat"]
         paging_audit_generator_path = os.path.join("Common", "MU", "UefiTestingPkg", "AuditTests",
                                                    "PagingAudit", "Windows", "PagingReportGenerator.py")
-
+        report_output_dir.mkdir(exist_ok=True)
         for file in paging_audit_data_files:
             drive.get_file(file, os.path.join(report_output_dir, file))
         output_audit = os.path.join(report_output_dir, "pagingaudit.html")
