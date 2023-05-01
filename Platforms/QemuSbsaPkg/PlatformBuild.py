@@ -30,7 +30,6 @@ from io import StringIO
 # Declare test whose failure will not return a non-zero exit code
 FAILURE_EXEMPT_TESTS = {
     "BootAuditTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
-    "LineParserTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
     "VariablePolicyFuncTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
     "DeviceIdTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
     "DxePagingAuditTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
