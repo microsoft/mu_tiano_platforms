@@ -28,17 +28,17 @@ DEFAULT_VERSION = "2.1.0"
 parser = argparse.ArgumentParser()
 
 # HINT: Run with '--help all' to get complete help.
-parser.add_argument("-u", "--update", action="store_true",
+parser.add_argument("--update", "-u", action="store_true",
                     help="Updates the firmware binaries.")
 parser.add_argument("--firmwaredir", default="./fw",
                     help="Directory to download and use firmware binaries.")
-parser.add_argument("-a", "--arch", default="x64",
+parser.add_argument("--arch", "-a", default="x64",
                     choices=["x64", "arm64"], help="The guest architecture for the VM.")
-parser.add_argument("-d", "--disk",
+parser.add_argument("--disk", "-d",
                     help="Path to the disk file.")
-parser.add_argument("-c", "--cores", default=2, type=int,
-                    help="Path to the disk file.")
-parser.add_argument("-m", "--memory", default="4096",
+parser.add_argument("--cores", "-c", default=2, type=int,
+                    help="The number of cores for the VM.")
+parser.add_argument("--memory", "-m", default="4096",
                     help="The memory size to use in Mb.")
 parser.add_argument("--vnc",
                     help="Provides the VNC port to use. E.g. ':1' for localhost:5901")
@@ -49,7 +49,7 @@ parser.add_argument("--version", default=DEFAULT_VERSION,
 parser.add_argument("--qemudir", default="",
                     help="Path to a custom QEMU install directory.")
 parser.add_argument("--gdbport", type=int,
-                    help="Enabled the GDB server on the specified port.")
+                    help="Enables the GDB server on the specified port. E.g. 1234")
 parser.add_argument("--debugfw", action="store_true",
                     help="Enables update to use the DEBUG firmware binaries.")
 parser.add_argument("--verbose", action="store_true",
