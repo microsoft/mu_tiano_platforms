@@ -191,7 +191,8 @@ class LinuxVirtualDrive(VirtualDrive):
             (RuntimeError): Failed to get the filepath
         """
         cmd = "mcopy"
-        args = f"-n -i {self.drive_path} {virtual_path} {local_path}"
+        full_path = os.path.join(self.drive_letter + ":", virtual_path)
+        args = f"-n -i {self.drive_path} {full_path} {local_path}"
         result = RunCmd(cmd, args)
         if result != 0:
             e = f"[{cmd} {args}] Result: {result}"
@@ -211,7 +212,6 @@ class LinuxVirtualDrive(VirtualDrive):
         """
         if local_path is None:
             local_path = tempfile.mktemp()
-        virtual_path = str(Path(self.drive_letter + ":", virtual_path))
         self.get_file(virtual_path, local_path)
 
         with open(local_path, "rb") as f:
@@ -331,6 +331,7 @@ class VirtualDriveManager(IUefiHelperPlugin):
         obj.Register("get_virtual_drive", VirtualDriveManager.get_virtual_drive, fp)
         obj.Register("add_tests", VirtualDriveManager.add_tests, fp)
         obj.Register("report_results", VirtualDriveManager.report_results, fp)
+        obj.Register("generate_paging_audit", VirtualDriveManager.generate_paging_audit, fp)
         return 0
     
     @staticmethod
@@ -340,7 +341,7 @@ class VirtualDriveManager(IUefiHelperPlugin):
         return LinuxVirtualDrive(path)
     
     @staticmethod
-    def add_tests(drive: VirtualDrive, test_list: list[str], auto_run = True, auto_shutdown = True):
+    def add_tests(drive: VirtualDrive, test_list: list[str], auto_run = True, auto_shutdown = True, paging_audit = False):
         """Adds tests to the virtual drive and optionally adds them to the startup script.
         
         !!! note
@@ -398,6 +399,9 @@ class VirtualDriveManager(IUefiHelperPlugin):
                 tests.append(f"    mv {test.stem}_JUNIT.XML {test.stem}_JUNIT_RESULT.XML")
                 tests.append("endif")
             
+            if paging_audit:
+                tests.append("DxePagingAuditTestApp.efi -d")
+            
         drive.add_startup_script(tests, auto_shutdown = auto_shutdown)
     
     @staticmethod
@@ -436,3 +440,23 @@ class VirtualDriveManager(IUefiHelperPlugin):
                 logging.error("Exception trying to read xml." + str(ex))
                 failure_count += 1
         return failure_count
+    
+    @staticmethod
+    def generate_paging_audit(drive: VirtualDrive, report_output_dir: Path, version: str):
+        paging_audit_data_files = ["1G.dat", "2M.dat", "4K.dat", "PDE.dat", "MAT.dat",
+                                   "GuardPage.dat", "MemoryInfoDatabase.dat"]
+        paging_audit_generator_path = os.path.join("Common", "MU", "UefiTestingPkg", "AuditTests",
+                                                   "PagingAudit", "Windows", "PagingReportGenerator.py")
+        report_output_dir.mkdir(exist_ok=True)
+        for file in paging_audit_data_files:
+            drive.get_file(file, os.path.join(report_output_dir, file))
+        output_audit = os.path.join(report_output_dir, "pagingaudit.html")
+        output_debug = os.path.join(report_output_dir, "pagingauditdebug.txt")
+        cmd = "python"
+        args = f"{paging_audit_generator_path} -i {report_output_dir} -o {output_audit} \
+-p Q35 -t DXE --debug -l {output_debug} -a X64 --PlatformVersion {version}"
+        result = RunCmd(cmd, args)
+        if result != 0:
+            e = f"[{cmd} {args}] Result: {result}"
+            logger.error("Paging audit could not be created.")
+            logger.error(e)

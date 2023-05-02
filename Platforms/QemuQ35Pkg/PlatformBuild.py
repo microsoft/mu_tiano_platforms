@@ -332,7 +332,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         empty_drive = (self.env.GetValue("EMPTY_DRIVE", "FALSE").upper() == "TRUE")
         test_regex = self.env.GetValue("TEST_REGEX", "")
         drive_path = self.env.GetValue("VIRTUAL_DRIVE_PATH")
-        
+        run_paging_audit = False
+ 
         # General debugging information for users
         if run_tests:
             if test_regex == "":
@@ -359,8 +360,11 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             test_list = []
             for pattern in test_regex.split(","):
                 test_list.extend(Path(output_base, "X64").glob(pattern))
-            
-            self.Helper.add_tests(virtual_drive, test_list, auto_run = run_tests, auto_shutdown = shutdown_after_run)
+
+            if any("DxePagingAuditTestApp.efi" in os.path.basename(test) for test in test_list):
+                run_paging_audit = True
+                
+            self.Helper.add_tests(virtual_drive, test_list, auto_run = run_tests, auto_shutdown = shutdown_after_run, paging_audit = run_paging_audit)
         # Otherwise add an empty startup script
         else:
             virtual_drive.add_startup_script([], auto_shutdown=shutdown_after_run)
@@ -393,6 +397,9 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         now = datetime.datetime.now()
         FET = FAILURE_EXEMPT_TESTS
         FEOL = FAILURE_EXEMPT_OMISSION_LENGTH
+
+        if run_paging_audit:
+            self.Helper.generate_paging_audit (virtual_drive, Path(drive_path).parent / "unit_test_results", self.env.GetValue("VERSION"))
 
         # Filter out tests that are exempt
         tests = list(filter(lambda file: file.name not in FET or not (now - FET.get(file.name)).total_seconds() < FEOL, test_list))
