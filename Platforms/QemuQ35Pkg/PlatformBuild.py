@@ -402,7 +402,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             self.Helper.generate_paging_audit (virtual_drive, Path(drive_path).parent / "unit_test_results", self.env.GetValue("VERSION"))
 
         # Filter out tests that are exempt
-        tests = list(filter(lambda file: file.name not in FET or not (now - FET.get(file.name)).total_seconds() < FEOL, test_list))            
+        tests = list(filter(lambda file: file.name not in FET or not (now - FET.get(file.name)).total_seconds() < FEOL, test_list))
         tests_exempt = list(filter(lambda file: file.name in FET and (now - FET.get(file.name)).total_seconds() < FEOL, test_list))       
         if len(tests_exempt) > 0:
             self.Helper.report_results(virtual_drive, tests_exempt, Path(drive_path).parent / "unit_test_results")
