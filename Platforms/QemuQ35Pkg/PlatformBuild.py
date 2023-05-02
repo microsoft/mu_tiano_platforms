@@ -30,7 +30,6 @@ from io import StringIO
 FAILURE_EXEMPT_TESTS = {
     "BootAuditTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
     "LineParserTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
-    "MorLockFunctionalTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
     "MsWheaEarlyUnitTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
     "VariablePolicyFuncTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
     "DeviceIdTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
@@ -399,12 +398,14 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         FET = FAILURE_EXEMPT_TESTS
         FEOL = FAILURE_EXEMPT_OMISSION_LENGTH
 
-        # Filter out tests that are exempt
-        tests = list(filter(lambda file: file.name not in FET or not (now - FET.get(file.name)).total_seconds() < FEOL, test_list))
-        
         if run_paging_audit:
             self.Helper.generate_paging_audit (virtual_drive, Path(drive_path).parent / "unit_test_results", self.env.GetValue("VERSION"))
-            
+
+        # Filter out tests that are exempt
+        tests = list(filter(lambda file: file.name not in FET or not (now - FET.get(file.name)).total_seconds() < FEOL, test_list))            
+        tests_exempt = list(filter(lambda file: file.name in FET and (now - FET.get(file.name)).total_seconds() < FEOL, test_list))       
+        if len(tests_exempt) > 0:
+            self.Helper.report_results(virtual_drive, tests_exempt, Path(drive_path).parent / "unit_test_results")
         # Helper located at QemuPkg/Plugins/VirtualDriveManager
         return self.Helper.report_results(virtual_drive, tests, Path(drive_path).parent / "unit_test_results")
 
