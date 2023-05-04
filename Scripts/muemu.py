@@ -20,7 +20,7 @@ exit
 # Constants
 #
 
-DEFAULT_VERSION = "2.1.0"
+DEFAULT_VERSION = "2.3.0"
 
 #
 # Setup and parse arguments.
@@ -98,6 +98,7 @@ def main():
     qemu_args += ["-device", "qemu-xhci,id=usb"]
     qemu_args += ["-device", "usb-mouse,id=input0,bus=usb.0,port=1"]
     qemu_args += ["-device", "usb-kbd,id=input1,bus=usb.0,port=2"]
+    # qemu_args += ["-device", "usb-tablet"]
 
     # Network
     qemu_args += ["-nic", "model=e1000"]
@@ -157,14 +158,15 @@ def build_args_arm64(qemu_args: List[str]):
     qemu_args += ["-drive",
                   f"if=pflash,format=raw,unit=1,file={efi_fd},readonly=on"]
 
-    if args.cores > 1 and not args.force:
-        print("Only one core currently supported for ARM64, setting cores to 1.")
-        args.cores = 1
+    if args.cores != 4 and not args.force:
+        print("Arm64 image must use 4 cores! Setting to 4.")
+        args.cores = 4
 
 
 def run_qemu(qemu_args: List[str]):
     if args.verbose:
         print(qemu_args)
+        subprocess.run([qemu_args[0], "--version"])
     try:
         subprocess.run(qemu_args)
     except Exception as e:
@@ -188,12 +190,12 @@ def update_firmware():
     if not os.path.exists(args.firmwaredir):
         os.makedirs(args.firmwaredir)
 
-    build_type = "DEBUG" if args.debugfw else "RELEASE"
-    fw_info_list = [["QemuQ35", "x64"],
-                    ["QemuQ35.NoSmm", "x64"],
-                    ["QemuSbsa", "aarch64"]]
+    fw_info_list = [["QemuQ35", "x64", True],
+                    ["QemuQ35.NoSmm", "x64", False],
+                    ["QemuSbsa", "aarch64", True]]
 
     for fw_info in fw_info_list:
+        build_type = "DEBUG" if args.debugfw and fw_info[2] else "RELEASE"
         url = f"https://github.com/microsoft/mu_tiano_platforms/releases/download/v{args.version}/Mu.{fw_info[0]}.FW.{build_type}-{args.version}.zip"
         zip_path = f"{args.firmwaredir}/{fw_info[0]}.zip"
 
