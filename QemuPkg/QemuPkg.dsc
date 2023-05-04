@@ -133,6 +133,8 @@
   QemuPkg/Library/BasePciCapLib/BasePciCapLib.inf
   QemuPkg/Library/BasePciCapPciSegmentLib/BasePciCapPciSegmentLib.inf
   QemuPkg/Library/ConfigSystemModeLibQemu/ConfigSystemModeLib.inf
+  QemuPkg/Library/DfciDeviceIdSupportLib/DfciDeviceIdSupportLib.inf
+  QemuPkg/Library/DfciUiSupportLib/DfciUiSupportLib.inf
   QemuPkg/Library/LockBoxLib/LockBoxBaseLib.inf
   QemuPkg/Library/LockBoxLib/LockBoxDxeLib.inf
   QemuPkg/Library/MsBootOptionsLibQemu/MsBootOptionsLib.inf
@@ -145,6 +147,7 @@
   QemuPkg/Library/VirtioLib/VirtioLib.inf
   QemuPkg/Library/QemuFwCfgLib/QemuFwCfgLibNull.inf
   QemuPkg/Library/XenPlatformLib/XenPlatformLib.inf
+  QemuPkg/FrontPageButtons/FrontPageButtons.inf
   QemuPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
   QemuPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
   QemuPkg/Virtio10Dxe/Virtio10.inf
