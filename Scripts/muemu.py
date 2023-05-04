@@ -1,3 +1,13 @@
+import zipfile
+import urllib.request
+import sys
+import subprocess
+import shutil
+import requests
+import os
+import argparse
+from typing import List
+exit
 #
 #  Script for running QEMU with the appropriate options for the given SKU/ARCH.
 #
@@ -5,15 +15,6 @@
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
-from typing import List
-import argparse
-import os
-import requests
-import shutil
-import subprocess
-import sys
-import urllib.request
-import zipfile
 
 #
 # Constants
@@ -28,20 +29,20 @@ DEFAULT_VERSION = "2.1.0"
 parser = argparse.ArgumentParser()
 
 # HINT: Run with '--help all' to get complete help.
-parser.add_argument("--update", "-u", action="store_true",
+parser.add_argument("-u", "--update", action="store_true",
                     help="Updates the firmware binaries.")
-parser.add_argument("--firmwaredir", default="./fw",
+parser.add_argument("--firmwaredir", default="./firmware",
                     help="Directory to download and use firmware binaries.")
-parser.add_argument("--arch", "-a", default="x64",
+parser.add_argument("-a", "--arch", default="x64",
                     choices=["x64", "arm64"], help="The guest architecture for the VM.")
-parser.add_argument("--disk", "-d",
+parser.add_argument("-d", "--disk",
                     help="Path to the disk file.")
-parser.add_argument("--cores", "-c", default=2, type=int,
-                    help="The number of cores for the VM.")
-parser.add_argument("--memory", "-m", default="4096",
+parser.add_argument("-c", "--cores", default=2, type=int,
+                    help="The number of cores for the VM. This may be overridden based on the configuration.")
+parser.add_argument("-m", "--memory", default="4096",
                     help="The memory size to use in Mb.")
 parser.add_argument("--vnc",
-                    help="Provides the VNC port to use. E.g. ':1' for localhost:5901")
+                    help="Provides the VNC port to use based on 5900. E.g. ':1' for localhost:5901")
 parser.add_argument("--accel", default="tcg",
                     choices=["tcg", "kvm", "whpx"], help="Acceleration back-end to use in QEMU.")
 parser.add_argument("--version", default=DEFAULT_VERSION,
@@ -183,6 +184,9 @@ def update_firmware():
     #     <root>/<arch>/<platform>/<build_toolchain>/<files>
     #
     print(f"Updating firmware to version {args.version}...")
+
+    if not os.path.exists(args.firmwaredir):
+        os.makedirs(args.firmwaredir)
 
     build_type = "DEBUG" if args.debugfw else "RELEASE"
     fw_info_list = [["QemuQ35", "x64"],
