@@ -15,7 +15,6 @@ exit
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
-
 #
 # Constants
 #
@@ -116,16 +115,17 @@ def main():
 
 
 def build_args_x64(qemu_args: List[str]):
+    smm_value = "off" if args.accel == "whpx" else "on"
     qemu_args += [f"{args.qemudir}qemu-system-x86_64"]
-    qemu_args += ["-machine", "q35,smm=on"]
     qemu_args += ["-cpu", "qemu64,+rdrand,umip,+smep"]
     qemu_args += ["-global", "ICH9-LPC.disable_s3=1"]
+    qemu_args += ["-machine", f"q35,smm={smm_value},accel={args.accel}"]
     qemu_args += ["-debugcon", "stdio"]  # file:uefi-x64.log
     qemu_args += ["-global", "isa-debugcon.iobase=0x402"]
     qemu_args += ["-vga", "cirrus"]
 
     # Flash storage
-    if args.accel != "whpx":
+    if smm_value == "on":
         code_fd = f"{args.firmwaredir}/x64/QemuQ35/VisualStudio-x64/QEMUQ35_CODE.fd"
         data_fd = f"{args.firmwaredir}/x64/QemuQ35/VisualStudio-x64/QEMUQ35_VARS.fd"
         qemu_args += ["-global",
@@ -146,7 +146,7 @@ def build_args_x64(qemu_args: List[str]):
 
 def build_args_arm64(qemu_args: List[str]):
     qemu_args += [f"{args.qemudir}qemu-system-aarch64"]
-    qemu_args += ["-machine", "sbsa-ref"]
+    qemu_args += ["-machine", "sbsa-ref,accel={args.accel}"]
     qemu_args += ["-cpu", "max"]
     qemu_args += ["-serial", "stdio"]  # file:uefi-arm64.log
 
