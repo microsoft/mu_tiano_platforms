@@ -119,7 +119,7 @@ def main():
 def build_args_x64(qemu_args: List[str]):
     smm_value = "off" if args.accel == "whpx" else "on"
     qemu_args += [f"{args.qemudir}qemu-system-x86_64"]
-    qemu_args += ["-cpu", "qemu64,+rdrand,umip,+smep"]
+    qemu_args += ["-cpu", "qemu64,+rdrand,umip,+smep,+popcnt"]
     qemu_args += ["-global", "ICH9-LPC.disable_s3=1"]
     qemu_args += ["-machine", f"q35,smm={smm_value},accel={args.accel}"]
     qemu_args += ["-debugcon", "stdio"]  # file:uefi-x64.log
