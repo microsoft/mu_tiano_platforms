@@ -56,6 +56,8 @@ parser.add_argument("--verbose", action="store_true",
                     help="Enabled verbose script prints.")
 parser.add_argument("--force", action="store_true",
                     help="Disables automatic correction of VM configurations.")
+parser.add_argument("--timeout", type=int, default=None,
+                    help="The number of seconds to wait before killing the QEMU process.")
 
 args = parser.parse_args()
 
@@ -168,7 +170,10 @@ def run_qemu(qemu_args: List[str]):
         print(qemu_args)
         subprocess.run([qemu_args[0], "--version"])
     try:
-        subprocess.run(qemu_args)
+        subprocess.run(qemu_args, timeout=args.timeout)
+    except subprocess.TimeoutExpired as e:
+        print(f"QEMU Ran longer then {args.timeout} seconds.")
+        return
     except Exception as e:
         raise e
 
@@ -176,7 +181,9 @@ def run_qemu(qemu_args: List[str]):
 def update_firmware():
     # Check if this is the newest version fore awareness.
     latest_version = get_latest_version()
-    if args.version != latest_version:
+    if args.version == "latest":
+        args.version = latest_version
+    elif args.version != latest_version:
         print("#############################################################")
         print(f"NOTE: A newer version of firmware available! {latest_version}")
         print("#############################################################\n")
