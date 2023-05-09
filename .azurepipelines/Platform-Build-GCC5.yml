@@ -25,4 +25,5 @@ jobs:
     tool_chain_tag: 'GCC5'
     vm_image: $(vm_image)
     pool_name: $(pool_name)
+    os_type: Linux
     container_image: linux-gcc

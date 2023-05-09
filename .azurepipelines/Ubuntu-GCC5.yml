@@ -38,3 +38,4 @@ jobs:
     vm_image: $(vm_image)
     pool_name: $(pool_name)
     container_image: linux-gcc
+    os_type: Linux
