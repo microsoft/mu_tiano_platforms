@@ -97,7 +97,7 @@ jobs:
       pool:
         name: ${{ parameters.pool_name }}
         demands:
-        - os -equals ${{ parameters.os_type }}
+        - Agent.OS -equals ${{ parameters.os_type }}
     ${{ else }}:
       pool:
         vmImage: ${{ parameters.vm_image }}
