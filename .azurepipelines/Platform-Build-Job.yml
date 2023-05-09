@@ -205,7 +205,8 @@ jobs:
       ${{ if eq(item.Value.SelfHostAgent, true) }}:
         pool:
           name: ${{ parameters.pool_name }}
-          name: ${{ parameters.os_type }}
+          demands:
+          - os -equals ${{ parameters.os_type }}
       ${{ else }}:
         pool:
           vmImage: ${{ parameters.vm_image }}
