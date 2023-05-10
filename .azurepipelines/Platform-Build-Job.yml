@@ -55,6 +55,7 @@ parameters:
       SelfHostAgent: false
       BuildArtifactsBinary: |
         **/QEMUQ35_*.fd
+      BuildArtifactsOther: "**/unit_test_results/*"
 
     QemuQ35_RELEASE:
       BuildPackage: QemuQ35Pkg
@@ -70,6 +71,7 @@ parameters:
       SelfHostAgent: false
       BuildArtifactsBinary: |
         **/QEMUQ35_*.fd
+      BuildArtifactsOther: "**/unit_test_results/*"
 
     QemuQ35_DEBUG_ARM:
       BuildPackage: QemuQ35Pkg
@@ -86,6 +88,7 @@ parameters:
       BuildArtifactsBinary: |
         **/QEMUQ35_*.fd
         **/*/*TestApp.efi
+      BuildArtifactsOther: "**/unit_test_results/*"
 
     QemuQ35_RELEASE_ARM:
       BuildPackage: QemuQ35Pkg
@@ -102,6 +105,7 @@ parameters:
       BuildArtifactsBinary: |
         **/QEMUQ35_*.fd
         **/*/*TestApp.efi
+      BuildArtifactsOther: "**/unit_test_results/*"
 
     QemuQ35_NO_SMM_RELEASE:
       BuildPackage: QemuQ35Pkg
@@ -116,6 +120,7 @@ parameters:
       RunFlags: SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE
       BuildArtifactsBinary: |
         **/QEMUQ35_*.fd
+      BuildArtifactsOther: ""
 
     QemuSbsa_DEBUG:
       BuildPackage: QemuSbsaPkg
@@ -133,6 +138,7 @@ parameters:
       BuildArtifactsBinary: |
         **/QEMU_EFI.fd
         **/SECURE_FLASH0.fd
+      BuildArtifactsOther: "**/unit_test_results/*"
 
     QemuSbsa_RELEASE:
       BuildPackage: QemuSbsaPkg
@@ -150,6 +156,7 @@ parameters:
       BuildArtifactsBinary: |
         **/QEMU_EFI.fd
         **/SECURE_FLASH0.fd
+      BuildArtifactsOther: "**/unit_test_results/*"
 
     QemuSbsa_DEBUG_ARM:
       BuildPackage: QemuSbsaPkg
@@ -166,6 +173,7 @@ parameters:
       BuildArtifactsBinary: |
         **/QEMU_EFI.fd
         **/SECURE_FLASH0.fd
+      BuildArtifactsOther: "**/unit_test_results/*"
 
     QemuSbsa_RELEASE_ARM:
       BuildPackage: QemuSbsaPkg
@@ -182,6 +190,7 @@ parameters:
       BuildArtifactsBinary: |
         **/QEMU_EFI.fd
         **/SECURE_FLASH0.fd
+      BuildArtifactsOther: "**/unit_test_results/*"
 
 jobs:
   - ${{ each item in parameters.build_matrix }}:
@@ -235,6 +244,7 @@ jobs:
           install_tools: ${{ and(not(eq(item.Value.SelfHostAgent, true)), eq(parameters.container_image, '')) }}
           artifacts_identifier: '${{ item.Value.BuildPackage }} $(tool_chain_tag) ${{ item.Value.BuildTarget }} ${{ item.Value.BuildExtraTag }}'
           artifacts_binary: ${{ item.Value.BuildArtifactsBinary }}
+          artifacts_other: ${{ item.Value.BuildArtifactsOther }}
 
     - job: RunQemuBuilds_${{ item.Key }}
       displayName: Run Qemu Builds ${{ item.Key }}
@@ -306,4 +316,10 @@ jobs:
       # Copy build logs to the artifact staging directory
       - template: Steps/CommonLogCopyAndPublish.yml@mu_devops
         parameters:
+          artifacts_identifier: 'Binaries ${{ item.Value.BuildPackage }} $(tool_chain_tag) ${{ item.Value.BuildTarget }} ${{ item.Value.BuildExtraTag }}'
+
+      # Copy other files to the artifact staging directory
+      - template: OtherCopyAndPublish.yml
+        parameters:
+          artifacts_other: ${{ item.Value.BuildArtifactsOther }}
           artifacts_identifier: 'Binaries ${{ item.Value.BuildPackage }} $(tool_chain_tag) ${{ item.Value.BuildTarget }} ${{ item.Value.BuildExtraTag }}'
