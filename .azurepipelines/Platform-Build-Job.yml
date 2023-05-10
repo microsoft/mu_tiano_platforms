@@ -194,7 +194,7 @@ jobs:
 
       variables:
       - name: Run
-        ${{ if or(item.Value.Run, ne(parameters.container_image, '')) }}:
+        ${{ if or(eq(item.Value.Run, true), eq(parameters.os_type, 'Linux')) }}:
           value: true
         ${{ else }}:
           value: false
