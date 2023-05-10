@@ -148,7 +148,7 @@ def build_args_x64(qemu_args: List[str]):
 
 def build_args_arm64(qemu_args: List[str]):
     qemu_args += [f"{args.qemudir}qemu-system-aarch64"]
-    qemu_args += ["-machine", "sbsa-ref,accel={args.accel}"]
+    qemu_args += ["-machine", f"sbsa-ref,accel={args.accel}"]
     qemu_args += ["-cpu", "max"]
     qemu_args += ["-serial", "stdio"]  # file:uefi-arm64.log
 
