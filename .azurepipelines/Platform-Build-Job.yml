@@ -51,7 +51,7 @@ parameters:
       BuildExtraStep:
         - script: echo No extra steps provided
       Run: true
-      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: false
       BuildArtifactsBinary: |
         **/QEMUQ35_*.fd
@@ -67,7 +67,7 @@ parameters:
       BuildExtraStep:
         - script: echo No extra steps provided
       Run: true
-      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: false
       BuildArtifactsBinary: |
         **/QEMUQ35_*.fd
@@ -83,7 +83,7 @@ parameters:
       BuildExtraStep:
         - script: echo No extra steps provided
       Run: false
-      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: true
       BuildArtifactsBinary: |
         **/QEMUQ35_*.fd
@@ -100,7 +100,7 @@ parameters:
       BuildExtraStep:
         - script: echo No extra steps provided
       Run: false
-      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
       SelfHostAgent: true
       BuildArtifactsBinary: |
         **/QEMUQ35_*.fd
@@ -117,7 +117,7 @@ parameters:
       BuildExtraStep:
         - script: echo No extra steps provided
       Run: true
-      RunFlags: SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE
+      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE"
       BuildArtifactsBinary: |
         **/QEMUQ35_*.fd
       BuildArtifactsOther: ""
