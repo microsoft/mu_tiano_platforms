@@ -30,6 +30,7 @@
         "AcceptableDependencies": [
             "MdePkg/MdePkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
+            "DfciPkg/DfciPkg.dec",
             "MfciPkg/MfciPkg.dec",
             "OemPkg/OemPkg.dec",
             "PcBdsPkg/PcBdsPkg.dec",
@@ -97,7 +98,7 @@
             "pointee",
             "ramfb",
             "rebecca",
-            "TSEGMB"
+            "tsegmb"
           ],
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
         "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)

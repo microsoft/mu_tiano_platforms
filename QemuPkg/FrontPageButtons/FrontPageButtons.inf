@@ -1,0 +1,48 @@
+## @file FrontPageButtons.inf
+#
+# This module installs the MsButtonServicesProtocol and reports the requested state of Vol+ and
+# Vol- as indicated by the smbios table type3 record version string.
+#
+# If the Type3.version string is:
+#     "Vol+"  -- Return Vol+ pressed.
+#     "Vol-"  -- Return Vol- pressed.
+#     any other string, or no string, return neither pressed
+#
+# Copyright (C) Microsoft Corporation. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.27
+  BASE_NAME                      = FrontPageButtons
+  FILE_GUID                      = d91fb421-e24f-4839-9a44-dc77189e87d2
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ButtonsInit
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  FrontPageButtons.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OemPkg/OemPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gMsButtonServicesProtocolGuid          #PRODUCES
+  gEfiSmbiosProtocolGuid                 #CONSUMES
+
+[Depex]
+  gEfiSmbiosProtocolGuid

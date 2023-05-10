@@ -55,6 +55,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         ''' Runs QEMU '''
         VirtualDrive = env.GetValue("VIRTUAL_DRIVE_PATH")
         OutputPath_FV = os.path.join(env.GetValue("BUILD_OUTPUT_BASE"), "FV")
+        version = env.GetValue("VERSION", "Unknown")
 
         # Check if QEMU is on the path, if not find it
         executable = "qemu-system-x86_64"
@@ -99,7 +100,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             args += " -hda \"" + env.GetValue("PATH_TO_OS") + "\""
         else:
             args += " -m 2048"
-        args += " -cpu qemu64,+rdrand,umip,+smep" # most compatible x64 CPU model + RDRAND + UMIP + SMEP support (not included by default)
+        args += " -cpu qemu64,+rdrand,umip,+smep,+popcnt" # most compatible x64 CPU model + RDRAND + UMIP + SMEP + POPCNT support (not included by default)
         if env.GetBuildValue ("QEMU_CORE_NUM") is not None:
             args += " -smp " + env.GetBuildValue ("QEMU_CORE_NUM")
         if smm_enabled == "on":
@@ -113,7 +114,9 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         args += " -device qemu-xhci,id=usb"
         args += " -device usb-mouse,id=input0,bus=usb.0,port=1"  # add a usb mouse
         #args += " -device usb-kbd,id=input1,bus=usb.0,port=2"    # add a usb keyboar
-        args += " -smbios type=0,vendor=Palindrome,uefi=on -smbios type=1,manufacturer=Palindrome,product=MuQemuQ35,serial=42-42-42-42"
+        args += " -smbios type=0,vendor=Palindrome,uefi=on"
+        args += " -smbios type=1,manufacturer=Palindrome,product=MuQemuQ35,serial=42-42-42-42"
+        args += f" -smbios type=3,manufacturer=Palindrome,version={version},serial=42-42-42-42,asset=Q35,sku=Q35"
 
         if (env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
             args += " -display none"  # no graphics

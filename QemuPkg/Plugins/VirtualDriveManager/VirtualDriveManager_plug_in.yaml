@@ -1,0 +1,11 @@
+## @file VirtualDriveManager_plug_in.yaml
+# Helper Plugin for managing a virtual drive, tests, and startup script.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "qemu",
+  "name": "Virtual Drive Manager",
+  "module": "VirtualDriveManager"
+}

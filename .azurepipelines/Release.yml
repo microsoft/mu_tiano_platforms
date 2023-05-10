@@ -17,27 +17,35 @@ resources:
       type: github
       endpoint: microsoft
       name: microsoft/mu_devops
-      ref: refs/tags/v2.0.1
+      ref: refs/tags/v2.5.2
 
 name: $(Date:yyyyMMdd)$(Rev:.r) Mu Tiano Platforms Release
 
 stages:
-- stage: BuildQemuQ35
-  displayName: Build QEMU Q35
+- stage: BuildQemuPlatforms
+  displayName: Build QEMU Platforms
   jobs:
-    - template: ../Platforms/QemuQ35Pkg/.azurepipelines/templates/Job-Ubuntu-GCC5.yml
-    - template: ../Platforms/QemuQ35Pkg/.azurepipelines/templates/Job-Windows-VS.yml
+    - template: Platform-Build-Job.yml
+      parameters:
+          extra_install_step:
+                - script: sudo dnf --assumeyes install openssl-devel
+                  displayName: Install openssl
+          container_image: ghcr.io/tianocore/containers/fedora-37-test:54e5bd1
+          tool_chain_tag: GCC5
+          vm_image: ubuntu-latest
 
-- stage: BuildQemuSbsa
-  displayName: Build QEMU SBSA
-  dependsOn: [] # Build in parallel with the previous stage
-  jobs:
-    - template: ../Platforms/QemuSbsaPkg/.azurepipelines/templates/Job-Ubuntu-GCC5.yml
+    - template: Platform-Build-Job.yml
+      parameters:
+          extra_install_step:
+          - powershell: choco install qemu --version=2022.8.31; Write-Host "##vso[task.prependpath]c:\Program Files\qemu"
+            displayName: Install QEMU and Set QEMU on path
+            condition: and(gt(variables.pkg_count, 0), succeeded())
+          tool_chain_tag: VS2022
+          vm_image: windows-latest
 
 - stage: PublishReleaseArtifacts
   displayName: Publish Release Artifacts
   dependsOn:
-  - BuildQemuQ35
-  - BuildQemuSbsa
+  - BuildQemuPlatforms
   jobs:
     - template: templates/Job-Publish.yml
