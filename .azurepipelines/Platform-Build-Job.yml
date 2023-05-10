@@ -118,6 +118,7 @@ parameters:
         - script: echo No extra steps provided
       Run: true
       RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE"
+      SelfHostAgent: false
       BuildArtifactsBinary: |
         **/QEMUQ35_*.fd
       BuildArtifactsOther: ""
