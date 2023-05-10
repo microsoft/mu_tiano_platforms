@@ -282,7 +282,7 @@ jobs:
         displayName: Download Visual Studio FD files
         inputs:
           buildType: 'current'
-          artifactName: 'Binaries ${{ item.Value.BuildPackage }} $(tool_chain_tag) ${{ item.Value.BuildTarget }}'
+          artifactName: 'Binaries ${{ item.Value.BuildPackage }} $(tool_chain_tag) ${{ item.Value.BuildTarget }} ${{ item.Value.BuildExtraTag }}'
           itemPattern: '**/*.fd'
           targetPath: 'Build/${{ item.Value.BuildPackage }}/${{ item.Value.BuildTarget }}_$(tool_chain_tag)/FV/'
 
@@ -291,7 +291,7 @@ jobs:
         displayName: Download Visual Studio Test Files
         inputs:
           buildType: 'current'
-          artifactName: 'Binaries ${{ item.Value.BuildPackage }} $(tool_chain_tag) ${{ item.Value.BuildTarget }}'
+          artifactName: 'Binaries ${{ item.Value.BuildPackage }} $(tool_chain_tag) ${{ item.Value.BuildTarget }} ${{ item.Value.BuildExtraTag }}'
           itemPattern: '**/*.efi'
           targetPath: 'Build/${{ item.Value.BuildPackage }}/${{ item.Value.BuildTarget }}_$(tool_chain_tag)/X64/'
 
