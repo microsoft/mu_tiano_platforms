@@ -1,6 +1,6 @@
 [submodule "MU_BASECORE"]
 	path = MU_BASECORE
-	url = https://github.com/kuqin12/mu_basecore.git
+	url = https://github.com/microsoft/mu_basecore.git
 	branch = release/202208
 [submodule "Common/MU_TIANO"]
 	path = Common/MU_TIANO
