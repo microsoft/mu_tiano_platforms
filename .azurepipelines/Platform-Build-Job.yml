@@ -319,7 +319,7 @@ jobs:
           artifacts_identifier: 'Binaries ${{ item.Value.BuildPackage }} $(tool_chain_tag) ${{ item.Value.BuildTarget }} ${{ item.Value.BuildExtraTag }}'
 
       # Copy other files to the artifact staging directory
-      - template: OtherCopyAndPublish.yml
+      - template: Steps/OtherCopyAndPublish.yml@mu_devops
         parameters:
           artifacts_other: ${{ item.Value.BuildArtifactsOther }}
           artifacts_identifier: 'Binaries ${{ item.Value.BuildPackage }} $(tool_chain_tag) ${{ item.Value.BuildTarget }} ${{ item.Value.BuildExtraTag }}'
