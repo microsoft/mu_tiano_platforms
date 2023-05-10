@@ -158,40 +158,6 @@ parameters:
         **/SECURE_FLASH0.fd
       BuildArtifactsOther: "**/unit_test_results/*"
 
-    QemuSbsa_DEBUG_ARM:
-      BuildPackage: QemuSbsaPkg
-      BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
-      BuildArch: AARCH64
-      BuildFlags: ""
-      BuildTarget: "DEBUG"
-      BuildExtraTag: "ON_ARM"
-      BuildExtraStep:
-        - script: echo No extra steps provided
-      Run: true
-      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-      SelfHostAgent: true
-      BuildArtifactsBinary: |
-        **/QEMU_EFI.fd
-        **/SECURE_FLASH0.fd
-      BuildArtifactsOther: "**/unit_test_results/*"
-
-    QemuSbsa_RELEASE_ARM:
-      BuildPackage: QemuSbsaPkg
-      BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
-      BuildArch: AARCH64
-      BuildFlags: ""
-      BuildTarget: "RELEASE"
-      BuildExtraTag: "ON_ARM"
-      BuildExtraStep:
-        - script: echo No extra steps provided
-      Run: true
-      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-      SelfHostAgent: true
-      BuildArtifactsBinary: |
-        **/QEMU_EFI.fd
-        **/SECURE_FLASH0.fd
-      BuildArtifactsOther: "**/unit_test_results/*"
-
 jobs:
   - ${{ each item in parameters.build_matrix }}:
     - job: PlatformBuild_${{ item.Key }}
@@ -244,7 +210,8 @@ jobs:
           install_tools: ${{ and(not(eq(item.Value.SelfHostAgent, true)), eq(parameters.container_image, '')) }}
           artifacts_identifier: '${{ item.Value.BuildPackage }} $(tool_chain_tag) ${{ item.Value.BuildTarget }} ${{ item.Value.BuildExtraTag }}'
           artifacts_binary: ${{ item.Value.BuildArtifactsBinary }}
-          artifacts_other: ${{ item.Value.BuildArtifactsOther }}
+          ${{ if or(eq(item.Value.Run, true), eq(parameters.os_type, 'Linux')) }}:
+            artifacts_other: ${{ item.Value.BuildArtifactsOther }}
 
     - job: RunQemuBuilds_${{ item.Key }}
       displayName: Run Qemu Builds ${{ item.Key }}
