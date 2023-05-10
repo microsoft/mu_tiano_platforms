@@ -164,7 +164,7 @@ jobs:
       displayName: Build Platforms ${{ item.Key }}
       condition: |
         and(not(Canceled()),
-            and(or(eq(variables['tool_chain_tag'], 'GCC5'), not(startsWith('${{ item.Key }}', 'QemuSbsa')))),
+            and(or(eq(variables['tool_chain_tag'], 'GCC5'), not(startsWith('${{ item.Key }}', 'QemuSbsa'))),
                 or(eq(${{ item.Value.SelfHostAgent }}, false), ne(${{ parameters.pool_name }}, '')))
 
       workspace:
