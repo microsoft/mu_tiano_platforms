@@ -417,7 +417,7 @@ INF  QemuPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
   INF  NetworkPkg/TcpDxe/TcpDxe.inf
   INF  NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
 
-  INF  PolicyServicePkg/PolicyService/Dxe/PolicyDxe.inf
+  INF  PolicyServicePkg/PolicyService/DxeMm/PolicyDxe.inf
   INF  SetupDataPkg/ConfApp/ConfApp.inf
 
   INF  NetworkPkg/TlsDxe/TlsDxe.inf

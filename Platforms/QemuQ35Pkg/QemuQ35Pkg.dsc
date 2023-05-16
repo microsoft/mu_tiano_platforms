@@ -39,7 +39,7 @@
 
   # Configure Shared Crypto
   !ifndef ENABLE_SHARED_CRYPTO # by default true
-    ENABLE_SHARED_CRYPTO = TRUE
+    ENABLE_SHARED_CRYPTO = FALSE
   !endif
   !if $(ENABLE_SHARED_CRYPTO) == TRUE
     PEI_CRYPTO_SERVICES = TINY_SHA
@@ -280,7 +280,7 @@
   # Qemu specific libraries
   QemuFwCfgLib             |QemuQ35Pkg/Library/QemuFwCfgLib/QemuFwCfgDxeLib.inf
   QemuFwCfgSimpleParserLib |QemuQ35Pkg/Library/QemuFwCfgSimpleParserLib/QemuFwCfgSimpleParserLib.inf
-  VmgExitLib               |UefiCpuPkg/Library/VmgExitLibNull/VmgExitLibNull.inf
+  CcExitLib                |UefiCpuPkg/Library/CcExitLibNull/CcExitLibNull.inf
 
   # Platform devices path libraries
   MsPlatformDevicesLib |QemuQ35Pkg/Library/MsPlatformDevicesLibQemuQ35/MsPlatformDevicesLib.inf
@@ -1267,7 +1267,7 @@
       gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0xFF
   }
 
-  PolicyServicePkg/PolicyService/Dxe/PolicyDxe.inf
+  PolicyServicePkg/PolicyService/DxeMm/PolicyDxe.inf
 
   SetupDataPkg/ConfApp/ConfApp.inf {
     <LibraryClasses>

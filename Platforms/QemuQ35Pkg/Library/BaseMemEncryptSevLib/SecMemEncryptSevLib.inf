@@ -45,10 +45,10 @@
 
 [LibraryClasses]
   BaseLib
+  CcExitLib
   CpuLib
   DebugLib
   PcdLib
-  VmgExitLib
 
 [FixedPcd]
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase

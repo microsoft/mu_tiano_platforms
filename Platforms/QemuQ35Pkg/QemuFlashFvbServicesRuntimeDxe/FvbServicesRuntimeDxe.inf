@@ -45,6 +45,7 @@
 [LibraryClasses]
   BaseLib
   BaseMemoryLib
+  CcExitLib
   DebugLib
   DevicePathLib
   DxeServicesTableLib
@@ -54,7 +55,6 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiRuntimeLib
-  VmgExitLib
 
 [Guids]
   gEfiEventVirtualAddressChangeGuid   # ALWAYS_CONSUMED
