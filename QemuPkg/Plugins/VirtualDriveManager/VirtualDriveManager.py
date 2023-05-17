@@ -368,9 +368,9 @@ class VirtualDriveManager(IUefiHelperPlugin):
             auto_shutdown (Boolean): Whether or not to shutdown after tests have completed.
         """
         drive.add_files(test_list)
+        tests = []
 
         if auto_run:
-            tests = []
             # Execute all tests
             tests.append("# 1. We conditionally run a test based off of the presence of a <TestName>_JUNIT.XML. When this file is")
             tests.append("#    present, it means that the test has completely finished and the results have been recorded. Once the")
