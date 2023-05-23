@@ -22,7 +22,7 @@ parameters:
 - name: pool_name
   displayName: Pool Name
   type: string
-  default: ""
+  default: ''
 - name: os_type
   displayName: OS type on the self-hosted agent pools
   type: string
@@ -40,124 +40,19 @@ parameters:
   default: 25
 - name: build_matrix
   type: object
-  default:
-    QemuQ35_DEBUG:
-      BuildPackage: QemuQ35Pkg
-      BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-      BuildArch: IA32,X64
-      BuildFlags: ""
-      BuildTarget: "DEBUG"
-      BuildExtraTag: ""
-      BuildExtraStep:
-        - script: echo No extra steps provided
-      Run: true
-      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-      SelfHostAgent: false
-      BuildArtifactsBinary: |
-        **/QEMUQ35_*.fd
-      BuildArtifactsOther: "**/unit_test_results/*"
-
-    QemuQ35_RELEASE:
-      BuildPackage: QemuQ35Pkg
-      BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-      BuildArch: IA32,X64
-      BuildFlags: ""
-      BuildTarget: "RELEASE"
-      BuildExtraTag: ""
-      BuildExtraStep:
-        - script: echo No extra steps provided
-      Run: true
-      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-      SelfHostAgent: false
-      BuildArtifactsBinary: |
-        **/QEMUQ35_*.fd
-      BuildArtifactsOther: "**/unit_test_results/*"
-
-    QemuQ35_DEBUG_ARM:
-      BuildPackage: QemuQ35Pkg
-      BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-      BuildArch: IA32,X64
-      BuildFlags: ""
-      BuildTarget: "DEBUG"
-      BuildExtraTag: "ON_ARM"
-      BuildExtraStep:
-        - script: echo No extra steps provided
-      Run: false
-      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-      SelfHostAgent: true
-      BuildArtifactsBinary: |
-        **/QEMUQ35_*.fd
-        **/*/*TestApp.efi
-      BuildArtifactsOther: "**/unit_test_results/*"
-
-    QemuQ35_RELEASE_ARM:
-      BuildPackage: QemuQ35Pkg
-      BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-      BuildArch: IA32,X64
-      BuildFlags: ""
-      BuildTarget: "RELEASE"
-      BuildExtraTag: "ON_ARM"
-      BuildExtraStep:
-        - script: echo No extra steps provided
-      Run: false
-      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-      SelfHostAgent: true
-      BuildArtifactsBinary: |
-        **/QEMUQ35_*.fd
-        **/*/*TestApp.efi
-      BuildArtifactsOther: "**/unit_test_results/*"
-
-    QemuQ35_NO_SMM_RELEASE:
-      BuildPackage: QemuQ35Pkg
-      BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-      BuildArch: IA32,X64
-      BuildFlags: "BLD_*_SMM_ENABLED=FALSE"
-      BuildTarget: "RELEASE"
-      BuildExtraTag: "NO_SMM"
-      BuildExtraStep:
-        - script: echo No extra steps provided
-      Run: true
-      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE"
-      SelfHostAgent: false
-      BuildArtifactsBinary: |
-        **/QEMUQ35_*.fd
-      BuildArtifactsOther: ""
-
-    QemuSbsa_DEBUG:
-      BuildPackage: QemuSbsaPkg
-      BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
-      BuildArch: AARCH64
-      BuildFlags: ""
-      BuildTarget: "DEBUG"
-      BuildExtraTag: ""
-      BuildExtraStep:
-        - script: sudo dnf --assumeyes install openssl-devel
-          displayName: Install openssl
-      Run: true
-      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-      SelfHostAgent: false
-      BuildArtifactsBinary: |
-        **/QEMU_EFI.fd
-        **/SECURE_FLASH0.fd
-      BuildArtifactsOther: "**/unit_test_results/*"
-
-    QemuSbsa_RELEASE:
-      BuildPackage: QemuSbsaPkg
-      BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
-      BuildArch: AARCH64
-      BuildFlags: ""
-      BuildTarget: "RELEASE"
-      BuildExtraTag: ""
-      BuildExtraStep:
-        - script: sudo dnf --assumeyes install openssl-devel
-          displayName: Install openssl
-      Run: true
-      RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-      SelfHostAgent: false
-      BuildArtifactsBinary: |
-        **/QEMU_EFI.fd
-        **/SECURE_FLASH0.fd
-      BuildArtifactsOther: "**/unit_test_results/*"
+  ## Build matrix to be supplied by both VS and GCC builds. The accepted parameters are listed below:
+  # BuildPackage:         Packages to be built, i.e., QemuQ35Pkg
+  # BuildFile:            Build script for building platform firmware, i.e., "Platforms/QemuQ35Pkg/PlatformBuild.py"
+  # BuildArch:            Architectures to be supported by platform firmware, i.e., IA32,X64
+  # BuildFlags:           Additional build flags, set to empty string if none
+  # BuildTarget:          Build targets to be used for platform firmware, i.e., "DEBUG"
+  # BuildExtraTag:        Extra tags to be used as artifact identifier, this is especially useful when building the same packages with the tool chain and target
+  # BuildExtraStep:       Extra steps the template will execute prior to Steps/BuildPlatform.yml
+  # Run:                  Indicate whether the QEMU runner should launch, this will be overridden to defer the run if a combination of Window and ARM host system is met
+  # RunFlags:             Run flags to be used for launching QEMU, i.e., "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+  # SelfHostAgent:        Indicate whether this matrix entry should be run on selfhosted agents
+  # BuildArtifactsBinary: Artifacts to be published after building steps
+  # BuildArtifactsOther:  Additional artifacts to be published after building steps
 
 jobs:
   - ${{ each item in parameters.build_matrix }}:
@@ -165,8 +60,7 @@ jobs:
       displayName: Build Platforms ${{ item.Key }}
       condition: |
         and(not(Canceled()),
-            and(or(eq(variables['tool_chain_tag'], 'GCC5'), not(startsWith('${{ item.Key }}', 'QemuSbsa'))),
-                or(eq(${{ item.Value.SelfHostAgent }}, false), ne('${{ parameters.pool_name }}', ''))))
+            or(eq(${{ item.Value.SelfHostAgent }}, false), ne(variables['${{ parameters.pool_name }}'], '')))
 
       workspace:
         clean: all
@@ -183,7 +77,7 @@ jobs:
 
       ${{ if eq(item.Value.SelfHostAgent, true) }}:
         pool:
-          name: ${{ parameters.pool_name }}
+          name: $(${{ parameters.pool_name }})
           demands:
           - Agent.OS -equals ${{ parameters.os_type }}
       ${{ else }}:
