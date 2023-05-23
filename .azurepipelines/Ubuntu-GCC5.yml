@@ -27,10 +27,6 @@ extends:
     do_non_ci_setup: true
     do_pr_eval: true
     container_build: true
-    extra_install_step:
-    - script: |
-              sudo dnf install --assumeyes mingw64-gcc
-      displayName: Install Windows Resource Compiler for Linux
     os_type: Linux
     build_matrix:
       TARGET_QEMU:
