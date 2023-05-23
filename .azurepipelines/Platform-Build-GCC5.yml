@@ -27,7 +27,7 @@ jobs:
     pool_name: $(pool_name)
     os_type: Linux
     container_image: linux-gcc
-    buid_matrix:
+    build_matrix:
       QemuQ35_DEBUG:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
