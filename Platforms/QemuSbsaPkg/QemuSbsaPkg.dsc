@@ -1094,7 +1094,7 @@
   PcBdsPkg/MsBootPolicy/MsBootPolicy.inf
 
   # Configuration modules
-  PolicyServicePkg/PolicyService/Dxe/PolicyDxe.inf
+  PolicyServicePkg/PolicyService/DxeMm/PolicyDxe.inf
 
   SetupDataPkg/ConfApp/ConfApp.inf {
     <LibraryClasses>
