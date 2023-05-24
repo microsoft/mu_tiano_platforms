@@ -289,7 +289,7 @@ READ_LOCK_STATUS   = TRUE
   #
   # Policy and configuration
   #
-  INF PolicyServicePkg/PolicyService/Dxe/PolicyDxe.inf
+  INF PolicyServicePkg/PolicyService/DxeMm/PolicyDxe.inf
 
   #
   # Frontpages
