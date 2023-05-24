@@ -54,7 +54,9 @@ updates:
     rebase-strategy: "disabled"
     ignore:
       - dependency-name: "MU_BASECORE"
+      - dependency-name: "Features/CONFIG"
       - dependency-name: "Features/DFCI"
+      - dependency-name: "Features/MM_SUPV"
 
   - package-ecosystem: "pip"
     directory: "/"
