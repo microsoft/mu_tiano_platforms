@@ -22,7 +22,7 @@ parameters:
 - name: pool_name
   displayName: Pool Name
   type: string
-  default: ''
+  default: pool_name
 - name: os_type
   displayName: OS type on the self-hosted agent pools
   type: string

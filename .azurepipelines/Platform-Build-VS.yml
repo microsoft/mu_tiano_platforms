@@ -25,7 +25,6 @@ jobs:
       condition: and(gt(variables.pkg_count, 0), succeeded())
     tool_chain_tag: 'VS2022'
     vm_image: $(vm_image)
-    pool_name: $(pool_name)
     os_type: Windows_NT
     build_matrix:
       QemuQ35_DEBUG:
