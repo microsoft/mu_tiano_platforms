@@ -14,7 +14,7 @@ resources:
       ref: main
   containers:
     - container: linux-gcc
-      image: ghcr.io/cfernald/mu_devops/ubuntu-22-test:latest
+      image: ghcr.io/microsoft/mu_devops/ubuntu-22-test:latest
 
 variables:
 - group: tool-chain-ubuntu-gcc
