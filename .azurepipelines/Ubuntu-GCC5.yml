@@ -33,17 +33,14 @@ extends:
         Pkgs: 'QemuPkg'
         Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
         ArchList: IA32,X64,AARCH64
-        SelfHostAgent: false
       TARGET_Q35:
         Pkgs: 'QemuQ35Pkg'
         Targets: 'NO-TARGET'
         ArchList: IA32,X64
-        SelfHostAgent: false
       TARGET_SBSA:
         Pkgs: 'QemuSbsaPkg'
         Targets: 'NO-TARGET'
         ArchList: AARCH64
-        SelfHostAgent: false
       TARGET_QEMU_ARM:
         Pkgs: 'QemuPkg'
         Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
