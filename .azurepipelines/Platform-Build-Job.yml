@@ -60,7 +60,7 @@ jobs:
       displayName: Build Platforms ${{ item.Key }}
       condition: |
         and(not(Canceled()),
-            or(ne(${{ item.Value.SelfHostAgent }}, true), ne(variables['${{ parameters.pool_name }}'], '')))
+            or(${{ ne(item.Value.SelfHostAgent, true) }}, ne(variables['${{ parameters.pool_name }}'], '')))
 
       workspace:
         clean: all
