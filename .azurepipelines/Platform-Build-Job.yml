@@ -50,7 +50,7 @@ parameters:
   # BuildExtraStep:       Extra steps the template will execute prior to Steps/BuildPlatform.yml
   # Run:                  Indicate whether the QEMU runner should launch, this will be overridden to defer the run if a combination of Window and ARM host system is met
   # RunFlags:             Run flags to be used for launching QEMU, i.e., "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-  # SelfHostAgent:        Indicate whether this matrix entry should be run on selfhosted agents
+  # SelfHostAgent:        Optional: Indicate whether this matrix entry should be run on selfhosted agents
   # BuildArtifactsBinary: Artifacts to be published after building steps
   # BuildArtifactsOther:  Additional artifacts to be published after building steps
 
@@ -60,7 +60,7 @@ jobs:
       displayName: Build Platforms ${{ item.Key }}
       condition: |
         and(not(Canceled()),
-            or(eq(${{ item.Value.SelfHostAgent }}, false), ne(variables['${{ parameters.pool_name }}'], '')))
+            or(ne(${{ item.Value.SelfHostAgent }}, true), ne(variables['${{ parameters.pool_name }}'], '')))
 
       workspace:
         clean: all
@@ -72,7 +72,7 @@ jobs:
         ${{ else }}:
           value: false
 
-      ${{ if and(ne(parameters.container_image, ''), not(eq(item.Value.SelfHostAgent, true))) }}:
+      ${{ if and(ne(parameters.container_image, ''), ne(item.Value.SelfHostAgent, true)) }}:
         container: ${{ parameters.container_image }}
 
       ${{ if eq(item.Value.SelfHostAgent, true) }}:
@@ -85,7 +85,7 @@ jobs:
           vmImage: ${{ parameters.vm_image }}
 
       steps:
-      - ${{ if and(and(ne(parameters.container_image, ''), not(eq(item.Value.SelfHostAgent, true))), not(contains(parameters.vm_image, 'windows'))) }}:
+      - ${{ if and(and(ne(parameters.container_image, ''), ne(item.Value.SelfHostAgent, true)), not(contains(parameters.vm_image, 'windows'))) }}:
         - script: echo "##vso[task.prependpath]/home/vsts_azpcontainer/.local/bin"
           displayName: Add User Local Bin to Path
         - script: sudo dnf install -y mtools dosfstools
@@ -105,7 +105,7 @@ jobs:
           run_flags: ${{ item.Value.RunFlags }}
           run_timeout: ${{ parameters.run_timeout }}
           extra_install_step: ${{ parameters.extra_install_step }}
-          install_tools: ${{ and(not(eq(item.Value.SelfHostAgent, true)), eq(parameters.container_image, '')) }}
+          install_tools: ${{ and(ne(item.Value.SelfHostAgent, true), eq(parameters.container_image, '')) }}
           artifacts_identifier: '${{ item.Value.BuildPackage }} $(tool_chain_tag) ${{ item.Value.BuildTarget }} ${{ item.Value.BuildExtraTag }}'
           artifacts_binary: ${{ item.Value.BuildArtifactsBinary }}
           ${{ if or(eq(item.Value.Run, true), eq(parameters.os_type, 'Linux')) }}:
