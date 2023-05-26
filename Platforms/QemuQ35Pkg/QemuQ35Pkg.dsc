@@ -1267,7 +1267,7 @@
       gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0xFF
   }
 
-  PolicyServicePkg/PolicyService/Dxe/PolicyDxe.inf
+  PolicyServicePkg/PolicyService/DxeMm/PolicyDxe.inf
 
   SetupDataPkg/ConfApp/ConfApp.inf {
     <LibraryClasses>
