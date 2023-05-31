@@ -37,6 +37,9 @@
   DEFINE PEI_MM_IPL_ENABLED             = TRUE
   DEFINE GUI_FRONT_PAGE                 = FALSE
 
+  DEFINE NETWORK_HTTP_ENABLE            = TRUE
+  DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS = TRUE
+
   # Configure Shared Crypto
   !ifndef ENABLE_SHARED_CRYPTO # by default true
     ENABLE_SHARED_CRYPTO = TRUE
