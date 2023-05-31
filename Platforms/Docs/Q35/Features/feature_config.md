@@ -54,7 +54,7 @@ the expected workflow.
 For a feature that needs to be configured through this framework, the end module should be updated to consume the data
 described in [PolicyServicePkg](https://microsoft.github.io/mu/dyn/mu_basecore/PolicyServicePkg/).
 
-In the example of GFX module, [QemuQ35Pkg/QemuVideoDxe/QemuVideoDxe.inf](../../QemuVideoDxe/QemuVideoDxe.inf) is updated
+In the example of GFX module, [QemuQ35Pkg/QemuVideoDxe/QemuVideoDxe.inf](../../../QemuQ35Pkg/QemuVideoDxe/QemuVideoDxe.inf) is updated
 to check against the published policy data (`GFX_POLICY_DATA`) to enable/disable the applicable VGA controller during the
 driver binding event.
 
@@ -65,7 +65,7 @@ values for the feature module to proceed properly. Per platform discretion, this
 if a general default policy data is applicable, or a platform module when the platform would like to apply customizations
 to the inital policy value.
 
-In the example of GFX module, this initial value is handled by [QemuQ35Pkg/ConfigDataGfx/ConfigDataGfx.inf](../../ConfigDataGfx/ConfigDataGfx.inf),
+In the example of GFX module, this initial value is handled by [QemuQ35Pkg/ConfigDataGfx/ConfigDataGfx.inf](../../../QemuQ35Pkg/ConfigKnobs/ConfigKnobs.inf),
 which publishes a policy blob under GUID `gPolicyDataGFXGuid` to enable all GFX controllers by default.
 
 ### Author the Platform Configuration Consumer
@@ -73,11 +73,11 @@ which publishes a policy blob under GUID `gPolicyDataGFXGuid` to enable all GFX 
 Once the initial policy data is published, the platform driver should check the configuration data, as defined by platform
 configuratuin definition files (i.e. XML) to translate the data and apply them on top of the GFX policy data.
 
-In the example of GFX module, this translation and data application is also handled by [QemuQ35Pkg/ConfigDataGfx/ConfigDataGfx.inf](../../ConfigDataGfx/ConfigDataGfx.inf).
+In the example of GFX module, this translation and data application is also handled by [QemuQ35Pkg/ConfigDataGfx/ConfigDataGfx.inf](../../../QemuQ35Pkg/ConfigKnobs/ConfigKnobs.inf).
 
 Note that with the support of GUIDed policy database and notification, the platform configuration consumer does not always
 need to be the same driver as the policy publisher, but can instead be a module with a Depex on the published policy data
 GUID (in this case, `gPolicyDataGFXGuid`).
 
-This way, when [QemuQ35Pkg/QemuVideoDxe/QemuVideoDxe.inf](../../QemuVideoDxe/QemuVideoDxe.inf) enters the driver binding
+This way, when [QemuQ35Pkg/QemuVideoDxe/QemuVideoDxe.inf](../../../QemuQ35Pkg/QemuVideoDxe/QemuVideoDxe.inf) enters the driver binding
 event, it will check against the updated policy database and enable/disable the VGA controller accordingly.

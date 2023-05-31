@@ -27,7 +27,7 @@ Visit the feature wiki detailing QEMU Q35 for more information: <https://wiki.qe
 ## Compiling and Running QEMU
 
 QemuQ35Pkg uses the Project Mu repositories and Edk2 PyTools for its build operations.
-Specific details can be found here [Development/building.md](Development/building.md)
+Specific details can be found here [Development/building.md](../Common/building.md)
 
 ## Firmware Features
 
@@ -40,7 +40,7 @@ Enable the Project Mu OEM sample "front page".
 This is a touch friendly, graphical, UEFI HII based UI application that
 allows basic platform and boot device configuration.
 
-[Details](Features/feature_frontpage.md)
+[Details](../Common/Features/feature_frontpage.md)
 
 ### Device Firmware Configuration Interface
 
@@ -49,7 +49,7 @@ bios settings **securely**.  DFCI is a foundational feature that provides a shar
 model between the device firmware and the cloud.  Once a device is enrolled this shared identity can be used
 to securely communicate across untrusted mediums (network or usb).
 
-[Details](Features/feature_dfci.md)
+[Details](../Common/Features/feature_dfci.md)
 
 ### Mu Telemetry / WHEA / HwErrorRecord
 
@@ -58,7 +58,7 @@ designed to collect critical (platform defined) status codes, record them into a
 and then transfer them through the Microsoft WHEA pipeline.  From there an OEM can use Microsoft
 provided reports to check on in market device health.  *Some work still pending completion.
 
-[Details](Features/feature_whea.md)
+[Details](../Common/Features/feature_whea.md)
 
 ### Platform Runtime Mechanism (PRM)
 
@@ -95,12 +95,12 @@ by the ColorBarDisplayDeviceStateLib.
 
 | Modules | Link to Documentation |
 | --- | --- |
-| **QemuVideoDxe** | [QEMU Cirrus Video Controller](../QemuVideoDxe/ReadMe.md) |
+| **QemuVideoDxe** | [QEMU Cirrus Video Controller](../../QemuQ35Pkg/QemuVideoDxe/ReadMe.md) |
 
 ### Libraries
 
 | Libraries | Link to Documentation |
 | --- | --- |
-| **MsPlatformDevicesLib** | [MsPlatformDevicesLib](../Library/MsPlatformDevicesLibQemuQ35/ReadMe.md) |
-| **PlatformDebugLibIoPort** | [PlatformDebugLibIoPort](../Library/PlatformDebugLibIoPort/ReadMe.md) |
-| **PlatformThemeLib** | [PlatformThemeLib](../Library/PlatformThemeLib/ReadMe.md) |
+| **MsPlatformDevicesLib** | [MsPlatformDevicesLib](../../QemuQ35Pkg/Library/MsPlatformDevicesLibQemuQ35/ReadMe.md) |
+| **PlatformDebugLibIoPort** | [PlatformDebugLibIoPort](../../QemuQ35Pkg/Library/PlatformDebugLibIoPort/ReadMe.md) |
+| **PlatformThemeLib** | [PlatformThemeLib](../../../QemuPkg/Library/PlatformThemeLib/ReadMe.md) |
