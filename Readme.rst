@@ -30,8 +30,8 @@ Platform and Toolchain        Status
 Quick Links
 ===========
 
-- `Build Instructions <Platforms/QemuQ35Pkg/Docs/Development/building.md>`_
-- `Contribution Instructions <CONTRIBUTING.md>`_
+- `Build Instructions <https://github.com/microsoft/mu_tiano_platforms/blob/main/Platforms/Docs/Common/building.md>`_
+- `Contribution Instructions <https://github.com/microsoft/mu_tiano_platforms/blob/main/CONTRIBUTING.md>`_
 - `Questions and Other Discussion <https://github.com/microsoft/mu_tiano_platforms/discussions>`_
 - `Releases <https://github.com/microsoft/mu_tiano_platforms/releases>`_
 - `Submit and View Bugs, Doc Requests, Feature Requests <https://github.com/microsoft/mu_tiano_platforms/issues>`_
@@ -67,10 +67,10 @@ Current Platforms Supported
 
 .. _`Project Mu`: https://microsoft.github.io/mu
 .. _`QEMU`: https://www.qemu.org/
-.. _`QemuQ35Pkg`: Platforms/QemuQ35Pkg
-.. _`QemuQ35Pkg Detailed Info`: Platforms/QemuQ35Pkg/Docs/QemuQ35_ReadMe.md
-.. _`QemuSbsaPkg`: Platforms/QemuSbsaPkg
-.. _`QemuSbsaPkg Detailed Info`: Platforms/QemuSbsaPkg/Docs/QemuSbsa_ReadMe.md
+.. _`QemuQ35Pkg`: https://github.com/microsoft/mu_tiano_platforms/tree/main/Platforms/QemuQ35Pkg
+.. _`QemuQ35Pkg Detailed Info`: https://github.com/microsoft/mu_tiano_platforms/blob/main/Platforms/Docs/Q35/QemuQ35_ReadMe.md
+.. _`QemuSbsaPkg`: https://github.com/microsoft/mu_tiano_platforms/tree/main/Platforms/QemuSbsaPkg
+.. _`QemuSbsaPkg Detailed Info`: https://github.com/microsoft/mu_tiano_platforms/blob/main/Platforms/Docs/SBSA/QemuSbsa_ReadMe.md
 
 Getting Started
 ===============
@@ -89,7 +89,7 @@ Build Instructions
 You can then apply that knowledge to build the platform you're interested in with the `PlatformBuild.py` files located
 in the platform directory.
 
-.. _`Building QemuQ35Pkg`: Platforms/QemuQ35Pkg/Docs/Development/building.md
+.. _`Building QemuQ35Pkg`: https://github.com/microsoft/mu_tiano_platforms/blob/main/Platforms/Docs/Common/building.md
 .. _`How to Build in edk2 with Stuart`: https://github.com/tianocore/tianocore.github.io/wiki/How-to-Build-With-Stuart
 
 Releases
