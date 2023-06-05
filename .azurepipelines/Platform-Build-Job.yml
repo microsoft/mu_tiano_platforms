@@ -132,8 +132,8 @@ jobs:
           install_python: true
 
       # Set default
-      - powershell:
-          Write-Host "##vso[task.setvariable variable=pkg_count]${{ 1 }}"
+      - script:
+          echo "##vso[task.setvariable variable=pkg_count]${{ 1 }}"
 
       # Setup repo
       - task: CmdLine@2
