@@ -1029,6 +1029,9 @@
 
   PcBdsPkg/MsBootPolicy/MsBootPolicy.inf
 
+  # Apply Variable Policy to Load Option UEFI Variables
+  MsCorePkg/LoadOptionVariablePolicyDxe/LoadOptionVariablePolicyDxe.inf
+
   MdeModulePkg/Universal/BootManagerPolicyDxe/BootManagerPolicyDxe.inf
 
   # AuthManager provides authentication for DFCI. AuthManagerNull passes out a consistent token to allow the rest
