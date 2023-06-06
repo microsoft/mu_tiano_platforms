@@ -1287,7 +1287,6 @@
   AdvLoggerPkg/AdvancedFileLogger/AdvancedFileLogger.inf
   MsCorePkg/Universal/StatusCodeHandler/Serial/Dxe/SerialStatusCodeHandlerDxe.inf
   MsCorePkg/MuCryptoDxe/MuCryptoDxe.inf
-  MsCorePkg/LoadOptionVariablePolicyDxe/LoadOptionVariablePolicyDxe.inf
   MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
   MsGraphicsPkg/MsEarlyGraphics/Dxe/MsEarlyGraphics.inf
   MsWheaPkg/MsWheaReport/Dxe/MsWheaReportDxe.inf

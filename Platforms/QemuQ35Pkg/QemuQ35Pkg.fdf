@@ -490,7 +490,6 @@ INF  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
 INF  AdvLoggerPkg/AdvancedFileLogger/AdvancedFileLogger.inf
 INF  MsCorePkg/Universal/StatusCodeHandler/Serial/Dxe/SerialStatusCodeHandlerDxe.inf
 INF  MsCorePkg/MuCryptoDxe/MuCryptoDxe.inf
-INF  MsCorePkg/LoadOptionVariablePolicyDxe/LoadOptionVariablePolicyDxe.inf
 INF  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
 INF  MsGraphicsPkg/MsEarlyGraphics/Dxe/MsEarlyGraphics.inf
 INF  MsWheaPkg/MsWheaReport/Dxe/MsWheaReportDxe.inf
