@@ -16,8 +16,8 @@ resources:
     - repository: mu_devops
       type: github
       endpoint: microsoft
-      name: microsoft/mu_devops
-      ref: refs/tags/v4.0.0
+      name: kuqin12/mu_devops
+      ref: public_coverage
 
 parameters:
 - name: do_ci_build
