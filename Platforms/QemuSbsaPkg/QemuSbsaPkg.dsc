@@ -1093,8 +1093,11 @@
   }
   PcBdsPkg/MsBootPolicy/MsBootPolicy.inf
 
+  # Apply Variable Policy to Load Option UEFI Variables
+  MsCorePkg/LoadOptionVariablePolicyDxe/LoadOptionVariablePolicyDxe.inf
+
   # Configuration modules
-  PolicyServicePkg/PolicyService/Dxe/PolicyDxe.inf
+  PolicyServicePkg/PolicyService/DxeMm/PolicyDxe.inf
 
   SetupDataPkg/ConfApp/ConfApp.inf {
     <LibraryClasses>

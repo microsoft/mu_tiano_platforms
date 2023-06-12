@@ -15,6 +15,7 @@ import datetime
 import subprocess
 import re
 import io
+import shutil
 from edk2toolext.environment import plugin_manager
 from edk2toolext.environment.plugintypes import uefi_helper_plugin
 from edk2toollib import utility_functions
@@ -69,15 +70,6 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         args += " -global isa-debugcon.iobase=0x402"
         # Turn off S3 support
         args += " -global ICH9-LPC.disable_s3=1"
-        # turn off network
-        args += " -net none"
-        # Mount disk with startup.nsh
-        if os.path.isfile(VirtualDrive):
-            args += f" -hdd {VirtualDrive}"
-        elif os.path.isdir(VirtualDrive):
-            args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
-        else:
-            logging.critical("Virtual Drive Path Invalid")
 
         if env.GetBuildValue("SMM_ENABLED") is None or env.GetBuildValue("SMM_ENABLED").lower() == "true":
             smm_enabled = "on"
@@ -94,29 +86,87 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
                 accel = ",accel=whpx"
 
         args += " -machine q35,smm=" + smm_enabled + accel
-        if env.GetValue("PATH_TO_OS") is not None:
+        path_to_os = env.GetValue("PATH_TO_OS")
+        if path_to_os is not None:
             # Potentially dealing with big daddy, give it more juice...
             args += " -m 8192"
-            args += " -hda \"" + env.GetValue("PATH_TO_OS") + "\""
+            #args += " -hda \"" + path_to_os + "\""
+            args += " -drive format=raw,index=0,media=disk,file=\"" + path_to_os + "\""
         else:
             args += " -m 2048"
-        args += " -cpu qemu64,+rdrand,umip,+smep,+popcnt" # most compatible x64 CPU model + RDRAND + UMIP + SMEP + POPCNT support (not included by default)
+
+        #args += " -cpu qemu64,+rdrand,umip,+smep,+popcnt" # most compatible x64 CPU model + RDRAND + UMIP + SMEP +POPCNT support (not included by default)
+        args += " -cpu qemu64,rdrand=on,umip=on,smep=on,pdpe1gb=on,popcnt=on" # most compatible x64 CPU model + RDRAND + UMIP + SMEP + PDPE1GB + POPCNT support (not included by default)
+
         if env.GetBuildValue ("QEMU_CORE_NUM") is not None:
             args += " -smp " + env.GetBuildValue ("QEMU_CORE_NUM")
         if smm_enabled == "on":
             args += " -global driver=cfi.pflash01,property=secure,value=on"
         args += " -drive if=pflash,format=raw,unit=0,file=" + \
             os.path.join(OutputPath_FV, "QEMUQ35_CODE.fd") + ",readonly=on"
-        args += " -drive if=pflash,format=raw,unit=1,file=" + \
-            os.path.join(OutputPath_FV, "QEMUQ35_VARS.fd")
+
+        orig_var_store = os.path.join(OutputPath_FV, "QEMUQ35_VARS.fd")
+        dfci_var_store =env.GetValue("DFCI_VAR_STORE")
+        if dfci_var_store is not None:
+            if not os.path.isfile(dfci_var_store):
+                shutil.copy(orig_var_store, dfci_var_store)
+            use_this_varstore = dfci_var_store
+        else:
+            use_this_varstore = orig_var_store
+        args += " -drive if=pflash,format=raw,unit=1,file=" + use_this_varstore
 
         # Add XHCI USB controller and mouse
         args += " -device qemu-xhci,id=usb"
         args += " -device usb-mouse,id=input0,bus=usb.0,port=1"  # add a usb mouse
         #args += " -device usb-kbd,id=input1,bus=usb.0,port=2"    # add a usb keyboar
+
+        dfci_files = env.GetValue("DFCI_FILES")
+        if dfci_files is not None:
+            args += f" -drive file=fat:rw:{dfci_files},format=raw,media=disk,if=none,id=dfci_disk"
+            args += " -device usb-storage,bus=usb.0,drive=dfci_disk"
+
+        install_files = env.GetValue("INSTALL_FILES")
+        if install_files is not None:
+            args += f" -drive file={install_files},format=raw,media=disk,if=none,id=install_disk"
+            args += " -device usb-storage,bus=usb.0,drive=install_disk"
+
+        boot_selection = ''
+        boot_to_front_page = env.GetValue("BOOT_TO_FRONT_PAGE")
+        if boot_to_front_page is not None:
+            if (boot_to_front_page.upper() == "TRUE"):
+                boot_selection += ",version=Vol+"
+
+        alt_boot_enable = env.GetValue("ALT_BOOT_ENABLE")
+        if alt_boot_enable is not None:
+            if alt_boot_enable.upper() == "TRUE":
+                boot_selection += ",version=Vol-"
+
+        # If DFCI_VAR_STORE is enabled, don't enable the Virtual Drive, and enable the network
+        dfci_var_store = env.GetValue("DFCI_VAR_STORE")
+        if dfci_var_store is None:
+            # turn off network
+            args += " -net none"
+            # Mount disk with startup.nsh
+            if os.path.isfile(VirtualDrive):
+                args += f" -hdd {VirtualDrive}"
+            elif os.path.isdir(VirtualDrive):
+                args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
+            else:
+                logging.critical("Virtual Drive Path Invalid")
+        else:
+            if boot_to_front_page is None:
+                # Booting to Windows, use a PCI nic
+                args += " -device e1000,netdev=net0"
+            else:
+                # Booting to UEFI, use virtio-net-pci
+                args += " -device virtio-net-pci,netdev=net0"
+
+            # forward ports for robotframework 8270 and 8271
+            args += " -netdev user,id=net0,hostfwd=tcp::8270-:8270,hostfwd=tcp::8271-:8271"
+
         args += " -smbios type=0,vendor=Palindrome,uefi=on"
-        args += " -smbios type=1,manufacturer=Palindrome,product=MuQemuQ35,serial=42-42-42-42"
-        args += f" -smbios type=3,manufacturer=Palindrome,version={version},serial=42-42-42-42,asset=Q35,sku=Q35"
+        args += " -smbios type=1,manufacturer=Palindrome,product=MuQemuQ35,serial=42-42-42-42,uuid=9de555c0-05d7-4aa1-84ab-bb511e3a8bef"
+        args += f" -smbios type=3,manufacturer=Palindrome,serial=40-41-42-43{boot_selection}"
 
         if (env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
             args += " -display none"  # no graphics

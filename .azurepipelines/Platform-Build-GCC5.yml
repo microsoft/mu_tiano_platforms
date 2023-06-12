@@ -24,7 +24,118 @@ jobs:
   parameters:
     tool_chain_tag: 'GCC5'
     vm_image: $(vm_image)
+    os_type: Linux
     container_image: linux-gcc
-    extra_install_step:
+    build_matrix:
+      QemuQ35_DEBUG:
+        BuildPackage: QemuQ35Pkg
+        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+        BuildArch: IA32,X64
+        BuildFlags: ""
+        BuildTarget: "DEBUG"
+        BuildExtraTag: ""
+        BuildExtraStep:
+          - script: echo No extra steps provided
+        Run: true
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+        BuildArtifactsBinary: |
+          **/QEMUQ35_*.fd
+        BuildArtifactsOther: "**/unit_test_results/*"
+
+      QemuQ35_RELEASE:
+        BuildPackage: QemuQ35Pkg
+        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+        BuildArch: IA32,X64
+        BuildFlags: ""
+        BuildTarget: "RELEASE"
+        BuildExtraTag: ""
+        BuildExtraStep:
+          - script: echo No extra steps provided
+        Run: true
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+        BuildArtifactsBinary: |
+          **/QEMUQ35_*.fd
+        BuildArtifactsOther: "**/unit_test_results/*"
+
+      QemuQ35_DEBUG_ARM:
+        BuildPackage: QemuQ35Pkg
+        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+        BuildArch: IA32,X64
+        BuildFlags: ""
+        BuildTarget: "DEBUG"
+        BuildExtraTag: "ON_ARM"
+        BuildExtraStep:
+          - script: echo No extra steps provided
+        Run: false
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+        SelfHostAgent: true
+        BuildArtifactsBinary: |
+          **/QEMUQ35_*.fd
+          **/*/*TestApp.efi
+        BuildArtifactsOther: "**/unit_test_results/*"
+
+      QemuQ35_RELEASE_ARM:
+        BuildPackage: QemuQ35Pkg
+        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+        BuildArch: IA32,X64
+        BuildFlags: ""
+        BuildTarget: "RELEASE"
+        BuildExtraTag: "ON_ARM"
+        BuildExtraStep:
+          - script: echo No extra steps provided
+        Run: false
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+        SelfHostAgent: true
+        BuildArtifactsBinary: |
+          **/QEMUQ35_*.fd
+          **/*/*TestApp.efi
+        BuildArtifactsOther: "**/unit_test_results/*"
+
+      QemuQ35_NO_SMM_RELEASE:
+        BuildPackage: QemuQ35Pkg
+        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+        BuildArch: IA32,X64
+        BuildFlags: "BLD_*_SMM_ENABLED=FALSE"
+        BuildTarget: "RELEASE"
+        BuildExtraTag: "NO_SMM"
+        BuildExtraStep:
+          - script: echo No extra steps provided
+        Run: true
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE"
+        BuildArtifactsBinary: |
+          **/QEMUQ35_*.fd
+        BuildArtifactsOther: ""
+
+      QemuSbsa_DEBUG:
+        BuildPackage: QemuSbsaPkg
+        BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+        BuildArch: AARCH64
+        BuildFlags: ""
+        BuildTarget: "DEBUG"
+        BuildExtraTag: ""
+        BuildExtraStep:
           - script: sudo dnf --assumeyes install openssl-devel
             displayName: Install openssl
+        Run: true
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+        BuildArtifactsBinary: |
+          **/QEMU_EFI.fd
+          **/SECURE_FLASH0.fd
+        BuildArtifactsOther: "**/unit_test_results/*"
+
+      QemuSbsa_RELEASE:
+        BuildPackage: QemuSbsaPkg
+        BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+        BuildArch: AARCH64
+        BuildFlags: ""
+        BuildTarget: "RELEASE"
+        BuildExtraTag: ""
+        BuildExtraStep:
+          - script: sudo dnf --assumeyes install openssl-devel
+            displayName: Install openssl
+        Run: true
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+        BuildArtifactsBinary: |
+          **/QEMU_EFI.fd
+          **/SECURE_FLASH0.fd
+        BuildArtifactsOther: "**/unit_test_results/*"
