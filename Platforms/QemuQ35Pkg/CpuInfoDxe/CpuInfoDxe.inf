@@ -1,0 +1,36 @@
+## @file CpuInfoDxe.inf
+#
+#  Copyright (c) Microsoft Corporation. All rights reserved.
+#
+#  Console message library
+#
+# @par Specification Reference:
+#
+##
+
+[Defines]
+  INF_VERSION     = 1.27
+  BASE_NAME       = CpuInfoDxe
+  FILE_GUID       = 9E748CD7-788E-46FA-B5C2-9CB75A32754F
+  MODULE_TYPE     = DXE_DRIVER
+  VERSION_STRING  = 1.0
+  ENTRY_POINT     = CpuInfoDxeEntry
+
+[Sources]
+  CpuInfoDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  BaseLib
+  PcdLib
+  PrintLib
+  UefiDriverEntryPoint
+
+[Depex]
+  gEfiVariableArchProtocolGuid AND
+  gEfiVariableWriteArchProtocolGuid

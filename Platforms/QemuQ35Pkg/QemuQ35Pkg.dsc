@@ -1334,6 +1334,8 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
   SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
 
+  QemuQ35Pkg/CpuInfoDxe/CpuInfoDxe.inf
+
 ## Unit Tests
 #
 ## Powershell script to discover unit tests:

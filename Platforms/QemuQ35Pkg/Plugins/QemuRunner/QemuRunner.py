@@ -106,7 +106,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             args += " -m 2048"
 
         #args += " -cpu qemu64,+rdrand,umip,+smep,+popcnt" # most compatible x64 CPU model + RDRAND + UMIP + SMEP +POPCNT support (not included by default)
-        args += " -cpu qemu64,rdrand=on,umip=on,smep=on,pdpe1gb=on,popcnt=on" # most compatible x64 CPU model + RDRAND + UMIP + SMEP + PDPE1GB + POPCNT support (not included by default)
+        args += " -cpu Skylake-Client-v1,rdrand=on,umip=on,smep=on,pdpe1gb=on,popcnt=on" # most compatible x64 CPU model + RDRAND + UMIP + SMEP + PDPE1GB + POPCNT support (not included by default)
 
         if env.GetBuildValue ("QEMU_CORE_NUM") is not None:
             args += " -smp " + env.GetBuildValue ("QEMU_CORE_NUM")
