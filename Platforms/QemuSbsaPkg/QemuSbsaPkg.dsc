@@ -1347,7 +1347,6 @@
       VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLib.inf
       VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
   }
-  ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashStandaloneMm.inf
 
 ###################################################################################################
 #
