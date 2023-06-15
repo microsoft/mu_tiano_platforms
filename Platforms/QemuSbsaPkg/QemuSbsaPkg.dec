@@ -76,6 +76,9 @@
   gQemuSbsaPkgTokenSpaceGuid.PcdChassisManufacturer|L""|VOID*|0x0000011B
   gQemuSbsaPkgTokenSpaceGuid.PcdChassisAssetTag|L""|VOID*|0x0000011C
   gQemuSbsaPkgTokenSpaceGuid.PcdChassisSKU|L""|VOID*|0x0000011D
+  
+  # Porting this PCD to here as it was an arm PCD that got moved to OvmfPkg
+  gUefiOvmfPkgTokenSpaceGuid.PcdForceNoAcpi|0x0|BOOLEAN|0x0000011E
 
 [PcdsFixedAtBuild, PcdsDynamic, PcdsDynamicEx]
   gQemuSbsaPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0|UINT16|0x1b
