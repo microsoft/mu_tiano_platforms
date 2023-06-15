@@ -201,7 +201,7 @@ OemUpdateSmbiosInfo (
     case FamilyType01:
       String = (CHAR16 *)PcdGetPtr (PcdSystemFamily);
       break;
-    case AssertTagType02:
+    case AssetTagType02:
       String = (CHAR16 *)PcdGetPtr (PcdBaseBoardAssetTag);
       break;
     case SerialNumberType02:
