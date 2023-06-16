@@ -21,7 +21,7 @@ VirtNorFlashPlatformInitialization (
   return EFI_SUCCESS;
 }
 
-NOR_FLASH_DESCRIPTION  mNorFlashDevice =
+VIRT_NOR_FLASH_DESCRIPTION  mNorFlashDevice =
 {
   FixedPcdGet64 (PcdFlashNvStorageBase),
   FixedPcdGet64 (PcdFlashNvStorageBase),
@@ -31,7 +31,7 @@ NOR_FLASH_DESCRIPTION  mNorFlashDevice =
 
 EFI_STATUS
 VirtNorFlashPlatformGetDevices (
-  OUT NOR_FLASH_DESCRIPTION  **NorFlashDescriptions,
+  OUT VIRT_NOR_FLASH_DESCRIPTION  **NorFlashDescriptions,
   OUT UINT32                 *Count
   )
 {
