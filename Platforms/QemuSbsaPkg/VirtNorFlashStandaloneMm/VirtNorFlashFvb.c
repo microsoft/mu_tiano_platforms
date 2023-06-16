@@ -742,6 +742,7 @@ EXIT:
   return Status;
 }
 
+// TEMP
 /**
   Fixup internal data so that EFI can be call in virtual mode.
   Call the passed in Child Notify event and convert any pointers in
@@ -750,7 +751,7 @@ EXIT:
   @param[in]    Event   The Event that is being processed
   @param[in]    Context Event Context
 **/
-VOID
+/*VOID
 EFIAPI
 FvbVirtualNotifyEvent (
   IN EFI_EVENT  Event,
@@ -759,4 +760,4 @@ FvbVirtualNotifyEvent (
 {
   EfiConvertPointer (0x0, (VOID **)&mFlashNvStorageVariableBase);
   return;
-}
+}*/
