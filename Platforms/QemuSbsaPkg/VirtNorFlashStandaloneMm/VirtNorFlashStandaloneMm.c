@@ -125,7 +125,7 @@ NorFlashCreateInstance (
                   &Instance->Handle,
                   &gEfiDevicePathProtocolGuid,
                   EFI_NATIVE_INTERFACE,
-                  NULL
+                  &Instance->DevicePath
                   );
     if (EFI_ERROR (Status)) {
       FreePool (Instance);
@@ -133,21 +133,10 @@ NorFlashCreateInstance (
     }
 
     Status = gMmst->MmInstallProtocolInterface (
-                  &Instance->DevicePath,
+                  &Instance->Handle,
                   &gEfiFirmwareVolumeBlockProtocolGuid,
                   EFI_NATIVE_INTERFACE,
-                  NULL
-                  );
-    if (EFI_ERROR (Status)) {
-      FreePool (Instance);
-      return Status;
-    }
-
-    Status = gMmst->MmInstallProtocolInterface (
-                  &Instance->FvbProtocol,
-                  NULL,
-                  EFI_NATIVE_INTERFACE,
-                  NULL
+                  &Instance->FvbProtocol
                   );
     if (EFI_ERROR (Status)) {
       FreePool (Instance);
@@ -165,18 +154,7 @@ NorFlashCreateInstance (
                   &Instance->Handle,
                   &gEfiDevicePathProtocolGuid,
                   EFI_NATIVE_INTERFACE,
-                  NULL
-                  );
-    if (EFI_ERROR (Status)) {
-      FreePool (Instance);
-      return Status;
-    }
-
-    Status = gMmst->MmInstallProtocolInterface (
-                  &Instance->DevicePath,
-                  NULL,
-                  EFI_NATIVE_INTERFACE,
-                  NULL
+                  &Instance->DevicePath
                   );
     if (EFI_ERROR (Status)) {
       FreePool (Instance);
@@ -199,7 +177,7 @@ NorFlashUnlockAndEraseSingleBlock (
 {
   EFI_STATUS  Status;
   UINTN       Index;
-  EFI_TPL     OriginalTPL;
+  //EFI_TPL     OriginalTPL; TEMP
 
   // TEMP
   /*if (!EfiAtRuntime ()) {
@@ -252,7 +230,7 @@ NorFlashWriteFullBlock (
   UINTN       BlockAddress;
   UINTN       BuffersInBlock;
   UINTN       RemainingWords;
-  EFI_TPL     OriginalTPL;
+  //EFI_TPL     OriginalTPL; TEMP
   UINTN       Cnt;
 
   Status = EFI_SUCCESS;
@@ -353,8 +331,8 @@ EXIT:
 EFI_STATUS
 EFIAPI
 NorFlashInitialise (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_MM_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS                  Status;
@@ -514,14 +492,6 @@ NorFlashFvbInitialize (
                   EFI_NATIVE_INTERFACE,
                   NULL
                   );*/
-  gMmst->MmInstallProtocolInterface (
-                  &gImageHandle,
-                  &gEdkiiNvVarStoreFormattedGuid,
-                  EFI_NATIVE_INTERFACE,
-                  NULL
-                  );
-  ASSERT_EFI_ERROR (Status);
-
   //
   // Register for the virtual address change event
   //
