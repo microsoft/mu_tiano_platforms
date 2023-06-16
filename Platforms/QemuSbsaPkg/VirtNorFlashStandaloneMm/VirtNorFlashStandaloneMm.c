@@ -17,7 +17,7 @@
 
 #include "VirtNorFlash.h"
 
-STATIC EFI_EVENT  mNorFlashVirtualAddrChangeEvent;
+//STATIC EFI_EVENT  mNorFlashVirtualAddrChangeEvent;
 
 //
 // Global variable declarations
