@@ -658,6 +658,7 @@ NorFlashReset (
   return EFI_SUCCESS;
 }
 
+// TEMP
 /**
   Fixup internal data so that EFI can be call in virtual mode.
   Call the passed in Child Notify event and convert any pointers in
@@ -666,7 +667,7 @@ NorFlashReset (
   @param[in]    Event   The Event that is being processed
   @param[in]    Context Event Context
 **/
-VOID
+/*VOID
 EFIAPI
 NorFlashVirtualNotifyEvent (
   IN EFI_EVENT  Event,
@@ -694,4 +695,4 @@ NorFlashVirtualNotifyEvent (
   }
 
   return;
-}
+}*/
