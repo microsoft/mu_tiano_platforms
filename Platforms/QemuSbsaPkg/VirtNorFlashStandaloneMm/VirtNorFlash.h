@@ -20,7 +20,7 @@
 #include <Library/IoLib.h>
 //#include <Library/UefiLib.h>
 //#include <Library/UefiRuntimeLib.h>
-#include <Library/NorFlashPlatformLib.h>
+#include <Library/VirtNorFlashPlatformLib.h>
 
 #define NOR_FLASH_ERASE_RETRY  10
 

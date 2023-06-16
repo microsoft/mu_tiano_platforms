@@ -41,7 +41,7 @@
   StandaloneMmDriverEntryPoint
   #UefiLib
   #UefiRuntimeLib
-  NorFlashPlatformLib
+  VirtNorFlashPlatformLib
 
 [Guids]
   gEdkiiNvVarStoreFormattedGuid     ## PRODUCES ## PROTOCOL

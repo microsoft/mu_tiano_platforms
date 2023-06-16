@@ -29,6 +29,7 @@
 [LibraryClasses]
   ##  @libraryclass  Flat device tree support library on the CPU ID related operations
   FdtHelperLib|Include/Library/FdtHelperLib.h
+  VirtNorFlashPlatformLib|Include/Library/VirtNorFlashPlatformLib.h
 
 [Guids]
   gQemuSbsaPkgTokenSpaceGuid                             = { 0x549288f7, 0x4281, 0x4f08, { 0x8f, 0x9e, 0x89, 0xe8, 0xd2, 0xf1, 0x8f, 0x2b } }

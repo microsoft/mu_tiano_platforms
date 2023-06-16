@@ -9,12 +9,12 @@
 
 #include <Base.h>
 #include <PiDxe.h>
-#include <Library/NorFlashPlatformLib.h>
+#include <Library/VirtNorFlashPlatformLib.h>
 
 #define QEMU_NOR_BLOCK_SIZE  SIZE_256KB
 
 EFI_STATUS
-NorFlashPlatformInitialization (
+VirtNorFlashPlatformInitialization (
   VOID
   )
 {
@@ -30,7 +30,7 @@ NOR_FLASH_DESCRIPTION  mNorFlashDevice =
 };
 
 EFI_STATUS
-NorFlashPlatformGetDevices (
+VirtNorFlashPlatformGetDevices (
   OUT NOR_FLASH_DESCRIPTION  **NorFlashDescriptions,
   OUT UINT32                 *Count
   )
