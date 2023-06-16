@@ -32,11 +32,11 @@
 
 [LibraryClasses]
   BaseLib
-  BaseMemoryAllocationLib
   DebugLib
   #DxeServicesTableLib
   HobLib
   IoLib
+  MemoryAllocationLib
   MmServicesTableLib
   #UefiBootServicesTableLib
   #UefiDriverEntryPoint
