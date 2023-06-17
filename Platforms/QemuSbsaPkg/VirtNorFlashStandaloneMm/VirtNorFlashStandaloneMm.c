@@ -78,7 +78,7 @@ NorFlashCreateInstance (
 
   ASSERT (NorFlashInstance != NULL);
   
-  Instance = AllocateCopyPool (sizeof (NOR_FLASH_INSTANCE), &mNorFlashInstanceTemplate);
+  Instance = AllocateRuntimeCopyPool (sizeof (NOR_FLASH_INSTANCE), &mNorFlashInstanceTemplate);
   if (Instance == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
