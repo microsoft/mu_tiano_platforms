@@ -32,7 +32,7 @@ VIRT_NOR_FLASH_DESCRIPTION  mNorFlashDevice =
 EFI_STATUS
 VirtNorFlashPlatformGetDevices (
   OUT VIRT_NOR_FLASH_DESCRIPTION  **NorFlashDescriptions,
-  OUT UINT32                 *Count
+  OUT UINT32                      *Count
   )
 {
   *NorFlashDescriptions = &mNorFlashDevice;

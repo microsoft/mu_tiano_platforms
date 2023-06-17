@@ -77,7 +77,7 @@ NorFlashCreateInstance (
   NOR_FLASH_INSTANCE  *Instance;
 
   ASSERT (NorFlashInstance != NULL);
-  
+
   Instance = AllocateRuntimeCopyPool (sizeof (NOR_FLASH_INSTANCE), &mNorFlashInstanceTemplate);
   if (Instance == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -101,11 +101,11 @@ NorFlashCreateInstance (
     NorFlashFvbInitialize (Instance);
 
     Status = gMmst->MmInstallProtocolInterface (
-                  &Instance->Handle,
-                  &gEfiFirmwareVolumeBlockProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &Instance->FvbProtocol
-                  );
+                      &Instance->Handle,
+                      &gEfiFirmwareVolumeBlockProtocolGuid,
+                      EFI_NATIVE_INTERFACE,
+                      &Instance->FvbProtocol
+                      );
     if (EFI_ERROR (Status)) {
       FreePool (Instance);
       return Status;
@@ -312,8 +312,8 @@ NorFlashFvbInitialize (
   IN NOR_FLASH_INSTANCE  *Instance
   )
 {
-  EFI_STATUS     Status;
-  UINT32         FvbNumLba;
+  EFI_STATUS  Status;
+  UINT32      FvbNumLba;
 
   DEBUG ((DEBUG_BLKIO, "NorFlashFvbInitialize\n"));
   ASSERT ((Instance != NULL));

@@ -659,6 +659,7 @@ NorFlashReset (
 }
 
 // TEMP
+
 /**
   Fixup internal data so that EFI can be call in virtual mode.
   Call the passed in Child Notify event and convert any pointers in

@@ -12,7 +12,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
-//#include <Library/UefiLib.h>
+#include <Library/UefiLib.h>
 
 #include <Guid/NvVarStoreFormatted.h>
 #include <Guid/SystemNvDataGuid.h>
