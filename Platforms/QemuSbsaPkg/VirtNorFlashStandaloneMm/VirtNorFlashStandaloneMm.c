@@ -7,17 +7,9 @@
 **/
 
 #include <Library/BaseMemoryLib.h>
-//#include <Library/DxeServicesTableLib.h>
 #include <Library/MmServicesTableLib.h>
-#include <Library/HobLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/PcdLib.h>
-//#include <Library/UefiBootServicesTableLib.h>
-//#include <Library/UefiLib.h>
-
 #include "VirtNorFlash.h"
-
-//STATIC EFI_EVENT  mNorFlashVirtualAddrChangeEvent;
 
 //
 // Global variable declarations
@@ -25,7 +17,6 @@
 NOR_FLASH_INSTANCE  **mNorFlashInstances;
 UINT32              mNorFlashDeviceCount;
 UINTN               mFlashNvStorageVariableBase;
-EFI_EVENT           mFvbVirtualAddrChangeEvent;
 
 NOR_FLASH_INSTANCE  mNorFlashInstanceTemplate = {
   NOR_FLASH_SIGNATURE, // Signature
@@ -87,7 +78,6 @@ NorFlashCreateInstance (
 
   ASSERT (NorFlashInstance != NULL);
   
-  // TEMP
   Instance = AllocateCopyPool (sizeof (NOR_FLASH_INSTANCE), &mNorFlashInstanceTemplate);
   if (Instance == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -102,8 +92,6 @@ NorFlashCreateInstance (
   CopyGuid (&Instance->DevicePath.Vendor.Guid, &gEfiCallerIdGuid);
   Instance->DevicePath.Index = (UINT8)Index;
 
-  // TEMP
-  //Instance->ShadowBuffer = AllocateRuntimePool (BlockSize);
   Instance->ShadowBuffer = AllocatePool (BlockSize);
   if (Instance->ShadowBuffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -111,26 +99,6 @@ NorFlashCreateInstance (
 
   if (SupportFvb) {
     NorFlashFvbInitialize (Instance);
-
-    // TEMP
-    /*Status = gBS->InstallMultipleProtocolInterfaces (
-                    &Instance->Handle,
-                    &gEfiDevicePathProtocolGuid,
-                    &Instance->DevicePath,
-                    &gEfiFirmwareVolumeBlockProtocolGuid,
-                    &Instance->FvbProtocol,
-                    NULL
-                    );*/
-    Status = gMmst->MmInstallProtocolInterface (
-                  &Instance->Handle,
-                  &gEfiDevicePathProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &Instance->DevicePath
-                  );
-    if (EFI_ERROR (Status)) {
-      FreePool (Instance);
-      return Status;
-    }
 
     Status = gMmst->MmInstallProtocolInterface (
                   &Instance->Handle,
@@ -143,23 +111,9 @@ NorFlashCreateInstance (
       return Status;
     }
   } else {
-    // TEMP
-    /*Status = gBS->InstallMultipleProtocolInterfaces (
-                    &Instance->Handle,
-                    &gEfiDevicePathProtocolGuid,
-                    &Instance->DevicePath,
-                    NULL
-                    );*/
-    Status = gMmst->MmInstallProtocolInterface (
-                  &Instance->Handle,
-                  &gEfiDevicePathProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &Instance->DevicePath
-                  );
-    if (EFI_ERROR (Status)) {
-      FreePool (Instance);
-      return Status;
-    }
+    DEBUG ((DEBUG_ERROR, "standalone MM NOR Flash driver only support FVB.\n"));
+    FreePool (Instance);
+    return EFI_UNSUPPORTED;
   }
 
   *NorFlashInstance = Instance;
@@ -177,17 +131,6 @@ NorFlashUnlockAndEraseSingleBlock (
 {
   EFI_STATUS  Status;
   UINTN       Index;
-  //EFI_TPL     OriginalTPL; TEMP
-
-  // TEMP
-  /*if (!EfiAtRuntime ()) {
-    // Raise TPL to TPL_HIGH to stop anyone from interrupting us.
-    OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
-  } else {
-    // This initialization is only to prevent the compiler to complain about the
-    // use of uninitialized variables
-    OriginalTPL = TPL_HIGH_LEVEL;
-  }*/
 
   Index = 0;
   // The block erase might fail a first time (SW bug ?). Retry it ...
@@ -205,12 +148,6 @@ NorFlashUnlockAndEraseSingleBlock (
   if (Index == NOR_FLASH_ERASE_RETRY) {
     DEBUG ((DEBUG_ERROR, "EraseSingleBlock(BlockAddress=0x%08x: Block Locked Error (try to erase %d times)\n", BlockAddress, Index));
   }
-
-  // TEMP
-  /*if (!EfiAtRuntime ()) {
-    // Interruptions can resume.
-    gBS->RestoreTPL (OriginalTPL);
-  }*/
 
   return Status;
 }
@@ -230,7 +167,6 @@ NorFlashWriteFullBlock (
   UINTN       BlockAddress;
   UINTN       BuffersInBlock;
   UINTN       RemainingWords;
-  //EFI_TPL     OriginalTPL; TEMP
   UINTN       Cnt;
 
   Status = EFI_SUCCESS;
@@ -240,16 +176,6 @@ NorFlashWriteFullBlock (
 
   // Start writing from the first address at the start of the block
   WordAddress = BlockAddress;
-
-  // TEMP
-  /*if (!EfiAtRuntime ()) {
-    // Raise TPL to TPL_HIGH to stop anyone from interrupting us.
-    OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
-  } else {
-    // This initialization is only to prevent the compiler to complain about the
-    // use of uninitialized variables
-    OriginalTPL = TPL_HIGH_LEVEL;
-  }*/
 
   Status = NorFlashUnlockAndEraseSingleBlock (Instance, BlockAddress);
   if (EFI_ERROR (Status)) {
@@ -315,12 +241,6 @@ EXIT:
   // Put device back into Read Array mode
   SEND_NOR_COMMAND (Instance->DeviceBaseAddress, 0, P30_CMD_READ_ARRAY);
 
-  // TEMP
-  /*if (!EfiAtRuntime ()) {
-    // Interruptions can resume.
-    gBS->RestoreTPL (OriginalTPL);
-  }*/
-
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "NOR FLASH Programming [WriteSingleBlock] failed at address 0x%08x. Exit Status = \"%r\".\n", WordAddress, Status));
   }
@@ -352,8 +272,6 @@ NorFlashInitialise (
     return Status;
   }
 
-  // TEMP
-  //mNorFlashInstances = AllocateRuntimePool (sizeof (NOR_FLASH_INSTANCE *) * mNorFlashDeviceCount);
   mNorFlashInstances = AllocatePool (sizeof (NOR_FLASH_INSTANCE *) * mNorFlashDeviceCount);
 
   for (Index = 0; Index < mNorFlashDeviceCount; Index++) {
@@ -385,20 +303,6 @@ NorFlashInitialise (
     }
   }
 
-  //
-  // Register for the virtual address change event
-  //
-  // TEMP
-  /*Status = gBS->CreateEventEx (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_NOTIFY,
-                  NorFlashVirtualNotifyEvent,
-                  NULL,
-                  &gEfiEventVirtualAddressChangeGuid,
-                  &mNorFlashVirtualAddrChangeEvent
-                  );
-  ASSERT_EFI_ERROR (Status);*/
-
   return Status;
 }
 
@@ -410,37 +314,9 @@ NorFlashFvbInitialize (
 {
   EFI_STATUS     Status;
   UINT32         FvbNumLba;
-  EFI_BOOT_MODE  BootMode;
-  UINTN          RuntimeMmioRegionSize;
 
   DEBUG ((DEBUG_BLKIO, "NorFlashFvbInitialize\n"));
   ASSERT ((Instance != NULL));
-
-  //
-  // Declare the Non-Volatile storage as EFI_MEMORY_RUNTIME
-  //
-
-  // Note: all the NOR Flash region needs to be reserved into the UEFI Runtime memory;
-  //       even if we only use the small block region at the top of the NOR Flash.
-  //       The reason is when the NOR Flash memory is set into program mode, the command
-  //       is written as the base of the flash region (ie: Instance->DeviceBaseAddress)
-  RuntimeMmioRegionSize = (Instance->RegionBaseAddress - Instance->DeviceBaseAddress) + Instance->Size;
-
-  // TEMP
-  /*Status = gDS->AddMemorySpace (
-                  EfiGcdMemoryTypeMemoryMappedIo,
-                  Instance->DeviceBaseAddress,
-                  RuntimeMmioRegionSize,
-                  EFI_MEMORY_UC | EFI_MEMORY_RUNTIME
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  Status = gDS->SetMemorySpaceAttributes (
-                  Instance->DeviceBaseAddress,
-                  RuntimeMmioRegionSize,
-                  EFI_MEMORY_UC | EFI_MEMORY_RUNTIME
-                  );
-  ASSERT_EFI_ERROR (Status);*/
 
   mFlashNvStorageVariableBase = (PcdGet64 (PcdFlashNvStorageVariableBase64) != 0) ?
                                 PcdGet64 (PcdFlashNvStorageVariableBase64) : PcdGet32 (PcdFlashNvStorageVariableBase);
@@ -448,13 +324,8 @@ NorFlashFvbInitialize (
   // Set the index of the first LBA for the FVB
   Instance->StartLba = (mFlashNvStorageVariableBase - Instance->RegionBaseAddress) / Instance->BlockSize;
 
-  BootMode = GetBootModeHob ();
-  if (BootMode == BOOT_WITH_DEFAULT_SETTINGS) {
-    Status = EFI_INVALID_PARAMETER;
-  } else {
-    // Determine if there is a valid header at the beginning of the NorFlash
-    Status = ValidateFvHeader (Instance);
-  }
+  // Determine if there is a valid header at the beginning of the NorFlash
+  Status = ValidateFvHeader (Instance);
 
   // Install the Default FVB header if required
   if (EFI_ERROR (Status)) {
@@ -480,31 +351,6 @@ NorFlashFvbInitialize (
       return Status;
     }
   }
-
-  //
-  // The driver implementing the variable read service can now be dispatched;
-  // the varstore headers are in place.
-  //
-  // TEMP
-  /*Status = gBS->InstallProtocolInterface (
-                  &gImageHandle,
-                  &gEdkiiNvVarStoreFormattedGuid,
-                  EFI_NATIVE_INTERFACE,
-                  NULL
-                  );*/
-  //
-  // Register for the virtual address change event
-  //
-  // TEMP
-  /*Status = gBS->CreateEventEx (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_NOTIFY,
-                  FvbVirtualNotifyEvent,
-                  NULL,
-                  &gEfiEventVirtualAddressChangeGuid,
-                  &mFvbVirtualAddrChangeEvent
-                  );
-  ASSERT_EFI_ERROR (Status);*/
 
   return Status;
 }
