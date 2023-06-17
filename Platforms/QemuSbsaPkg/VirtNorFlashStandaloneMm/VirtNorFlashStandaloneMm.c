@@ -1,4 +1,4 @@
-/** @file  NorFlashDxe.c
+/** @file  NorFlashStandaloneMm.c
 
   Copyright (c) 2011 - 2021, Arm Limited. All rights reserved.<BR>
 
@@ -92,7 +92,7 @@ NorFlashCreateInstance (
   CopyGuid (&Instance->DevicePath.Vendor.Guid, &gEfiCallerIdGuid);
   Instance->DevicePath.Index = (UINT8)Index;
 
-  Instance->ShadowBuffer = AllocatePool (BlockSize);
+  Instance->ShadowBuffer = AllocateRuntimePool (BlockSize);
   if (Instance->ShadowBuffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -102,7 +102,7 @@ NorFlashCreateInstance (
 
     Status = gMmst->MmInstallProtocolInterface (
                       &Instance->Handle,
-                      &gEfiFirmwareVolumeBlockProtocolGuid,
+                      &gEfiSmmFirmwareVolumeBlockProtocolGuid,
                       EFI_NATIVE_INTERFACE,
                       &Instance->FvbProtocol
                       );
