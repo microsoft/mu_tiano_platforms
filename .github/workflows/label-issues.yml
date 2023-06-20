@@ -31,4 +31,4 @@ on:
 
 jobs:
   apply:
-    uses: microsoft/mu_devops/.github/workflows/Labeler.yml@v4.0.0
+    uses: makubacki/mu_devops/.github/workflows/Labeler.yml@update_issue_labeler_to_latest_3_1
