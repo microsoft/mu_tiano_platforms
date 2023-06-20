@@ -33,16 +33,11 @@
 [LibraryClasses]
   BaseLib
   DebugLib
-  #DxeServicesTableLib
   HobLib
   IoLib
   MemoryAllocationLib
   MmServicesTableLib
-  #UefiBootServicesTableLib
-  #UefiDriverEntryPoint
   StandaloneMmDriverEntryPoint
-  #UefiLib
-  #UefiRuntimeLib
   VirtNorFlashPlatformLib
 
 [Guids]
@@ -70,4 +65,4 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
 
 [Depex]
-  gEfiCpuArchProtocolGuid
+  TRUE
