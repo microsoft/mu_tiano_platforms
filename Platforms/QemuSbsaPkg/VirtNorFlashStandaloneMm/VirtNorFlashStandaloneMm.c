@@ -274,6 +274,10 @@ NorFlashInitialise (
   }
 
   mNorFlashInstances = AllocatePool (sizeof (NOR_FLASH_INSTANCE *) * mNorFlashDeviceCount);
+  if (mNorFlashInstances == NULL) {
+    ASSERT (mNorFlashInstances != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   for (Index = 0; Index < mNorFlashDeviceCount; Index++) {
     // Check if this NOR Flash device contain the variable storage region

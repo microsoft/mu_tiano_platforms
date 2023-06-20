@@ -1,4 +1,4 @@
-/** @file  NorFlash.h
+/** @file  VirtNorFlash.h
 
   Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
 
