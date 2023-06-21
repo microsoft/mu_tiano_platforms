@@ -12,7 +12,6 @@
 /**
   Helper function to apply GFX configuration data to GFX silicon policy.
 
-  @param[in]      PolicyInterface   Pointer to current policy protocol/PPI interface.
   @param[in]      GfxConfigBuffer   Pointer to GFX configuration data.
 
   @retval EFI_SUCCESS           The configuration is translated to policy successfully.
@@ -23,7 +22,6 @@
 EFI_STATUS
 EFIAPI
 ApplyGfxConfigToPolicy (
-  IN  POLICY_PPI  *PolicyInterface,
   IN  VOID        *ConfigBuffer
   );
 
