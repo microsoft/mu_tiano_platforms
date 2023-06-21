@@ -53,6 +53,7 @@
 [LibraryClasses]
   BaseLib
   CacheMaintenanceLib
+  CcExitLib
   DebugLib
   HobLib
   IoLib
@@ -67,7 +68,6 @@
   MtrrLib
   MemEncryptSevLib
   PcdLib
-  VmgExitLib
 
 [Pcd]
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfPeiMemFvBase

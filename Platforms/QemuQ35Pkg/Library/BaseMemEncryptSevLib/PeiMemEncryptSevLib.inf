@@ -48,11 +48,11 @@
 [LibraryClasses]
   BaseLib
   CacheMaintenanceLib
+  CcExitLib
   CpuLib
   DebugLib
   MemoryAllocationLib
   PcdLib
-  VmgExitLib
 
 [FeaturePcd]
   gQemuPkgTokenSpaceGuid.PcdSmmSmramRequire
