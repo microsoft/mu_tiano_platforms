@@ -8,10 +8,7 @@
 
 #include <Uefi.h>
 #include <PolicyDataStructGFX.h>
-#include <Protocol/Policy.h>
 
-#include <Ppi/ReadOnlyVariable2.h>
-#include <Ppi/Policy.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -20,6 +17,7 @@
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PrintLib.h>
+#include <Library/PolicyLib.h>
 #include <Library/MemoryAllocationLib.h>
 
 // XML autogen definitions
@@ -38,7 +36,6 @@ GFX_POLICY_DATA  DefaultQemuGfxPolicy[GFX_PORT_MAX_CNT] = {
 /**
   Helper function to apply GFX configuration data to GFX silicon policy.
 
-  @param[in]      PolicyInterface   Pointer to current policy protocol/PPI interface.
   @param[in]      GfxConfigBuffer   Pointer to GFX configuration data.
 
   @retval EFI_SUCCESS           The configuration is translated to policy successfully.
@@ -49,7 +46,6 @@ GFX_POLICY_DATA  DefaultQemuGfxPolicy[GFX_PORT_MAX_CNT] = {
 EFI_STATUS
 EFIAPI
 ApplyGfxConfigToPolicy (
-  IN  POLICY_PPI  *PolicyInterface,
   IN  VOID        *ConfigBuffer
   )
 {
@@ -57,8 +53,7 @@ ApplyGfxConfigToPolicy (
   BOOLEAN          GfxEnablePort0;
   GFX_POLICY_DATA  *GfxSiliconPolicy;
 
-  if ((PolicyInterface == NULL) ||
-      (ConfigBuffer == NULL))
+  if (ConfigBuffer == NULL)
   {
     return EFI_INVALID_PARAMETER;
   }
