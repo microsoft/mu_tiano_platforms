@@ -1,0 +1,68 @@
+#/** @file
+#
+#  Component description file for NorFlashDxe module
+#
+#  Copyright (c) 2011 - 2021, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) Microsoft Corporation.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = VirtNorFlashStandaloneMm
+  FILE_GUID                      = a0dedcb8-c1ae-4431-b458-80b35fc5042d
+  MODULE_TYPE                    = MM_STANDALONE
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = NorFlashInitialise
+
+[Sources.common]
+  VirtNorFlash.c
+  VirtNorFlash.h
+  VirtNorFlashFvb.c
+  VirtNorFlashStandaloneMm.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  QemuSbsaPkg/QemuSbsaPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  HobLib
+  IoLib
+  MemoryAllocationLib
+  MmServicesTableLib
+  StandaloneMmDriverEntryPoint
+  VirtNorFlashPlatformLib
+
+[Guids]
+  gEdkiiNvVarStoreFormattedGuid     ## PRODUCES ## PROTOCOL
+  gEfiAuthenticatedVariableGuid
+  gEfiEventVirtualAddressChangeGuid
+  gEfiSystemNvDataFvGuid
+  gEfiVariableGuid
+
+[Protocols]
+  gEfiBlockIoProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEfiDiskIoProtocolGuid
+  gEfiSmmFirmwareVolumeBlockProtocolGuid
+
+[Pcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+
+[Depex]
+  TRUE

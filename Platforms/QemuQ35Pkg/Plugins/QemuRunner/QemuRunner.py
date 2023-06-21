@@ -166,7 +166,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
         args += " -smbios type=0,vendor=Palindrome,uefi=on"
         args += " -smbios type=1,manufacturer=Palindrome,product=MuQemuQ35,serial=42-42-42-42,uuid=9de555c0-05d7-4aa1-84ab-bb511e3a8bef"
-        args += f" -smbios type=3,manufacturer=Palindrome,serial=42-42-42-42{boot_selection}"
+        args += f" -smbios type=3,manufacturer=Palindrome,serial=40-41-42-43{boot_selection}"
 
         if (env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
             args += " -display none"  # no graphics
