@@ -22,7 +22,7 @@
 EFI_STATUS
 EFIAPI
 ApplyGfxConfigToPolicy (
-  IN  VOID        *ConfigBuffer
+  IN  VOID  *ConfigBuffer
   );
 
 #endif // CONFIG_KNOBS_H_
