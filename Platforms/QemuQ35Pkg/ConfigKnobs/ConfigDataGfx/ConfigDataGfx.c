@@ -47,15 +47,14 @@ GFX_POLICY_DATA  DefaultQemuGfxPolicy[GFX_PORT_MAX_CNT] = {
 EFI_STATUS
 EFIAPI
 ApplyGfxConfigToPolicy (
-  IN  VOID        *ConfigBuffer
+  IN  VOID  *ConfigBuffer
   )
 {
   EFI_STATUS       Status;
   BOOLEAN          GfxEnablePort0;
   GFX_POLICY_DATA  *GfxSiliconPolicy;
 
-  if (ConfigBuffer == NULL)
-  {
+  if (ConfigBuffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
