@@ -12,8 +12,8 @@
 	branch = release/202302
 [submodule "Common/MU_OEM_SAMPLE"]
 	path = Common/MU_OEM_SAMPLE
-	url = https://github.com/microsoft/mu_oem_sample.git
-	branch = release/202302
+	url = https://github.com/kuqin12/mu_oem_sample.git
+	branch = oem_config_udpate
 [submodule "Silicon/Arm/MU_TIANO"]
 	path = Silicon/Arm/MU_TIANO
 	url = https://github.com/microsoft/mu_silicon_arm_tiano.git
