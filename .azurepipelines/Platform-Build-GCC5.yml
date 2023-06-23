@@ -146,7 +146,7 @@ jobs:
         BuildArch: AARCH64
         BuildFlags: ""
         BuildTarget: "DEBUG"
-        BuildExtraTag: "ON_ARM"
+        BuildExtraTag: "ON_AARCH64"
         BuildExtraStep:
           - script: echo No extra steps provided
         Run: true
@@ -163,7 +163,7 @@ jobs:
         BuildArch: AARCH64
         BuildFlags: ""
         BuildTarget: "RELEASE"
-        BuildExtraTag: "ON_ARM"
+        BuildExtraTag: "ON_AARCH64"
         BuildExtraStep:
           - script: echo No extra steps provided
         Run: true
