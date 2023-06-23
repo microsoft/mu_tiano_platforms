@@ -9,12 +9,11 @@
 #include <Uefi.h>
 #include <PolicyDataStructGFX.h>
 
-#include <Ppi/Policy.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/PeiServicesLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
+#include <Library/PolicyLib.h>
 #include <ConfigStdStructDefs.h>
 
 // XML autogen definitions
@@ -39,19 +38,9 @@ ConfigKnobsEntry (
   )
 {
   EFI_STATUS  Status;
-  POLICY_PPI  *PolPpi = NULL;
-
-  BOOLEAN  GfxEnablePort0;
+  BOOLEAN     GfxEnablePort0;
 
   DEBUG ((DEBUG_INFO, "%a - Entry.\n", __FUNCTION__));
-
-  // First locate policy ppi, should not fail as we populate the
-  Status = PeiServicesLocatePpi (&gPeiPolicyPpiGuid, 0, NULL, (VOID *)&PolPpi);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a Failed to locate Policy PPI - %r\n", __FUNCTION__, Status));
-    ASSERT (FALSE);
-    goto Done;
-  }
 
   Status = ConfigGetPowerOnPort0 (&GfxEnablePort0);
   if (EFI_ERROR (Status)) {
@@ -60,7 +49,7 @@ ConfigKnobsEntry (
     goto Done;
   }
 
-  Status = ApplyGfxConfigToPolicy (PolPpi, &GfxEnablePort0);
+  Status = ApplyGfxConfigToPolicy (&GfxEnablePort0);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a Failed to apply configuration data to the GFX silicon policy - %r\n", __FUNCTION__, Status));
     ASSERT (FALSE);
