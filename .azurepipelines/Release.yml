@@ -115,40 +115,6 @@ stages:
               **/SECURE_FLASH0.fd
             BuildArtifactsOther: "**/unit_test_results/*"
 
-          QemuSbsa_GCC_DEBUG_ARM:
-            BuildPackage: QemuSbsaPkg
-            BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
-            BuildArch: AARCH64
-            BuildFlags: ""
-            BuildTarget: "DEBUG"
-            BuildExtraTag: "ON_AARCH64"
-            BuildExtraStep:
-              - script: echo No extra steps provided
-            Run: true
-            RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-            SelfHostAgent: true
-            BuildArtifactsBinary: |
-              **/QEMU_EFI.fd
-              **/SECURE_FLASH0.fd
-            BuildArtifactsOther: "**/unit_test_results/*"
-
-          QemuSbsa_GCC_RELEASE_ARM:
-            BuildPackage: QemuSbsaPkg
-            BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
-            BuildArch: AARCH64
-            BuildFlags: ""
-            BuildTarget: "RELEASE"
-            BuildExtraTag: "ON_AARCH64"
-            BuildExtraStep:
-              - script: echo No extra steps provided
-            Run: true
-            RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-            SelfHostAgent: true
-            BuildArtifactsBinary: |
-              **/QEMU_EFI.fd
-              **/SECURE_FLASH0.fd
-            BuildArtifactsOther: "**/unit_test_results/*"
-
 - stage: WindowsBuildQemuPlatforms
   displayName: Build QEMU Platforms on Windows
   dependsOn: []
