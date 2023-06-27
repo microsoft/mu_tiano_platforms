@@ -85,12 +85,6 @@ jobs:
           vmImage: ${{ parameters.vm_image }}
 
       steps:
-      - ${{ if and(and(ne(parameters.container_image, ''), ne(item.Value.SelfHostAgent, true)), not(contains(parameters.vm_image, 'windows'))) }}:
-        - script: echo "##vso[task.prependpath]/home/vsts_azpcontainer/.local/bin"
-          displayName: Add User Local Bin to Path
-        - script: sudo dnf install -y mtools dosfstools
-          displayName: Install mtools and dosfstools
-
       # Potential Extra steps from specific build targets
       - ${{ item.Value.BuildExtraStep }}
 
