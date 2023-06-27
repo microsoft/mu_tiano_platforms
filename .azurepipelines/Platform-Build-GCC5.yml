@@ -114,7 +114,7 @@ jobs:
         BuildTarget: "DEBUG"
         BuildExtraTag: ""
         BuildExtraStep:
-          - script: sudo apt-get install -y openssl-dev
+          - script: sudo apt-get install -y libssl-dev
             displayName: Install openssl
         Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
@@ -131,7 +131,7 @@ jobs:
         BuildTarget: "RELEASE"
         BuildExtraTag: ""
         BuildExtraStep:
-          - script: sudo apt-get install -y openssl-dev
+          - script: sudo apt-get install -y libssl-dev
             displayName: Install openssl
         Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
