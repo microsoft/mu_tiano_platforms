@@ -34,6 +34,7 @@
   PeiServicesLib
   PrintLib
   PcdLib
+  PolicyLib
 
 [Guids]
   gSbsaPolicyDataGFXGuid            ## CONSUMES

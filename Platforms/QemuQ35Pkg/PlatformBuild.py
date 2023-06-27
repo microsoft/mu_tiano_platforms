@@ -282,6 +282,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                           self.mws.join(self.ws, 'Platforms', 'QemuQ35Pkg', 'CfgData', 'Profile1QemuQ35PkgCfgData.csv'),
                           "Platform Hardcoded"
         )
+        self.env.SetValue('CONF_PROFILE_NAMES', "P0,P1", "Platform Hardcoded")
 
         # Globally set CodeQL failures to be ignored in this repo.
         # Note: This has no impact if CodeQL is not active/enabled.
