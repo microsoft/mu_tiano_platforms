@@ -939,7 +939,6 @@
 
   PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
 
-  QemuSbsaPkg/PolicyDataGfx/PolicyDataGfx.inf
   QemuSbsaPkg/ConfigKnobs/ConfigKnobs.inf
   OemPkg/OemConfigPolicyCreatorPei/OemConfigPolicyCreatorPei.inf {
     <LibraryClasses>
