@@ -48,5 +48,4 @@
 
 [Depex]
   gPeiPolicyPpiGuid AND       ## Policy Service
-  gOemConfigPolicyGuid AND    ## Oem Published Config Policy
-  gSbsaPolicyDataGFXGuid      ## Gfx Module Published Silicon Policy
+  gOemConfigPolicyGuid        ## Oem Published Config Policy

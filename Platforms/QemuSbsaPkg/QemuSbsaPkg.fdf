@@ -491,7 +491,6 @@ READ_LOCK_STATUS   = TRUE
 
   INF  PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
 
-  INF  QemuSbsaPkg/PolicyDataGfx/PolicyDataGfx.inf
   INF  QemuSbsaPkg/ConfigKnobs/ConfigKnobs.inf
   INF  OemPkg/OemConfigPolicyCreatorPei/OemConfigPolicyCreatorPei.inf
 
