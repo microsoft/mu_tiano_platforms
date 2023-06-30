@@ -2,6 +2,10 @@
 # Dependabot configuration file to enable GitHub services for managing and updating
 # dependencies.
 #
+# This dependabot configuration expects submodules to be placed in specific directory paths
+# relative to the root of the repo. These are also the paths generally recommended to place
+# these submodules for consistency across Project Mu projects.
+#
 # NOTE: This file is automatically synchronized from Mu DevOps. Update the original file there
 #       instead of the file in this repo.
 #
@@ -55,10 +59,18 @@ updates:
       - "type:dependencies"
     rebase-strategy: "disabled"
     ignore:
-      - dependency-name: "MU_BASECORE"
+      - dependency-name: "Common/MIN_PLAT"
+      - dependency-name: "Common/MU_BASECORE"
+      - dependency-name: "Common/MU_OEM_SAMPLE"
+      - dependency-name: "Common/MU_TIANO"
+      - dependency-name: "Common/MU"
       - dependency-name: "Features/CONFIG"
       - dependency-name: "Features/DFCI"
+      - dependency-name: "Features/IPMI"
       - dependency-name: "Features/MM_SUPV"
+      - dependency-name: "MU_BASECORE"
+      - dependency-name: "Silicon/Arm/MU_TIANO"
+      - dependency-name: "Silicon/Intel/MU_TIANO"
 
   - package-ecosystem: "pip"
     directory: "/"
