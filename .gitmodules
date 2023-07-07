@@ -21,7 +21,7 @@
 [submodule "Silicon/Arm/TFA"]
 	path = Silicon/Arm/TFA
 	url = https://github.com/ARM-software/arm-trusted-firmware.git
-	branch = v2.7
+	branch = v2.9.0
 [submodule "Features/DFCI"]
 	path = Features/DFCI
 	url = https://github.com/microsoft/mu_feature_dfci

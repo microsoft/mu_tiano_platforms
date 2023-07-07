@@ -25,7 +25,7 @@ jobs:
 
     steps:
       - name: Update Submodules to Latest Release
-        uses: microsoft/mu_devops/.github/actions/submodule-release-updater@v5.0.1
+        uses: microsoft/mu_devops/.github/actions/submodule-release-updater@v5.0.4
         with:
           GH_PAT: ${{ secrets.SUBMODULE_UPDATER_TOKEN }}
           GH_USER: "ProjectMuBot"
