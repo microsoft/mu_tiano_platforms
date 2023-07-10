@@ -6,6 +6,9 @@
 ##
 
 {
+    "PrEval": {
+        "DscPath": "QemuPkg.dsc",
+    },
     "LicenseCheck": {
         "IgnoreFiles": []
     },
