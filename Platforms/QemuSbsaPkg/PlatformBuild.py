@@ -187,13 +187,6 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         if args.build_arch.upper() != "AARCH64":
             raise Exception("Invalid Arch Specified.  Please see comments in PlatformBuild.py::PlatformBuilder::AddCommandLineOptions")
 
-        shell_environment.GetBuildVars().SetValue(
-            "TARGET_ARCH", args.build_arch.upper(), "From CmdLine")
-
-        shell_environment.GetBuildVars().SetValue(
-            "ACTIVE_PLATFORM", "QemuSbsaPkg/QemuSbsaPkg.dsc", "From CmdLine")
-
-
     def GetWorkspaceRoot(self):
         ''' get WorkspacePath '''
         return CommonPlatform.WorkspaceRoot
