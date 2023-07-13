@@ -30,7 +30,9 @@
   # -D FLAG=VALUE
   #
   DEFINE SOURCE_DEBUG_ENABLE            = FALSE
-  DEFINE TPM_ENABLE                     = TRUE
+!ifndef TPM_ENABLE
+  DEFINE TPM_ENABLE                     = FALSE
+!endif
   DEFINE TPM_CONFIG_ENABLE              = FALSE
   DEFINE OPT_INTO_MFCI_PRE_PRODUCTION   = TRUE
   DEFINE BUILD_UNIT_TESTS               = TRUE
