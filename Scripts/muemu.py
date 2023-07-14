@@ -7,7 +7,7 @@ import requests
 import os
 import argparse
 from typing import List
-exit
+
 #
 #  Script for running QEMU with the appropriate options for the given SKU/ARCH.
 #
@@ -40,6 +40,8 @@ parser.add_argument("-c", "--cores", default=2, type=int,
                     help="The number of cores for the VM. This may be overridden based on the configuration.")
 parser.add_argument("-m", "--memory", default="4096",
                     help="The memory size to use in Mb.")
+parser.add_argument("--tpm", action="store_true",
+                    help="Linux only. Enables the emulated TPM using swtpm.")
 parser.add_argument("--vnc",
                     help="Provides the VNC port to use based on 5900. E.g. ':1' for localhost:5901")
 parser.add_argument("--accel", default="tcg",
@@ -104,6 +106,13 @@ def main():
     # Network
     qemu_args += ["-nic", "model=e1000"]
 
+    # TPM
+    if args.tpm:
+        qemu_args += ["-chardev",
+                      f"socket,id=chrtpm,path={args.firmwaredir}/tpm/swtpm-sock"]
+        qemu_args += ["-tpmdev", "emulator,id=tpm0,chardev=chrtpm"]
+        qemu_args += ["-device", "tpm-tis,tpmdev=tpm0"]
+
     # Display
     if args.vnc != None:
         qemu_args += ["-display", f"vnc={args.vnc}"]
@@ -166,6 +175,17 @@ def build_args_arm64(qemu_args: List[str]):
 
 
 def run_qemu(qemu_args: List[str]):
+    if args.tpm:
+        os.makedirs(f"{args.firmwaredir}/tpm", exist_ok=True)
+        swtpm_args = ["swtpm",
+                      "socket",
+                      "--tpmstate", f"dir={args.firmwaredir}/tpm",
+                      "--ctrl", f"type=unixio,path={args.firmwaredir}/tpm/swtpm-sock",
+                      "--tpm2",
+                      "--log", f"file={args.firmwaredir}/tpm/tpm.log,level=20"]
+
+        swtpm_proc = subprocess.Popen(swtpm_args)
+
     if args.verbose:
         print(qemu_args)
         subprocess.run([qemu_args[0], "--version"])
@@ -173,9 +193,13 @@ def run_qemu(qemu_args: List[str]):
         subprocess.run(qemu_args, timeout=args.timeout)
     except subprocess.TimeoutExpired as e:
         print(f"QEMU Ran longer then {args.timeout} seconds.")
-        return
     except Exception as e:
+        if swtpm_proc is not None:
+            swtpm_proc.kill()
         raise e
+
+    if swtpm_proc is not None:
+        swtpm_proc.kill()
 
 
 def update_firmware():
