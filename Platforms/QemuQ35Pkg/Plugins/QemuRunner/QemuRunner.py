@@ -90,8 +90,16 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         if path_to_os is not None:
             # Potentially dealing with big daddy, give it more juice...
             args += " -m 8192"
-            #args += " -hda \"" + path_to_os + "\""
-            args += " -drive format=raw,index=0,media=disk,file=\"" + path_to_os + "\""
+
+            storage_rule = {
+                ".vhd": " -drive format=raw,index=0,media=disk,file=\"" + path_to_os + "\"",
+                ".qcow2": " -hda \"" + path_to_os + "\""
+            }.get(os.path.splitext(path_to_os)[1], None)
+
+            if storage_rule is None:
+                raise Exception("Unknown OS storage type: " + path_to_os)
+            
+            args += storage_rule
         else:
             args += " -m 2048"
 
