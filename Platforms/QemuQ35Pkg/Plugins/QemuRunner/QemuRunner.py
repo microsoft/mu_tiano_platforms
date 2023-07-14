@@ -16,6 +16,7 @@ import subprocess
 import re
 import io
 import shutil
+from pathlib import Path
 from edk2toolext.environment import plugin_manager
 from edk2toolext.environment.plugintypes import uefi_helper_plugin
 from edk2toollib import utility_functions
@@ -90,8 +91,18 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         if path_to_os is not None:
             # Potentially dealing with big daddy, give it more juice...
             args += " -m 8192"
-            #args += " -hda \"" + path_to_os + "\""
-            args += " -drive format=raw,index=0,media=disk,file=\"" + path_to_os + "\""
+
+            file_extension = Path(path_to_os).suffix.lower().replace('"', '')
+            
+            storage_rule = {
+                ".vhd": f" -drive format=raw,index=0,media=disk,file=\"{path_to_os}\"",
+                ".qcow2": f" -hda \"{path_to_os}\""
+            }.get(file_extension, None)
+
+            if storage_rule is None:
+                raise Exception("Unknown OS storage type: " + path_to_os)
+            
+            args += storage_rule
         else:
             args += " -m 2048"
 
