@@ -89,7 +89,7 @@ stages:
             BuildTarget: "DEBUG"
             BuildExtraTag: ""
             BuildExtraStep:
-              - script: sudo dnf --assumeyes install openssl-devel
+              - script: sudo apt-get install -y libssl-dev
                 displayName: Install openssl
             Run: true
             RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
@@ -106,7 +106,7 @@ stages:
             BuildTarget: "RELEASE"
             BuildExtraTag: ""
             BuildExtraStep:
-              - script: sudo dnf --assumeyes install openssl-devel
+              - script: sudo apt-get install -y libssl-dev
                 displayName: Install openssl
             Run: true
             RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
