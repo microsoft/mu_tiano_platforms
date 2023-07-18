@@ -146,6 +146,7 @@
   QemuPkg/Library/UefiPciCapPciIoLib/UefiPciCapPciIoLib.inf
   QemuPkg/Library/VirtioLib/VirtioLib.inf
   QemuPkg/Library/QemuFwCfgLib/QemuFwCfgLibNull.inf
+  QemuPkg/Library/QemuPreUefiEventLogLibNull/QemuPreUefiEventLogLibNull.inf
   QemuPkg/Library/XenPlatformLib/XenPlatformLib.inf
   QemuPkg/FrontPageButtons/FrontPageButtons.inf
   QemuPkg/PciHotPlugInitDxe/PciHotPlugInit.inf

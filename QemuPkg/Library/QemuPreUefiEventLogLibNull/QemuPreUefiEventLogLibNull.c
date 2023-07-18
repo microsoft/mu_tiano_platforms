@@ -18,4 +18,3 @@ CreateTcg2PreUefiEventLogEntries (
 {
   return;
 }
-
