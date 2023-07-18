@@ -1,3 +1,10 @@
+#
+#  Script for running QEMU with the appropriate options for the given SKU/ARCH.
+#
+#  Copyright (c) Microsoft Corporation
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
 import zipfile
 import urllib.request
 import sys
@@ -9,17 +16,10 @@ import argparse
 from typing import List
 
 #
-#  Script for running QEMU with the appropriate options for the given SKU/ARCH.
-#
-#  Copyright (c) Microsoft Corporation
-#  SPDX-License-Identifier: BSD-2-Clause-Patent
-#
-
-#
 # Constants
 #
 
-DEFAULT_VERSION = "2.3.0"
+DEFAULT_VERSION = "4.0.2"
 
 #
 # Setup and parse arguments.
@@ -66,7 +66,6 @@ args = parser.parse_args()
 #
 # Script routines.
 #
-
 
 def main():
     # Run special operations if requested.
