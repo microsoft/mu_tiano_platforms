@@ -72,7 +72,6 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         # Turn off S3 support
         args += " -global ICH9-LPC.disable_s3=1"
 
-
         if env.GetBuildValue("SMM_ENABLED") is None or env.GetBuildValue("SMM_ENABLED").lower() == "true":
             smm_enabled = "on"
         else:
