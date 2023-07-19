@@ -289,7 +289,7 @@ READ_LOCK_STATUS   = TRUE
   #
   # Policy and configuration
   #
-  INF PolicyServicePkg/PolicyService/Dxe/PolicyDxe.inf
+  INF PolicyServicePkg/PolicyService/DxeMm/PolicyDxe.inf
 
   #
   # Frontpages
@@ -401,6 +401,7 @@ READ_LOCK_STATUS   = TRUE
   INF  MsGraphicsPkg/MsEarlyGraphics/Dxe/MsEarlyGraphics.inf
   INF  MsWheaPkg/MsWheaReport/Dxe/MsWheaReportDxe.inf
   INF  MsCorePkg/MuVarPolicyFoundationDxe/MuVarPolicyFoundationDxe.inf
+  INF  MsCorePkg/LoadOptionVariablePolicyDxe/LoadOptionVariablePolicyDxe.inf
   INF  MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.inf
   INF  MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
   INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
@@ -490,7 +491,6 @@ READ_LOCK_STATUS   = TRUE
 
   INF  PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
 
-  INF  QemuSbsaPkg/PolicyDataGfx/PolicyDataGfx.inf
   INF  QemuSbsaPkg/ConfigKnobs/ConfigKnobs.inf
   INF  OemPkg/OemConfigPolicyCreatorPei/OemConfigPolicyCreatorPei.inf
 
@@ -527,7 +527,7 @@ READ_LOCK_STATUS   = TRUE
   INF StandaloneMmPkg/Core/StandaloneMmCore.inf
   INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteStandaloneMm.inf
   INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStandaloneMm.inf
-  INF ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashStandaloneMm.inf
+  INF QemuSbsaPkg/VirtNorFlashStandaloneMm/VirtNorFlashStandaloneMm.inf
   INF ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
 
 ################################################################################

@@ -28,14 +28,7 @@ from io import StringIO
 
 # Declare test whose failure will not return a non-zero exit code
 FAILURE_EXEMPT_TESTS = {
-    "BootAuditTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
-    "LineParserTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
-    "MsWheaEarlyUnitTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
-    "VariablePolicyFuncTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
-    "DeviceIdTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
-    "DxePagingAuditTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
-    "MemoryProtectionTestApp.efi": datetime.datetime(2023, 4, 5, 0, 0, 0),
-    "MemoryAttributeProtocolFuncTestApp.efi": datetime.datetime(2023, 4, 5, 0, 0, 0),
+    "VariablePolicyFuncTestApp.efi": datetime.datetime(2023, 4, 21, 0, 0, 0),
 }
 
 # Allow failure exempt tests to be ignored for 90 days
@@ -286,6 +279,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                           self.mws.join(self.ws, 'Platforms', 'QemuQ35Pkg', 'CfgData', 'Profile1QemuQ35PkgCfgData.csv'),
                           "Platform Hardcoded"
         )
+        self.env.SetValue('CONF_PROFILE_NAMES', "P0,P1", "Platform Hardcoded")
 
         # Globally set CodeQL failures to be ignored in this repo.
         # Note: This has no impact if CodeQL is not active/enabled.
@@ -399,7 +393,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         FEOL = FAILURE_EXEMPT_OMISSION_LENGTH
 
         if run_paging_audit:
-            self.Helper.generate_paging_audit (virtual_drive, Path(drive_path).parent / "unit_test_results", self.env.GetValue("VERSION"))
+            self.Helper.generate_paging_audit (virtual_drive, Path(drive_path).parent / "unit_test_results", self.env.GetValue("VERSION"), "Q35", "X64")
 
         # Filter out tests that are exempt
         tests = list(filter(lambda file: file.name not in FET or not (now - FET.get(file.name)).total_seconds() < FEOL, test_list))

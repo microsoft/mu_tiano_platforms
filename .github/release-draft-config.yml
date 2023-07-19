@@ -20,6 +20,7 @@
 name-template: 'v$RESOLVED_VERSION'
 tag-template: 'v$RESOLVED_VERSION'
 
+
 template: |
   # What's Changed
 
@@ -88,11 +89,10 @@ version-resolver:
   default: patch
 
 exclude-labels:
+  - 'type:dependabot'
   - 'type:file-sync'
   - 'type:notes'
   - 'type:question'
 
 exclude-contributors:
   - 'uefibot'
-  - 'dependabot'
-  - 'dependabot[bot]'

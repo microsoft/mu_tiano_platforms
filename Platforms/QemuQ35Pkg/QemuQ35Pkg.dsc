@@ -30,12 +30,17 @@
   # -D FLAG=VALUE
   #
   DEFINE SOURCE_DEBUG_ENABLE            = FALSE
+!ifndef TPM_ENABLE
   DEFINE TPM_ENABLE                     = FALSE
+!endif
   DEFINE TPM_CONFIG_ENABLE              = FALSE
   DEFINE OPT_INTO_MFCI_PRE_PRODUCTION   = TRUE
   DEFINE BUILD_UNIT_TESTS               = TRUE
   DEFINE PEI_MM_IPL_ENABLED             = TRUE
   DEFINE GUI_FRONT_PAGE                 = FALSE
+
+  DEFINE NETWORK_HTTP_ENABLE            = TRUE
+  DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS = TRUE
 
   # Configure Shared Crypto
   !ifndef ENABLE_SHARED_CRYPTO # by default true
@@ -280,7 +285,7 @@
   # Qemu specific libraries
   QemuFwCfgLib             |QemuQ35Pkg/Library/QemuFwCfgLib/QemuFwCfgDxeLib.inf
   QemuFwCfgSimpleParserLib |QemuQ35Pkg/Library/QemuFwCfgSimpleParserLib/QemuFwCfgSimpleParserLib.inf
-  VmgExitLib               |UefiCpuPkg/Library/VmgExitLibNull/VmgExitLibNull.inf
+  CcExitLib                |UefiCpuPkg/Library/CcExitLibNull/CcExitLibNull.inf
 
   # Platform devices path libraries
   MsPlatformDevicesLib |QemuQ35Pkg/Library/MsPlatformDevicesLibQemuQ35/MsPlatformDevicesLib.inf
@@ -338,7 +343,7 @@
             NULL|MdePkg/Library/VsIntrinsicLib/VsIntrinsicLib.inf
           !endif
           IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
+          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf # Contains openSSL library used by BaseCryptoLib
         <PcdsFixedAtBuild>
           !include CryptoPkg/Driver/Bin/Crypto.pcd.TINY_SHA.inc.dsc
     }
@@ -349,7 +354,7 @@
           BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
           TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
           IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
+          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf # Contains openSSL library used by BaseCryptoLib
         <PcdsFixedAtBuild>
           !include CryptoPkg/Driver/Bin/Crypto.pcd.STANDARD.inc.dsc
     }
@@ -358,7 +363,7 @@
           BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
           TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
           IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
+          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf # Contains openSSL library used by BaseCryptoLib
         <PcdsFixedAtBuild>
           !include CryptoPkg/Driver/Bin/Crypto.pcd.STANDARD.inc.dsc
     }
@@ -434,6 +439,7 @@
   PcdDatabaseLoaderLib       |MdeModulePkg/Library/PcdDatabaseLoaderLib/Pei/PcdDatabaseLoaderLibPei.inf
   OemMfciLib                 |OemPkg/Library/OemMfciLib/OemMfciLibPei.inf
   ConfigKnobShimLib          |SetupDataPkg/Library/ConfigKnobShimLib/ConfigKnobShimPeiLib/ConfigKnobShimPeiLib.inf
+  PolicyLib                  |PolicyServicePkg/Library/PeiPolicyLib/PeiPolicyLib.inf
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
   DebugAgentLib              |SourceLevelDebugPkg/Library/DebugAgent/SecPeiDebugAgentLib.inf
 !endif
@@ -441,7 +447,7 @@
   Tpm12DeviceLib             |SecurityPkg/Library/Tpm12DeviceLibDTpm/Tpm12DeviceLibDTpm.inf
   Tpm2DeviceLib              |SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
   SourceDebugEnabledLib      |SourceLevelDebugPkg/Library/SourceDebugEnabled/SourceDebugEnabledLib.inf
-  Tcg2PreUefiEventLogLib     |SecurityPkg/Library/QemuQ35PkgPreUefiEventLogLib/QemuQ35PkgPreUefiEventLogLib.inf ## BRET - Do we have a null instance
+  Tcg2PreUefiEventLogLib     |QemuPkg/Library/QemuPreUefiEventLogLibNull/QemuPreUefiEventLogLibNull.inf
 !endif
 
 [LibraryClasses.X64.PEIM]
@@ -509,6 +515,7 @@
   UpdateFacsHardwareSignatureLib|OemPkg/Library/UpdateFacsHardwareSignatureLib/UpdateFacsHardwareSignatureLib.inf
   PcdDatabaseLoaderLib|MdeModulePkg/Library/PcdDatabaseLoaderLib/Dxe/PcdDatabaseLoaderLibDxe.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeCapsuleLib.inf
+  PolicyLib|PolicyServicePkg/Library/DxePolicyLib/DxePolicyLib.inf
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
   DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/DxeDebugAgentLib.inf
 !endif
@@ -579,7 +586,7 @@
   StandaloneMmDriverEntryPoint|MmSupervisorPkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
   # TODO: ShareCrypto support
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
-  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
   AdvLoggerAccessLib|MdeModulePkg/Library/AdvLoggerAccessLibNull/AdvLoggerAccessLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibStandaloneMm.inf
@@ -792,6 +799,9 @@
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|TRUE
   gQemuPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0x29C0
 
+  # CMOS region is 128 bytes
+  gMsWheaPkgTokenSpaceGuid.PcdMsWheaReportEarlyStorageCapacity|0x80
+
 [PcdsFixedAtBuild.IA32]
   #
   # The NumberOfPages values below are ad-hoc. They are updated sporadically at
@@ -846,6 +856,9 @@
   gUefiQemuQ35PkgTokenSpaceGuid.PcdPciMmio32Size|0x0
   gUefiQemuQ35PkgTokenSpaceGuid.PcdPciMmio64Base|0x0
   gUefiQemuQ35PkgTokenSpaceGuid.PcdPciMmio64Size|0x800000000
+
+  # Limit to SHA256 for now.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0x00002
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
 
@@ -965,7 +978,6 @@
 
 !if $(TPM_ENABLE) == TRUE
   QemuPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
-  SecurityPkg/Tcg/TcgPei/TcgPei.inf
   SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf {
     <LibraryClasses>
       HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCryptoRouterPei.inf
@@ -1000,7 +1012,6 @@
   MfciPkg/MfciPei/MfciPei.inf
 
   PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
-  QemuQ35Pkg/PolicyDataGfx/PolicyDataGfx.inf
   QemuQ35Pkg/ConfigKnobs/ConfigKnobs.inf
   OemPkg/OemConfigPolicyCreatorPei/OemConfigPolicyCreatorPei.inf {
     <LibraryClasses>
@@ -1022,6 +1033,9 @@
   OemPkg/BootMenu/BootMenu.inf
 
   PcBdsPkg/MsBootPolicy/MsBootPolicy.inf
+
+  # Apply Variable Policy to Load Option UEFI Variables
+  MsCorePkg/LoadOptionVariablePolicyDxe/LoadOptionVariablePolicyDxe.inf
 
   MdeModulePkg/Universal/BootManagerPolicyDxe/BootManagerPolicyDxe.inf
 
@@ -1264,7 +1278,7 @@
       gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0xFF
   }
 
-  PolicyServicePkg/PolicyService/Dxe/PolicyDxe.inf
+  PolicyServicePkg/PolicyService/DxeMm/PolicyDxe.inf
 
   SetupDataPkg/ConfApp/ConfApp.inf {
     <LibraryClasses>
@@ -1329,12 +1343,14 @@
   CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf {
     <LibraryClasses>
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
-      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
+      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf # Contains openSSL library used by BaseCryptoLib
       IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
     <PcdsPatchableInModule>
       #Turn off Halt on Assert and Print Assert so that libraries can
       #be tested in more of a release mode environment
       gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
+    <PcdsFixedAtBuild>
+      !include CryptoPkg/Test/Crypto.pcd.ALL.inc.dsc
   }
   DfciPkg/UnitTests/DeviceIdTest/DeviceIdTestApp.inf
   # DfciPkg/UnitTests/DfciVarLockAudit/UEFI/DfciVarLockAuditTestApp.inf # DOESN'T PRODUCE OUTPUT
@@ -1348,7 +1364,7 @@
   MsCorePkg/UnitTests/MathLibUnitTest/MathLibUnitTestApp.inf
   # MsGraphicsPkg/UnitTests/SpinnerTest/SpinnerTest.inf # DOESN'T PRODUCE OUTPUT
   MsWheaPkg/Test/UnitTests/Library/LibraryClass/CheckHwErrRecHeaderTestApp.inf
-  MsWheaPkg/Test/UnitTests/MsWheaEarlyStorageUnitTestApp/MsWheaEarlyUnitTestApp.inf
+  # MsWheaPkg/Test/UnitTests/MsWheaEarlyStorageUnitTestApp/MsWheaEarlyUnitTestApp.inf # CMOS REGION TOO SMALL TO STORE DATA
   MsWheaPkg/Test/UnitTests/MsWheaReportUnitTestApp/MsWheaReportUnitTestApp.inf
   MmSupervisorPkg/Test/MmPagingAuditTest/UEFI/MmPagingAuditApp.inf
   MmSupervisorPkg/Test/MmSupvRequestUnitTestApp/MmSupvRequestUnitTestApp.inf
@@ -1439,7 +1455,7 @@
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
       TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
       IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
+      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf # Contains openSSL library used by BaseCryptoLib
   }
 
   #
@@ -1456,10 +1472,6 @@
       NULL|SecurityPkg/Library/HashInstanceLibSha384/HashInstanceLibSha384.inf
       NULL|SecurityPkg/Library/HashInstanceLibSha512/HashInstanceLibSha512.inf
       NULL|SecurityPkg/Library/HashInstanceLibSm3/HashInstanceLibSm3.inf
-  }
-  SecurityPkg/Tcg/TcgDxe/TcgDxe.inf {
-    <LibraryClasses>
-      Tpm12DeviceLib|SecurityPkg/Library/Tpm12DeviceLibDTpm/Tpm12DeviceLibDTpm.inf
   }
 !endif
 !if $(TPM_CONFIG_ENABLE) == TRUE AND $(TPM_ENABLE) == TRUE
@@ -1517,6 +1529,9 @@
   #
   MSFT:*_*_*_CC_FLAGS = /D DISABLE_NEW_DEPRECATED_INTERFACES
   GCC:*_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
+
+[BuildOptions.IA32]
+  MSFT:*_*_*_DLINK_FLAGS = /ALIGN:64
 
 # Force PE/COFF sections to be aligned at 4KB boundaries to support page level
 # protection of DXE_SMM_DRIVER/SMM_CORE modules

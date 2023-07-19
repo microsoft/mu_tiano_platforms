@@ -29,15 +29,9 @@ from io import StringIO
 
 # Declare test whose failure will not return a non-zero exit code
 FAILURE_EXEMPT_TESTS = {
-    "BootAuditTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
-    "LineParserTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
-    "MsWheaEarlyUnitTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
-    "VariablePolicyFuncTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
-    "DeviceIdTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
-    "DxePagingAuditTestApp.efi": datetime.datetime(2023, 3, 7, 0, 0, 0),
-    "JsonTestApp.efi": datetime.datetime(2023, 4, 5, 0, 0, 0),
-    "MemoryProtectionTestApp.efi": datetime.datetime(2023, 4, 5, 0, 0, 0),
-    "BaseCryptLibUnitTestApp.efi": datetime.datetime(2023, 4, 5, 0, 0, 0),
+    "VariablePolicyFuncTestApp.efi": datetime.datetime(2023, 4, 21, 0, 0, 0),
+    "DxePagingAuditTestApp.efi": datetime.datetime(2023, 4, 21, 0, 0, 0),
+    "BaseCryptLibUnitTestApp.efi": datetime.datetime(2023, 4, 21, 0, 0, 0),
 }
 
 # Allow failure exempt tests to be ignored for 90 days
@@ -193,13 +187,6 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         if args.build_arch.upper() != "AARCH64":
             raise Exception("Invalid Arch Specified.  Please see comments in PlatformBuild.py::PlatformBuilder::AddCommandLineOptions")
 
-        shell_environment.GetBuildVars().SetValue(
-            "TARGET_ARCH", args.build_arch.upper(), "From CmdLine")
-
-        shell_environment.GetBuildVars().SetValue(
-            "ACTIVE_PLATFORM", "QemuSbsaPkg/QemuSbsaPkg.dsc", "From CmdLine")
-
-
     def GetWorkspaceRoot(self):
         ''' get WorkspacePath '''
         return CommonPlatform.WorkspaceRoot
@@ -303,7 +290,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         args += " PLAT=" + self.env.GetValue("QEMU_PLATFORM").lower()
         args += " ARCH=" + self.env.GetValue("TARGET_ARCH").lower()
         args += " DEBUG=" + str(1 if self.env.GetValue("TARGET").lower() == 'debug' else 0)
-        args += " SPM_MM=1 EL3_EXCEPTION_HANDLING=1"
+        args += " SPM_MM=1 EL3_EXCEPTION_HANDLING=1 ENABLE_SME_FOR_NS=0 ENABLE_SVE_FOR_NS=0"
         args += " ENABLE_FEAT_HCX=1" # Features used by hypervisor
         # args += " FEATURE_DETECTION=1" # Enforces support for features enabled.
         args += " BL32=" + os.path.join(op_fv, "BL32_AP_MM.fd")
@@ -431,9 +418,9 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         now = datetime.datetime.now()
         FET = FAILURE_EXEMPT_TESTS
         FEOL = FAILURE_EXEMPT_OMISSION_LENGTH
-        
+
         if run_paging_audit:
-            self.Helper.generate_paging_audit (virtual_drive, Path(drive_path).parent / "unit_test_results", self.env.GetValue("VERSION"))
+            self.Helper.generate_paging_audit (virtual_drive, Path(drive_path).parent / "unit_test_results", self.env.GetValue("VERSION"), "SBSA", "AARCH64")
 
         # Filter out tests that are exempt
         tests = list(filter(lambda file: file.name not in FET or not (now - FET.get(file.name)).total_seconds() < FEOL, test_list))

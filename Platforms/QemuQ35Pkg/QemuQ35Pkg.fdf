@@ -250,7 +250,6 @@ INF  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 
 !if $(TPM_ENABLE) == TRUE
 INF  QemuPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
-INF  SecurityPkg/Tcg/TcgPei/TcgPei.inf
 INF  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
 !endif
 
@@ -269,7 +268,6 @@ INF  MsGraphicsPkg/MsEarlyGraphics/Pei/MsEarlyGraphics.inf
 INF  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTablePei/FirmwarePerformancePei.inf
 
 INF  PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
-INF  QemuQ35Pkg/PolicyDataGfx/PolicyDataGfx.inf
 INF  QemuQ35Pkg/ConfigKnobs/ConfigKnobs.inf
 INF  OemPkg/OemConfigPolicyCreatorPei/OemConfigPolicyCreatorPei.inf
 
@@ -417,7 +415,7 @@ INF  QemuPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
   INF  NetworkPkg/TcpDxe/TcpDxe.inf
   INF  NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
 
-  INF  PolicyServicePkg/PolicyService/Dxe/PolicyDxe.inf
+  INF  PolicyServicePkg/PolicyService/DxeMm/PolicyDxe.inf
   INF  SetupDataPkg/ConfApp/ConfApp.inf
 
   INF  NetworkPkg/TlsDxe/TlsDxe.inf
@@ -477,7 +475,6 @@ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 # TPM support
 #
 !if $(TPM_ENABLE) == TRUE
-INF  SecurityPkg/Tcg/TcgDxe/TcgDxe.inf
 INF  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
 !if $(TPM_CONFIG_ENABLE) == TRUE
 INF  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
@@ -498,6 +495,7 @@ INF  MdeModulePkg/Universal/ReportStatusCodeRouter/Smm/ReportStatusCodeRouterSta
 INF  MsCorePkg/Universal/StatusCodeHandler/Serial/Smm/SerialStatusCodeHandlerSmm.inf
 INF  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableSmm/FirmwarePerformanceStandaloneMm.inf
 INF  MsCorePkg/MuVarPolicyFoundationDxe/MuVarPolicyFoundationDxe.inf
+INF MsCorePkg/LoadOptionVariablePolicyDxe/LoadOptionVariablePolicyDxe.inf
 !if $(SMM_ENABLED) == TRUE
 INF  MmSupervisorPkg/Drivers/MmSupervisorRing3Broker/MmSupervisorRing3Broker.inf
 INF  MmSupervisorPkg/Drivers/StandaloneMmUnblockMem/StandaloneMmUnblockMem.inf

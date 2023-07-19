@@ -18,7 +18,7 @@ start Windbg bound to the EXDI interface.
 
 Once Windbg is connected, following the instruction in the readme, the symbols
 and source can be loaded. This is most easily done using the
-[UEFI debugger extension](../../../../UefiDbgExt/readme.md). This can also be done
+[UEFI debugger extension](../../../UefiDbgExt/readme.md). This can also be done
 manually by scanning memory for images using the image scan command. For example:
 
     kd> r rip

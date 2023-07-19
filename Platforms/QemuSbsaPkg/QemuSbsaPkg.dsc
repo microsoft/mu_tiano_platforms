@@ -78,7 +78,7 @@
   DEFINE NETWORK_SNP_ENABLE              = FALSE
   DEFINE NETWORK_TLS_ENABLE              = FALSE
   DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS  = TRUE
-  DEFINE NETWORK_ISCSI_ENABLE            = TRUE
+  DEFINE NETWORK_ISCSI_ENABLE            = FALSE
 
 !if $(NETWORK_SNP_ENABLE) == TRUE
   !error "NETWORK_SNP_ENABLE is IA32/X64/EBC only"
@@ -89,11 +89,6 @@
 !include MdePkg/MdeLibs.dsc.inc
 
 [LibraryClasses.common]
-!if $(TARGET) == RELEASE
-  DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
-!else
-  DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-!endif
   DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
 
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
@@ -210,12 +205,14 @@
   #
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
 !if $(NETWORK_TLS_ENABLE) == TRUE
-  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
 !else
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
 !endif
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
-  RngLib|MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
+  RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
+  ArmMonitorLib|ArmPkg/Library/ArmMonitorLib/ArmMonitorLib.inf
+  ArmTrngLib|ArmPkg/Library/ArmTrngLib/ArmTrngLib.inf
   Hash2CryptoLib|SecurityPkg/Library/BaseHash2CryptoLibNull/BaseHash2CryptoLibNull.inf
 
   #
@@ -434,6 +431,7 @@
   ArmPlatformLib             |QemuSbsaPkg/Library/SbsaQemuLib/SbsaQemuLib.inf
   OemMfciLib                 |OemPkg/Library/OemMfciLib/OemMfciLibPei.inf
   ConfigKnobShimLib          |SetupDataPkg/Library/ConfigKnobShimLib/ConfigKnobShimPeiLib/ConfigKnobShimPeiLib.inf
+  PolicyLib                  |PolicyServicePkg/Library/PeiPolicyLib/PeiPolicyLib.inf
 
 !if $(TPM2_ENABLE) == TRUE
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
@@ -456,6 +454,7 @@
   PcdDatabaseLoaderLib|MdeModulePkg/Library/PcdDatabaseLoaderLib/Dxe/PcdDatabaseLoaderLibDxe.inf
   UpdateFacsHardwareSignatureLib|OemPkg/Library/UpdateFacsHardwareSignatureLib/UpdateFacsHardwareSignatureLib.inf
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxDxeLib.inf
+  PolicyLib|PolicyServicePkg/Library/DxePolicyLib/DxePolicyLib.inf
 
 !if $(TPM2_ENABLE) == TRUE
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg2.inf
@@ -495,14 +494,14 @@
   MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
   RngLib|MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
   VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
 
-  NorFlashPlatformLib|QemuSbsaPkg/Library/SbsaQemuNorFlashLib/SbsaQemuNorFlashLib.inf
+  VirtNorFlashPlatformLib|QemuSbsaPkg/Library/SbsaQemuNorFlashLib/SbsaQemuNorFlashLib.inf
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
   AdvLoggerAccessLib|AdvLoggerPkg/Library/AdvLoggerMmAccessLib/AdvLoggerMmAccessLib.inf
   MemoryTypeInfoSecVarCheckLib|MdeModulePkg/Library/MemoryTypeInfoSecVarCheckLib/MemoryTypeInfoSecVarCheckLib.inf
@@ -518,6 +517,27 @@
   PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
+
+#########################################
+# Advanced Logger Libraries
+#########################################
+[LibraryClasses]
+  DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+  AssertLib|AdvLoggerPkg/Library/AssertLib/AssertLib.inf
+  AdvancedLoggerHdwPortLib|AdvLoggerPkg/Library/AdvancedLoggerHdwPortLib/AdvancedLoggerHdwPortLib.inf
+  AdvancedLoggerAccessLib|AdvLoggerPkg/Library/AdvancedLoggerAccessLib/AdvancedLoggerAccessLib.inf
+
+[LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.UEFI_APPLICATION]
+  AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Dxe/AdvancedLoggerLib.inf
+  DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
+
+[LibraryClasses.common.DXE_CORE]
+  AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/DxeCore/AdvancedLoggerLib.inf
+  DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
+
+[LibraryClasses.common.DXE_RUNTIME_DRIVER]
+  AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Runtime/AdvancedLoggerLib.inf
+  DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
 
 [BuildOptions]
 !include NetworkPkg/NetworkBuildOptions.dsc.inc
@@ -547,6 +567,7 @@
 
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|TRUE
   gQemuPkgTokenSpaceGuid.PcdEnableMemoryProtection|$(MEMORY_PROTECTION)
+  gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedLoggerLocator|TRUE
 
 [PcdsFeatureFlag.AARCH64]
   #
@@ -617,6 +638,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerInBootOrder|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformRecoverySupport|FALSE
   gPcBdsPkgTokenSpaceGuid.PcdLowResolutionInternalShell|FALSE
+  gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedFileLoggerFlush|0x03
   gMsGraphicsPkgTokenSpaceGuid.PcdMsGopOverrideProtocolGuid|{0xF5, 0x3B, 0x5E, 0xAA, 0x8A, 0x81, 0x2D, 0x41, 0xA1, 0x8E, 0xD8, 0x79, 0x3B, 0xA0, 0x3A, 0x5C}
 
 !if $(ARCH) == AARCH64
@@ -848,7 +870,6 @@
   gArmTokenSpaceGuid.PcdMmBufferBase
 
 [PcdsDynamicHii]
-  gArmVirtTokenSpaceGuid.PcdForceNoAcpi|L"ForceNoAcpi"|gArmVirtVariableGuid|0x0|FALSE|NV,BS
 
 !if $(TPM2_CONFIG_ENABLE) == TRUE
   gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x0|"1.3"|NV,BS
@@ -918,7 +939,6 @@
 
   PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
 
-  QemuSbsaPkg/PolicyDataGfx/PolicyDataGfx.inf
   QemuSbsaPkg/ConfigKnobs/ConfigKnobs.inf
   OemPkg/OemConfigPolicyCreatorPei/OemConfigPolicyCreatorPei.inf {
     <LibraryClasses>
@@ -1075,8 +1095,11 @@
   }
   PcBdsPkg/MsBootPolicy/MsBootPolicy.inf
 
+  # Apply Variable Policy to Load Option UEFI Variables
+  MsCorePkg/LoadOptionVariablePolicyDxe/LoadOptionVariablePolicyDxe.inf
+
   # Configuration modules
-  PolicyServicePkg/PolicyService/Dxe/PolicyDxe.inf
+  PolicyServicePkg/PolicyService/DxeMm/PolicyDxe.inf
 
   SetupDataPkg/ConfApp/ConfApp.inf {
     <LibraryClasses>
@@ -1178,7 +1201,7 @@
   CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf {
     <LibraryClasses>
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
-      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
+      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf # Contains openSSL library used by BaseCryptoLib
       IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
     <PcdsPatchableInModule>
       #Turn off Halt on Assert and Print Assert so that libraries can
@@ -1197,7 +1220,7 @@
   MsCorePkg/UnitTests/MathLibUnitTest/MathLibUnitTestApp.inf
   # MsGraphicsPkg/UnitTests/SpinnerTest/SpinnerTest.inf # DOESN'T PRODUCE OUTPUT
   MsWheaPkg/Test/UnitTests/Library/LibraryClass/CheckHwErrRecHeaderTestApp.inf
-  MsWheaPkg/Test/UnitTests/MsWheaEarlyStorageUnitTestApp/MsWheaEarlyUnitTestApp.inf
+  # MsWheaPkg/Test/UnitTests/MsWheaEarlyStorageUnitTestApp/MsWheaEarlyUnitTestApp.inf # NO EARLY STORE METHOD AVAILABLE ON ARM
   MsWheaPkg/Test/UnitTests/MsWheaReportUnitTestApp/MsWheaReportUnitTestApp.inf
   # MmSupervisorPkg/Test/MmPagingAuditTest/UEFI/MmPagingAuditApp.inf # NOT APPLICABLE TO SBSA
   # MmSupervisorPkg/Test/MmSupvRequestUnitTestApp/MmSupvRequestUnitTestApp.inf # NOT APPLICABLE TO SBSA
@@ -1326,7 +1349,7 @@
       VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLib.inf
       VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
   }
-  ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashStandaloneMm.inf
+  QemuSbsaPkg/VirtNorFlashStandaloneMm/VirtNorFlashStandaloneMm.inf
 
 ###################################################################################################
 #
