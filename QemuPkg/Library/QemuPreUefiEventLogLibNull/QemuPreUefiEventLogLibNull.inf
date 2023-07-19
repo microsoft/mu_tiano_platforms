@@ -1,0 +1,22 @@
+## @file
+#  NULL PreUefiEventLogLibNull library instance for QEMU
+#
+# Copyright (c) Microsoft Corporation
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = QemuPreUefiEventLogLibNull
+  FILE_GUID                      = A3E24CE0-4E7D-4164-9A5B-90DFBE2F5744
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = Tcg2PreUefiEventLogLib
+
+[Sources]
+  QemuPreUefiEventLogLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec

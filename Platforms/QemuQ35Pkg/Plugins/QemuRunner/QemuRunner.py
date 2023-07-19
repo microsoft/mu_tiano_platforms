@@ -93,7 +93,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             args += " -m 8192"
 
             file_extension = Path(path_to_os).suffix.lower().replace('"', '')
-            
+
             storage_rule = {
                 ".vhd": f" -drive format=raw,index=0,media=disk,file=\"{path_to_os}\"",
                 ".qcow2": f" -hda \"{path_to_os}\""
@@ -101,7 +101,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
             if storage_rule is None:
                 raise Exception("Unknown OS storage type: " + path_to_os)
-            
+
             args += storage_rule
         else:
             args += " -m 2048"
@@ -178,6 +178,13 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         args += " -smbios type=0,vendor=Palindrome,uefi=on"
         args += " -smbios type=1,manufacturer=Palindrome,product=MuQemuQ35,serial=42-42-42-42,uuid=9de555c0-05d7-4aa1-84ab-bb511e3a8bef"
         args += f" -smbios type=3,manufacturer=Palindrome,serial=40-41-42-43{boot_selection}"
+
+        # TPM in Linux
+        tpm_dev = env.GetValue("TPM_DEV")
+        if tpm_dev is not None:
+            args += f" -chardev socket,id=chrtpm,path={tpm_dev}"
+            args += " -tpmdev emulator,id=tpm0,chardev=chrtpm"
+            args += " -device tpm-tis,tpmdev=tpm0"
 
         if (env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
             args += " -display none"  # no graphics
