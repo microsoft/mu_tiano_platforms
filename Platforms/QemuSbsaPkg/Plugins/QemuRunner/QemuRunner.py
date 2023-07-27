@@ -7,12 +7,13 @@
 ##
 
 import logging
+import io
 import os
-import sys
-import time
+import re
 import threading
 import datetime
 import subprocess
+from pathlib import Path
 from edk2toolext.environment import plugin_manager
 from edk2toolext.environment.plugintypes import uefi_helper_plugin
 from edk2toollib import utility_functions
@@ -31,14 +32,34 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         return 0
 
     @staticmethod
+    # raw helper function to extract version number from QEMU
+    def QueryQemuVersion(exec):
+        if exec is None:
+            return None
+
+        result = io.StringIO()
+        ret = utility_functions.RunCmd(exec, "--version", outstream=result)
+        if ret != 0:
+            return None
+
+        # expected version string will be "QEMU emulator version maj.min.rev"
+        res = result.getvalue()
+        ver_str = re.search(r'version\s*([\d.]+)', res).group(1)
+
+        return ver_str.split('.')
+
+
+    @staticmethod
     def Runner(env):
         ''' Runs QEMU '''
         VirtualDrive = env.GetValue("VIRTUAL_DRIVE_PATH")
         OutputPath_FV = os.path.join(env.GetValue("BUILD_OUTPUT_BASE"), "FV")
-        version = env.GetValue("VERSION", "Unknown")
+        repo_version = env.GetValue("VERSION", "Unknown")
 
         # Check if QEMU is on the path, if not find it
         executable = "qemu-system-aarch64"
+
+        qemu_version = QemuRunner.QueryQemuVersion(executable)
 
         # turn off network
         args = "-net none"
@@ -64,16 +85,23 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         args += " -global driver=cfi.pflash01,property=secure,value=on"
         args += " -drive if=pflash,format=raw,unit=0,file=" + \
             os.path.join(OutputPath_FV, "SECURE_FLASH0.fd")
+
+        code_fd = os.path.join(OutputPath_FV, "QEMU_EFI.fd")
         args += " -drive if=pflash,format=raw,unit=1,file=" + \
-            os.path.join(OutputPath_FV, "QEMU_EFI.fd") + ",readonly=on"
+                code_fd + ",readonly=on"
 
         # Add XHCI USB controller and mouse
         args += " -device qemu-xhci,id=usb"
         args += " -device usb-tablet,id=input0,bus=usb.0,port=1"  # add a usb mouse
-        args += " -device usb-kbd,id=input1,bus=usb.0,port=2"    # add a usb keyboard
-        args += " -smbios type=0,vendor=Palindrome,uefi=on"
-        args += " -smbios type=1,manufacturer=Palindrome,product=MuQemuQ35,serial=42-42-42-42"
-        args += f" -smbios type=3,manufacturer=Palindrome,version={version},serial=42-42-42-42,asset=Q35,sku=Q35"
+        args += " -device usb-kbd,id=input1,bus=usb.0,port=2"     # add a usb keyboard
+
+        creation_time = Path(code_fd).stat().st_ctime
+        creation_datetime = datetime.datetime.fromtimestamp(creation_time)
+        creation_date = creation_datetime.strftime("%m/%d/%Y")
+
+        args += f" -smbios type=0,vendor=\"Project Mu\",version=\"mu_tiano_platforms-{repo_version}\",date={creation_date},uefi=on"
+        args += f" -smbios type=1,manufacturer=Palindrome,product=\"QEMU SBSA\",family=QEMU,version=\"{'.'.join(qemu_version)}\",serial=42-42-42-42"
+        args += f" -smbios type=3,manufacturer=Palindrome,serial=42-42-42-42,asset=SBSA,sku=SBSA"
 
         if (env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
             args += " -display none"  # no graphics
@@ -109,7 +137,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             ret = 0
 
         ## TODO: remove this once we upgrade to newer QEMU
-        if ret == 0x8B and ver[0] == '4':
+        if ret == 0x8B and qemu_version[0] == '4':
             # QEMU v4 will return segmentation fault when shutting down.
             # Tested same FDs on QEMU 6 and 7, not observing the same.
             ret = 0
