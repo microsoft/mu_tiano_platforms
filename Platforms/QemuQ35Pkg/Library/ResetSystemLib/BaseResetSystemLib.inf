@@ -1,5 +1,5 @@
 ## @file
-#  Base library instance for ResetSystem library class for OVMF
+#  Base library instance for ResetSystem library class for QEMU.
 #
 #  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -12,7 +12,8 @@
   FILE_GUID                      = 66564872-21d4-4d2a-a68b-1e844f980820
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = ResetSystemLib|SEC PEI_CORE PEIM DXE_CORE
+  LIBRARY_CLASS                  = HwResetSystemLib
+  LIBRARY_CLASS                  = ResetSystemLib
 
 #
 # The following information is for reference only and not required by the build

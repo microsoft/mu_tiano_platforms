@@ -463,7 +463,7 @@
   PcdLib                        |MdePkg/Library/DxePcdLib/DxePcdLib.inf
   HobLib                        |MdePkg/Library/DxeHobLib/DxeHobLib.inf
   ResetSystemLib                |MdeModulePkg/Library/DxeResetSystemLib/DxeResetSystemLib.inf
-  HwResetSystemLib              |MdeModulePkg/Library/DxeResetSystemLib/DxeResetSystemLib.inf
+  HwResetSystemLib              |QemuQ35Pkg/Library/ResetSystemLib/BaseResetSystemLib.inf
   DxeCoreEntryPoint             |MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
   MemoryAllocationLib           |MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   CpuExceptionHandlerLib        |UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
@@ -570,7 +570,7 @@
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibStandaloneMm.inf
   SortLib|MdeModulePkg/Library/BaseSortLib/BaseSortLib.inf
   SmmPolicyGateLib|MmSupervisorPkg/Library/SmmPolicyGateLib/SmmPolicyGateLib.inf
-  HwResetSystemLib|PcAtChipsetPkg/Library/ResetSystemLib/ResetSystemLib.inf
+  HwResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   IhvSmmSaveStateSupervisionLib|MmSupervisorPkg/Library/IhvMmSaveStateSupervisionLib/IhvMmSaveStateSupervisionLib.inf
 
 [LibraryClasses.common.MM_STANDALONE]
@@ -582,7 +582,7 @@
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxStandaloneMmLib.inf
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/SmmCpuExceptionHandlerLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/SmmReportStatusCodeLib/StandaloneMmReportStatusCodeLib.inf
-  HwResetSystemLib|PcAtChipsetPkg/Library/ResetSystemLib/ResetSystemLib.inf
+  HwResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   StandaloneMmDriverEntryPoint|MmSupervisorPkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
   # TODO: ShareCrypto support
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
@@ -923,6 +923,10 @@
 !if $(ENABLE_SHARED_CRYPTO) == TRUE
   !include CryptoPkg/Driver/Bin/CryptoDriver.inc.dsc
 !endif
+
+QemuQ35Pkg/Library/ResetSystemLib/BaseResetSystemLib.inf
+QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
+QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
 
 [Components.IA32]
   QemuQ35Pkg/ResetVector/ResetVector.inf
