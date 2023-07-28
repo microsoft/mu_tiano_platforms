@@ -1,5 +1,5 @@
 ## @file
-#  DXE library instance for ResetSystem library class for QEMU.
+#  Standalone MM library instance for ResetSystem library class for QEMU.
 #
 #  Copyright (C) 2020, Red Hat, Inc.
 #  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
@@ -10,14 +10,15 @@
 ##
 
 [Defines]
-  INF_VERSION       = 1.29
-  BASE_NAME         = DxeResetSystemLib
-  FILE_GUID         = bc7835ea-4094-41fe-b770-bad9e6c479b2
-  MODULE_TYPE       = DXE_DRIVER
-  VERSION_STRING    = 1.0
-  LIBRARY_CLASS     = ResetSystemLib|DXE_DRIVER DXE_RUNTIME_DRIVER SMM_CORE DXE_SMM_DRIVER UEFI_DRIVER UEFI_APPLICATION
-  LIBRARY_CLASS     = HwResetSystemLib|DXE_DRIVER DXE_RUNTIME_DRIVER SMM_CORE DXE_SMM_DRIVER UEFI_DRIVER UEFI_APPLICATION
-  CONSTRUCTOR       = DxeConstructor
+  INF_VERSION                 = 0x0001001A
+  BASE_NAME                   = StandaloneMmResetSystemLib
+  FILE_GUID                   = F95BE63D-2DD4-43AC-8C80-46F7741E8061
+  MODULE_TYPE                 = MM_STANDALONE
+  PI_SPECIFICATION_VERSION    = 0x00010032
+  VERSION_STRING              = 1.0
+  LIBRARY_CLASS               = ResetSystemLib|MM_STANDALONE MM_CORE_STANDALONE
+  LIBRARY_CLASS               = HwResetSystemLib|MM_STANDALONE MM_CORE_STANDALONE
+  CONSTRUCTOR                 = StandaloneMmConstructor
 
 #
 # The following information is for reference only and not required by the build
@@ -27,10 +28,10 @@
 #
 
 [Sources]
-  DxeResetSystemLib.c
   ResetSystemLib.c
   ResetSystemLibInternal.h
   RuntimeResetSystemLib.c
+  StandaloneMmResetSystemLib.c
 
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
