@@ -44,7 +44,7 @@
 
   # Configure Shared Crypto
   !ifndef ENABLE_SHARED_CRYPTO # by default true
-    ENABLE_SHARED_CRYPTO = TRUE
+    ENABLE_SHARED_CRYPTO = FALSE
   !endif
   !if $(ENABLE_SHARED_CRYPTO) == TRUE
     PEI_CRYPTO_SERVICES = TINY_SHA
