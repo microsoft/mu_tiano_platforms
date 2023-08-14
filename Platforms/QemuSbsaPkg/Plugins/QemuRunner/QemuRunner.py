@@ -63,9 +63,22 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
         # turn off network
         args = "-net none"
+
         # Mount disk with either startup.nsh or OS image
-        if env.GetValue("PATH_TO_OS") is not None:
-            args += " -hda \"" + env.GetValue("PATH_TO_OS") + "\""
+        path_to_os = env.GetValue("PATH_TO_OS")
+        if path_to_os is not None:
+            file_extension = Path(path_to_os).suffix.lower().replace('"', '')
+
+            storage_format = {
+                ".vhd": "raw",
+                ".qcow2": "qcow2"
+            }.get(file_extension, None)
+
+            if storage_format is None:
+                raise Exception(f"Unknown OS storage type: {path_to_os}")
+
+            args += f" -drive file=\"{path_to_os}\",format={storage_format},if=none,id=os_nvme"
+            args += " -device nvme,serial=nvme-1,drive=os_nvme"
         elif os.path.isfile(VirtualDrive):
             args += f" -hdd {VirtualDrive}"
         elif os.path.isdir(VirtualDrive):
@@ -73,7 +86,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         else:
             logging.critical("Virtual Drive Path Invalid")
 
-        if env.GetValue("PATH_TO_OS") is not None:
+        if path_to_os is not None:
             args += " -m 8192"
         else:
             args += " -m 2048"

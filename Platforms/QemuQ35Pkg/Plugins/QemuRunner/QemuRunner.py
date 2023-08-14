@@ -92,15 +92,16 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
             file_extension = Path(path_to_os).suffix.lower().replace('"', '')
 
-            storage_rule = {
-                ".vhd": f" -drive format=raw,index=0,media=disk,file=\"{path_to_os}\"",
-                ".qcow2": f" -hda \"{path_to_os}\""
+            storage_format = {
+                ".vhd": "raw",
+                ".qcow2": "qcow2"
             }.get(file_extension, None)
 
-            if storage_rule is None:
-                raise Exception("Unknown OS storage type: " + path_to_os)
+            if storage_format is None:
+                raise Exception(f"Unknown OS storage type: {path_to_os}")
 
-            args += storage_rule
+            args += f" -drive file=\"{path_to_os}\",format={storage_format},if=none,id=os_nvme"
+            args += " -device nvme,serial=nvme-1,drive=os_nvme"
         else:
             args += " -m 2048"
 
