@@ -330,6 +330,9 @@ INF  MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
 INF  MdeModulePkg/Universal/Metronome/Metronome.inf
 INF  PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
 
+# CPU branding information
+INF  QemuQ35Pkg/CpuInfoDxe/CpuInfoDxe.inf
+
 INF  QemuPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
 INF  QemuPkg/Virtio10Dxe/Virtio10.inf
 INF  QemuPkg/VirtioBlkDxe/VirtioBlk.inf

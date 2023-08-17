@@ -313,6 +313,37 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         self.env.SetValue("BLD_*_POLICY_BIN_PATH", output_name, "Set generated secure policy path")
         return ret
 
+    # TODO: Validation should be done by parsing the cpu.c file from qemu
+    def __ValidateCpuModelInfo(self):
+        output_file = os.path.join(self.ws, "Build", "BUILDLOG_" +  self.GetName() + ".txt")
+        cpu_brandname_dict = {
+            "phenom": "AMD Phenom(tm) 9550 Quad-Core Processor",
+            "coreduo": "Genuine Intel(R) CPU           T2600  @ 2.16GHz",
+            "core2duo": "Intel(R) Core(TM)2 Duo CPU     T7700  @ 2.40GHz",
+            "Skylake-Client-v1": "Intel Core Processor (Skylake)",
+            "Skylake-Client-v2": "Intel Core Processor (Skylake, IBRS)",
+            "Skylake-Client-v3": "Intel Core Processor (Skylake, IBRS, no TSX)",
+            "Skylake-Client-v4": "Intel Core Processor (Skylake)",
+        }
+
+        cpu_model = self.env.GetValue("CPU_MODEL")
+        cpu_brandname_log = 'CPU Brand Name:'
+
+        with open(output_file, 'r') as handle:
+            logs = handle.readlines()
+            for line in logs:
+                if cpu_brandname_log in line:
+                    cpu_brandname = line.split(cpu_brandname_log)[-1].strip()
+
+                    if cpu_brandname_dict[cpu_model] == cpu_brandname:
+                        logging.critical("CPU brandname matches")
+                        return 0
+
+        # If the right logs are not found
+        logging.error("CPU branding logs missing or incorrect")
+        return -1
+
+
     def __SetEsrtGuidVars(self, var_name, guid_str, desc_string):
         cur_guid = uuid.UUID(guid_str)
         self.env.SetValue("BLD_*_%s_REGISTRY" % var_name, guid_str, desc_string)
@@ -383,6 +414,9 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         if ret != 0:
             logging.critical("Failed running Qemu")
             return ret
+
+        if self.env.GetValue("CPU_MODEL") is not None:
+            self.__ValidateCpuModelInfo()
 
         if not run_tests:
             return 0
