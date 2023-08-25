@@ -13,7 +13,7 @@ discovered that UEFI firmware is lacking basic memory protections that have been
 over a decade. Coupled with the inconsistency of security capabilities inherit to vendor firmware implementations,
 UEFI firmware has become an increasingly attractive system attack vector.
 
-`QemuQ35Pkg` allows experimentation with the memory protections being offered in physical platforms.
+`QemuQ35Pkg` and `QemuSbsaPkg` allow experimentation with the memory protections being offered in physical platforms.
 
 Memory protections are ON by default on Q35 and SBSA. To disable memory protection add `BLD_*_MEMORY_PROTECTION=FALSE`
 to your `stuart_build` command. Example:
