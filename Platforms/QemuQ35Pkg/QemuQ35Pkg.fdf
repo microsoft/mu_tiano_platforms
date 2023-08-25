@@ -518,6 +518,7 @@ INF  MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.
 INF  DfciPkg/Application/DfciMenu/DfciMenu.inf
 INF  MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
 INF  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+INF  MsCorePkg/HelloWorldRustDxe/HelloWorldRustDxe.inf
 INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
 
 #SHARED_CRYPTO Crypto Bin Modules
