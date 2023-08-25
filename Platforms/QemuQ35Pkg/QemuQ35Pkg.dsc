@@ -1355,6 +1355,7 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   MdeModulePkg/Universal/EsrtFmpDxe/EsrtFmpDxe.inf
   MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.inf
   MsCorePkg/AcpiRGRT/AcpiRgrt.inf
+  MsCorePkg/HelloWorldRustDxe/HelloWorldRustDxe.inf
   DfciPkg/Application/DfciMenu/DfciMenu.inf
 
   MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
