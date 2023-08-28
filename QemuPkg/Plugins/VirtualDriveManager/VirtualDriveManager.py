@@ -442,9 +442,9 @@ class VirtualDriveManager(IUefiHelperPlugin):
         return failure_count
     
     @staticmethod
-    def generate_paging_audit(drive: VirtualDrive, report_output_dir: Path, version: str, platform: str, arch: str):
+    def generate_paging_audit(drive: VirtualDrive, report_output_dir: Path, version: str, platform: str):
         paging_audit_data_files = ["1G.dat", "2M.dat", "4K.dat", "PDE.dat", "MAT.dat",
-                                   "GuardPage.dat", "MemoryInfoDatabase.dat"]
+                                   "GuardPage.dat", "MemoryInfoDatabase.dat", "PlatformInfo.dat"]
         paging_audit_generator_path = os.path.join("Common", "MU", "UefiTestingPkg", "AuditTests",
                                                    "PagingAudit", "Windows", "PagingReportGenerator.py")
         report_output_dir.mkdir(exist_ok=True)
@@ -454,7 +454,7 @@ class VirtualDriveManager(IUefiHelperPlugin):
         output_debug = os.path.join(report_output_dir, "pagingauditdebug.txt")
         cmd = "python"
         args = f"{paging_audit_generator_path} -i {report_output_dir} -o {output_audit} \
--p {platform} -t DXE --debug -l {output_debug} -a {arch} --PlatformVersion {version}"
+-p {platform} --debug -l {output_debug} --PlatformVersion {version}"
         result = RunCmd(cmd, args)
         if result != 0:
             e = f"[{cmd} {args}] Result: {result}"
