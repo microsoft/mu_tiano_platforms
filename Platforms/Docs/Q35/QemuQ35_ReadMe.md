@@ -26,6 +26,7 @@ that can emulate PC class hardware with industry standard features like SMM and 
     - [Mu Telemetry / WHEA / HwErrorRecord](#mu-telemetry--whea--hwerrorrecord)
     - [Platform Runtime Mechanism (PRM)](#platform-runtime-mechanism-prm)
     - [Trusted Platform Module (TPM)](#trusted-platform-module-tpm)
+    - [Trusted Platform Module (TPM) Replay](#trusted-platform-module-tpm-replay)
     - [UEFI Memory Protections](#uefi-memory-protections)
   - [Mu Customized Components](#mu-customized-components)
     - [Modules](#modules)
@@ -124,6 +125,15 @@ TPM Profile (PTP) Specification. `QemuQ35Pkg` has support to include TPM drivers
 socket interface. Usage is covered in the detailed feature readme.
 
 [Details](Features/feature_tpm.md)
+
+### Trusted Platform Module (TPM) Replay
+
+An OS and firmware developer feature that allows a custom crafted TPM event log to be created and replayed during boot.
+Any PCRs specified in the input TPM Replay event log are exclusively extended to the PCR (any other firmware
+measurements that would normally target the PCR are blocked). This feature can be useful to test a wide range of inputs
+to OS and firmware features dependent on TPM measurements
+
+[Details](Features/feature_tpm_replay.md)
 
 ### UEFI Memory Protections
 

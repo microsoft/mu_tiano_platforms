@@ -1,0 +1,39 @@
+## @file
+# A library that publishes the FV Measurement Exclusion PPI for this platform.
+#
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION           = 0x00010005
+  BASE_NAME             = PeiFvMeasurementExclusionLib
+  FILE_GUID             = EFEF0468-A1FC-4110-89C0-091C19676380
+  MODULE_TYPE           = PEIM
+  VERSION_STRING        = 1.0
+  LIBRARY_CLASS         = FvMeasurementExclusionLib
+
+[LibraryClasses]
+  DebugLib
+  MemoryAllocationLib
+  PcdLib
+  PeiServicesLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  QemuQ35Pkg/QemuQ35Pkg.dec
+
+[Sources]
+  PeiFvMeasurementExclusionLib.c
+
+[Pcd]
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfPeiMemFvBase             ## CONSUMES
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfPeiMemFvSize             ## CONSUMES
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfDxeMemFvBase             ## CONSUMES
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfDxeMemFvSize             ## CONSUMES
+
+[Ppis]
+  gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid           ## PRODUCES
