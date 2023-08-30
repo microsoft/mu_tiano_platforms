@@ -190,7 +190,7 @@
   BaseBinSecurityLib    |MdePkg/Library/BaseBinSecurityLibNull/BaseBinSecurityLibNull.inf
   SecurityLockAuditLib  |MdeModulePkg/Library/SecurityLockAuditDebugMessageLib/SecurityLockAuditDebugMessageLib.inf ##MU_CHANGE
   LockBoxLib            |QemuPkg/Library/LockBoxLib/LockBoxBaseLib.inf
-  PlatformSecureLib     |QemuPkg/Library/PlatformSecureLib/PlatformSecureLib.inf
+  PlatformSecureLib     |SecurityPkg/Library/PlatformSecureLibNull/PlatformSecureLibNull.inf
   PasswordStoreLib      |MsCorePkg/Library/PasswordStoreLibNull/PasswordStoreLibNull.inf
   PasswordPolicyLib     |OemPkg/Library/PasswordPolicyLib/PasswordPolicyLib.inf
   SecureBootVariableLib |SecurityPkg/Library/SecureBootVariableLib/SecureBootVariableLib.inf
@@ -688,6 +688,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize|0x1000
   gPcBdsPkgTokenSpaceGuid.PcdEnableMemMapOutput|0x1
   gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedFileLoggerFlush|3
+  gEfiSecurityPkgTokenSpaceGuid.PcdUserPhysicalPresence|FALSE
 
 !if $(NETWORK_TLS_ENABLE) == FALSE
   # match PcdFlashNvStorageVariableSize purely for convenience

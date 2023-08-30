@@ -221,8 +221,7 @@
   AuthVariableLib|SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf
   SecureBootVariableLib|SecurityPkg/Library/SecureBootVariableLib/SecureBootVariableLib.inf
   SecureBootVariableProvisionLib|SecurityPkg/Library/SecureBootVariableProvisionLib/SecureBootVariableProvisionLib.inf
-  # re-use the UserPhysicalPresent() dummy implementation from the ovmf tree
-  PlatformSecureLib|QemuPkg/Library/PlatformSecureLib/PlatformSecureLib.inf
+  PlatformSecureLib|SecurityPkg/Library/PlatformSecureLibNull/PlatformSecureLibNull.inf
 
   # Security Libraries
   LockBoxLib            |QemuPkg/Library/LockBoxLib/LockBoxBaseLib.inf
@@ -649,7 +648,7 @@
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x4000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800
-  gEfiSecurityPkgTokenSpaceGuid.PcdUserPhysicalPresence|TRUE
+  gEfiSecurityPkgTokenSpaceGuid.PcdUserPhysicalPresence|FALSE
 
 !if $(NETWORK_TLS_ENABLE) == TRUE
   #
