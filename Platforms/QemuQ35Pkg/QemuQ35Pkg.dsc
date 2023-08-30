@@ -144,7 +144,6 @@
 
   # CPU/SMBUS/Peripherals Libraries
   CpuLib              |MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
-  UefiCpuLib          |UefiCpuPkg/Library/BaseUefiCpuLib/BaseUefiCpuLib.inf
   SynchronizationLib  |MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
   LocalApicLib        |UefiCpuPkg/Library/BaseXApicX2ApicLib/BaseXApicX2ApicLib.inf
   SmbusLib            |MdePkg/Library/BaseSmbusLibNull/BaseSmbusLibNull.inf

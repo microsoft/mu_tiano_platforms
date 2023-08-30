@@ -12,7 +12,7 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseLib.h>
 #include <Library/PrintLib.h>
-#include <Library/UefiCpuLib.h>
+#include <Library/CpuLib.h>
 #include <Register/Intel/Cpuid.h>
 
 #define MAX_MESSAGE_LENGTH  64
