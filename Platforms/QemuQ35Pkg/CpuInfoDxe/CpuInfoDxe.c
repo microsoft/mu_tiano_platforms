@@ -60,43 +60,6 @@ GetCpuIdFamilyEaxString (
 }
 
 /**
-  This function returns the CPU stepping ID information as a UINT8.
-**/
-UINT8
-GetCpuSteppingId (
-  VOID
-  )
-{
-  CPUID_VERSION_INFO_EAX  Eax;
-
-  AsmCpuid (CPUID_VERSION_INFO, &Eax.Uint32, NULL, NULL, NULL);
-
-  return (UINT8)Eax.Bits.SteppingId;
-}
-
-/**
-  This function returns the CPU family and model information as a UINT32.
-**/
-UINT32
-GetCpuFamilyModel (
-  VOID
-  )
-{
-  CPUID_VERSION_INFO_EAX  Eax;
-
-  AsmCpuid (CPUID_VERSION_INFO, &Eax.Uint32, NULL, NULL, NULL);
-
-  //
-  // Mask other fields than Family and Model.
-  //
-  Eax.Bits.SteppingId    = 0;
-  Eax.Bits.ProcessorType = 0;
-  Eax.Bits.Reserved1     = 0;
-  Eax.Bits.Reserved2     = 0;
-  return Eax.Uint32;
-}
-
-/**
   Driver entry point
 
   @param  ImageHandle   ImageHandle of the loaded driver.

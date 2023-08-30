@@ -28,6 +28,7 @@
   UefiLib
   BaseLib
   PrintLib
+  UefiCpuLib
   UefiDriverEntryPoint
   UefiBootServicesTableLib
 
