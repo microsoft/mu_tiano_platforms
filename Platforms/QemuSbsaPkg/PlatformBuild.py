@@ -30,7 +30,6 @@ from io import StringIO
 # Declare test whose failure will not return a non-zero exit code
 FAILURE_EXEMPT_TESTS = {
     "VariablePolicyFuncTestApp.efi": datetime.datetime(2023, 7, 20, 0, 0, 0),
-    "DxePagingAuditTestApp.efi": datetime.datetime(2023, 7, 20, 0, 0, 0),
 }
 
 # Allow failure exempt tests to be ignored for 90 days
@@ -246,13 +245,13 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         # Include the MFCI test cert by default, override on the commandline with "BLD_*_SHIP_MODE=TRUE" if you want the retail MFCI cert
         self.env.SetValue("BLD_*_SHIP_MODE", "FALSE", "Default")
 
-        self.env.SetValue("CONF_AUTOGEN_INCLUDE_PATH", self.mws.join(self.ws, "Platforms", "QemuSbsaPkg", "Include"), "Platform Hardcoded")
-        self.env.SetValue("MU_SCHEMA_DIR", self.mws.join(self.ws, "Platforms", "QemuSbsaPkg", "CfgData"), "Platform Defined")
+        self.env.SetValue("CONF_AUTOGEN_INCLUDE_PATH",self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuSbsaPkg", "Include"), "Platform Hardcoded")
+        self.env.SetValue("MU_SCHEMA_DIR", self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuSbsaPkg", "CfgData"), "Platform Defined")
         self.env.SetValue("MU_SCHEMA_FILE_NAME", "QemuSbsaPkgCfgData.xml", "Platform Hardcoded")
 
-        self.env.SetValue("YAML_POLICY_FILE", self.mws.join(self.ws, "QemuQ35Pkg", "PolicyData", "PolicyDataUsb.yaml"), "Platform Hardcoded")
-        self.env.SetValue("POLICY_DATA_STRUCT_FOLDER", self.mws.join(self.ws, "QemuQ35Pkg", "Include"), "Platform Defined")
-        self.env.SetValue('POLICY_REPORT_FOLDER', self.mws.join(self.ws, "QemuQ35Pkg", "PolicyData"), "Platform Defined")
+        self.env.SetValue("YAML_POLICY_FILE", self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuQ35Pkg", "PolicyData", "PolicyDataUsb.yaml"), "Platform Hardcoded")
+        self.env.SetValue("POLICY_DATA_STRUCT_FOLDER", self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuQ35Pkg", "Include"), "Platform Defined")
+        self.env.SetValue('POLICY_REPORT_FOLDER', self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuQ35Pkg", "PolicyData"), "Platform Defined")
 
         return 0
 
@@ -419,7 +418,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         FEOL = FAILURE_EXEMPT_OMISSION_LENGTH
 
         if run_paging_audit:
-            self.Helper.generate_paging_audit (virtual_drive, Path(drive_path).parent / "unit_test_results", self.env.GetValue("VERSION"), "SBSA", "AARCH64")
+            self.Helper.generate_paging_audit (virtual_drive, Path(drive_path).parent / "unit_test_results", self.env.GetValue("VERSION"), "SBSA")
 
         # Filter out tests that are exempt
         tests = list(filter(lambda file: file.name not in FET or not (now - FET.get(file.name)).total_seconds() < FEOL, test_list))

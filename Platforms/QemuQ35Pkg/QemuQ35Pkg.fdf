@@ -249,6 +249,9 @@ INF  MmSupervisorPkg/Drivers/MmCommunicationBuffer/MmCommunicationBufferPei.inf
 INF  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 
 !if $(TPM_ENABLE) == TRUE
+!if $(TPM_REPLAY_ENABLED) == TRUE
+INF  TpmTestingPkg/TpmReplayPei/Pei/TpmReplayPei.inf
+!endif
 INF  QemuPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
 INF  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
 !endif
@@ -478,7 +481,11 @@ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 # TPM support
 #
 !if $(TPM_ENABLE) == TRUE
+!if $(TPM_REPLAY_ENABLED) == TRUE
+INF  TpmTestingPkg/Overrides/Tcg2Dxe/Tcg2Dxe.inf
+!else
 INF  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
+!endif
 !if $(TPM_CONFIG_ENABLE) == TRUE
 INF  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
 !endif

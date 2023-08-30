@@ -38,6 +38,7 @@
   DEFINE BUILD_UNIT_TESTS               = TRUE
   DEFINE PEI_MM_IPL_ENABLED             = TRUE
   DEFINE GUI_FRONT_PAGE                 = FALSE
+  DEFINE TPM_REPLAY_ENABLED             = FALSE
 
   DEFINE NETWORK_HTTP_ENABLE            = TRUE
   DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS = TRUE
@@ -924,6 +925,8 @@
   !include CryptoPkg/Driver/Bin/CryptoDriver.inc.dsc
 !endif
 
+QemuQ35Pkg/Library/PeiFvMeasurementExclusionLib/PeiFvMeasurementExclusionLib.inf
+
 QemuQ35Pkg/Library/ResetSystemLib/BaseResetSystemLib.inf
 QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
 QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
@@ -956,6 +959,18 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+
+!if $(TPM_REPLAY_ENABLED) == TRUE
+  TpmTestingPkg/TpmReplayPei/Pei/TpmReplayPei.inf {
+    <LibraryClasses>
+      FvMeasurementExclusionLib|QemuQ35Pkg/Library/PeiFvMeasurementExclusionLib/PeiFvMeasurementExclusionLib.inf
+      Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
+    <PcdsPatchableInModule>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x3F
+    <PcdsFixedAtBuild>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80480246
+  }
+!endif
 
   QemuQ35Pkg/PlatformPei/PlatformPei.inf {
     <LibraryClasses>
@@ -1086,11 +1101,20 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
 
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
     <LibraryClasses>
+!if $(TPM_REPLAY_ENABLED) == TRUE
+      NULL|TpmTestingPkg/Overrides/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
+!else
       NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
+!endif
 
 !if $(TPM_ENABLE) == TRUE
+!if $(TPM_REPLAY_ENABLED) == TRUE
+      # Only TPM 2.0 is supported by the feature
+      NULL|TpmTestingPkg/Overrides/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBootLib.inf
+!else
       NULL|SecurityPkg/Library/DxeTpmMeasureBootLib/DxeTpmMeasureBootLib.inf
       NULL|SecurityPkg/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBootLib.inf
+!endif
 !endif
   }
 
@@ -1469,7 +1493,11 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   # TPM support
   #
 !if $(TPM_ENABLE) == TRUE
+!if $(TPM_REPLAY_ENABLED) == TRUE
+  TpmTestingPkg/Overrides/Tcg2Dxe/Tcg2Dxe.inf
+!else
   SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf {
+!endif
     <LibraryClasses>
       Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibRouter/Tpm2DeviceLibRouterDxe.inf
       NULL|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2InstanceLibDTpm.inf
@@ -1517,6 +1545,8 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
       MfciRetrievePolicyLib|MfciPkg/Library/MfciRetrievePolicyLibViaHob/MfciRetrievePolicyLibViaHob.inf
       MfciDeviceIdSupportLib|MfciPkg/Library/MfciDeviceIdSupportLibSmbios/MfciDeviceIdSupportLibSmbios.inf
   }
+
+!include TpmTestingPkg/TpmReplay.dsc.inc
 
 ################################################################################
 #

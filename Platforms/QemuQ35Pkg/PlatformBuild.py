@@ -267,16 +267,16 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         self.env.SetValue("BLD_*_MEMORY_PROTECTION", "TRUE", "Default")
         # Include the MFCI test cert by default, override on the commandline with "BLD_*_SHIP_MODE=TRUE" if you want the retail MFCI cert
         self.env.SetValue("BLD_*_SHIP_MODE", "FALSE", "Default")
-        self.env.SetValue("CONF_AUTOGEN_INCLUDE_PATH", self.mws.join(self.ws, "Platforms", "QemuQ35Pkg", "Include"), "Platform Defined")
+        self.env.SetValue("CONF_AUTOGEN_INCLUDE_PATH", self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuQ35Pkg", "Include"), "Platform Defined")
 
-        self.env.SetValue("YAML_POLICY_FILE", self.mws.join(self.ws, "QemuQ35Pkg", "PolicyData", "PolicyDataUsb.yaml"), "Platform Hardcoded")
-        self.env.SetValue("POLICY_DATA_STRUCT_FOLDER", self.mws.join(self.ws, "QemuQ35Pkg", "Include"), "Platform Defined")
-        self.env.SetValue('POLICY_REPORT_FOLDER', self.mws.join(self.ws, "QemuQ35Pkg", "PolicyData"), "Platform Defined")
-        self.env.SetValue('MU_SCHEMA_DIR', self.mws.join(self.ws, "Platforms", "QemuQ35Pkg", "CfgData"), "Platform Defined")
+        self.env.SetValue("YAML_POLICY_FILE", self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuQ35Pkg", "PolicyData", "PolicyDataUsb.yaml"), "Platform Hardcoded")
+        self.env.SetValue("POLICY_DATA_STRUCT_FOLDER", self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuQ35Pkg", "Include"), "Platform Defined")
+        self.env.SetValue('POLICY_REPORT_FOLDER', self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuQ35Pkg", "PolicyData"), "Platform Defined")
+        self.env.SetValue('MU_SCHEMA_DIR', self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuQ35Pkg", "CfgData"), "Platform Defined")
         self.env.SetValue('MU_SCHEMA_FILE_NAME', "QemuQ35PkgCfgData.xml", "Platform Hardcoded")
         self.env.SetValue('CONF_PROFILE_PATHS',
-                          self.mws.join(self.ws, 'Platforms', 'QemuQ35Pkg', 'CfgData', 'Profile0QemuQ35PkgCfgData.csv') + " " +
-                          self.mws.join(self.ws, 'Platforms', 'QemuQ35Pkg', 'CfgData', 'Profile1QemuQ35PkgCfgData.csv'),
+                          self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath('QemuQ35Pkg', 'CfgData', 'Profile0QemuQ35PkgCfgData.csv') + " " +
+                          self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath('QemuQ35Pkg', 'CfgData', 'Profile1QemuQ35PkgCfgData.csv'),
                           "Platform Hardcoded"
         )
         self.env.SetValue('CONF_PROFILE_NAMES', "P0,P1", "Platform Hardcoded")
@@ -301,7 +301,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
     def PlatformPreBuild(self):
         # Here we build the secure policy blob for build system to use and add into the targeted FV
-        policy_example_dir = self.mws.join(self.mws.WORKSPACE, "MmSupervisorPkg", "SupervisorPolicyTools", "MmIsolationPoliciesExample.xml")
+        policy_example_dir = self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("MmSupervisorPkg", "SupervisorPolicyTools", "MmIsolationPoliciesExample.xml")
         output_dir = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "Policy")
         if (not os.path.isdir(output_dir)):
             os.makedirs (output_dir)
@@ -427,7 +427,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         FEOL = FAILURE_EXEMPT_OMISSION_LENGTH
 
         if run_paging_audit:
-            self.Helper.generate_paging_audit (virtual_drive, Path(drive_path).parent / "unit_test_results", self.env.GetValue("VERSION"), "Q35", "X64")
+            self.Helper.generate_paging_audit (virtual_drive, Path(drive_path).parent / "unit_test_results", self.env.GetValue("VERSION"), "Q35")
 
         # Filter out tests that are exempt
         tests = list(filter(lambda file: file.name not in FET or not (now - FET.get(file.name)).total_seconds() < FEOL, test_list))
