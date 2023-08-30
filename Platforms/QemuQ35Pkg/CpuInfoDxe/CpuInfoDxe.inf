@@ -15,7 +15,7 @@
   ENTRY_POINT       = CpuInfoDxeEntryPoint
 
 [Sources]
-  CpuInfoDxe.c 
+  CpuInfoDxe.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -28,7 +28,7 @@
   UefiLib
   BaseLib
   PrintLib
-  UefiCpuLib
+  CpuLib
   UefiDriverEntryPoint
   UefiBootServicesTableLib
 
