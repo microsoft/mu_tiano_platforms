@@ -167,7 +167,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             args += " -net none"
             # Mount disk with startup.nsh
             if os.path.isfile(VirtualDrive):
-                args += f" -hdd {VirtualDrive}"
+                args += f" -drive file={VirtualDrive},if=virtio"
             elif os.path.isdir(VirtualDrive):
                 args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
             else:
