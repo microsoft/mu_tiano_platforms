@@ -80,7 +80,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             args += f" -drive file=\"{path_to_os}\",format={storage_format},if=none,id=os_nvme"
             args += " -device nvme,serial=nvme-1,drive=os_nvme"
         elif os.path.isfile(VirtualDrive):
-            args += f" -hdd {VirtualDrive}"
+            args += f" -drive file={VirtualDrive},if=virtio"
         elif os.path.isdir(VirtualDrive):
             args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
         else:

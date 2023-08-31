@@ -12,3 +12,6 @@ UefiDbgExt/x64/
 *.vcxproj.user
 /Conf/
 /**/Include/Generated/**
+
+# Ignore Rust build output
+/target
