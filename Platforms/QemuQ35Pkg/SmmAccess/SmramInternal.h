@@ -8,6 +8,9 @@
 
 **/
 
+#ifndef SMM_ACCESS_SMRAM_INTERNAL_H_
+#define SMM_ACCESS_SMRAM_INTERNAL_H_
+
 #include <Pi/PiMultiPhase.h>
 
 //
@@ -102,3 +105,5 @@ SmramAccessGetCapabilities (
   IN OUT UINTN                 *SmramMapSize,
   IN OUT EFI_SMRAM_DESCRIPTOR  *SmramMap
   );
+
+#endif
