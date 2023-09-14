@@ -239,12 +239,21 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         return "QemuQ35Pkg"
 
     def GetLoggingLevel(self, loggerType):
-        ''' Get the logging level for a given type
-        base == lowest logging level supported
-        con  == Screen logging
-        txt  == plain text file logging
-        md   == markdown file logging
-        '''
+        """Get the logging level depending on logger type.
+
+        Args:
+            loggerType (str): type of logger being logged to
+        
+        Returns:
+            (Logging.Level): The logging level
+
+        !!! note "loggerType possible values"
+            "base": lowest logging level supported
+
+            "con": logs to screen
+
+            "txt": logs to plain text file
+        """
         return logging.INFO
         return super().GetLoggingLevel(loggerType)
 
