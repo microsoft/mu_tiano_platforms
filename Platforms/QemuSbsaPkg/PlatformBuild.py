@@ -7,7 +7,6 @@
 import os
 import logging
 import datetime
-import sys
 import uuid
 
 from edk2toolext.environment import shell_environment
