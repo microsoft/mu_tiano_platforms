@@ -153,6 +153,16 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
     def __init__(self):
         UefiBuilder.__init__(self)
 
+    def CleanTree(self, RemoveConfTemplateFilesToo=False):
+        # Add a step to clean up BL31 as well, if asked
+        cmd = "make"
+        args = "distclean"
+        ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_TFA_PATH"))
+        if ret != 0:
+            return ret
+
+        return super().CleanTree(RemoveConfTemplateFilesToo)
+
     def AddCommandLineOptions(self, parserObj):
         ''' Add command line options to the argparser '''
 
