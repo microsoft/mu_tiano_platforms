@@ -4,24 +4,25 @@
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
-import os
-import logging
-import glob
 import datetime
+import glob
+import logging
+import os
 import sys
 import uuid
+from io import StringIO
+from pathlib import Path
+from typing import Tuple
 
 from edk2toolext import codeql as codeql_helpers
 from edk2toolext.environment import shell_environment
 from edk2toolext.environment.uefi_build import UefiBuilder
 from edk2toolext.invocables.edk2_platform_build import BuildSettingsManager
-from edk2toolext.invocables.edk2_setup import SetupSettingsManager, RequiredSubmodule
-from edk2toolext.invocables.edk2_update import UpdateSettingsManager
 from edk2toolext.invocables.edk2_pr_eval import PrEvalSettingsManager
-from edk2toollib.utility_functions import RunCmd, GetHostInfo
-from typing import Tuple
-from pathlib import Path
-from io import StringIO
+from edk2toolext.invocables.edk2_setup import (RequiredSubmodule,
+                                               SetupSettingsManager)
+from edk2toolext.invocables.edk2_update import UpdateSettingsManager
+from edk2toollib.utility_functions import GetHostInfo, RunCmd
 
 WORKSPACE_ROOT = str(Path(__file__).parent.parent.parent)
 
@@ -445,9 +446,10 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 if __name__ == "__main__":
     import argparse
     import sys
-    from edk2toolext.invocables.edk2_update import Edk2Update
-    from edk2toolext.invocables.edk2_setup import Edk2PlatformSetup
+
     from edk2toolext.invocables.edk2_platform_build import Edk2PlatformBuild
+    from edk2toolext.invocables.edk2_setup import Edk2PlatformSetup
+    from edk2toolext.invocables.edk2_update import Edk2Update
     print("Invoking Stuart")
     print("     ) _     _")
     print("    ( (^)-~-(^)")
