@@ -23,7 +23,7 @@ from typing import Tuple
 from pathlib import Path
 from io import StringIO
 
-WORKSPACE_ROOT = Path(__file__).parent.parent.parent.cwd()
+WORKSPACE_ROOT = str(Path(__file__).parent.parent.parent)
 
 # Declare test whose failure will not return a non-zero exit code
 FAILURE_EXEMPT_TESTS = {
@@ -75,7 +75,7 @@ class CommonPlatform():
         if codeql_enabled:
             codeql_filter_files = [str(n) for n in glob.glob(
                 os.path.join(WORKSPACE_ROOT,
-                                '**/CodeQlFilters.yml'), recursive=True)]
+                             '**/CodeQlFilters.yml'), recursive=True)]
             shell_environment.GetBuildVars().SetValue(
                 "STUART_CODEQL_FILTER_FILES",
                 ','.join(codeql_filter_files),
@@ -142,7 +142,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
     def GetWorkspaceRoot(self):
         ''' get WorkspacePath '''
-        return str(WORKSPACE_ROOT)
+        return WORKSPACE_ROOT
 
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
@@ -211,7 +211,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
     def GetWorkspaceRoot(self):
         ''' get WorkspacePath '''
-        return str(WORKSPACE_ROOT)
+        return WORKSPACE_ROOT
 
     def GetPackagesPath(self):
         ''' Return a list of workspace relative paths that should be mapped as edk2 PackagesPath '''
