@@ -1233,10 +1233,7 @@
   # ShellPkg/Application/ShellSortTestApp/ShellSortTestApp.inf # DOESN'T PRODUCE OUTPUT
   UnitTestFrameworkPkg/Library/UnitTestBootLibUsbClass/UnitTestBootLibUsbClass.inf
   UnitTestFrameworkPkg/Library/UnitTestPersistenceLibSimpleFileSystem/UnitTestPersistenceLibSimpleFileSystem.inf
-  !if $(TARGET) == RELEASE
-    # REQUIRES VARIABLE POLICY TO BE LOCKED (POLICY NOT LOCKED ON DEBUG BUILDS)
-    UefiTestingPkg/AuditTests/BootAuditTest/UEFI/BootAuditTestApp.inf
-  !endif
+  UefiTestingPkg/AuditTests/BootAuditTest/UEFI/BootAuditTestApp.inf
   # UefiTestingPkg/AuditTests/DMAProtectionAudit/UEFI/DMAIVRSProtectionUnitTestApp.inf # NOT APPLICABLE TO SBSA
   UefiTestingPkg/AuditTests/PagingAudit/UEFI/DxePagingAuditTestApp.inf
   # UefiTestingPkg/AuditTests/PagingAudit/UEFI/SmmPagingAuditTestApp.inf # DOESN'T PRODUCE OUTPUT
