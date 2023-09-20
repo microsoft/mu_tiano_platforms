@@ -10,8 +10,8 @@ resources:
     - repository: mu_devops
       type: github
       endpoint: microsoft
-      name: microsoft/mu_devops
-      ref: main
+      name: kuqin12/mu_devops
+      ref: fix_arm64
   containers:
     - container: linux-gcc
       image: ghcr.io/microsoft/mu_devops/ubuntu-22-test:latest
