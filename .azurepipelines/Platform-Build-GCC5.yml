@@ -10,8 +10,8 @@ resources:
     - repository: mu_devops
       type: github
       endpoint: microsoft
-      name: kuqin12/mu_devops
-      ref: fix_arm64
+      name: microsoft/mu_devops
+      ref: refs/tags/v6.1.0
   containers:
     - container: linux-gcc
       image: ghcr.io/microsoft/mu_devops/ubuntu-22-test:latest
@@ -65,8 +65,6 @@ jobs:
         BuildFlags: ""
         BuildTarget: "DEBUG"
         BuildExtraTag: "ON_ARM"
-        BuildExtraStep:
-          - template: Steps/RustSetupSteps.yml@mu_devops
         Run: false
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
         SelfHostAgent: true
@@ -82,8 +80,6 @@ jobs:
         BuildFlags: ""
         BuildTarget: "RELEASE"
         BuildExtraTag: "ON_ARM"
-        BuildExtraStep:
-          - template: Steps/RustSetupSteps.yml@mu_devops
         Run: false
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
         SelfHostAgent: true
