@@ -11,7 +11,7 @@ resources:
       type: github
       endpoint: microsoft
       name: microsoft/mu_devops
-      ref: refs/tags/v6.1.0
+      ref: main
   containers:
     - container: linux-gcc
       image: ghcr.io/microsoft/mu_devops/ubuntu-22-test:latest
