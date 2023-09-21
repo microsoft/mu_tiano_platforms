@@ -22,7 +22,7 @@ from edk2toollib.utility_functions import RunCmd
 
 # Declare test whose failure will not return a non-zero exit code
 FAILURE_EXEMPT_TESTS = {
-    "VariablePolicyFuncTestApp.efi": datetime.datetime(2023, 7, 20, 0, 0, 0),
+    # example "PiValueTestApp.efi": datetime.datetime(3141, 5, 9, 2, 6, 53, 589793),
 }
 
 # Allow failure exempt tests to be ignored for 90 days
