@@ -67,6 +67,8 @@ jobs:
         BuildFlags: ""
         BuildTarget: "DEBUG"
         BuildExtraTag: "ON_ARM"
+        BuildExtraStep:
+          - script: echo No extra steps provided
         Run: false
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
         SelfHostAgent: true
@@ -82,6 +84,8 @@ jobs:
         BuildFlags: ""
         BuildTarget: "RELEASE"
         BuildExtraTag: "ON_ARM"
+        BuildExtraStep:
+          - script: echo No extra steps provided
         Run: false
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
         SelfHostAgent: true
