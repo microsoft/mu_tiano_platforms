@@ -16,8 +16,8 @@ resources:
     - repository: mu_devops
       type: github
       endpoint: microsoft
-      name: kuqin12/mu_devops
-      ref: fix_arm64
+      name: microsoft/mu_devops
+      ref: refs/tags/v6.4.1
 
 parameters:
 - name: do_ci_build
