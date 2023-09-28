@@ -166,7 +166,7 @@ class LinuxVirtualDrive(VirtualDrive):
         
         # Create an mtools config file to virtually map the image to a drive letter
         RunCmd("echo", "mtools_skip_check=1 > ~/.mtoolsrc")
-        RunCmd("echo", f"drive {self.drive_letter}: >> ~/.mtoolsrc")
+        RunCmd("echo", f"drive+ {self.drive_letter}: >> ~/.mtoolsrc")
         RunCmd("echo", f"\"  file=\\\"{self.drive_path}\\\" exclusive\" >> ~/.mtoolsrc")
 
     def add_file(self, filepath: PathLike):
