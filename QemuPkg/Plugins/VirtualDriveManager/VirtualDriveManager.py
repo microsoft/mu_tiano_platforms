@@ -165,9 +165,8 @@ class LinuxVirtualDrive(VirtualDrive):
             raise RuntimeError(e)
         
         # Create an mtools config file to virtually map the image to a drive letter
-        RunCmd("echo", "mtools_skip_check=1 > ~/.mtoolsrc")
-        RunCmd("echo", f"drive+ {self.drive_letter}: >> ~/.mtoolsrc")
-        RunCmd("echo", f"\"  file=\\\"{self.drive_path}\\\" exclusive\" >> ~/.mtoolsrc")
+        RunCmd("export", "MTOOLS_SKIP_CHECK=1")
+        RunCmd("export", f"MTOOLSRC=\"drive+ {self.drive_letter}:  file=\\\"{self.drive_path}\\\" exclusive\"")
 
     def add_file(self, filepath: PathLike):
         """Adds a file to the virtual drive."""
