@@ -15,6 +15,7 @@ from os import PathLike
 from pathlib import Path
 
 from edk2toolext.environment.plugintypes.uefi_helper_plugin import IUefiHelperPlugin
+from edk2toolext.environment import shell_environment
 from edk2toollib.utility_functions import RunCmd
 from html import unescape
 
@@ -165,9 +166,14 @@ class LinuxVirtualDrive(VirtualDrive):
             raise RuntimeError(e)
         
         # Create an mtools config file to virtually map the image to a drive letter
+        conf_path = os.path.join(os.path.dirname(self.drive_path), "mtool.conf")
+        if os.path.exists(conf_path):
+            # This should be repopulated per build
+            RunCmd("rm", conf_path)
         RunCmd("echo", "mtools_skip_check=1 > ~/.mtoolsrc")
-        RunCmd("echo", f"drive {self.drive_letter}: >> ~/.mtoolsrc")
-        RunCmd("echo", f"\"  file=\\\"{self.drive_path}\\\" exclusive\" >> ~/.mtoolsrc")
+        RunCmd("echo", f"drive+ {self.drive_letter}: >> {conf_path}")
+        RunCmd("echo", f"\"  file=\\\"{self.drive_path}\\\" exclusive\" >> {conf_path}")
+        shell_environment.GetEnvironment().set_shell_var ("MTOOLSRC", conf_path)
 
     def add_file(self, filepath: PathLike):
         """Adds a file to the virtual drive."""
