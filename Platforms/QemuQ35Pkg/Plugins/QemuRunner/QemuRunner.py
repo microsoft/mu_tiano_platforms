@@ -16,6 +16,7 @@ import io
 import shutil
 from pathlib import Path
 from edk2toolext.environment import plugin_manager
+from edk2toolext.environment import shell_environment
 from edk2toolext.environment.plugintypes import uefi_helper_plugin
 from edk2toollib import utility_functions
 from edk2toollib.uefi.edk2.parsers.dsc_parser import DscParser
@@ -75,6 +76,24 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         else:
             smm_enabled = "off"
 
+        pxe_boot = env.GetValue("PXE_BOOT")
+        if pxe_boot is not None and pxe_boot.upper() == "TRUE":
+            # Prepare PXE folder and boot file, default to Shell.efi from build directory
+            pxe_path = env.GetValue("PXE_FOLDER_PATH")
+            pxe_file = env.GetValue("PXE_BOOT_FILE")
+            if pxe_path is None or pxe_file is None:
+                pxe_path = os.path.join(env.GetValue("BUILD_OUTPUT_BASE"), "X64")
+                pxe_file = "Shell.efi"
+
+            # Enable e1000 as nic and setup the TFTP server for pxe boot
+            args += f" -netdev user,id=net0,tftp={pxe_path},bootfile={pxe_file} "\
+                    f"-device e1000,netdev=net0 "
+
+            # Tips: To use your own option rom, add the following to the above line
+            # ",romfile=<path_to_your_8086100e.efirom> "\
+            # To dump the network traffic to a file, add the following to the above line
+            # "-object filter-dump,id=f1,netdev=net0,file=dump.dat"
+
         accel = ""
         if env.GetValue("QEMU_ACCEL") is not None:
             if env.GetValue("QEMU_ACCEL").lower() == "kvm":
@@ -87,9 +106,6 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         args += " -machine q35,smm=" + smm_enabled + accel
         path_to_os = env.GetValue("PATH_TO_OS")
         if path_to_os is not None:
-            # Potentially dealing with big daddy, give it more juice...
-            args += " -m 8192"
-
             file_extension = Path(path_to_os).suffix.lower().replace('"', '')
 
             storage_format = {
@@ -102,6 +118,10 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
             args += f" -drive file=\"{path_to_os}\",format={storage_format},if=none,id=os_nvme"
             args += " -device nvme,serial=nvme-1,drive=os_nvme"
+
+        if (path_to_os is not None) or (pxe_boot is not None and pxe_boot.upper() == "TRUE"):
+            # Potentially dealing with big daddy, give it more juice...
+            args += " -m 8192"
         else:
             args += " -m 2048"
 
