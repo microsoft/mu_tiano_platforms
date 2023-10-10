@@ -1453,6 +1453,16 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
       DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
   }
 
+  UefiTestingPkg/AuditTests/AuthenticatedVariablesAudit/UEFIBasicUsageTests/AuthenticatedVariablesBasicTest.inf {
+      <LibraryClasses>
+        DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
+  }
+
+  UefiTestingPkg/AuditTests/AuthenticatedVariablesAudit/UEFIAdvanceUsageTests/AuthenticatedVariablesAdvanceTest.inf {
+      <LibraryClasses>
+        DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
+  }
+
   #########################################
   # SMM Phase modules
   #########################################
