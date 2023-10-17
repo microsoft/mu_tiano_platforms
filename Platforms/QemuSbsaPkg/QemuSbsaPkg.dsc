@@ -1155,6 +1155,11 @@
   QemuPkg/Virtio10Dxe/Virtio10.inf
 
   #
+  # HID Support
+  #
+  HidPkg/UefiHidDxe/UefiHidDxe.inf
+
+  #
   # USB Support
   #
   MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
@@ -1163,7 +1168,10 @@
   MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
-  MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.inf
+  HidPkg/UsbHidDxe/UsbHidDxe.inf {
+    <LibraryClasses>
+      UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
+  }
 
   #
   # TPM2 support

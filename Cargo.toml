@@ -2,13 +2,18 @@
 
 # Add packages that generate binaries here
 members = [
+  "Common/MU/HidPkg/UefiHidDxe",
   "Common/MU/MsCorePkg/HelloWorldRustDxe"
 ]
 
 # Add packages that generate libraries here
 [workspace.dependencies]
+HidIo = {path = "Common/MU/HidPkg/Crates/HidIo"}
 RustAdvancedLoggerDxe = {path = "Common/MU/AdvLoggerPkg/Crates/RustAdvancedLoggerDxe"}
 RustBootServicesAllocatorDxe = {path = "Common/MU/MsCorePkg/Crates/RustBootServicesAllocatorDxe"}
 
-r-efi = "4.0.0"
+hidparser = {git = "https://github.com/microsoft/mu_rust_hid.git", branch = "main"}
+memoffset = "0.9.0"
+r-efi = "4.3.0"
+rustversion = "1.0.14"
 spin = "0.5.2"
