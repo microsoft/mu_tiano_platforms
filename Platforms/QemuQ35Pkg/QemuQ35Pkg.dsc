@@ -813,10 +813,10 @@
   # unknown) workloads / boot paths.
   #
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS|0x80
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0x10
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x80
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0x20
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x510
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0x100
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x100
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x1C0
 
 [PcdsFixedAtBuild.X64]
 
