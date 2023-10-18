@@ -738,7 +738,7 @@
   gQemuSbsaPkgTokenSpaceGuid.PcdPlatformAhciBase|0x60100000
   gQemuSbsaPkgTokenSpaceGuid.PcdPlatformAhciSize|0x00010000
 
-  gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|TRUE
   # The GUID of SetupDataPkg/ConfApp/ConfApp.inf: E3624086-4FCD-446E-9D07-B6B913792071
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x86, 0x40, 0x62, 0xe3, 0xcd, 0x4f, 0x6e, 0x44, 0x9d, 0x7, 0xb6, 0xb9, 0x13, 0x79, 0x20, 0x71 }
   # The GUID of Frontpage.inf from MU_OEM_SAMPLE: 4042708A-0F2D-4823-AC60-0D77B3111889
