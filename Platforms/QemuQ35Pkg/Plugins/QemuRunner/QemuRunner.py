@@ -16,7 +16,6 @@ import io
 import shutil
 from pathlib import Path
 from edk2toolext.environment import plugin_manager
-from edk2toolext.environment import shell_environment
 from edk2toolext.environment.plugintypes import uefi_helper_plugin
 from edk2toollib import utility_functions
 from edk2toollib.uefi.edk2.parsers.dsc_parser import DscParser
