@@ -829,7 +829,8 @@ InitializePlatform (
 
     MmSettings.HeapGuardPolicy.Fields.MmPageGuard                    = 1;
     MmSettings.HeapGuardPolicy.Fields.MmPoolGuard                    = 1;
-    DxeSettings.ImageProtectionPolicy.Fields.ProtectImageFromUnknown = 1;
+    // Note: This is to leave a place holder for iPXE option rom...
+    DxeSettings.ImageProtectionPolicy.Fields.ProtectImageFromUnknown = 0;
     // THE /NXCOMPAT DLL flag cannot be set using non MinGW GCC
  #ifdef __GNUC__
     DxeSettings.ImageProtectionPolicy.Fields.BlockImagesWithoutNxFlag = 0;
