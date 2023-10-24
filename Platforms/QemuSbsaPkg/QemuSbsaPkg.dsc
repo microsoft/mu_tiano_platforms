@@ -102,6 +102,7 @@
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsicArmVirt.inf
   UefiDecompressLib|MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
+  PanicLib|MdePkg/Library/BasePanicLibSerialPort/BasePanicLibSerialPort.inf
 
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
   HobLib|ArmVirtPkg/Library/ArmVirtDxeHobLib/ArmVirtDxeHobLib.inf
