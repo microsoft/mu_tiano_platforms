@@ -1,5 +1,5 @@
 ## @file
-# Azure Pipeline build file for a build using mu_devops..
+# Azure Pipeline build file for a build using mu_devops.
 #
 # To upload coverage results, set `coverage_upload_target` to `ado` or `codecov`.
 #
@@ -120,7 +120,7 @@ jobs:
       parameters:
         container_build: true
 
-- template: Jobs/CodeCoverage.yml@mu_devops
+- template: Jobs/PlatformReports.yml@mu_devops
   parameters:
     rust_build: ${{ parameters.rust_build }}
     tool_chain: $(tool_chain_tag)
