@@ -56,13 +56,16 @@ QEMU leverages iPXE as the NIC driver for its e1000 device. To customize the iPX
 driver to enable NX flag and/or paging alignment, one can follow the steps below:
 
 - One can refer to the QEMU usage for building iPXE from their make file [here](https://github.com/qemu/qemu/blob/master/roms/Makefile).
-However, it is essentially doing the following, where the output *.efirom will be our target:
+However, it is essentially doing the following, where the output *.efirom will be our target. Note that one will need
+EfiRom from our [BaseTools](https://github.com/microsoft/mu_basecore/tree/release/202302/BaseTools) for the below
+commands to work:
 
 ```bash
 cd ipxe/src
 make veryclean
 make bin-x86_64-efi/8086100e.efidrv -j 4 CONFIG=qemu
-/home/test/mu_tiano_platforms/MU_BASECORE/BaseTools/Bin/Mu-Basetools_extdep/Linux-x86/EfiRom -f "0x8086" -i "0x100e" -l 0x02 -ec bin-x86_64-efi/8086100e.efidrv -o bin-x86_64-efi/8086100e.efirom
+cd ../..
+MU_BASECORE/BaseTools/Bin/Mu-Basetools_extdep/Linux-x86/EfiRom -f "0x8086" -i "0x100e" -l 0x02 -ec bin-x86_64-efi/8086100e.efidrv -o bin-x86_64-efi/8086100e.efirom
 ```
 
 - Once we have our own NIC driver, to apply the new option rom to the QEMU launching instance, one can specify the following
