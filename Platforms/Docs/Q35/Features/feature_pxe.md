@@ -24,7 +24,7 @@ To enable the QEMU PXE boot option, please specify the following parameters, eit
 
 | Name | Usage | Example |
 | --- | --- | --- |
-| `PXE_BOOT` | Flag to enable PXE booting | `PXE_BOOT=TRUE` |
+| `LOCAL_PXE_BOOT` | Flag to enable PXE booting | `LOCAL_PXE_BOOT=TRUE` |
 | `PXE_FOLDER_PATH` | Folder path to the prepared PXE boot files | `PXE_FOLDER_PATH="D:\\"` |
 | `PXE_BOOT_FILE` | File path to the initial download | `PXE_BOOT_FILE="Boot/bootmgfw.efi"` |
 

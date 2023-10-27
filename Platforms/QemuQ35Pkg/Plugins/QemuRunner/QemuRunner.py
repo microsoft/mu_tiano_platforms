@@ -75,24 +75,6 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         else:
             smm_enabled = "off"
 
-        pxe_boot = env.GetValue("PXE_BOOT")
-        if pxe_boot is not None and pxe_boot.upper() == "TRUE":
-            # Prepare PXE folder and boot file, default to Shell.efi from build directory
-            pxe_path = env.GetValue("PXE_FOLDER_PATH")
-            pxe_file = env.GetValue("PXE_BOOT_FILE")
-            if pxe_path is None or pxe_file is None:
-                pxe_path = os.path.join(env.GetValue("BUILD_OUTPUT_BASE"), "X64")
-                pxe_file = "Shell.efi"
-
-            # Enable e1000 as nic and setup the TFTP server for pxe boot
-            args += f" -netdev user,id=net0,tftp={pxe_path},bootfile={pxe_file} "\
-                    f"-device e1000,netdev=net0 "
-
-            # Tips: To use your own option rom, add the following to the above line
-            # ",romfile=<path_to_your_8086100e.efirom> "\
-            # To dump the network traffic to a file, add the following to the above line
-            # "-object filter-dump,id=f1,netdev=net0,file=dump.dat"
-
         accel = ""
         if env.GetValue("QEMU_ACCEL") is not None:
             if env.GetValue("QEMU_ACCEL").lower() == "kvm":
@@ -118,6 +100,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             args += f" -drive file=\"{path_to_os}\",format={storage_format},if=none,id=os_nvme"
             args += " -device nvme,serial=nvme-1,drive=os_nvme"
 
+        pxe_boot = env.GetValue("PXE_BOOT")
         if (path_to_os is not None) or (pxe_boot is not None and pxe_boot.upper() == "TRUE"):
             # Potentially dealing with big daddy, give it more juice...
             args += " -m 8192"
@@ -179,11 +162,10 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             if alt_boot_enable.upper() == "TRUE":
                 boot_selection += ",version=Vol-"
 
+        net_id = 0
         # If DFCI_VAR_STORE is enabled, don't enable the Virtual Drive, and enable the network
         dfci_var_store = env.GetValue("DFCI_VAR_STORE")
         if dfci_var_store is None:
-            # turn off network
-            args += " -net none"
             # Mount disk with startup.nsh
             if os.path.isfile(VirtualDrive):
                 args += f" -drive file={VirtualDrive},if=virtio"
@@ -194,13 +176,32 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         else:
             if boot_to_front_page is None:
                 # Booting to Windows, use a PCI nic
-                args += " -device e1000,netdev=net0"
+                args += f" -device e1000,netdev=net{net_id}"
             else:
                 # Booting to UEFI, use virtio-net-pci
-                args += " -device virtio-net-pci,netdev=net0"
+                args += f" -device virtio-net-pci,netdev=net{net_id}"
 
             # forward ports for robotframework 8270 and 8271
-            args += " -netdev user,id=net0,hostfwd=tcp::8270-:8270,hostfwd=tcp::8271-:8271"
+            args += f" -netdev user,id=net{net_id},hostfwd=tcp::8270-:8270,hostfwd=tcp::8271-:8271"
+            net_id += 1
+
+        if pxe_boot is not None and pxe_boot.upper() == "TRUE":
+            # Prepare PXE folder and boot file, default to Shell.efi from build directory
+            pxe_path = env.GetValue("PXE_FOLDER_PATH")
+            pxe_file = env.GetValue("PXE_BOOT_FILE")
+            if pxe_path is None or pxe_file is None:
+                pxe_path = os.path.join(env.GetValue("BUILD_OUTPUT_BASE"), "X64")
+                pxe_file = "Shell.efi"
+
+            # Enable e1000 as nic and setup the TFTP server for pxe boot
+            args += f" -netdev user,id=net{net_id},tftp={pxe_path},bootfile={pxe_file} "\
+                    f"-device e1000,netdev=net{net_id} "
+
+            # Tips:
+            # To use your own option rom, add the following to the above line
+            # ",romfile=<path_to_your_8086100e.efirom> "\
+            # To dump the network traffic to a file, add the following to the above line
+            # f"-object filter-dump,id=f1,netdev=net{net_id},file=dump.dat"
 
         creation_time = Path(code_fd).stat().st_ctime
         creation_datetime = datetime.datetime.fromtimestamp(creation_time)
