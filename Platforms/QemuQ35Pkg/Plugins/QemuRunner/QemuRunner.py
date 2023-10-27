@@ -100,8 +100,8 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             args += f" -drive file=\"{path_to_os}\",format={storage_format},if=none,id=os_nvme"
             args += " -device nvme,serial=nvme-1,drive=os_nvme"
 
-        pxe_boot = env.GetValue("PXE_BOOT")
-        if (path_to_os is not None) or (pxe_boot is not None and pxe_boot.upper() == "TRUE"):
+        local_pxe_boot = env.GetValue("LOCAL_PXE_BOOT")
+        if (path_to_os is not None) or (local_pxe_boot is not None and local_pxe_boot.upper() == "TRUE"):
             # Potentially dealing with big daddy, give it more juice...
             args += " -m 8192"
         else:
@@ -185,7 +185,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             args += f" -netdev user,id=net{net_id},hostfwd=tcp::8270-:8270,hostfwd=tcp::8271-:8271"
             net_id += 1
 
-        if pxe_boot is not None and pxe_boot.upper() == "TRUE":
+        if local_pxe_boot is not None and local_pxe_boot.upper() == "TRUE":
             # Prepare PXE folder and boot file, default to Shell.efi from build directory
             pxe_path = env.GetValue("PXE_FOLDER_PATH")
             pxe_file = env.GetValue("PXE_BOOT_FILE")

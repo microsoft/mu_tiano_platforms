@@ -17,7 +17,45 @@ efi file (instead of the exe file as mentioned in the documentation):
 bcdedit.exe /store c:\BCD /set {GUID1} path \windows\system32\winload.efi
 ```
 
-## Enable PXE Boot
+### Configuring QEMU PXE Windows Boot on Linux Host
+
+Due to the lack of path normalization support on QEMU TFTP server, starting from the normal Windows PXE setup, the Windows PXE boot files need to be updated with the following tricks:
+
+- `BCD` file needs to be renamed to `Boot\BCD`
+- `boot.wim` file needs to be renamed to `\boot.wim`
+- `boot.sdi` file needs to be renamed to `\boot.sdi`
+- `bootmgfw.efi` file needs to be renamed to `\bootmgfw.efi`
+
+Then update the corresponding BCD settings to follow the new file names, i.e.:
+
+```txt
+Windows Boot Manager
+--------------------
+identifier              {bootmgr}
+description             boot manager
+displayorder            {Your Own GUID}
+timeout                 30
+
+Windows Boot Loader
+-------------------
+identifier              {Your Own GUID}
+device                  ramdisk=[boot]\boot.wim,{ramdiskoptions}
+path                    \windows\system32\winload.efi
+description             winpe boot image
+osdevice                ramdisk=[boot]\boot.wim,{ramdiskoptions}
+systemroot              \windows
+detecthal               Yes
+winpe                   Yes
+
+Setup Ramdisk Options
+---------------------
+identifier              {ramdiskoptions}
+description             Ramdisk options
+ramdisksdidevice        boot
+ramdisksdipath          \boot.sdi
+```
+
+## Enable Local PXE Boot
 
 To enable the QEMU PXE boot option, please specify the following parameters, either through command line or through the
 `BuildConfig.conf` file:
