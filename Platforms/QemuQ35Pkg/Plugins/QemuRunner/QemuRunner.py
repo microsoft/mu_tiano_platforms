@@ -189,19 +189,20 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             # Prepare PXE folder and boot file, default to Shell.efi from build directory
             pxe_path = env.GetValue("PXE_FOLDER_PATH")
             pxe_file = env.GetValue("PXE_BOOT_FILE")
+            pxe_oprom = env.GetValue("PXE_OPTION_ROM")
             if pxe_path is None or pxe_file is None:
                 pxe_path = os.path.join(env.GetValue("BUILD_OUTPUT_BASE"), "X64")
                 pxe_file = "Shell.efi"
 
             # Enable e1000 as nic and setup the TFTP server for pxe boot
             args += f" -netdev user,id=net{net_id},tftp={pxe_path},bootfile={pxe_file} "\
-                    f"-device e1000,netdev=net{net_id} "
+                    f"-device e1000,netdev=net{net_id}"
+            if pxe_oprom is not None:
+                args += f",romfile={pxe_oprom}"
 
             # Tips:
-            # To use your own option rom, add the following to the above line
-            # ",romfile=<path_to_your_8086100e.efirom> "\
             # To dump the network traffic to a file, add the following to the above line
-            # f"-object filter-dump,id=f1,netdev=net{net_id},file=dump.dat"
+            # f" -object filter-dump,id=f1,netdev=net{net_id},file=dump.dat"
 
         creation_time = Path(code_fd).stat().st_ctime
         creation_datetime = datetime.datetime.fromtimestamp(creation_time)
