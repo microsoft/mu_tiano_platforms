@@ -65,6 +65,7 @@ To enable the QEMU PXE boot option, please specify the following parameters, eit
 | `LOCAL_PXE_BOOT` | Flag to enable PXE booting | `LOCAL_PXE_BOOT=TRUE` |
 | `PXE_FOLDER_PATH` | Folder path to the prepared PXE boot files | `PXE_FOLDER_PATH="D:\\"` |
 | `PXE_BOOT_FILE` | File path to the initial download | `PXE_BOOT_FILE="Boot/bootmgfw.efi"` |
+| `PXE_OPTION_ROM` | File path to the initial download, required for SBSA PXE boot, see [instruction below](#customized-pxe-driver) | `PXE_BOOT_FILE="Boot/bootmgfw.efi"` |
 
 This will allow the QEMU to set up a TFTP server and reply a default boot file to download when PXE boot is requested.
 The network driver in this case is set to e1000.
@@ -86,7 +87,8 @@ command in [QemuRunner.py](../../../QemuQ35Pkg/Plugins/QemuRunner/QemuRunner.py#
 ```
 
 Where the `dump.dat`, of which name is subject to users' choice, is the file to store the network traffic. This file can
-be opened by Wireshark to analyze the network traffic.
+be opened by Wireshark to analyze the network traffic. Please note that the `netdev` should match the NIC driver added for
+PXE boot.
 
 ### Customized PXE Driver
 
@@ -96,7 +98,7 @@ driver to enable NX flag and/or paging alignment, one can follow the steps below
 - One can refer to the QEMU usage for building iPXE from their make file [here](https://github.com/qemu/qemu/blob/master/roms/Makefile).
 However, it is essentially doing the following, where the output *.efirom will be our target. Note that one will need
 EfiRom from our [BaseTools](https://github.com/microsoft/mu_basecore/tree/release/202302/BaseTools) for the below
-commands to work:
+commands to work. For Q35, we enable e1000:
 
 ```bash
 cd ipxe/src
@@ -104,6 +106,17 @@ make veryclean
 make bin-x86_64-efi/8086100e.efidrv -j 4 CONFIG=qemu
 cd ../..
 MU_BASECORE/BaseTools/Bin/Mu-Basetools_extdep/Linux-x86/EfiRom -f "0x8086" -i "0x100e" -l 0x02 -ec bin-x86_64-efi/8086100e.efidrv -o bin-x86_64-efi/8086100e.efirom
+```
+
+- For SBSA, the e1000e is supported. However, this is not included with a default QEMU build. Thus the following commands can be used,
+assuming that the `GCC5_AARCH64_PREFIX` is already set during the SBSA UEFI build:
+
+```bash
+cd src
+make veryclean
+make bin-arm64-efi/808610d3.efidrv -j 4 CONFIG=qemu CROSS_COMPILE=${GCC5_AARCH64_PREFIX}
+/home/test/mu_tiano_platforms/MU_BASECORE/BaseTools/Bin/Mu-Basetools_extdep/Linux-x86/EfiRom -f "0x8086" -i "0x10d3" -l 0x02 -ec bin-arm64-efi/808610d3.efidrv -o bin-arm64-efi/808610d3.efirom
+${GCC5_AARCH64_PREFIX}objdump -d bin-arm64-efi/808610d3.efidrv.tmp > ../out_dism.log
 ```
 
 - Once we have our own NIC driver, to apply the new option rom to the QEMU launching instance, one can specify the following
