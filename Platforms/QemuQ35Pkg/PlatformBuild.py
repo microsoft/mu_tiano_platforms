@@ -46,7 +46,7 @@ class CommonPlatform():
     PackagesSupported = ("QemuQ35Pkg",)
     ArchSupported = ("IA32", "X64")
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
-    Scopes = ('qemu', 'qemuq35', 'edk2-build', 'cibuild', 'configdata')
+    Scopes = ('qemu', 'qemuq35', 'edk2-build', 'cibuild', 'configdata', 'rust-ci')
     PackagesPath = (
         "Platforms",
         "MU_BASECORE",
@@ -245,7 +245,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         Args:
             loggerType (str): type of logger being logged to
-        
+
         Returns:
             (Logging.Level): The logging level
 

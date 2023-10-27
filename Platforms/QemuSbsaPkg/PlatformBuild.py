@@ -39,7 +39,7 @@ class CommonPlatform():
     PackagesSupported = ("QemuSbsaPkg",)
     ArchSupported = ("AARCH64",)
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
-    Scopes = ('qemu', 'qemusbsa', 'gcc_aarch64_linux', 'edk2-build', 'cibuild', 'configdata')
+    Scopes = ('qemu', 'qemusbsa', 'gcc_aarch64_linux', 'edk2-build', 'cibuild', 'configdata', 'rust-ci')
     WorkspaceRoot = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     PackagesPath = (
         "Platforms",
@@ -212,7 +212,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         Args:
             loggerType (str): type of logger being logged to
-        
+
         Returns:
             (Logging.Level): The logging level
 

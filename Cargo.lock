@@ -12,6 +12,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "HidIo"
+version = "0.1.0"
+dependencies = [
+ "r-efi",
+]
+
+[[package]]
 name = "RustAdvancedLoggerDxe"
 version = "0.1.0"
 dependencies = [
@@ -28,10 +35,49 @@ dependencies = [
 ]
 
 [[package]]
-name = "r-efi"
-version = "4.2.0"
+name = "UefiHidDxe"
+version = "0.1.0"
+dependencies = [
+ "HidIo",
+ "RustAdvancedLoggerDxe",
+ "RustBootServicesAllocatorDxe",
+ "hidparser",
+ "memoffset",
+ "r-efi",
+ "rustversion",
+]
+
+[[package]]
+name = "autocfg"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "575fc2d9b3da54adbdfaddf6eca48fec256d977c8630a1750b8991347d1ac911"
+checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
+
+[[package]]
+name = "hidparser"
+version = "0.2.0"
+source = "git+https://github.com/microsoft/mu_rust_hid.git?branch=main#e98613519a43215c668fa991fecba29140c3d6cc"
+
+[[package]]
+name = "memoffset"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5a634b1c61a95585bd15607c6ab0c4e5b226e695ff2800ba0cdccddf208c406c"
+dependencies = [
+ "autocfg",
+]
+
+[[package]]
+name = "r-efi"
+version = "4.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0e244f96e03a3067f9e521d3167bd42657594cb8588c8d3a2db01545dc1af2e0"
+
+[[package]]
+name = "rustversion"
+version = "1.0.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7ffc183a10b4478d04cbbbfc96d0873219d962dd5accaff2ffbd4ceb7df837f4"
 
 [[package]]
 name = "spin"
