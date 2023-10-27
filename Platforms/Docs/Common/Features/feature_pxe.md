@@ -17,6 +17,8 @@ efi file (instead of the exe file as mentioned in the documentation):
 bcdedit.exe /store c:\BCD /set {GUID1} path \windows\system32\winload.efi
 ```
 
+The boot file for TFTP offering should also be pointing to `bootmgfw.efi`, which needs to be copied from `mount\Windows\Boot\EFI\bootmgfw.efi` in the Windows PE image folder.
+
 ### Configuring QEMU PXE Windows Boot on Linux Host
 
 Due to the lack of path normalization support on QEMU TFTP server, starting from the normal Windows PXE setup, the Windows PXE boot files need to be updated with the following tricks:
@@ -63,9 +65,9 @@ To enable the QEMU PXE boot option, please specify the following parameters, eit
 | Name | Usage | Example |
 | --- | --- | --- |
 | `LOCAL_PXE_BOOT` | Flag to enable PXE booting | `LOCAL_PXE_BOOT=TRUE` |
-| `PXE_FOLDER_PATH` | Folder path to the prepared PXE boot files | `PXE_FOLDER_PATH="D:\\"` |
-| `PXE_BOOT_FILE` | File path to the initial download | `PXE_BOOT_FILE="Boot/bootmgfw.efi"` |
-| `PXE_OPTION_ROM` | File path to the initial download, required for SBSA PXE boot, see [instruction below](#customized-pxe-driver) | `PXE_BOOT_FILE="Boot/bootmgfw.efi"` |
+| `PXE_FOLDER_PATH` | Folder path to the prepared PXE boot files | `PXE_FOLDER_PATH="D:\\Boot"` |
+| `PXE_BOOT_FILE` | File path to the initial download | `PXE_BOOT_FILE="bootmgfw.efi"` |
+| `PXE_OPTION_ROM` | File path to the initial download, required for SBSA PXE boot, see [instruction below](#customized-pxe-driver) | `PXE_BOOT_FILE="ipxe/src/bin-arm64-efi/808610d3.efirom"` |
 
 This will allow the QEMU to set up a TFTP server and reply a default boot file to download when PXE boot is requested.
 The network driver in this case is set to e1000.
