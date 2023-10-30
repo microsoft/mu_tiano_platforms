@@ -120,5 +120,7 @@ jobs:
         BuildFlags: "CODE_COVERAGE=TRUE"
         BuildTarget: "NOOPT"
         BuildExtraTag: "TEST"
+        BuildExtraStep:
+          - script: echo No extra steps provided
         Run: false
         BuildArtifactsOther: "**/Coverage/*"
