@@ -121,6 +121,6 @@ jobs:
         BuildTarget: "NOOPT"
         BuildExtraTag: "TEST"
         BuildExtraStep:
-          - script: echo No extra steps provided
+          - template: Steps/RustSetupSteps.yml@mu_devops
         Run: false
         BuildArtifactsOther: "**/Coverage/*"
