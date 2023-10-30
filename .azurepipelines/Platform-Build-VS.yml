@@ -121,6 +121,18 @@ jobs:
         BuildTarget: "NOOPT"
         BuildExtraTag: "TEST"
         BuildExtraStep:
-          - template: Steps/RustSetupSteps.yml@mu_devops
+          - script: echo no steps provided
         Run: false
+        BuildArtifactsOther: "**/Coverage/*"
+
+    QemuSbsa_CODE_COVERAGE:
+        BuildPackage: QemuSbsaPkg
+        BuildFile: "Platforms/QemuSbsaPkg/Test/PlatformTest.py"
+        BuildArch: "X64"
+        BuildFlags: "CODE_COVERAGE=TRUE"
+        BuildTarget: "NOOPT"
+        BuildExtraTag: "TEST"
+        BuildExtraStep:
+          - script: echo no steps provided
+        Run: False
         BuildArtifactsOther: "**/Coverage/*"

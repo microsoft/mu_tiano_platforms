@@ -12,7 +12,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 import PlatformBuild  # noqa: E402
 
 
-PLATFORM_DSC = 'QemuQ35Pkg/QemuQ35Pkg.dsc'
+PLATFORM_DSC = 'QemuSbsaPkg/QemuSbsaPkg.dsc'
 PLATFORMBUILD_DIR = str(Path(__file__).parent.parent)
 
 # The query to determine which INFs test source files used by QemuQ35Pkg/QemuQ35Pkg.dsc
@@ -52,14 +52,14 @@ class TestManager(BuildSettingsManager, UefiBuilder):
         return PlatformBuild.CommonPlatform.PackagesPath
 
     def GetActiveScopes(self):
-        return ('qemu', 'qemuq35', 'edk2-build', 'cibuild', 'host-based-test')
+        return ('qemu', 'qemusbsa', 'edk2-build', 'cibuild', 'host-based-test')
     
     def GetName(self):
-        return "QemuQ35Pkg_HostBasedTest"
+        return "QemuSbsaPkg_HostBasedTest"
 
     def SetPlatformEnv(self):
         logging.debug("PlatformBuilder SetPlatformEnv")
-        self.env.SetValue("ACTIVE_PLATFORM", "QemuQ35Pkg/Test/QemuQ35PkgHostTest.dsc", "Platform Hardcoded.")
+        self.env.SetValue("ACTIVE_PLATFORM", "QemuSbsaPkg/Test/QemuSbsaPkgHostTest.dsc", "Platform Hardcoded.")
         self.env.SetValue("TARGET", "NOOPT", "Platform Hardcoded.")
         self.env.SetValue("CI_BUILD_TYPE", "host_unit_test", "Platform Hardcoded.")
         self.env.SetValue("TARGET_ARCH", "X64", "Platform Hardcoded.")
