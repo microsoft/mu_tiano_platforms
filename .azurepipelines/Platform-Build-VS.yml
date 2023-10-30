@@ -113,7 +113,7 @@ jobs:
           **/QEMUQ35_*.fd
         BuildArtifactsOther: ""
 
-      QemuQ35_Tests:
+      QemuQ35_CODE_COVERAGE:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/Test/PlatformTest.py"
         BuildArch: "X64"
