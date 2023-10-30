@@ -26,6 +26,13 @@ jobs:
       workingDirectory: .azurepipelines/
       displayName: Install QEMU and Set QEMU on path # friendly name displayed in the UI
       condition: and(gt(variables.pkg_count, 0), succeeded())
+    - script: |
+        pip install --upgrade --force git+https://github.com/javagedes/edk2-pytool-extensions@report-parser-sqlite3
+        pip install --upgrade --force git+https://github.com/javagedes/edk2-pytool-library@parser-updates
+        pip install jinja2 plotly
+      displayName: Install extra Python Modules for Report Generation
+    - script: dotnet tool install -g dotnet-reportgenerator-globaltool
+      displayName: Install Report Generator Tool
     tool_chain_tag: 'VS2022'
     vm_image: $(vm_image)
     os_type: Windows_NT
@@ -108,3 +115,13 @@ jobs:
         BuildArtifactsBinary: |
           **/QEMUQ35_*.fd
         BuildArtifactsOther: ""
+
+      QemuQ35_Tests:
+        BuildPackage: QemuQ35Pkg
+        BuildFile: "Platforms/QemuQ35Pkg/Test/PlatformTest.py"
+        BuildArch: "X64"
+        BuildFlags: "CODE_COVERAGE=TRUE"
+        BuildTarget: "NOOPT"
+        BuildExtraTag: "TEST"
+        Run: false
+        BuildArtifactsOther: "**/Coverage/*"
