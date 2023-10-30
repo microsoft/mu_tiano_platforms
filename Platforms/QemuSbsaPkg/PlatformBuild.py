@@ -18,7 +18,6 @@ from edk2toolext.invocables.edk2_pr_eval import PrEvalSettingsManager
 from edk2toolext.invocables.edk2_setup import (RequiredSubmodule,
                                                SetupSettingsManager)
 from edk2toolext.invocables.edk2_update import UpdateSettingsManager
-from edk2toolext.invocables.edk2_parse import ParseSettingsManager
 from edk2toollib.utility_functions import RunCmd
 
 # Declare test whose failure will not return a non-zero exit code
@@ -58,7 +57,7 @@ class CommonPlatform():
     # ####################################################################################### #
     #                         Configuration for Update & Setup                                #
     # ####################################################################################### #
-class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSettingsManager, ParseSettingsManager):
+class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSettingsManager):
 
     def GetPackagesSupported(self):
         ''' return iterable of edk2 packages supported by this build.

@@ -33,7 +33,7 @@
 
     ## options defined .pytool/Plugin/HostUnitTestCompilerPlugin
     "HostUnitTestCompilerPlugin": {
-        "DscPath": "Test/QemuSbsaPkgHostTest.dsc"
+        "DscPath": "" # Don't support this test
     },
 
     ## options defined .pytool/Plugin/CharEncodingCheck

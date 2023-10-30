@@ -13,7 +13,7 @@ import PlatformBuild  # noqa: E402
 
 
 PLATFORM_DSC = 'QemuQ35Pkg/QemuQ35Pkg.dsc'
-PLATFORMBUILD_DIR = str(Path(__file__).parent)
+PLATFORMBUILD_DIR = str(Path(__file__).parent.parent)
 
 # The query to determine which INFs test source files used by QemuQ35Pkg/QemuQ35Pkg.dsc
 TEST_QUERY = """
