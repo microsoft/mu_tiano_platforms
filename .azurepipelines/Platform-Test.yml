@@ -1,0 +1,41 @@
+## @file
+# Azure Pipeline for testing platform host based unit tests
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+resources:
+  repositories:
+    - repository: mu_devops
+      type: github
+      endpoint: microsoft
+      name: microsoft/mu_devops
+      ref: personal/joeyvagedes/platform-coverage
+
+variables:
+- group: tool-chain-windows-visual-studio-latest
+
+jobs:
+- template: Platform-Build-Job.yml
+  parameters:
+    extra_install_step:
+    - script: |
+        pip install --upgrade --force git+https://github.com/javagedes/edk2-pytool-extensions@report-parser-sqlite3
+        pip install --upgrade --force git+https://github.com/javagedes/edk2-pytool-library@parser-updates
+        pip install jinja2 plotly
+      displayName: Install extra Python Modules for Report Generation
+    - script: dotnet tool install -g dotnet-reportgenerator-globaltool
+      displayName: Install Report Generator Tool
+    tool_chain_tag: 'VS2022'
+    os_type: Windows_NT
+    build_matrix:
+      QemuQ35_Tests:
+        BuildPackage: QemuQ35Pkg
+        BuildFile: "Platforms/QemuQ35Pkg/Test/PlatformTest.py"
+        BuildArch: "X64"
+        BuildFlags: "CODE_COVERAGE=TRUE"
+        BuildTarget: "NOOPT"
+        BuildExtraTag: "TEST"
+        Run: false
+        BuildArtifactsOther: "**/Coverage/*"

@@ -125,6 +125,10 @@ jobs:
       - template: Steps/SetupPythonPreReqs.yml@mu_devops
         parameters:
           install_python: true
+      
+      - script: |
+        pip install --upgrade --force git+https://github.com/javagedes/edk2-pytool-extensions@report-parser-sqlite3
+        pip install --upgrade --force git+https://github.com/javagedes/edk2-pytool-library@parser-updates
 
       # Set default
       - script:

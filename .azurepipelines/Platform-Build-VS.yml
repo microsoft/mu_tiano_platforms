@@ -26,10 +26,7 @@ jobs:
       workingDirectory: .azurepipelines/
       displayName: Install QEMU and Set QEMU on path # friendly name displayed in the UI
       condition: and(gt(variables.pkg_count, 0), succeeded())
-    - script: |
-        pip install --upgrade --force git+https://github.com/javagedes/edk2-pytool-extensions@report-parser-sqlite3
-        pip install --upgrade --force git+https://github.com/javagedes/edk2-pytool-library@parser-updates
-        pip install jinja2 plotly
+    - script: pip install jinja2 plotly
       displayName: Install extra Python Modules for Report Generation
     - script: dotnet tool install -g dotnet-reportgenerator-globaltool
       displayName: Install Report Generator Tool
