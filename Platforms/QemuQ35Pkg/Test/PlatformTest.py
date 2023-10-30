@@ -49,7 +49,7 @@ class TestManager(BuildSettingsManager, UefiBuilder):
         return str(Path(__file__).parent.parent.parent.parent)
     
     def GetPackagesPath(self):
-        return PlatformBuild.CommonPlatform.PackagesSupporteD
+        return PlatformBuild.CommonPlatform.PackagesPath
 
     def GetActiveScopes(self):
         return ('qemu', 'qemuq35', 'edk2-build', 'cibuild', 'rust-ci', 'host-based-test')

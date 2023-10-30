@@ -56,12 +56,3 @@ extends:
         Targets: 'NO-TARGET'
         ArchList: IA32,X64
         SelfHostAgent: true
-    coverage_matrix:
-      TARGET_Q35:
-        Package: QemuQ35Pkg
-        ActivePlatform: QemuQ35Pkg/QemuQ35Pkg.dsc
-        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-      TARGET_SBSA:
-        Package: QemuSbsaPkg
-        ActivePlatform: QemuSbsaPkg/QemuSbsaPkg.dsc
-        BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"

@@ -56,9 +56,6 @@ parameters:
 - name: build_matrix
   displayName: Build matrix for this repository
   type: object
-- name: coverage_matrix
-  displayName: Coverage matrix for this repository
-  type: object
 - name: pool_name
   displayName: Variable name that hosts pool name to be used for self-hosted agents
   type: string
@@ -119,17 +116,5 @@ jobs:
     - template: Steps/RustCargoSteps.yml@mu_devops
       parameters:
         container_build: true
-
-# - template: Jobs/PlatformReports.yml@mu_devops
-#   parameters:
-#     rust_build: ${{ parameters.rust_build }}
-#     tool_chain: $(tool_chain_tag)
-#     vm_image: $(vm_image)
-#     container_build: ${{ parameters.container_build }}
-#     linux_container_image: ghcr.io/microsoft/mu_devops/ubuntu-22-build:9ab29bc
-#     ${{ if eq(parameters.rust_build, true) }}:
-#       linux_container_options: --security-opt seccomp=unconfined
-#     do_setup: true
-#     matrix:  ${{ parameters.coverage_matrix }}
 
 - ${{ parameters.extra_jobs }}

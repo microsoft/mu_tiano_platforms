@@ -15,7 +15,7 @@
 
     ## options defined .pytool/Plugin/HostUnitTestCompilerPlugin
     "HostUnitTestCompilerPlugin": {
-        "DscPath": "Test/QemuQ35PkgHostTest.dsc"
+        "DscPath": "" # Don't support this test
     },
 
     ## options defined .pytool/Plugin/CharEncodingCheck
