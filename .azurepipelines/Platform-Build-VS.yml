@@ -126,7 +126,7 @@ jobs:
         Run: false
         BuildArtifactsOther: "**/Coverage/**/*"
 
-      Qem uSbsa_CODE_COVERAGE:
+      QemuSbsa_CODE_COVERAGE:
         BuildPackage: QemuSbsaPkg
         BuildFile: "Platforms/QemuSbsaPkg/Test/PlatformTest.py"
         BuildArch: "AARCH64"
