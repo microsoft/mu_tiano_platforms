@@ -30,6 +30,7 @@ jobs:
       displayName: Install extra Python Modules for Report Generation
     - script: dotnet tool install -g dotnet-reportgenerator-globaltool
       displayName: Install Report Generator Tool
+    - template: Steps/InstallCoverageTools.yml@mu_devops
     tool_chain_tag: 'VS2022'
     vm_image: $(vm_image)
     os_type: Windows_NT
@@ -128,7 +129,7 @@ jobs:
       QemuSbsa_CODE_COVERAGE:
         BuildPackage: QemuSbsaPkg
         BuildFile: "Platforms/QemuSbsaPkg/Test/PlatformTest.py"
-        BuildArch: "X64"
+        BuildArch: "AARCH64"
         BuildFlags: "CODE_COVERAGE=TRUE"
         BuildTarget: "NOOPT"
         BuildExtraTag: "TEST"
