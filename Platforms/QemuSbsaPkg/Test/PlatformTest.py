@@ -113,8 +113,7 @@ class TestManager(BuildSettingsManager, UefiBuilder):
         logging.info(f'Report Types: {",".join(reporttypes)}')
 
         # Organize existing report by platform
-        build_dir = Path(self.GetWorkspaceRoot(), "Build")
-        coverage_file = str(build_dir / "coverage.xml")
+        coverage_file = str(Path(self.GetWorkspaceRoot(), "Build", "coverage.xml"))
         params = "coverage"
         params += f' {coverage_file}'
         params += f' -ws {self.GetWorkspaceRoot()}'
@@ -128,8 +127,9 @@ class TestManager(BuildSettingsManager, UefiBuilder):
             return -1
         
         # Generate the requested reports
+        out_cov_dir = Path(self.env.GetValue("BUILD_OUTPUT_BASE"), "Coverage")
         params = f'-reports:"{coverage_file}"'
-        params += f' -targetdir:"{str(build_dir / "Coverage")}"'
+        params += f' -targetdir:"{str(out_cov_dir)}"'
         params += f' -reporttypes:{";".join(reporttypes)}'
         try:
            RunCmd("reportgenerator", params, raise_exception_on_nonzero=True, logging_level=logging.DEBUG)

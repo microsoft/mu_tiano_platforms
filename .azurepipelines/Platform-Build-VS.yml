@@ -120,20 +120,20 @@ jobs:
         BuildArch: "X64"
         BuildFlags: "CODE_COVERAGE=TRUE"
         BuildTarget: "NOOPT"
-        BuildExtraTag: "TEST"
+        BuildExtraTag: "UNIT_TESTS"
         BuildExtraStep:
           - script: echo no steps provided
         Run: false
-        BuildArtifactsOther: "**/Coverage/*"
+        BuildArtifactsOther: "**/Coverage/**/*""
 
       QemuSbsa_CODE_COVERAGE:
         BuildPackage: QemuSbsaPkg
         BuildFile: "Platforms/QemuSbsaPkg/Test/PlatformTest.py"
         BuildArch: "AARCH64"
-        BuildFlags: "CODE_COVERAGE=TRUE"
+        BuildFlags: "CODE_COVERAGE=TRUE REPORTTYPES=Cobertura,Html,JsonSummary"
         BuildTarget: "NOOPT"
-        BuildExtraTag: "TEST"
+        BuildExtraTag: "UNIT_TESTS"
         BuildExtraStep:
           - script: echo no steps provided
         Run: False
-        BuildArtifactsOther: "**/Coverage/*"
+        BuildArtifactsOther: "**/Coverage/**/*""

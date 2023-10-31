@@ -211,10 +211,6 @@ SetupDataPkg/ConfApp/UnitTest/ConfAppSecureBootUnitTest.inf {
     UefiRuntimeServicesTableLib|SetupDataPkg/Test/MockLibrary/MockUefiRuntimeServicesTableLib/MockUefiRuntimeServicesTableLib.inf
     ResetSystemLib|SetupDataPkg/Test/MockLibrary/MockResetSystemLib/MockResetSystemLib.inf
 }
-MmSupervisorPkg/Library/SmmPolicyGateLib/UnitTest/SmmPolicyGateLibUnitTest.inf {
-  <LibraryClasses>
-    SmmPolicyGateLib|MmSupervisorPkg/Library/SmmPolicyGateLib/SmmPolicyGateLib.inf
-}
 CryptoPkg/Test/UnitTest/Library/BaseCryptLib/TestBaseCryptLibHost.inf {
   <LibraryClasses>
     OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
