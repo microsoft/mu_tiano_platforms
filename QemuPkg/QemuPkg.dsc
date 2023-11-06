@@ -130,6 +130,7 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0
 
 [Components]
+  QemuPkg/Library/BaseFwCfgInputChannelLib/BaseFwCfgInputChannelLib.inf
   QemuPkg/Library/BasePciCapLib/BasePciCapLib.inf
   QemuPkg/Library/BasePciCapPciSegmentLib/BasePciCapPciSegmentLib.inf
   QemuPkg/Library/ConfigSystemModeLibQemu/ConfigSystemModeLib.inf

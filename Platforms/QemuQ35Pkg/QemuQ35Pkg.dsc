@@ -967,6 +967,7 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   TpmTestingPkg/TpmReplayPei/Pei/TpmReplayPei.inf {
     <LibraryClasses>
       FvMeasurementExclusionLib|QemuQ35Pkg/Library/PeiFvMeasurementExclusionLib/PeiFvMeasurementExclusionLib.inf
+      InputChannelLib|QemuPkg/Library/BaseFwCfgInputChannelLib/BaseFwCfgInputChannelLib.inf
       Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
     <PcdsPatchableInModule>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x3F
@@ -1510,10 +1511,7 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   #
 !if $(TPM_ENABLE) == TRUE
 !if $(TPM_REPLAY_ENABLED) == TRUE
-  TpmTestingPkg/Overrides/Tcg2Dxe/Tcg2Dxe.inf
-!else
-  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf {
-!endif
+  TpmTestingPkg/Overrides/Tcg2Dxe/Tcg2Dxe.inf {
     <LibraryClasses>
       Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibRouter/Tpm2DeviceLibRouterDxe.inf
       NULL|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2InstanceLibDTpm.inf
@@ -1524,6 +1522,19 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
       NULL|SecurityPkg/Library/HashInstanceLibSha512/HashInstanceLibSha512.inf
       NULL|SecurityPkg/Library/HashInstanceLibSm3/HashInstanceLibSm3.inf
   }
+!else
+  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf {
+    <LibraryClasses>
+      Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibRouter/Tpm2DeviceLibRouterDxe.inf
+      NULL|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2InstanceLibDTpm.inf
+      HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCryptoRouterDxe.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSha256.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha384/HashInstanceLibSha384.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha512/HashInstanceLibSha512.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSm3/HashInstanceLibSm3.inf
+  }
+!endif
 !endif
 !if $(TPM_CONFIG_ENABLE) == TRUE AND $(TPM_ENABLE) == TRUE
   SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf

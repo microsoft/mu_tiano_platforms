@@ -42,6 +42,7 @@
             "ShellPkg/ShellPkg.dec",
             "EmbeddedPkg/EmbeddedPkg.dec",
             "QemuPkg/QemuPkg.dec",
+            "TpmTestingPkg/TpmTestingPkg.dec"
         ],
         # For host based unit tests
         "AcceptableDependencies-HOST_APPLICATION":[],
@@ -101,6 +102,7 @@
             "pointee",
             "ramfb",
             "rebecca",
+            "tpmreplay",
             "tsegmb"
           ],
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore

@@ -147,6 +147,21 @@ The binary can be provided to the firmware three ways:
 More details about these are covered in the ["Input Channels"](https://github.com/microsoft/mu_plus/blob/HEAD/TpmTestingPkg/TpmReplayPei/Readme.md#tcg-event-log-input-channels)
 section of the main TPM Replay feature documentation.
 
+#### FW CFG Example
+
+This option allows a new log to be passed to QEMU from the host machine easily without rebuilding firmware.
+
+An additional argument to QEMU can be passed in the runner plugin.
+
+- [QemuQ35Pkg QemuRunner.py](https://github.com/microsoft/mu_tiano_platforms/blob/HEAD/Platforms/QemuQ35Pkg/Plugins/QemuRunner/QemuRunner.py)
+- [QemuSbsaPkg QemuRunner.py](https://github.com/microsoft/mu_tiano_platforms/blob/HEAD/Platforms/QemuSbsaPkg/Plugins/QemuRunner/QemuRunner.py)
+
+The `args` variable can be updated with the fw_cfg item:
+
+```python
+  args += " -fw_cfg name=opt/org.mu/tpm_replay/event_log,file=/replaylog.bin"`
+```
+
 ### Converting a Binary Back to a Human Readable File
 
 It may be useful to view what's in a binary. That is also possible using `TpmReplay.py`.

@@ -43,7 +43,8 @@
             "MfciPkg/MfciPkg.dec",
             "OemPkg/OemPkg.dec",
             "QemuPkg/QemuPkg.dec",
-            "QemuQ35Pkg/QemuQ35Pkg.dec"
+            "QemuQ35Pkg/QemuQ35Pkg.dec",
+            "TpmTestingPkg/TpmTestingPkg.dec"
         ],
         # For host based unit tests
         "AcceptableDependencies-HOST_APPLICATION":[

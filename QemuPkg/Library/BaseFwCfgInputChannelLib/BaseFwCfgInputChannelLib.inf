@@ -1,0 +1,30 @@
+## @file
+# FW CFG TPM Event Log Input Channel Library
+#
+# Copyright (c) Microsoft Corporation.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION           = 0x00010005
+  BASE_NAME             = BaseFwCfgInputChannelLib
+  FILE_GUID             = 8B3828C5-DC85-49F0-8AF2-0F50391EC0BC
+  MODULE_TYPE           = BASE
+  VERSION_STRING        = 1.0
+  LIBRARY_CLASS         = InputChannelLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  TpmTestingPkg/TpmTestingPkg.dec
+  QemuPkg/QemuPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  MemoryAllocationLib
+  QemuFwCfgLib
+
+[Sources]
+  BaseFwCfgInputChannelLib.c
