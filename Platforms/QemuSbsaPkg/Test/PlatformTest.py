@@ -1,3 +1,4 @@
+from collections import namedtuple
 from edk2toolext.invocables.edk2_platform_build import BuildSettingsManager
 from edk2toolext.environment.uefi_build import UefiBuilder
 from edk2toollib.utility_functions import RunCmd
@@ -7,6 +8,9 @@ from edk2toollib.database import Edk2DB
 from pathlib import Path
 import logging
 import sys
+import io
+import shutil
+import re
 
 sys.path.append(str(Path(__file__).parent.parent))
 import PlatformBuild  # noqa: E402
@@ -64,8 +68,6 @@ class TestManager(BuildSettingsManager, UefiBuilder):
         self.env.SetValue("CI_BUILD_TYPE", "host_unit_test", "Platform Hardcoded.")
         self.env.SetValue("TARGET_ARCH", "X64", "Platform Hardcoded.")
         self.env.SetValue("TOOL_CHAIN_TAG", "VS2022", "Platform Hardcoded.")
-        self.env.SetValue("CODE_COVERAGE", "TRUE", "Platform Hardcoded.")
-        self.env.SetValue("REPORTTYPES", "Cobertura", "Platform Hardcoded.")
 
         # Must use PlatformFlashImage to generate coverage report as PlatformPostBuild runs before PostBuildPlugins,
         # Which generates intitial code coverage.
@@ -73,13 +75,23 @@ class TestManager(BuildSettingsManager, UefiBuilder):
             self.FlashImage = True
         return 0
     
+    def SetPlatformDefaultEnv(self):
+        Env = namedtuple("Env", ["name", "default", "description"])
+
+        return [
+            Env("CODE_COVERAGE", "FALSE", "Generate Code Coverage Reports"),
+            Env("REPORTTYPES", "Cobertura", "Code Coverage Report Types"),
+            Env("FLATTEN_COVERAGE", "TRUE", "Group Coverage Results by source file instead of by INF."),
+            Env("FULL_COVERAGE", "FALSE", "Create coverage lines for files without any coverage data.")
+        ]
+
     def PlatformPreBuild(self):
         # Make sure code cov tools are installed if they want code coverage reports.
         if self.env.GetValue("CODE_COVERAGE") == "TRUE" and not self._verify_code_cov_tools():
             return -1
             
         DB_PATH = Path(self.GetWorkspaceRoot(), "Build", "DATABASE.db")
-        if not DB_PATH.exists(): # TODO: Add cli arg to force parsing
+        if not DB_PATH.exists() or not self._verify_db_data(DB_PATH): # TODO: Add cli arg to force parsing
             try:
                 logging.log(SUB_SECTION , "Running stuart_parse")
                 RunCmd("stuart_parse", '', workingdir = PLATFORMBUILD_DIR, logging_level=logging.DEBUG, raise_exception_on_nonzero=True)
@@ -107,6 +119,11 @@ class TestManager(BuildSettingsManager, UefiBuilder):
 
         return 0
 
+    def PlatformPostBuild(self):
+        if self.env.GetValue("CODE_COVERAGE") == "TRUE":
+            self.FlashImage = True
+        return 0
+    
     def PlatformFlashImage(self):
         reporttypes = self.env.GetValue("REPORTTYPES").split(",")
         logging.log(SECTION, "Generating Requested Code Coverage Reports")
@@ -120,8 +137,11 @@ class TestManager(BuildSettingsManager, UefiBuilder):
         params += ' --by-platform'
         params += f' -d {PLATFORM_DSC}'
         params += f' -o {coverage_file}'
+        params += ' --full' * int(self.env.GetValue("FULL_COVERAGE") == "TRUE")
+        params += ' --flatten' * int(self.env.GetValue("FLATTEN_COVERAGE") == "TRUE")
+
         try:
-            RunCmd("stuart_report", params, logging_level=logging.DEBUG, raise_exception_on_nonzero=True)
+            RunCmd("stuart_report", params, logging_level=logging.DEBUG, raise_exception_on_nonzero = True)
         except Exception:
             logging.error("stuart_report Failed to generate a report.")
             return -1
@@ -137,34 +157,57 @@ class TestManager(BuildSettingsManager, UefiBuilder):
             logging.error("reportgenerator Failed to generate a report.")
             return -1
         
+        # If Cobertura is the only requested report, just copy the existing report generated with stuart_report
+        out_cov_dir = Path(self.env.GetValue("BUILD_OUTPUT_BASE"), "Coverage")
+        if self.env.GetValue("REPORTTYPES") == 'Cobertura':
+            shutil.copy2(coverage_file, out_cov_dir)
+        else:
+            params = f'-reports:"{coverage_file}"'
+            params += f' -targetdir:"{str(out_cov_dir)}"'
+            params += f' -reporttypes:{";".join(reporttypes)}'
+            try:
+                RunCmd("reportgenerator", params, logging_level=logging.DEBUG, raise_exception_on_nonzero = True)
+            except Exception:
+                logging.error("reportgenerator Failed to generate a report.")
+                return -1
+
         # Clean up the raw coverage file
         Path(coverage_file).unlink()
         return 0
 
     def _verify_code_cov_tools(self) -> bool:
-        return True
-        try:
-            RunCmd("reportgenerator", "-h", logging_level=logging.DEBUG, raise_exception_on_nonzero=True)
-        except Exception:
-            logging.error("You do not have reportgenerator installed, but are requesting a report be generated.")
-            logging.error("You can install with `dotnet tool install -g dotnet-reportgenerator-globaltool`")
-            return False
-        
+        "Verifies if the necessary coverage tools are installed."
+        COV_TOOLS = {
+            "reportgenerator": ("-h", "Parameters"),
+            "OpenCppCoverage": ("-h", "Command line only:"),
+            "lcov": ("--help", "Options:"),
+            "lcov_cobertura": ("-h", "Options:"),
+        }
+
+        # Register the tools to check
+        tools = []
+        if self.env.GetValue("REPORTTYPES") != "Cobertura":
+            tools.append("reportgenerator")
+
         if sys.platform.startswith("win"):
-            try:
-                RunCmd("OpenCppCoverage", "", logging_level=logging.DEBUG, raise_exception_on_nonzero=True)
-            except Exception:
-                logging.error("You do not have OpenCppCoverage installed, but are requesting a report be generated.")
-                return False
+            tools.append("OpenCppCoverage")
         else:
-            try:
-                RunCmd("lcov", "--version", logging_level=logging.DEBUG, raise_exception_on_nonzero=True)
-            except Exception:
-                logging.error("You do not have lcov installed, but are requesting a report be generated.")
-                return False
-            try:
-                RunCmd("lcov_cobertura", "--version", logging_level=logging.DEBUG, raise_exception_on_nonzero=True)
-            except Exception:
-                logging.error("You do not have lcov_cobertura installed, but are requesting a report be generated.")
+            tools.extend(["lcov", "lcov_cobertura"])
+
+        # Check if the tools are installed
+        for tool in tools:
+            params, pattern = COV_TOOLS[tool]
+            output = io.StringIO()
+            RunCmd(tool, params, outstream=output, logging_level=logging.DEBUG)
+            output.seek(0)
+            match = re.search(pattern, output.getvalue())
+            if not match:
+                logging.error(f"You do not have {tool} installed, but current command settings require the tool.")
                 return False
         return True
+
+    def _verify_db_data(self, db_path: Path) -> bool:
+        with Edk2DB(db_path, self.edk2path) as db:
+            if db.connection.execute("SELECT COUNT(*) from instanced_inf WHERE ? LIKE '%' || dsc || '%'", (PLATFORM_DSC,)).fetchone()[0] == 0:
+                return False
+            return True

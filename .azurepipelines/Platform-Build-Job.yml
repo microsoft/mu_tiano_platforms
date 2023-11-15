@@ -183,3 +183,10 @@ jobs:
         parameters:
           artifacts_other: ${{ item.Value.BuildArtifactsOther }}
           artifacts_identifier: 'Binaries ${{ item.Value.BuildPackage }} $(tool_chain_tag) ${{ item.Value.BuildTarget }} ${{ item.Value.BuildExtraTag }}'
+
+      - ${{ containsValue(item.Key, 'CODE_COVERAGE') }}:
+        - template: UploadCodeCoverage@mu_devops
+          parameters:
+            report_dir: 'Build/${{ item.Value.BuildPackage }}'
+            flag: ${{ item.Value.BuildPackage }}
+            install_dependencies: true
