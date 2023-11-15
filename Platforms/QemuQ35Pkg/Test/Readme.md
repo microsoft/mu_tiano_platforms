@@ -6,4 +6,17 @@ This is different than the `stuart_ci_build` process for compiling and executing
 
 ## Code Coverage
 
+Code coverage can be enabled when building with `PlatformTest.py` by adding `CODE_COVERAGE=TRUE` to your command line. This does require additional tools to be installed, as noted below:
 
+* Windows Prerequisite
+
+  1. OpenCppCoverage: Download and install <https://github.com/OpenCppCoverage/OpenCppCoverage/releases>
+  2. pygount (if using the --full comand): pip install pygount
+
+* Linux Prerequisite
+
+  1. lcov: sudo apt-get install -y lcov
+  2. lcov_cobertura: pip install lcov_cobertura
+  3. pygount (if using the --full comand): pip install pygount
+
+  Using this command, 
