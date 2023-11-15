@@ -106,7 +106,7 @@ jobs:
             artifacts_other: ${{ item.Value.BuildArtifactsOther }}
       
       - ${{ if EndsWith(item.Key, 'CODE_COVERAGE') }}:
-        - template: UploadCodeCoverage@mu_devops
+        - template: Steps/UploadCodeCoverage@mu_devops
           parameters:
             report_dir: 'Build/${{ item.Value.BuildPackage }}'
             flag: ${{ item.Value.BuildPackage }}
