@@ -16,6 +16,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 import PlatformBuild  # noqa: E402
 
 
+PLATFORM_NAME = 'QemuQ35Pkg'
 PLATFORM_DSC = 'QemuQ35Pkg/QemuQ35Pkg.dsc'
 PLATFORMBUILD_DIR = str(Path(__file__).parent.parent)
 
@@ -149,7 +150,7 @@ class TestManager(BuildSettingsManager, UefiBuilder):
             return -1
         
         # If Cobertura is the only requested report, just copy the existing report generated with stuart_report
-        out_cov_dir = Path(self.env.GetValue("BUILD_OUTPUT_BASE"), "Coverage")
+        out_cov_dir = Path(self.env.GetValue("BUILD_OUTPUT_BASE"), f"{PLATFORM_NAME}_coverage.xml")
         if self.env.GetValue("REPORTTYPES") == 'Cobertura':
             shutil.copy2(coverage_file, out_cov_dir)
         else:

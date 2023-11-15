@@ -11,7 +11,7 @@ resources:
       type: github
       endpoint: microsoft
       name: microsoft/mu_devops
-      ref: main
+      ref: remove_edk2toollib_dep
   containers:
     - container: linux-gcc
       image: ghcr.io/microsoft/mu_devops/ubuntu-22-test:latest

@@ -16,6 +16,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 import PlatformBuild  # noqa: E402
 
 
+PLATFORM_NAME = 'QemuSbsaPkg'
 PLATFORM_DSC = 'QemuSbsaPkg/QemuSbsaPkg.dsc'
 PLATFORMBUILD_DIR = str(Path(__file__).parent.parent)
 
@@ -147,7 +148,7 @@ class TestManager(BuildSettingsManager, UefiBuilder):
             return -1
         
         # Generate the requested reports
-        out_cov_dir = Path(self.env.GetValue("BUILD_OUTPUT_BASE"), "Coverage")
+        out_cov_dir = Path(self.env.GetValue("BUILD_OUTPUT_BASE"), f"{PLATFORM_NAME}_coverage.xml")
         params = f'-reports:"{coverage_file}"'
         params += f' -targetdir:"{str(out_cov_dir)}"'
         params += f' -reporttypes:{";".join(reporttypes)}'
