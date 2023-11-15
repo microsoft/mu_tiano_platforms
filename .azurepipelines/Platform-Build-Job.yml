@@ -117,7 +117,7 @@ jobs:
       dependsOn: PlatformBuild_${{ item.Key }}
       # Need to skip run-in-place for Windows ARM systems, as we do not have sufficient support for QEMU on those systems. We can get rid of these steps once we do.
       condition: |
-        and(not(EndsWith('${{ item.Key }}, 'CODE_COVERAGE')),
+        and(not(EndsWith('${{ item.Key }}', 'CODE_COVERAGE')),
             succeeded(),
             and(ne(variables['tool_chain_tag'], 'GCC5'),
                 and(StartsWith('${{ item.Key }}', 'QemuQ35'), EndsWith('${{ item.Key }}', 'ARM'))))
