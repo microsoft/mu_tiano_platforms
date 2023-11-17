@@ -28,7 +28,7 @@ This does require additional tools to be installed, which is verified as a pre-b
   3. pygount (if using the --full comand): pip install pygount
 
 With `CODE_COVERAGE=TRUE`, a coverage report will be geenrated at
-`Build/QemuQ35Pkg/HostTest/NOOPT_<TOOL_CHAIN>/QemuQ35Pkg_coverage.xml`. Other optional config knobs are
+`Build/QemuSbsaPkg/HostTest/NOOPT_<TOOL_CHAIN>/QemuSbsaPkg_coverage.xml`. Other optional config knobs are
 `CC_FLATTEN=TRUE`, which removes duplicate source code coverage information, which happens due to some INFs re-using
 source files and `CC_FULL=TRUE`, which will create xml data for files used by the platform that does not have existing
 coverage information. This provides a more accurate view of overall code coverage for a platform.
@@ -43,5 +43,5 @@ cobertura files to provide PR checks and general code coverage statistics for th
 
 If you have `reportgenerator` installed, you can additionally set `REPORTTYPES` to any report type that
 `reportgenerator` can generate, and those reports will be generated at
-`Build/QemuQ35Pkg/HostTest/NOOPT_<TOOL_CHAIN>/Coverage/*`. This parameter supports a comma separated list such as
+`Build/QemuSbsaPkg/HostTest/NOOPT_<TOOL_CHAIN>/Coverage/*`. This parameter supports a comma separated list such as
 `REPORTTYPES=HtmlSummary,JsonSummary`.
