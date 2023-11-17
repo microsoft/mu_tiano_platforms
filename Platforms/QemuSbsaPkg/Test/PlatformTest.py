@@ -57,18 +57,21 @@ class TestManager(BuildSettingsManager, UefiBuilder):
         return PlatformBuild.CommonPlatform.PackagesPath
 
     def GetActiveScopes(self):
-        return ('qemu', 'qemusbsa', 'edk2-build', 'cibuild', 'host-based-test')
+        return ('qemu', 'qemuq35', 'edk2-build', 'cibuild', 'host-based-test')
     
     def GetName(self):
-        return "QemuSbsaPkg_HostBasedTest"
+        return "QemuQ35Pkg_HostBasedTest"
 
     def SetPlatformEnv(self):
         logging.debug("PlatformBuilder SetPlatformEnv")
-        self.env.SetValue("ACTIVE_PLATFORM", "QemuSbsaPkg/Test/QemuSbsaPkgHostTest.dsc", "Platform Hardcoded.")
+        self.env.SetValue("ACTIVE_PLATFORM", "QemuQ35Pkg/Test/QemuQ35PkgHostTest.dsc", "Platform Hardcoded.")
         self.env.SetValue("TARGET", "NOOPT", "Platform Hardcoded.")
         self.env.SetValue("CI_BUILD_TYPE", "host_unit_test", "Platform Hardcoded.")
         self.env.SetValue("TARGET_ARCH", "X64", "Platform Hardcoded.")
         self.env.SetValue("TOOL_CHAIN_TAG", "VS2022", "Platform Hardcoded.")
+
+        # Don't let the host runner reorganize the build. This file will do it by platform.
+        self.env.SetValue("CC_REORGANIZE", "FALSE", "Platform Hardcoded")
 
         # Must use PlatformFlashImage to generate coverage report as PlatformPostBuild runs before PostBuildPlugins,
         # Which generates intitial code coverage.
@@ -82,8 +85,8 @@ class TestManager(BuildSettingsManager, UefiBuilder):
         return [
             Env("CODE_COVERAGE", "FALSE", "Generate Code Coverage Reports"),
             Env("REPORTTYPES", "Cobertura", "Code Coverage Report Types"),
-            Env("FLATTEN_COVERAGE", "TRUE", "Group Coverage Results by source file instead of by INF."),
-            Env("FULL_COVERAGE", "FALSE", "Create coverage lines for files without any coverage data.")
+            Env("CC_FLATTEN", "TRUE", "Group Coverage Results by source file instead of by INF."),
+            Env("CC_FULL", "FALSE", "Create coverage lines for files without any coverage data.")
         ]
 
     def PlatformPreBuild(self):
@@ -124,7 +127,7 @@ class TestManager(BuildSettingsManager, UefiBuilder):
         if self.env.GetValue("CODE_COVERAGE") == "TRUE":
             self.FlashImage = True
         return 0
-    
+
     def PlatformFlashImage(self):
         reporttypes = self.env.GetValue("REPORTTYPES").split(",")
         logging.log(SECTION, "Generating Requested Code Coverage Reports")
@@ -138,28 +141,16 @@ class TestManager(BuildSettingsManager, UefiBuilder):
         params += ' --by-platform'
         params += f' -d {PLATFORM_DSC}'
         params += f' -o {coverage_file}'
-        params += ' --full' * int(self.env.GetValue("FULL_COVERAGE") == "TRUE")
-        params += ' --flatten' * int(self.env.GetValue("FLATTEN_COVERAGE") == "TRUE")
-
+        params += ' --full' * int(self.env.GetValue("CC_FULL") == "TRUE")
+        params += ' --flatten' * int(self.env.GetValue("CC_FLATTEN") == "TRUE")
         try:
             RunCmd("stuart_report", params, logging_level=logging.DEBUG, raise_exception_on_nonzero = True)
         except Exception:
             logging.error("stuart_report Failed to generate a report.")
             return -1
         
-        # Generate the requested reports
-        out_cov_dir = Path(self.env.GetValue("BUILD_OUTPUT_BASE"), f"{PLATFORM_NAME}_coverage.xml")
-        params = f'-reports:"{coverage_file}"'
-        params += f' -targetdir:"{str(out_cov_dir)}"'
-        params += f' -reporttypes:{";".join(reporttypes)}'
-        try:
-           RunCmd("reportgenerator", params, raise_exception_on_nonzero=True, logging_level=logging.DEBUG)
-        except Exception:
-            logging.error("reportgenerator Failed to generate a report.")
-            return -1
-        
         # If Cobertura is the only requested report, just copy the existing report generated with stuart_report
-        out_cov_dir = Path(self.env.GetValue("BUILD_OUTPUT_BASE"), "Coverage")
+        out_cov_dir = Path(self.env.GetValue("BUILD_OUTPUT_BASE"), f"{PLATFORM_NAME}_coverage.xml")
         if self.env.GetValue("REPORTTYPES") == 'Cobertura':
             shutil.copy2(coverage_file, out_cov_dir)
         else:
@@ -171,7 +162,7 @@ class TestManager(BuildSettingsManager, UefiBuilder):
             except Exception:
                 logging.error("reportgenerator Failed to generate a report.")
                 return -1
-
+            
         # Clean up the raw coverage file
         Path(coverage_file).unlink()
         return 0
