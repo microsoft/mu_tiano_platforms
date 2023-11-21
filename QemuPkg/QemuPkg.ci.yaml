@@ -107,7 +107,7 @@
             "pygount",
             "lcov",
             "lcov_cobertura",
-            "pycobertura"
+            "pycobertura",
             "cobertura",
           ],
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
