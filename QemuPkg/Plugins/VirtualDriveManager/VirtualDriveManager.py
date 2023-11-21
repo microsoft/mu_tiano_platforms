@@ -137,6 +137,18 @@ class LinuxVirtualDrive(VirtualDrive):
         super().__init__(path)
         self.drive_letter = self._find_unused_drive_letter()
 
+        conf_path = os.path.join(os.path.dirname(self.drive_path), "mtool.conf")
+        if os.path.exists(conf_path):
+            shell_environment.GetEnvironment().set_shell_var("MTOOLSRC", conf_path)
+        elif os.path.exists(self.drive_path):
+            logger.error("VirtualDrive.img exists from a previous build but "
+                         "mtool.conf is not in the same directory. Add "
+                         f"mtool.conf or delete {self.drive_path} to recreate "
+                         "the virtual drive and the corresponding mtool.conf "
+                         "file.")
+            raise FileNotFoundError(
+                errno.ENOENT, os.strerror(errno.ENOENT), conf_path)
+
     def make_drive(self, size: int = 60):
         """Creates a virtual hard drive
 
