@@ -17,6 +17,7 @@ import PlatformBuild  # noqa: E402
 
 
 PLATFORM_NAME = 'QemuQ35Pkg'
+PLATFORM_TEST_DSC = 'QemuQ35Pkg/Test/QemuQ35PkgHostTest.dsc'
 PLATFORM_DSC = 'QemuQ35Pkg/QemuQ35Pkg.dsc'
 PLATFORMBUILD_DIR = str(Path(__file__).parent.parent)
 
@@ -40,8 +41,10 @@ JOIN host_test_files ON iisj.source = host_test_files.source
 WHERE iisj.instanced_inf NOT LIKE '%UnitTestApp.inf';
 """
 
+
 class TestSettingsManager(PlatformBuild.SettingsManager):
     pass
+
 
 class TestManager(BuildSettingsManager, UefiBuilder):
 
@@ -60,11 +63,11 @@ class TestManager(BuildSettingsManager, UefiBuilder):
         return ('qemu', 'qemuq35', 'edk2-build', 'cibuild', 'host-based-test')
     
     def GetName(self):
-        return "QemuQ35Pkg_HostBasedTest"
+        return f"{PLATFORM_NAME}_HostBasedTest"
 
     def SetPlatformEnv(self):
         logging.debug("PlatformBuilder SetPlatformEnv")
-        self.env.SetValue("ACTIVE_PLATFORM", "QemuQ35Pkg/Test/QemuQ35PkgHostTest.dsc", "Platform Hardcoded.")
+        self.env.SetValue("ACTIVE_PLATFORM", PLATFORM_TEST_DSC, "Platform Hardcoded.")
         self.env.SetValue("TARGET", "NOOPT", "Platform Hardcoded.")
         self.env.SetValue("CI_BUILD_TYPE", "host_unit_test", "Platform Hardcoded.")
         self.env.SetValue("TARGET_ARCH", "X64", "Platform Hardcoded.")
