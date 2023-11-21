@@ -71,7 +71,7 @@ class TestManager(BuildSettingsManager, UefiBuilder):
         self.env.SetValue("TARGET", "NOOPT", "Platform Hardcoded.")
         self.env.SetValue("CI_BUILD_TYPE", "host_unit_test", "Platform Hardcoded.")
         self.env.SetValue("TARGET_ARCH", "X64", "Platform Hardcoded.")
-        self.env.SetValue("TOOL_CHAIN_TAG", "VS2022", "Platform Hardcoded.")
+        self.env.SetValue("TOOL_CHAIN_TAG", "GCC5", "Platform Hardcoded.")
 
         # Don't let the host runner reorganize the build. This file will do it by platform.
         self.env.SetValue("CC_REORGANIZE", "FALSE", "Platform Hardcoded")
