@@ -181,7 +181,7 @@ jobs:
       QemuSbsa_CODE_COVERAGE:
         BuildPackage: QemuSbsaPkg
         BuildFile: "Platforms/QemuSbsaPkg/Test/PlatformTest.py"
-        BuildArch: "X64"
+        BuildArch: "AARCH64"
         BuildFlags: "CODE_COVERAGE=TRUE CC_FULL=TRUE CC_FLATTEN=TRUE"
         BuildTarget: "NOOPT"
         BuildExtraTag: "UNIT_TESTS"
