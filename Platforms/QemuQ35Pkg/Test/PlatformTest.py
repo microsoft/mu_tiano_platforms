@@ -60,7 +60,7 @@ class TestManager(BuildSettingsManager, UefiBuilder):
         return PlatformBuild.CommonPlatform.PackagesPath
 
     def GetActiveScopes(self):
-        return ('qemu', 'qemuq35', 'edk2-build', 'cibuild', 'host-based-test')
+        return PlatformBuild.CommonPlatform.Scopes
     
     def GetName(self):
         return f"{PLATFORM_NAME}_HostBasedTest"

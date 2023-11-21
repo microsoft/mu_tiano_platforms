@@ -41,8 +41,10 @@ JOIN host_test_files ON iisj.source = host_test_files.source
 WHERE iisj.instanced_inf NOT LIKE '%UnitTestApp.inf';
 """
 
+
 class TestSettingsManager(PlatformBuild.SettingsManager):
     pass
+
 
 class TestManager(BuildSettingsManager, UefiBuilder):
 
@@ -58,7 +60,7 @@ class TestManager(BuildSettingsManager, UefiBuilder):
         return PlatformBuild.CommonPlatform.PackagesPath
 
     def GetActiveScopes(self):
-        return ('qemu', 'qemuqsbsa', 'edk2-build', 'cibuild', 'configdata', 'host-based-test')
+        return PlatformBuild.CommonPlatform.Scopes
     
     def GetName(self):
         return f"{PLATFORM_NAME}_HostBasedTest"
