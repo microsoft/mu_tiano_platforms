@@ -32,15 +32,28 @@ WITH host_test_files AS (
         junction.table1 = 'inf'
         AND junction.table2 = 'source'
         AND inf.module_type = 'HOST_APPLICATION'
-    AND inf.path = junction.key1
+        AND inf.path = junction.key1
 )
 SELECT DISTINCT host_test_files.inf
 FROM
     instanced_inf_source_junction AS iisj
 JOIN host_test_files ON iisj.source = host_test_files.source
-WHERE iisj.instanced_inf NOT LIKE '%UnitTestApp.inf';
+WHERE
+    iisj.instanced_inf NOT LIKE '%UnitTestApp.inf'
+    AND iisj.env = ?;
 """
 
+ID_QUERY_BY_PACKAGE = """
+SELECT environment.id
+FROM
+    environment
+    LEFT JOIN environment_values ON environment.id = environment_values.id
+WHERE
+    environment_values.key = 'ACTIVE_PLATFORM'
+    AND environment_values.value = ?
+ORDER BY environment.date DESC
+LIMIT 1;
+"""
 
 class TestSettingsManager(PlatformBuild.SettingsManager):
     pass
@@ -94,34 +107,19 @@ class TestManager(BuildSettingsManager, UefiBuilder):
 
     def PlatformPreBuild(self):
         # Make sure code cov tools are installed if they want code coverage reports.
-        if self.env.GetValue("CODE_COVERAGE") == "TRUE" and not self._verify_code_cov_tools():
+        if self.env.GetValue("CODE_COVERAGE") != "TRUE":
+            return 0
+        
+        if not self._verify_code_cov_tools():
             return -1
-            
-        DB_PATH = Path(self.GetWorkspaceRoot(), "Build", "DATABASE.db")
-        if not DB_PATH.exists() or not self._verify_db_data(DB_PATH): # TODO: Add cli arg to force parsing
-            try:
-                logging.log(SUB_SECTION , "Running stuart_parse")
-                RunCmd("stuart_parse", '', workingdir = PLATFORMBUILD_DIR, logging_level=logging.DEBUG, raise_exception_on_nonzero=True)
-            except Exception:
-                logging.error("Failed to run stuart_parse. Review Build/PARSE_LOG.txt")
-                return -1
-        else:
-            logging.warning("Skipping Parse as DATABASE.db already exists. Force a re-parse with --ForceParse")
 
-        # Verify that any file that is both used by the platform, and tested by a test, is in the dsc.
-        logging.log(SECTION, "Verify Host Based Tests are Up to Date")
-        dscp = DscParser()
-        dscp.SetEdk2Path(self.edk2path).SetInputVars(self.env.GetAllBuildKeyValues() | self.env.GetAllNonBuildKeyValues())
-        dscp.ParseFile(self.env.GetValue("ACTIVE_PLATFORM"))
-
-        used_tests = set([component for component, _, _ in dscp.Components])
-        must_use_tests = set([module for module, in Edk2DB(DB_PATH).connection.execute(TEST_QUERY).fetchall()])
-        unused_tests = must_use_tests - used_tests
-        if len(unused_tests) > 0:
-            logging.error("The following host based unit tests test files used by the "
-                          "platform, but are not in the host based unit test dsc:")
-            logging.error("\n  ".join(unused_tests))
+        db_path = Path(self.GetWorkspaceRoot(), "Build", "DATABASE.db")
+        if not self._parse_platform(db_path, PLATFORMBUILD_DIR):
             return -1
+
+        if not self._verify_test_dsc(db_path):
+            return -1
+
         logging.info("Host Based Tests are up to date.")
 
         return 0
@@ -136,39 +134,85 @@ class TestManager(BuildSettingsManager, UefiBuilder):
         logging.log(SECTION, "Generating Requested Code Coverage Reports")
         logging.info(f'Report Types: {",".join(reporttypes)}')
 
-        # Organize existing report by platform
-        coverage_file = str(Path(self.GetWorkspaceRoot(), "Build", "coverage.xml"))
+        coverage_file = Path(self.env.GetValue("BUILD_OUTPUT_BASE"), "_coverage.xml")
+        coverage_file = str(coverage_file.rename(coverage_file.parent / f'{PLATFORM_NAME}_coverage.xml'))
+        if not self._reorganize_coverage_report(coverage_file):
+            return -1
+
+        out_dir = Path(self.env.GetValue("BUILD_OUTPUT_BASE"), "Coverage")
+        out_dir.mkdir(parents=True, exist_ok=True)
+        if not self._generate_reports(coverage_file, out_dir, reporttypes):
+            return -1
+
+        return 0
+
+    def _verify_test_dsc(self, db_path: Path) -> bool:
+        """Compares all source files used by the platform to the source files used by the host based tests."""
+        logging.log(SECTION, "Verify Host Based Tests are Up to Date")
+        dscp = DscParser()
+        dscp.SetEdk2Path(self.edk2path).SetInputVars(self.env.GetAllBuildKeyValues() | self.env.GetAllNonBuildKeyValues())
+        dscp.ParseFile(self.env.GetValue("ACTIVE_PLATFORM")) # The test DSC
+
+        with Edk2DB(db_path) as db:
+            used_tests = set([component for component, _, _ in dscp.Components])
+            env_id = db.connection.execute(ID_QUERY_BY_PACKAGE, (PLATFORM_DSC,)).fetchone()[0]
+            must_use_tests = set([module for module, in db.connection.execute(TEST_QUERY, (env_id,)).fetchall()])
+            unused_tests = must_use_tests - used_tests
+        
+        if len(unused_tests) > 0:
+            logging.error("The following host based unit tests test files used by the "
+                          "platform, but are not in the host based unit test dsc:")
+            logging.error("\n  ".join(unused_tests))
+            return False
+
+        return True
+
+    def _parse_platform(self, db_path: Path, platform_dir: str) -> bool:
+        """Parses the platform if necessary."""
+        if not db_path.exists() or not self._verify_db_data(db_path):
+            try:
+                logging.log(SUB_SECTION , "Running stuart_parse")
+                RunCmd("stuart_parse", '', workingdir = platform_dir, logging_level=logging.DEBUG, raise_exception_on_nonzero=True)
+            except Exception:
+                logging.error("Failed to run stuart_parse. Review Build/PARSE_LOG.txt")
+                return False
+        else:
+            logging.warning("Skipping Parse as database contains necessary data.")
+        return True
+
+    def _reorganize_coverage_report(self, cov_file: str) -> bool:
+        """Reorganizes a coverage report by platform."""
         params = "coverage"
-        params += f' {coverage_file}'
+        params += f' {cov_file}'
         params += f' -ws {self.GetWorkspaceRoot()}'
         params += ' --by-platform'
         params += f' -d {PLATFORM_DSC}'
-        params += f' -o {coverage_file}'
+        params += f' -o {cov_file}'
         params += ' --full' * int(self.env.GetValue("CC_FULL") == "TRUE")
         params += ' --flatten' * int(self.env.GetValue("CC_FLATTEN") == "TRUE")
         try:
             RunCmd("stuart_report", params, logging_level=logging.DEBUG, raise_exception_on_nonzero = True)
         except Exception:
             logging.error("stuart_report Failed to generate a report.")
-            return -1
+            return False
+        return True
         
-        # If Cobertura is the only requested report, just copy the existing report generated with stuart_report
-        out_cov_dir = Path(self.env.GetValue("BUILD_OUTPUT_BASE"), f"{PLATFORM_NAME}_coverage.xml")
+    def _generate_reports(self, cov_file: str, out_dir: str, reporttypes: list) -> bool:
+        """Generates one or more coverage report types using reportgenerator."""
         if self.env.GetValue("REPORTTYPES") == 'Cobertura':
-            shutil.copy2(coverage_file, out_cov_dir)
+            shutil.copy2(cov_file, out_dir)
         else:
-            params = f'-reports:"{coverage_file}"'
-            params += f' -targetdir:"{str(out_cov_dir)}"'
+            params = f'-reports:"{cov_file}"'
+            params += f' -targetdir:"{str(out_dir)}"'
             params += f' -reporttypes:{";".join(reporttypes)}'
             try:
                 RunCmd("reportgenerator", params, logging_level=logging.DEBUG, raise_exception_on_nonzero = True)
             except Exception:
                 logging.error("reportgenerator Failed to generate a report.")
-                return -1
-            
+                return False
         # Clean up the raw coverage file
-        Path(coverage_file).unlink()
-        return 0
+        Path(cov_file).unlink()
+        return True
 
     def _verify_code_cov_tools(self) -> bool:
         "Verifies if the necessary coverage tools are installed."
