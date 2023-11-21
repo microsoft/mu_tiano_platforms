@@ -11,10 +11,11 @@ resources:
       type: github
       endpoint: microsoft
       name: microsoft/mu_devops
-      ref: codecov-fix
+      ref: main
 
 variables:
 - group: tool-chain-windows-visual-studio-latest
+- group: coverage
 
 jobs:
 - template: Platform-Build-Job.yml

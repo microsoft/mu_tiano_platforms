@@ -11,7 +11,7 @@ resources:
       type: github
       endpoint: microsoft
       name: microsoft/mu_devops
-      ref: codecov-fix
+      ref: main
   containers:
     - container: linux-gcc
       image: ghcr.io/microsoft/mu_devops/ubuntu-22-test:latest
@@ -19,6 +19,7 @@ resources:
 
 variables:
 - group: tool-chain-ubuntu-gcc
+- group: coverage
 
 jobs:
 - template: Platform-Build-Job.yml

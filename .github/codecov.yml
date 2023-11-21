@@ -10,3 +10,5 @@ flags:
     carryforward: true
   QemuSbsaPkg:
     carryforward: true
+  QemuPkg:
+    carryforward: true
