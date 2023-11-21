@@ -107,12 +107,10 @@ class TestManager(BuildSettingsManager, UefiBuilder):
 
     def PlatformPreBuild(self):
         # Make sure code cov tools are installed if they want code coverage reports.
-        if self.env.GetValue("CODE_COVERAGE") != "TRUE":
-            return 0
-        
-        if not self._verify_code_cov_tools():
+        if self.env.GetValue("CODE_COVERAGE") == "TRUE" and not self._verify_code_cov_tools():
             return -1
 
+        # Parse the platform so we can verify the test dsc is up to date
         db_path = Path(self.GetWorkspaceRoot(), "Build", "DATABASE.db")
         if not self._parse_platform(db_path, PLATFORMBUILD_DIR):
             return -1
