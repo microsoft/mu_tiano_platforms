@@ -122,11 +122,6 @@ class TestManager(BuildSettingsManager, UefiBuilder):
 
         return 0
 
-    def PlatformPostBuild(self):
-        if self.env.GetValue("CODE_COVERAGE") == "TRUE":
-            self.FlashImage = True
-        return 0
-
     def PlatformFlashImage(self):
         reporttypes = self.env.GetValue("REPORTTYPES").split(",")
         logging.log(SECTION, "Generating Requested Code Coverage Reports")
