@@ -15,7 +15,6 @@ resources:
 
 variables:
 - group: tool-chain-windows-visual-studio-latest
-- group: coverage
 
 jobs:
 - template: Platform-Build-Job.yml
@@ -115,9 +114,10 @@ jobs:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/Test/PlatformTest.py"
         BuildArch: "X64"
-        BuildFlags: "CODE_COVERAGE=TRUE CC_FULL=TRUE CC_FLATTEN=TRUE"
+        BuildFlags: "CODE_COVERAGE=TRUE CC_FULL=TRUE CC_FLATTEN=TRUE REPORTTYPES=Cobertura,HtmlSummary,JsonSummary"
         BuildTarget: "NOOPT"
         BuildExtraTag: "UNIT_TESTS"
         BuildExtraStep:
           - script: echo No extra steps provided
+        BuildArtifactsOther: "**/Coverage/**"
         Run: false
