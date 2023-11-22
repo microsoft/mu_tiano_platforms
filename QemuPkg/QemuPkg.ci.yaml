@@ -103,7 +103,12 @@
             "ramfb",
             "rebecca",
             "tpmreplay",
-            "tsegmb"
+            "tsegmb",
+            "pygount",
+            "lcov",
+            "lcov_cobertura",
+            "pycobertura",
+            "cobertura",
           ],
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
         "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)
