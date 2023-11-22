@@ -104,7 +104,7 @@ jobs:
           install_tools: ${{ and(ne(item.Value.SelfHostAgent, true), eq(parameters.container_image, '')) }}
           artifacts_identifier: '${{ item.Value.BuildPackage }} $(tool_chain_tag) ${{ item.Value.BuildTarget }} ${{ item.Value.BuildExtraTag }}'
           artifacts_binary: ${{ item.Value.BuildArtifactsBinary }}
-          ${{ if or(eq(item.Value.Run, true), eq(parameters.os_type, 'Linux')) }}:
+          ${{ if or(eq(item.Value.Run, true), eq(parameters.os_type, 'Linux'), EndsWith(item.Key, 'CODE_COVERAGE')) }}:
             artifacts_other: ${{ item.Value.BuildArtifactsOther }}
       
       - ${{ if EndsWith(item.Key, 'CODE_COVERAGE') }}:
