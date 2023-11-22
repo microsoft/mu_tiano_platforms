@@ -111,7 +111,7 @@ jobs:
         - template: Steps/UploadCodeCoverage.yml@mu_devops
           parameters:
             report_dir: 'Build/${{ item.Value.BuildPackage }}'
-            flag: ${{ item.Value.BuildPackage }}
+            flag: '${{ item.Value.BuildPackage }}'
             install_dependencies: true
 
     - job: RunQemuBuilds_${{ item.Key }}

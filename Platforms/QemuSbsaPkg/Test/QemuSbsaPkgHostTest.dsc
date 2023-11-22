@@ -12,7 +12,7 @@
   PLATFORM_GUID                 = D03133B4-3FCC-42B3-9CC6-01CFC6A75245
   PLATFORM_VERSION              = 0.1
   DSC_SPECIFICATION             = 0x00010005
-  OUTPUT_DIRECTORY              = Build/QemuSbsa/HostTest
+  OUTPUT_DIRECTORY              = Build/QemuSbsaPkg/HostTest
   SUPPORTED_ARCHITECTURES       = IA32|X64
   BUILD_TARGETS                 = NOOPT
   SKUID_IDENTIFIER              = DEFAULT
