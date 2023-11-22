@@ -67,7 +67,7 @@ jobs:
 
       variables:
       - name: Run
-        ${{ if EndsWith('${{ item.Key }}', 'CODE_COVERAGE')}}:
+        ${{ if EndsWith(item.Key, 'CODE_COVERAGE') }}:
           value: false
         ${{ elseif or(eq(item.Value.Run, true), eq(parameters.os_type, 'Linux')) }}:
           value: true
