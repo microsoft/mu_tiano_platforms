@@ -118,7 +118,12 @@ jobs:
         BuildTarget: "NOOPT"
         BuildExtraTag: "UNIT_TESTS"
         BuildExtraStep:
-          - template: Steps/InstallCoverageTools.yml@mu_devops
+          - task: CmdLine@2
+            displayName: Merge Coverage Reports
+            inputs:
+              script: |
+                dotnet tool install -g dotnet-reportgenerator-globaltool
+                reportgenerator -reports:$(Build.ArtifactStagingDirectory)/coverage/**/*_coverage.xml -targetdir:$(Build.ArtifactStagingDirectory)/Coverage -reporttypes:Cobertura
         BuildArtifactsOther: "**/Coverage/**"
         Run: false
       
@@ -130,6 +135,11 @@ jobs:
         BuildTarget: "NOOPT"
         BuildExtraTag: "UNIT_TESTS"
         BuildExtraStep:
-          - template: Steps/InstallCoverageTools.yml@mu_devops
+          - task: CmdLine@2
+            displayName: Merge Coverage Reports
+            inputs:
+              script: |
+                dotnet tool install -g dotnet-reportgenerator-globaltool
+                reportgenerator -reports:$(Build.ArtifactStagingDirectory)/coverage/**/*_coverage.xml -targetdir:$(Build.ArtifactStagingDirectory)/Coverage -reporttypes:Cobertura
         BuildArtifactsOther: "**/Coverage/**"
         Run: false
