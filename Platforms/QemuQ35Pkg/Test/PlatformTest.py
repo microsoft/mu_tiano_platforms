@@ -1,3 +1,9 @@
+# @file
+# Script to Build QemuQ35 host-based unit tests.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
 from collections import namedtuple
 from edk2toolext.invocables.edk2_platform_build import BuildSettingsManager
 from edk2toolext.environment.uefi_build import UefiBuilder
