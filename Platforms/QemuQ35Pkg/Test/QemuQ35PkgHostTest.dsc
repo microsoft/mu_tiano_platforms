@@ -199,7 +199,6 @@ MdeModulePkg/Core/Dxe/UnitTest/MemoryProtectionUnitTestHost.inf {
     DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
     DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
     CpuExceptionHandlerLib|MdeModulePkg/Library/CpuExceptionHandlerLibNull/CpuExceptionHandlerLibNull.inf
-    BaseBinSecurityLib|MdePkg/Library/BaseBinSecurityLibNull/BaseBinSecurityLibNull.inf
     UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
     MemoryBinOverrideLib|MdeModulePkg/Library/MemoryBinOverrideLibNull/MemoryBinOverrideLibNull.inf
   <PcdsFixedAtBuild>
@@ -210,6 +209,15 @@ MdeModulePkg/Core/Dxe/UnitTest/MemoryProtectionUnitTestHost.inf {
 MdePkg/Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLibHost.inf
 PolicyServicePkg/PolicyService/DxeMm/UnitTest/DxeMmPolicyUnitTest.inf
 PolicyServicePkg/PolicyService/Pei/UnitTest/PeiPolicyUnitTest.inf
+SetupDataPkg/Library/ConfigKnobShimLib/ConfigKnobShimDxeLib/GoogleTest/ConfigKnobShimDxeLibGoogleTest.inf {
+  <LibraryClasses>
+    UefiRuntimeServicesTableLib|MdePkg/Test/Mock/Library/GoogleTest/MockUefiRuntimeServicesTableLib/MockUefiRuntimeServicesTableLib.inf
+}
+SetupDataPkg/Library/ConfigKnobShimLib/ConfigKnobShimPeiLib/GoogleTest/ConfigKnobShimPeiLibGoogleTest.inf {
+  <LibraryClasses>
+    ConfigKnobShimLib|SetupDataPkg/Library/ConfigKnobShimLib/ConfigKnobShimPeiLib/ConfigKnobShimPeiLib.inf
+    PeiServicesLib|MdePkg/Test/Mock/Library/GoogleTest/MockPeiServicesLib/MockPeiServicesLib.inf
+}
 
 [BuildOptions]
   *_*_*_CC_FLAGS            = -D DISABLE_NEW_DEPRECATED_INTERFACES
