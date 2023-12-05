@@ -296,6 +296,10 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         # Enabled all of the SMM modules
         self.env.SetValue("BLD_*_SMM_ENABLED", "TRUE", "Default")
 
+        if self.Helper.generate_secureboot_pcds(self) != 0:
+            logging.error("Failed to generate include PCDs")
+            return -1
+
         return 0
 
     def SetPlatformEnvAfterTarget(self):
