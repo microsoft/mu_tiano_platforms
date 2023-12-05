@@ -193,7 +193,7 @@
   PasswordStoreLib      |MsCorePkg/Library/PasswordStoreLibNull/PasswordStoreLibNull.inf
   PasswordPolicyLib     |OemPkg/Library/PasswordPolicyLib/PasswordPolicyLib.inf
   SecureBootVariableLib |SecurityPkg/Library/SecureBootVariableLib/SecureBootVariableLib.inf
-  SecureBootKeyStoreLib |OemPkg/Library/SecureBootKeyStoreLibOem/SecureBootKeyStoreLibOem.inf
+  SecureBootKeyStoreLib |MsCorePkg/Library/BaseSecureBootKeyStoreLib/BaseSecureBootKeyStoreLib.inf
   PlatformPKProtectionLib|SecurityPkg/Library/PlatformPKProtectionLibVarPolicy/PlatformPKProtectionLibVarPolicy.inf
   MuSecureBootKeySelectorLib|MsCorePkg/Library/MuSecureBootKeySelectorLib/MuSecureBootKeySelectorLib.inf
 
@@ -671,6 +671,7 @@
 !endif
 
 [PcdsFixedAtBuild]
+  !include QemuPkg/AutoGen/SecurebootPcds.inc
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|TRUE
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10
