@@ -18,7 +18,7 @@ class BuildSecurebootPcds(IUefiHelperPlugin):
         return 0
     
     @staticmethod
-    def generate_pcds(thebuilder):
+    def generate_pcds(thebuilder) -> int:
         """Generates Secureboot PCDs at the requested location."""
         secureboot_bin_dir = thebuilder.env.GetValue("SECUREBOOT_BINARIES", "")
         if secureboot_bin_dir == "":
@@ -70,7 +70,7 @@ class BuildSecurebootPcds(IUefiHelperPlugin):
                 logging.critical("Failed to generate " + entry['pcd'] + " PCD include.")
                 return ret
         
-        out_file = secureboot_pcd_dir / "SecurebootPCDs.inc"
+        out_file = secureboot_pcd_dir / "SecurebootPcds.inc"
         with open(out_file, 'w') as f:
             for file in tmp_dir.glob("*.inc"):
                 with open(file, 'r') as inc:

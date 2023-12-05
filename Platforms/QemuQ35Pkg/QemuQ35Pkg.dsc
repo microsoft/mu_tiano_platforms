@@ -671,7 +671,7 @@
 !endif
 
 [PcdsFixedAtBuild]
-  !include QemuPkg/AutoGen/SecurebootPCDs.inc
+  !include QemuPkg/AutoGen/SecurebootPcds.inc
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|TRUE
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10

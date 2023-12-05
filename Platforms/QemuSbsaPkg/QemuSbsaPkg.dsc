@@ -593,7 +593,7 @@
 !endif
 
 [PcdsFixedAtBuild.common]
-  !include QemuPkg/AutoGen/SecurebootPCDs.inc
+  !include QemuPkg/AutoGen/SecurebootPcds.inc
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|0
