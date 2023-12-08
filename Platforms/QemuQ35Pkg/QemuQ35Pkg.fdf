@@ -532,7 +532,7 @@ INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
 
 !if $(BUILD_UNIT_TESTS) == TRUE
   INF  UefiTestingPkg/FunctionalSystemTests/SmmPagingProtectionsTest/Smm/SmmPagingProtectionsTestSmm.inf
-  INF  UefiTestingPkg/FunctionalSystemTests/MemoryProtectionTest/Smm/MemoryProtectionTestSmm.inf
+  # INF  UefiTestingPkg/FunctionalSystemTests/MemoryProtectionTest/Driver/SmmMemoryProtectionTestDriver.inf
 !if $(SMM_ENABLED) == TRUE
   INF  MmSupervisorPkg/Test/MmPagingAuditTest/UEFI/MmPagingAuditApp.inf
 !endif
