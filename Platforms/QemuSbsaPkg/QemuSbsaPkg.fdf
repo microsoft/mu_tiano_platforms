@@ -428,6 +428,7 @@ READ_LOCK_STATUS   = TRUE
   #
   !if $(BUILD_UNIT_TESTS) == TRUE
   # INF  UefiTestingPkg/AuditTests/PagingAudit/UEFI/DxePagingAuditDriver.inf
+  # INF  UefiTestingPkg/FunctionalSystemTests/SmmPagingProtectionsTest/Smm/SmmPagingProtectionsTestStandaloneMm.inf # NOT YET SUPPORTED
   !endif
 
   #
