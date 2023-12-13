@@ -315,7 +315,7 @@
   RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
 [LibraryClasses.X64]
   BaseBinSecurityLib|MdePkg/Library/BaseBinSecurityLibRng/BaseBinSecurityLibRng.inf
-  NULL|MdePkg/Library/BaseBinSecurityLibRng/BaseBinSecurityLibRng.inf
+  # NULL|MdePkg/Library/BaseBinSecurityLibRng/BaseBinSecurityLibRng.inf
 !endif
 ##MSCHANGE End
 
@@ -345,7 +345,7 @@
             NULL|MdePkg/Library/VsIntrinsicLib/VsIntrinsicLib.inf
           !endif
           IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf # Contains openSSL library used by BaseCryptoLib
+          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf # Contains openSSL library used by BaseCryptoLib
         <PcdsFixedAtBuild>
           !include CryptoPkg/Driver/Bin/Crypto.pcd.TINY_SHA.inc.dsc
     }
@@ -356,7 +356,7 @@
           BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
           TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
           IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf # Contains openSSL library used by BaseCryptoLib
+          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf # Contains openSSL library used by BaseCryptoLib
         <PcdsFixedAtBuild>
           !include CryptoPkg/Driver/Bin/Crypto.pcd.STANDARD.inc.dsc
     }
@@ -365,7 +365,7 @@
           BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
           TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
           IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf # Contains openSSL library used by BaseCryptoLib
+          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf # Contains openSSL library used by BaseCryptoLib
         <PcdsFixedAtBuild>
           !include CryptoPkg/Driver/Bin/Crypto.pcd.STANDARD.inc.dsc
     }
@@ -575,6 +575,8 @@
   SmmPolicyGateLib|MmSupervisorPkg/Library/SmmPolicyGateLib/SmmPolicyGateLib.inf
   HwResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   IhvSmmSaveStateSupervisionLib|MmSupervisorPkg/Library/IhvMmSaveStateSupervisionLib/IhvMmSaveStateSupervisionLib.inf
+  MmServicesTableLib|MmSupervisorPkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLibCore.inf
+  MmSaveStateLib|UefiCpuPkg/Library/MmSaveStateLib/AmdMmSaveStateLib.inf
 
 [LibraryClasses.common.MM_STANDALONE]
   TimerLib|QemuQ35Pkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
@@ -589,7 +591,7 @@
   StandaloneMmDriverEntryPoint|MmSupervisorPkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
   # TODO: ShareCrypto support
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
-  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
   AdvLoggerAccessLib|MdeModulePkg/Library/AdvLoggerAccessLibNull/AdvLoggerAccessLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibStandaloneMm.inf
@@ -881,7 +883,7 @@
   # UefiCpuPkg PCDs related to initial AP bringup and general AP management.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuBootLogicalProcessorNumber|0
 
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdQ35TsegMbytes|8
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdQ35TsegMbytes|32
   gUefiQemuQ35PkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase|FALSE
 
 
@@ -1387,7 +1389,7 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf {
     <LibraryClasses>
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
-      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf # Contains openSSL library used by BaseCryptoLib
+      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf # Contains openSSL library used by BaseCryptoLib
       IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
     <PcdsPatchableInModule>
       #Turn off Halt on Assert and Print Assert so that libraries can
@@ -1502,7 +1504,7 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
       TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
       IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf # Contains openSSL library used by BaseCryptoLib
+      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf # Contains openSSL library used by BaseCryptoLib
   }
 
   #
