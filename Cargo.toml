@@ -9,11 +9,37 @@ members = [
 # Add packages that generate libraries here
 [workspace.dependencies]
 HidIo = {path = "Common/MU/HidPkg/Crates/HidIo"}
+HiiKeyboardLayout = {path = "Common/MU/HidPkg/Crates/HiiKeyboardLayout"}
 RustAdvancedLoggerDxe = {path = "Common/MU/AdvLoggerPkg/Crates/RustAdvancedLoggerDxe"}
 RustBootServicesAllocatorDxe = {path = "Common/MU/MsCorePkg/Crates/RustBootServicesAllocatorDxe"}
 
 hidparser = {git = "https://github.com/microsoft/mu_rust_hid.git", branch = "main"}
 memoffset = "0.9.0"
+num-traits = { version = "0.2", default-features = false}
+num-derive = { version = "0.4", default-features = false}
 r-efi = "4.3.0"
+scroll = { version = "0.11", default-features = false, features = ["derive"]}
 rustversion = "1.0.14"
 spin = "0.5.2"
+
+# By default, the dev profile is used. The default build settings for the dev profile are documented here:
+# https://doc.rust-lang.org/cargo/reference/profiles.html#dev
+#
+# Unmodified dev profile settings result in extraordinarily large binaries relative to UEFI FW. This especially
+# impacts DEBUG builds which already have less optimized C code resulting in overall greater space occupation.
+# Without a change, the binaries are simply too large and will continue to push the limits of firmware volumes
+# (on a real system constrained by flash size) over time.
+#
+# Therefore, the below setting enables optimization level 3 (all optimizations) that is used by the release profile
+# by default. This greatly reduces the overall binary size. [profile.dev.package."*"] is specified to apply the
+# opt-level for all dependencies (but not a workspace member). This emphasizes debuggability of workspace code but
+# optimizes dependencies. An individual dependency can be overridden by specifying the named package instead of "*".
+# For example:
+#
+# [profile.dev.package.foo]
+# opt-level = 0
+#
+# That will likely allow the overall build to still fit in the FV but remove optimizations from an individual package
+# that needs to be debugged.
+[profile.dev.package."*"]
+opt-level = 3

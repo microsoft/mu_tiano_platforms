@@ -26,6 +26,7 @@ jobs:
       workingDirectory: .azurepipelines/
       displayName: Install QEMU and Set QEMU on path # friendly name displayed in the UI
       condition: and(gt(variables.pkg_count, 0), succeeded())
+    - template: Steps/InstallCoverageTools.yml@mu_devops
     tool_chain_tag: 'VS2022'
     vm_image: $(vm_image)
     os_type: Windows_NT
@@ -108,3 +109,29 @@ jobs:
         BuildArtifactsBinary: |
           **/QEMUQ35_*.fd
         BuildArtifactsOther: ""
+
+      QemuQ35_CODE_COVERAGE:
+        BuildPackage: QemuQ35Pkg
+        BuildFile: "Platforms/QemuQ35Pkg/Test/PlatformTest.py"
+        BuildArch: "X64"
+        BuildFlags: "CODE_COVERAGE=TRUE CC_FULL=TRUE CC_FLATTEN=TRUE REPORTTYPES=Cobertura,HtmlSummary,JsonSummary"
+        BuildTarget: "NOOPT"
+        BuildExtraTag: "UNIT_TESTS"
+        BuildExtraStep:
+          - script: dotnet tool install -g dotnet-reportgenerator-globaltool
+            displayName: Install Report Generator
+        BuildArtifactsOther: "**/Coverage/**"
+        Run: false
+      
+      QemuSbsa_CODE_COVERAGE:
+        BuildPackage: QemuSbsaPkg
+        BuildFile: "Platforms/QemuSbsaPkg/Test/PlatformTest.py"
+        BuildArch: "AARCH64"
+        BuildFlags: "CODE_COVERAGE=TRUE CC_FULL=TRUE CC_FLATTEN=TRUE REPORTTYPES=Cobertura,HtmlSummary,JsonSummary"
+        BuildTarget: "NOOPT"
+        BuildExtraTag: "UNIT_TESTS"
+        BuildExtraStep:
+          - script: dotnet tool install -g dotnet-reportgenerator-globaltool
+            displayName: Install Report Generator
+        BuildArtifactsOther: "**/Coverage/**"
+        Run: false

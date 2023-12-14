@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
+import errno
 import logging
 import string
 import tempfile
@@ -40,9 +41,9 @@ endfor
     def __init__(self):
         self._use_fs_finder = False
         self._lines = []
-    
+
     def write_out(self, host_file_path, shutdown):
-        
+
         with open(host_file_path, "w") as nsh:
             if self._use_fs_finder:
                 this_file = os.path.basename(host_file_path)
@@ -53,7 +54,7 @@ endfor
 
             if shutdown:
                 nsh.write("reset -s\n")
-        
+
     def add_line(self, line: str):
         self._lines.append(line.rstrip())
         self._use_fs_finder = True
@@ -61,14 +62,14 @@ endfor
 
 class VirtualDrive:
     """A base class for managing virtual drives.
-    
+
     Attributes:
         drive_path (Path): the path to the drive
     """
     def __init__(self, path: PathLike):
         """Initializes the virtual drive."""
         self.drive_path = Path(path)
-    
+
     def exists(self) -> bool:
         """Returns if the Virtual drive exists at `drive_path`."""
         return self.drive_path.exists()
@@ -77,25 +78,25 @@ class VirtualDrive:
         """Deletes the virtual drive and creates an empty one at the same location."""
         self.drive_path.unlink(missing_ok=True)
         self.make_drive(size)
-    
+
     def add_startup_script(self, lines: list[str] = [], auto_shutdown = True):
         """Adds a startup script that executes on boot.
-        
+
         Args:
             lines (list[str]): A list of lines to execute on startup
             auto_shutdown (Boolean): Whether or not to add a line that shuts down system after all lines have excuted.
-        
+
         !!! note
             `lines`  does not need to be a str, but it must be convertable to a str with `str()`
         """
         nsh = StartupScript()
         for line in lines:
             nsh.add_line(str(line))
-        
+
         nsh_path = self.drive_path.parent / "startup.nsh"
         nsh.write_out(nsh_path, auto_shutdown)
         self.add_file(nsh_path)
-    
+
     def add_files(self, filepaths: list[str]):
         """Adds files to the root directory of the virtual drive."""
         for filepath in filepaths:
@@ -104,11 +105,11 @@ class VirtualDrive:
     def add_file(self, file: PathLike):
         """Adds a file to the root directory of the virtual drive."""
         raise NotImplementedError
-    
+
     def make_drive(self, size: int = 60):
         """Creates a virtual drive at self.drive_path."""
         raise NotImplementedError
-    
+
     def get_file(self, virtual_path: PathLike, local_path: PathLike):
         """Retrieves a file from the virtual drive.
 
@@ -120,11 +121,11 @@ class VirtualDrive:
 
     def get_file_contents(self, virtual_path: PathLike, local_path: PathLike = None) -> str:
         """Gets a contents from a file from the virtual drive. Optionally save the file too.
-        
+
         Args:
             virtual_path (PathLike): The path to the file on the virtual drive
             local_path (PathLike): The path to save the file to
-        
+
         Raises:
             (RuntimeError): Failed to get the filepath
         """
@@ -136,12 +137,24 @@ class LinuxVirtualDrive(VirtualDrive):
         super().__init__(path)
         self.drive_letter = self._find_unused_drive_letter()
 
+        conf_path = os.path.join(os.path.dirname(self.drive_path), "mtool.conf")
+        if os.path.exists(conf_path):
+            shell_environment.GetEnvironment().set_shell_var("MTOOLSRC", conf_path)
+        elif os.path.exists(self.drive_path):
+            logger.error("VirtualDrive.img exists from a previous build but "
+                         "mtool.conf is not in the same directory. Add "
+                         f"mtool.conf or delete {self.drive_path} to recreate "
+                         "the virtual drive and the corresponding mtool.conf "
+                         "file.")
+            raise FileNotFoundError(
+                errno.ENOENT, os.strerror(errno.ENOENT), conf_path)
+
     def make_drive(self, size: int = 60):
         """Creates a virtual hard drive
-        
+
         Args:
             size (int | Optional): The size of the hard drive in MB
-        
+
         Raises:
         (RuntimeError): The drive could not be created
         """
@@ -154,7 +167,7 @@ class LinuxVirtualDrive(VirtualDrive):
             logger.error("Drive could not be created.")
             logger.error(e)
             raise RuntimeError(e)
-        
+
         # Format the image as FAT32
         cmd = "mkfs.vfat"
         args = f"{self.drive_path}"
@@ -164,7 +177,7 @@ class LinuxVirtualDrive(VirtualDrive):
             logger.error("Failed to format drive")
             logger.error(e)
             raise RuntimeError(e)
-        
+
         # Create an mtools config file to virtually map the image to a drive letter
         conf_path = os.path.join(os.path.dirname(self.drive_path), "mtool.conf")
         if os.path.exists(conf_path):
@@ -188,11 +201,11 @@ class LinuxVirtualDrive(VirtualDrive):
 
     def get_file(self, virtual_path: PathLike, local_path: PathLike):
         """Gets a file from the virtual drive.
-        
+
         Args:
             virtual_path (PathLike): The path to the file on the virtual drive
             local_path (PathLike): The path to save the file to
-        
+
         Raises:
             (RuntimeError): Failed to get the filepath
         """
@@ -205,14 +218,14 @@ class LinuxVirtualDrive(VirtualDrive):
             logger.error(f"Failed to get {virtual_path} from drive.")
             logger.error(e)
             raise RuntimeError(e)
-    
+
     def get_file_contents(self, virtual_path: PathLike, local_path: PathLike = None):
         """Gets a contents from a file from the virtual drive. Optionally save the file too.
-        
+
         Args:
             virtual_path (PathLike): The path to the file on the virtual drive
             local_path (PathLike): The path to save the file to
-        
+
         Raises:
             (RuntimeError): Failed to get the filepath
         """
@@ -228,15 +241,15 @@ class LinuxVirtualDrive(VirtualDrive):
             cmd = "grep"
             args = f"-i '/mnt/{drive_letter} ' /etc/mtab"
             result = RunCmd(cmd, args)
-            
+
             # per man grep, ret 1 is no lines matched, so we can return
-            if result == 1: 
+            if result == 1:
                 return drive_letter
-            
+
             # per man grep, ret 0 is lines were matched
             elif result == 0:
                 continue
-           
+
             else:
                 e = f"[{cmd} {args}] Result: {result}"
                 logger.error("Failed to check if drive letter is in use.")
@@ -253,10 +266,10 @@ class WindowsVirtualDrive(VirtualDrive):
 
     def make_drive(self, size: int = 60):
         """Creates a virtual hard drive
-        
+
         Args:
             size (int | Optional): The size of the hard drive in MB
-        
+
         Raises:
             (RuntimeError): The drive could not be created
         """
@@ -295,11 +308,11 @@ class WindowsVirtualDrive(VirtualDrive):
 
     def get_file(self, virtual_path: PathLike, local_path: PathLike):
         """Gets a file from the virtual drive.
-        
+
         Args:
             virtual_path (PathLike): The path to the file on the virtual drive
             local_path (PathLike): The path to save the file to
-        
+
         Raises:
             (RuntimeError): Failed to get the filepath
         """
@@ -314,11 +327,11 @@ class WindowsVirtualDrive(VirtualDrive):
 
     def get_file_contents(self, virtual_path: PathLike, local_path: PathLike = None):
         """Gets a contents from a file from the virtual drive. Optionally save the file too.
-        
+
         Args:
             virtual_path (PathLike): The path to the file on the virtual drive
             local_path (PathLike): The path to save the file to
-        
+
         Raises:
             (RuntimeError): Failed to get the filepath
         """
@@ -339,33 +352,33 @@ class VirtualDriveManager(IUefiHelperPlugin):
         obj.Register("report_results", VirtualDriveManager.report_results, fp)
         obj.Register("generate_paging_audit", VirtualDriveManager.generate_paging_audit, fp)
         return 0
-    
+
     @staticmethod
     def get_virtual_drive(path: PathLike):
         if os.name == 'nt':
             return WindowsVirtualDrive(path)
         return LinuxVirtualDrive(path)
-    
+
     @staticmethod
     def add_tests(drive: VirtualDrive, test_list: list[str], auto_run = True, auto_shutdown = True, paging_audit = False):
         """Adds tests to the virtual drive and optionally adds them to the startup script.
-        
+
         !!! note
             Typically, to run a test, one must only run the test efi, however to automate this process, we have added
-            slightly more complex logic to the startup.nsh to ensure the tests will run and provide a fresh set of 
+            slightly more complex logic to the startup.nsh to ensure the tests will run and provide a fresh set of
             results each time tests are added to the it.
 
             1. We conditionally run a test based off of the presence of a <TestName>_JUNIT.XML. When this file is
                present, it means that the test has completely finished and the results have been recorded. Once the
                tests have finished, we rename them to _JUNIT_RESULT.XML so that the presence of these files will not
                stop tests from running again.
-            
+
             2. After all tests have finished, we delete two types of files. The first is a previous run's
                _JUNIT_RESULT.XML. This is necessary as the mv cannot overwrite a file. The second is that we delete
                a test's _Cache.dat file. This is important because if we do not delete this file, the efi will execute,
                but the test will not run. This is because a test uses the _Cache.dat file to see the current status
                of the test (important for tests that require restarts)
-            
+
             3. We finally rename the current test results to _JUNIT_RESULT.XML to reset test progress and also allow
                for test results to be read after Qemu has shut down.
         Args:
@@ -393,23 +406,23 @@ class VirtualDriveManager(IUefiHelperPlugin):
                 tests.append(f"if not exist {test.stem}_JUNIT.XML then")
                 tests.append(f"    {test.name}")
                 tests.append("endif")
-            
+
             # Tests have finished, no more restarts
             # Remove any old test results and reset test status
             tests.append("rm *_JUNIT_RESULT.XML")
             tests.append("rm *_Cache.dat")
-            
+
             # Rename test results to what we expect
             for test in test_list:
                 tests.append(f"if exist {test.stem}_JUNIT.XML then")
                 tests.append(f"    mv {test.stem}_JUNIT.XML {test.stem}_JUNIT_RESULT.XML")
                 tests.append("endif")
-            
+
             if paging_audit:
                 tests.append("DxePagingAuditTestApp.efi -d")
-            
+
         drive.add_startup_script(tests, auto_shutdown = auto_shutdown)
-    
+
     @staticmethod
     def report_results(drive: VirtualDrive, test_list: list[str], result_output_dir: Path) -> list[(str, str)]:
         """Prints test results to the terminal and returns the number of failed tests."""
@@ -441,12 +454,12 @@ class VirtualDriveManager(IUefiHelperPlugin):
                                 caseresult = "\t\tFAIL" + " - " + unescape(result.attrib['message'])
                                 failure_count += 1
                         logging.log( level, caseresult)
-                
+
             except Exception as ex:
                 logging.error("Exception trying to read xml." + str(ex))
                 failure_count += 1
         return failure_count
-    
+
     @staticmethod
     def generate_paging_audit(drive: VirtualDrive, report_output_dir: Path, version: str, platform: str):
         paging_audit_data_files = ["1G.dat", "2M.dat", "4K.dat", "PDE.dat", "MAT.dat",

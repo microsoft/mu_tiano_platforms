@@ -57,8 +57,8 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         OutputPath_FV = os.path.join(env.GetValue("BUILD_OUTPUT_BASE"), "FV")
         repo_version = env.GetValue("VERSION", "Unknown")
 
-        # Check if QEMU is on the path, if not find it
-        executable = "qemu-system-x86_64"
+        # Use a provided QEMU path. Default to the system path if not provided.
+        executable = env.GetValue("QEMU_PATH", "qemu-system-x86_64")
 
         # First query the version
         qemu_version = QemuRunner.QueryQemuVersion(executable)

@@ -67,7 +67,9 @@ jobs:
 
       variables:
       - name: Run
-        ${{ if or(eq(item.Value.Run, true), eq(parameters.os_type, 'Linux')) }}:
+        ${{ if EndsWith(item.Key, 'CODE_COVERAGE') }}:
+          value: false
+        ${{ elseif or(eq(item.Value.Run, true), eq(parameters.os_type, 'Linux')) }}:
           value: true
         ${{ else }}:
           value: false
@@ -102,15 +104,23 @@ jobs:
           install_tools: ${{ and(ne(item.Value.SelfHostAgent, true), eq(parameters.container_image, '')) }}
           artifacts_identifier: '${{ item.Value.BuildPackage }} $(tool_chain_tag) ${{ item.Value.BuildTarget }} ${{ item.Value.BuildExtraTag }}'
           artifacts_binary: ${{ item.Value.BuildArtifactsBinary }}
-          ${{ if or(eq(item.Value.Run, true), eq(parameters.os_type, 'Linux')) }}:
+          ${{ if or(eq(item.Value.Run, true), eq(parameters.os_type, 'Linux'), EndsWith(item.Key, 'CODE_COVERAGE')) }}:
             artifacts_other: ${{ item.Value.BuildArtifactsOther }}
+      
+      - ${{ if EndsWith(item.Key, 'CODE_COVERAGE') }}:
+        - template: Steps/UploadCodeCoverage.yml@mu_devops
+          parameters:
+            report_dir: 'Build/${{ item.Value.BuildPackage }}'
+            flag: '${{ item.Value.BuildPackage }}'
+            install_dependencies: true
 
     - job: RunQemuBuilds_${{ item.Key }}
       displayName: Run Qemu Builds ${{ item.Key }}
       dependsOn: PlatformBuild_${{ item.Key }}
       # Need to skip run-in-place for Windows ARM systems, as we do not have sufficient support for QEMU on those systems. We can get rid of these steps once we do.
       condition: |
-        and(succeeded(),
+        and(not(EndsWith('${{ item.Key }}', 'CODE_COVERAGE')),
+            succeeded(),
             and(ne(variables['tool_chain_tag'], 'GCC5'),
                 and(StartsWith('${{ item.Key }}', 'QemuQ35'), EndsWith('${{ item.Key }}', 'ARM'))))
 

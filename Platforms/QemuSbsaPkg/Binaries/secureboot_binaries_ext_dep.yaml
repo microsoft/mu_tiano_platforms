@@ -1,0 +1,18 @@
+## @file
+# Download the secureboot binary blobs for the default Db, 3PDb, Dbx, KEK, and Pk
+#
+# Copyright (c) Microsoft Corporation
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "qemusbsa",
+  "type": "web",
+  "name": "secureboot_binaries",
+  "source": "https://github.com/microsoft/secureboot_objects/releases/download/v1.1.0/edk2-aarch64-secureboot-binaries.tar.gz",
+  "version": "v1.1.0",
+  "sha256": "5dad5e98052ee8556f31c5730e0eded3fdfa7dcbe004e60ff6fdc1425e1bc7f2",
+  "internal_path": "/",
+  "compression_type": "tar",
+  "flags": ["set_build_var"],
+  "var_name": "SECUREBOOT_BINARIES"
+}
