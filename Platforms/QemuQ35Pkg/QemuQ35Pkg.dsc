@@ -44,9 +44,10 @@
   DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS = TRUE
 
   # Configure Shared Crypto
-  !ifndef ENABLE_SHARED_CRYPTO # by default true
-    ENABLE_SHARED_CRYPTO = TRUE
-  !endif
+  # !ifndef ENABLE_SHARED_CRYPTO # by default true
+  #   ENABLE_SHARED_CRYPTO = TRUE
+  # !endif
+  ENABLE_SHARED_CRYPTO = FALSE
   !if $(ENABLE_SHARED_CRYPTO) == TRUE
     PEI_CRYPTO_SERVICES = TINY_SHA
     DXE_CRYPTO_SERVICES = STANDARD
@@ -344,7 +345,7 @@
           BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
           TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
           IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf # Contains openSSL library used by BaseCryptoLib
+          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
         <PcdsFixedAtBuild>
           !include CryptoPkg/Driver/Bin/Crypto.pcd.STANDARD.inc.dsc
     }
@@ -353,7 +354,7 @@
           BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
           TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
           IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf # Contains openSSL library used by BaseCryptoLib
+          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
         <PcdsFixedAtBuild>
           !include CryptoPkg/Driver/Bin/Crypto.pcd.STANDARD.inc.dsc
     }
@@ -580,7 +581,7 @@
   StandaloneMmDriverEntryPoint|MmSupervisorPkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
   # TODO: ShareCrypto support
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
-  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
   AdvLoggerAccessLib|MdeModulePkg/Library/AdvLoggerAccessLibNull/AdvLoggerAccessLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibStandaloneMm.inf
@@ -1380,7 +1381,7 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf {
     <LibraryClasses>
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
-      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf # Contains openSSL library used by BaseCryptoLib
+      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
       IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
     <PcdsPatchableInModule>
       #Turn off Halt on Assert and Print Assert so that libraries can
@@ -1497,7 +1498,7 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
       TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
       IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf # Contains openSSL library used by BaseCryptoLib
+      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
   }
 
   #
