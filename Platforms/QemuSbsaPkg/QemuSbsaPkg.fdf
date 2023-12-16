@@ -408,6 +408,7 @@ READ_LOCK_STATUS   = TRUE
   INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
   INF  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
   INF  MsCorePkg/HelloWorldRustDxe/HelloWorldRustDxe.inf
+  INF  AdvLoggerPkg/Application/AdvancedLogDumper/AdvancedLogDumper.inf
 
   #
   # DFCI support
