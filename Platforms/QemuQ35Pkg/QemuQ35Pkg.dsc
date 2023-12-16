@@ -1190,7 +1190,6 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
   AdvLoggerPkg/Application/AdvancedLogDumper/AdvancedLogDumper.inf
-  MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
 
   QemuQ35Pkg/QemuVideoDxe/QemuVideoDxe.inf
 
