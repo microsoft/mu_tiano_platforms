@@ -275,7 +275,7 @@ jobs:
       run: stuart_setup -c ${{ matrix.build_file }} -t DEBUG -a ${{ matrix.archs }} TOOL_CHAIN_TAG=${{ matrix.tool_chain_tag }}
 
     - name: Upload Setup Log As An Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: (success() || failure()) && steps.get_platform_info.outputs.setup_supported == 'true'
       with:
         name: ${{ steps.get_platform_info.outputs.pkg_name }}-Logs
@@ -291,7 +291,7 @@ jobs:
       run: stuart_ci_setup -c ${{ matrix.build_file }} -t DEBUG -a ${{ matrix.archs }} TOOL_CHAIN_TAG=${{ matrix.tool_chain_tag }}
 
     - name: Upload CI Setup Log As An Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: (success() || failure()) && steps.get_platform_info.outputs.ci_setup_supported == 'true'
       with:
         name: ${{ steps.get_platform_info.outputs.pkg_name }}-Logs
@@ -306,7 +306,7 @@ jobs:
       run: stuart_update -c ${{ matrix.build_file }} -t DEBUG -a ${{ matrix.archs }} TOOL_CHAIN_TAG=${{ matrix.tool_chain_tag }}
 
     - name: Upload Update Log As An Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: success() || failure()
       with:
         name: ${{ steps.get_platform_info.outputs.pkg_name }}-Logs
@@ -424,7 +424,7 @@ jobs:
         delete_dirs(build_path)
 
     - name: Upload Build Logs As An Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: success() || failure()
       with:
         name: ${{ steps.get_platform_info.outputs.pkg_name }}-Logs
@@ -455,7 +455,7 @@ jobs:
             print(f'sarif_file_path={sarif_path}', file=fh)
 
     - name: Upload CodeQL Results (SARIF) As An Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ steps.get_platform_info.outputs.pkg_name }}-CodeQL-SARIF
         path: ${{ steps.env_data.outputs.sarif_file_path }}

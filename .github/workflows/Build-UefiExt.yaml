@@ -39,7 +39,7 @@ jobs:
       
       - name: Publish Binary
         if: ${{ matrix.configuration == 'Release' && github.event_name != 'pull_request' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: UefiDbgExt-${{ matrix.platform }}-${{ matrix.configuration }}
           path: UefiDbgExt\${{ matrix.platform }}\${{ matrix.configuration }}\uefiext.dll
