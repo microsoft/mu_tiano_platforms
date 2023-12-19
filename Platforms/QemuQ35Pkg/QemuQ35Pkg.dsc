@@ -678,11 +678,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize|0x1000
   gPcBdsPkgTokenSpaceGuid.PcdEnableMemMapOutput|0x1
   gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedFileLoggerFlush|3
-  gEfiSecurityPkgTokenSpaceGuid.PcdUserPhysicalPresence|FALSE
-
   gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedLoggerPreMemPages|3
-  gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedLoggerMessageMmCorePrefix|"[MM]"
-  gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedLoggerMessagePeiCorePrefix|"[PEI]"
+  gEfiSecurityPkgTokenSpaceGuid.PcdUserPhysicalPresence|FALSE
 
 !if $(NETWORK_TLS_ENABLE) == FALSE
   # match PcdFlashNvStorageVariableSize purely for convenience
