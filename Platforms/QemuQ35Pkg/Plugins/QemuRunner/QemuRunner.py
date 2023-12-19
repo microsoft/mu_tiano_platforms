@@ -64,7 +64,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         qemu_version = QemuRunner.QueryQemuVersion(executable)
 
         # write messages to stdio
-        args = "-debugcon stdio -no-reboot"
+        args = "-debugcon stdio"
         # debug messages out thru virtual io port
         args += " -global isa-debugcon.iobase=0x402"
         # Turn off S3 support

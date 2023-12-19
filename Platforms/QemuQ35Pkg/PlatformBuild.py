@@ -257,10 +257,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
             "txt": logs to plain text file
         """
-        if loggerType == 'con':
-            return logging.WARNING
-        else:
-            return super().GetLoggingLevel(loggerType)
+        return logging.INFO
+        return super().GetLoggingLevel(loggerType)
 
     def SetPlatformEnv(self):
         logging.debug("PlatformBuilder SetPlatformEnv")
