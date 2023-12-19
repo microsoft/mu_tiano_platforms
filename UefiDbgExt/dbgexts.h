@@ -31,7 +31,6 @@ Module Name:
 extern "C" {
 #endif
 
-
 #define INIT_API()                             \
     HRESULT Status;                            \
     if ((Status = ExtQuery(Client)) != S_OK) return Status;
@@ -39,25 +38,30 @@ extern "C" {
 #define EXT_RELEASE(Unk) \
     ((Unk) != NULL ? ((Unk)->Release(), (Unk) = NULL) : NULL)
 
-#define EXIT_API     ExtRelease
-
+#define EXIT_API  ExtRelease
 
 // Global variables initialized by query.
-extern PDEBUG_CLIENT4        g_ExtClient;
-extern PDEBUG_CONTROL        g_ExtControl;
-extern PDEBUG_SYMBOLS2       g_ExtSymbols;
+extern PDEBUG_CLIENT4   g_ExtClient;
+extern PDEBUG_CONTROL   g_ExtControl;
+extern PDEBUG_SYMBOLS2  g_ExtSymbols;
 
-extern BOOL  Connected;
-extern ULONG TargetMachine;
+extern BOOL   Connected;
+extern ULONG  TargetMachine;
 
 HRESULT
-ExtQuery(PDEBUG_CLIENT4 Client);
+ExtQuery (
+  PDEBUG_CLIENT4  Client
+  );
 
 void
-ExtRelease(void);
+ExtRelease (
+  void
+  );
 
 HRESULT
-NotifyOnTargetAccessible(PDEBUG_CONTROL Control);
+NotifyOnTargetAccessible (
+  PDEBUG_CONTROL  Control
+  );
 
 #ifdef __cplusplus
 }
