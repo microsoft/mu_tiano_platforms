@@ -573,6 +573,7 @@ FILE FREEFORM = PCD(gZeroTouchPkgTokenSpaceGuid.PcdZeroTouchCertificateFile) {
   INF MfciPkg/MfciDxe/MfciDxe.inf
   INF MsGraphicsPkg/OnScreenKeyboardDxe/OnScreenKeyboardDxe.inf
   INF MsGraphicsPkg/SimpleWindowManagerDxe/SimpleWindowManagerDxe.inf
+  INF AdvLoggerPkg/Application/AdvancedLogDumper/AdvancedLogDumper.inf
 !if $(SMM_ENABLED) == TRUE
   INF MmSupervisorPkg/Drivers/MmSupervisorErrorReport/MmSupervisorErrorReport.inf
 !endif

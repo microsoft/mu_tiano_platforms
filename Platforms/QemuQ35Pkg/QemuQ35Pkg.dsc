@@ -203,7 +203,6 @@
   MemoryTypeInfoSecVarCheckLib   |MdeModulePkg/Library/MemoryTypeInfoSecVarCheckLib/MemoryTypeInfoSecVarCheckLib.inf # MU_CHANGE TCBZ1086
   MemoryTypeInformationChangeLib |MdeModulePkg/Library/MemoryTypeInformationChangeLibNull/MemoryTypeInformationChangeLibNull.inf
   MtrrLib                        |UefiCpuPkg/Library/MtrrLib/MtrrLib.inf # Memory Type Range Register (https://en.wikipedia.org/wiki/Memory_type_range_register)
-  MmUnblockMemoryLib             |MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
   DxeMemoryProtectionHobLib      |MdeModulePkg/Library/MemoryProtectionHobLibNull/DxeMemoryProtectionHobLibNull.inf
   ExceptionPersistenceLib        |MsCorePkg/Library/ExceptionPersistenceLibCmos/ExceptionPersistenceLibCmos.inf
   CpuPageTableLib                |UefiCpuPkg/Library/CpuPageTableLib/CpuPageTableLib.inf
@@ -409,6 +408,7 @@
   RngLib                     |MdePkg/Library/BaseRngLib/BaseRngLib.inf
   MemEncryptSevLib           |QemuQ35Pkg/Library/BaseMemEncryptSevLib/PeiMemEncryptSevLib.inf
   FrameBufferMemDrawLib      |MsGraphicsPkg/Library/FrameBufferMemDrawLib/FrameBufferMemDrawLibPei.inf
+  MmUnblockMemoryLib         |MmSupervisorPkg/Library/MmSupervisorUnblockMemoryLib/MmSupervisorUnblockMemoryLibPei.inf
 
 [LibraryClasses.common.PEI_CORE]
   PeiCoreEntryPoint |MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
@@ -580,7 +580,7 @@
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-  AdvLoggerAccessLib|MdeModulePkg/Library/AdvLoggerAccessLibNull/AdvLoggerAccessLib.inf
+  AdvLoggerAccessLib|AdvLoggerPkg/Library/AdvLoggerMmAccessLib/AdvLoggerMmAccessLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibStandaloneMm.inf
   RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
   PciLib|QemuQ35Pkg/Library/DxePciLibI440FxQ35/DxePciLibI440FxQ35.inf
@@ -603,10 +603,17 @@
   AssertLib|AdvLoggerPkg/Library/AssertLib/AssertLib.inf
   AdvancedLoggerAccessLib|AdvLoggerPkg/Library/AdvancedLoggerAccessLib/AdvancedLoggerAccessLib.inf
 
-[LibraryClasses.common.MM_CORE_STANDALONE, LibraryClasses.common.MM_STANDALONE, LibraryClasses.common.PEIM, LibraryClasses.common.PEI_CORE]
+[LibraryClasses.IA32.PEI_CORE]
+  AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/PeiCore/AdvancedLoggerLib.inf
+
+[LibraryClasses.IA32.PEIM]
+  AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Pei/AdvancedLoggerLib.inf
 !ifndef $(DEBUG_ON_SERIAL_PORT)
-  DebugLib|QemuQ35Pkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
+  DebugLib|AdvLoggerPkg/Library/PeiDebugLibAdvancedLogger/PeiDebugLibAdvancedLogger.inf
 !endif
+
+[LibraryClasses.X64.PEIM]
+  AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Pei64/AdvancedLoggerLib.inf
 
 [LibraryClasses.X64]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Dxe/AdvancedLoggerLib.inf
@@ -614,27 +621,18 @@
 
 [LibraryClasses.X64.DXE_CORE]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/DxeCore/AdvancedLoggerLib.inf
-!ifndef $(DEBUG_ON_SERIAL_PORT)
-  DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
-!endif
 
 [LibraryClasses.X64.DXE_SMM_DRIVER]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Smm/AdvancedLoggerLib.inf
-!ifndef $(DEBUG_ON_SERIAL_PORT)
-  DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
-!endif
 
 [LibraryClasses.X64.SMM_CORE]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Smm/AdvancedLoggerLib.inf
-!ifndef $(DEBUG_ON_SERIAL_PORT)
-  DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
-!endif
 
 [LibraryClasses.X64.DXE_RUNTIME_DRIVER]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Runtime/AdvancedLoggerLib.inf
-!ifndef $(DEBUG_ON_SERIAL_PORT)
-  DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
-!endif
+
+[LibraryClasses.X64.MM_CORE_STANDALONE, LibraryClasses.X64.MM_STANDALONE]
+  AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/MmCore/AdvancedLoggerLib.inf
 
 ################################################################################
 #
@@ -680,6 +678,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize|0x1000
   gPcBdsPkgTokenSpaceGuid.PcdEnableMemMapOutput|0x1
   gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedFileLoggerFlush|3
+  gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedLoggerPreMemPages|3
   gEfiSecurityPkgTokenSpaceGuid.PcdUserPhysicalPresence|FALSE
 
 !if $(NETWORK_TLS_ENABLE) == FALSE
@@ -1187,6 +1186,7 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
+  AdvLoggerPkg/Application/AdvancedLogDumper/AdvancedLogDumper.inf
 
   QemuQ35Pkg/QemuVideoDxe/QemuVideoDxe.inf
 

@@ -525,22 +525,33 @@
 # Advanced Logger Libraries
 #########################################
 [LibraryClasses]
-  DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+  DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
   AssertLib|AdvLoggerPkg/Library/AssertLib/AssertLib.inf
   AdvancedLoggerHdwPortLib|AdvLoggerPkg/Library/AdvancedLoggerHdwPortLib/AdvancedLoggerHdwPortLib.inf
   AdvancedLoggerAccessLib|AdvLoggerPkg/Library/AdvancedLoggerAccessLib/AdvancedLoggerAccessLib.inf
 
+[LibraryClasses.common.SEC]
+  DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+
+[LibraryClasses.common.PEI_CORE]
+  AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/PeiCore/AdvancedLoggerLib.inf
+
+[LibraryClasses.common.PEIM]
+  AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Pei/AdvancedLoggerLib.inf
+
 [LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.UEFI_APPLICATION]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Dxe/AdvancedLoggerLib.inf
-  DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
 
 [LibraryClasses.common.DXE_CORE]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/DxeCore/AdvancedLoggerLib.inf
-  DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Runtime/AdvancedLoggerLib.inf
-  DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
+
+[LibraryClasses.common.MM_CORE_STANDALONE, LibraryClasses.common.MM_STANDALONE]
+  # Current support of advanced logger in Standalone MM is limited to the platforms
+  # that supports it from TFA.
+  DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 
 [BuildOptions]
 !include NetworkPkg/NetworkBuildOptions.dsc.inc
@@ -599,6 +610,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|0
   gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout|10000000
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320
+  gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedLoggerPreMemPages|3
 
 !if $(TARGET) != RELEASE
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|$(DEBUG_PRINT_ERROR_LEVEL)
@@ -649,7 +661,7 @@
 !endif
 
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x1000007c000
-  gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x4000
+  gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x10000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800
   gEfiSecurityPkgTokenSpaceGuid.PcdUserPhysicalPresence|FALSE
@@ -1063,6 +1075,7 @@
 
   MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
   SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+  AdvLoggerPkg/Application/AdvancedLogDumper/AdvancedLogDumper.inf
 
   #
   # DFCI support
