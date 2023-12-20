@@ -80,6 +80,21 @@
   DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS  = TRUE
   DEFINE NETWORK_ISCSI_ENABLE            = FALSE
 
+  #
+  # Configure Shared Crypto
+  #
+  !ifndef ENABLE_SHARED_CRYPTO # by default false, because it is not supported on ARM platforms for now
+    ENABLE_SHARED_CRYPTO = FALSE
+  !endif
+  !if $(ENABLE_SHARED_CRYPTO) == TRUE
+    PEI_CRYPTO_SERVICES = TINY_SHA
+    DXE_CRYPTO_SERVICES = STANDARD
+    SMM_CRYPTO_SERVICES = STANDARD
+    PEI_CRYPTO_ARCH = IA32
+    DXE_CRYPTO_ARCH = X64
+    SMM_CRYPTO_ARCH = X64
+  !endif
+
 !if $(NETWORK_SNP_ENABLE) == TRUE
   !error "NETWORK_SNP_ENABLE is IA32/X64/EBC only"
 !endif
@@ -204,13 +219,6 @@
   #
   # CryptoPkg libraries needed by multiple firmware features
   #
-  IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-!if $(NETWORK_TLS_ENABLE) == TRUE
-  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
-!else
-  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
-!endif
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
   ArmMonitorLib|ArmPkg/Library/ArmMonitorLib/ArmMonitorLib.inf
   ArmTrngLib|ArmPkg/Library/ArmTrngLib/ArmTrngLib.inf
@@ -437,7 +445,6 @@
   PolicyLib                  |PolicyServicePkg/Library/PeiPolicyLib/PeiPolicyLib.inf
 
 !if $(TPM2_ENABLE) == TRUE
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
 !endif
 
@@ -472,10 +479,6 @@
   VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
   ResetSystemLib|MdeModulePkg/Library/RuntimeResetSystemLib/RuntimeResetSystemLib.inf
 
-!if $(SECURE_BOOT_ENABLE) == TRUE
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
-!endif
-
 [LibraryClasses.common.MM_CORE_STANDALONE]
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
@@ -497,7 +500,7 @@
   MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   RngLib|MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
   VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
@@ -888,6 +891,51 @@
 
 ################################################################################
 #
+# Crypto magic, be it shared binary or on protocol/ppi
+#
+################################################################################
+#SHARED_CRYPTO
+!if $(ENABLE_SHARED_CRYPTO) == FALSE
+  [LibraryClasses.common.PEIM]
+    BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
+    TlsLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
+
+  [LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.UEFI_APPLICATION]
+    BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/DxeCryptLib.inf
+    TlsLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/DxeCryptLib.inf
+
+  [Components.common.PEIM]
+    CryptoPkg/Driver/CryptoPei.inf {
+        <LibraryClasses>
+          BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
+          TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
+          !if "MSFT" IN $(FAMILY)
+            NULL|MdePkg/Library/VsIntrinsicLib/VsIntrinsicLib.inf
+          !endif
+          IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf # Contains openSSL library used by BaseCryptoLib
+        <PcdsFixedAtBuild>
+          !include CryptoPkg/Driver/Bin/Crypto.pcd.TINY_SHA.inc.dsc
+    }
+
+  [Components.common.DXE_DRIVER]
+    CryptoPkg/Driver/CryptoDxe.inf {
+        <LibraryClasses>
+          BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+          TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
+          IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
+        <PcdsFixedAtBuild>
+          !include CryptoPkg/Driver/Bin/Crypto.pcd.STANDARD.inc.dsc
+    }
+!else
+  # Shared Crypto Include
+  [Components]
+    !include CryptoPkg/Driver/Bin/CryptoDriver.inc.dsc
+!endif
+
+################################################################################
+#
 # Components Section - list of all EDK II Modules needed by this Platform
 #
 ################################################################################
@@ -1213,7 +1261,7 @@
   CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf {
     <LibraryClasses>
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
-      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf # Contains openSSL library used by BaseCryptoLib
+      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
       IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
     <PcdsPatchableInModule>
       #Turn off Halt on Assert and Print Assert so that libraries can
