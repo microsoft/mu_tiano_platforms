@@ -71,14 +71,18 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
             storage_format = {
                 ".vhd": "raw",
-                ".qcow2": "qcow2"
+                ".qcow2": "qcow2",
+                ".iso": "iso",
             }.get(file_extension, None)
 
             if storage_format is None:
                 raise Exception(f"Unknown OS storage type: {path_to_os}")
 
-            args += f" -drive file=\"{path_to_os}\",format={storage_format},if=none,id=os_nvme"
-            args += " -device nvme,serial=nvme-1,drive=os_nvme"
+            if storage_format == "iso":
+                args += f" -cdrom \"{path_to_os}\""
+            else:
+                args += f" -drive file=\"{path_to_os}\",format={storage_format},if=none,id=os_nvme"
+                args += " -device nvme,serial=nvme-1,drive=os_nvme"
         elif os.path.isfile(VirtualDrive):
             args += f" -drive file={VirtualDrive},if=virtio"
         elif os.path.isdir(VirtualDrive):
@@ -139,7 +143,6 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             args += " -monitor tcp:127.0.0.1:" + monitor_port + ",server,nowait"
 
         # Run QEMU
-        #ret = QemuRunner.RunCmd(executable, args,  thread_target=QemuRunner.QemuCmdReader)
         ret = utility_functions.RunCmd(executable, args)
         if ret != 0 and os.name != 'nt':
             # Linux version of QEMU will mess with the print if its run failed, this is to restore it
