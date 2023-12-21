@@ -8,19 +8,13 @@
 
 import logging
 import os
-import threading
 import datetime
-import subprocess
 import re
 import io
 import shutil
 from pathlib import Path
-from edk2toolext.environment import plugin_manager
 from edk2toolext.environment.plugintypes import uefi_helper_plugin
 from edk2toollib import utility_functions
-from edk2toollib.uefi.edk2.parsers.dsc_parser import DscParser
-from edk2toollib.uefi.edk2.parsers.inf_parser import InfParser
-from edk2toolext.environment.multiple_workspace import MultipleWorkspace
 
 class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
@@ -236,79 +230,3 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             ret = 0
 
         return ret
-
-    ####
-    # Helper functions for running commands from the shell in python environment
-    # Don't use directly
-    #
-    # process output stream and write to log.
-    # part of the threading pattern.
-    #
-    #  http://stackoverflow.com/questions/19423008/logged-subprocess-communicate
-    ####
-    @staticmethod
-    def QemuCmdReader(filepath, outstream, stream, logging_level=logging.INFO):
-        f = None
-        # open file if caller provided path
-        error_found = False
-        if(filepath):
-            f = open(filepath, "w")
-        while True:
-            try:
-                s = stream.readline().decode()
-                ss = s.rstrip() # string stripped
-            except UnicodeDecodeError as e:
-                logging.error(str(e))
-            if not s:
-                break
-            if(f is not None):
-                # write to file if caller provided file
-                f.write(ss)
-                f.write("\n")
-            if(outstream is not None):
-                # write to stream object if caller provided object
-                outstream.write(ss)
-                f.write("\n")
-            logging.log(logging_level, ss)
-            if s.startswith("ASSERT "):
-                message = "ASSERT DETECTED, killing QEMU process: " + ss
-                logging.error(message)
-                if (outstream is not None):
-                    outstream.write(message)
-                if (f is not None):
-                    f.write(message)
-                error_found = True
-                break
-        stream.close()
-        if(f is not None):
-            f.close()
-        return None if not error_found else 1
-
-####
-# Class to support running commands from the shell in a python environment.
-# Don't use directly.
-#
-# PropagatingThread copied from sample here:
-# https://stackoverflow.com/questions/2829329/catch-a-threads-exception-in-the-caller-thread-in-python
-####
-class PropagatingThread(threading.Thread):
-    def run(self):
-        self.exc = None
-        self.ret = None
-        try:
-            if hasattr(self, '_Thread__target'):
-                # Thread uses name mangling prior to Python 3.
-                self.ret = self._Thread__target(*self._Thread__args, **self._Thread__kwargs)
-            else:
-                self.ret = self._target(*self._args, **self._kwargs)
-        except SystemExit as e:
-            self.ret = e.code
-        except BaseException as e:
-            self.exc = e
-
-    def join(self, timeout=0.5):
-        ''' timeout is the number of seconds to timeout '''
-        super(PropagatingThread, self).join(timeout)
-        if self.exc:
-            raise self.exc
-        return self.ret
