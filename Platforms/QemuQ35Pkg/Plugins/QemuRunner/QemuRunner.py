@@ -214,7 +214,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             args += " -monitor tcp:127.0.0.1:" + monitor_port + ",server,nowait"
 
         # Run QEMU
-        ret = utility_functions.RunCmd(executable, args, logging_level=logging.CRITICAL)
+        ret = utility_functions.RunCmd(executable, args)
         if ret != 0 and os.name != 'nt':
             # Linux version of QEMU will mess with the print if its run failed, this is to restore it
             utility_functions.RunCmd ('stty', 'echo')
