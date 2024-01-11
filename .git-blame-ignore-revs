@@ -1,0 +1,19 @@
+###################################################
+# Line Ending Only Changes                        #
+###################################################
+# Fix line endings (LF to CRLF)
+c853b999de5d0bdece402c2cbd4782aad8002607
+# OvmfPkg: convert C files with LF line terminators to CRLF
+dde2662a0848293eed4fccc2d1ceaa429b1f7702
+# OvmfPkg/SerializeVariablesLib: convert line endings to uniform CRLF
+86cba94f94c7025dc6cbcf11ac0ca7d95d0c9f16
+# OvmfPkg/Sec/SecMain.c: Convert to CRLF (dos) text
+19ab6f660fb71168e67d770dca1166b4f85282e3
+
+###################################################
+# Code Formatting (Uncrustify) Only Changes       #
+###################################################
+# OvmfPkg: Uncrustify fixes
+1b090e756186838eed0c7477aa81c61315e90dad
+# OvmfPkg: Apply uncrustify changes
+b7893247c679c1bfb3a24f402358d47ecf9d7cb3
