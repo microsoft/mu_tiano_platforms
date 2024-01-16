@@ -61,8 +61,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
         qemu_version = QemuRunner.QueryQemuVersion(executable)
 
-        # turn off network
-        args = "-net none"
+        args = ""
 
         # Mount disk with either startup.nsh or OS image
         path_to_os = env.GetValue("PATH_TO_OS")
@@ -86,7 +85,8 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         else:
             logging.critical("Virtual Drive Path Invalid")
 
-        if path_to_os is not None:
+        local_pxe_boot = env.GetValue("LOCAL_PXE_BOOT")
+        if (path_to_os is not None) or (local_pxe_boot is not None and local_pxe_boot.upper() == "TRUE"):
             args += " -m 8192"
         else:
             args += " -m 2048"
@@ -107,6 +107,24 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         args += " -device qemu-xhci,id=usb"
         args += " -device usb-tablet,id=input0,bus=usb.0,port=1"  # add a usb mouse
         args += " -device usb-kbd,id=input1,bus=usb.0,port=2"     # add a usb keyboard
+
+        if local_pxe_boot is not None and local_pxe_boot.upper() == "TRUE":
+            # Prepare PXE folder and boot file, default to Shell.efi from build directory
+            pxe_path = env.GetValue("PXE_FOLDER_PATH")
+            pxe_file = env.GetValue("PXE_BOOT_FILE")
+            pxe_oprom = env.GetValue("PXE_OPTION_ROM")
+            if pxe_path is None or pxe_file is None:
+                pxe_path = os.path.join(env.GetValue("BUILD_OUTPUT_BASE"), "X64")
+                pxe_file = "Shell.efi"
+
+            # Enable e1000 as nic and setup the TFTP server for pxe boot
+            args += f" -netdev user,id=net0,tftp={pxe_path},bootfile={pxe_file} "\
+                    f"-device e1000e,netdev=net0"\
+                    f",romfile={pxe_oprom}"
+
+            # Tips:
+            # To dump the network traffic to a file, add the following to the above line
+            # " -object filter-dump,id=f1,netdev=net0,file=dump.dat"
 
         creation_time = Path(code_fd).stat().st_ctime
         creation_datetime = datetime.datetime.fromtimestamp(creation_time)
