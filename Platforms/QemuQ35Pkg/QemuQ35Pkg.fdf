@@ -276,7 +276,7 @@ INF  OemPkg/OemConfigPolicyCreatorPei/OemConfigPolicyCreatorPei.inf
 
 # Shared Crypto
 !if $(ENABLE_SHARED_CRYPTO) == TRUE
-  !include CryptoPkg/Driver/Bin/CryptoDriver.BOOTBLOCK.inc.fdf
+  !include CryptoPkg/Driver/Bin/CryptoDriver.PEI.inc.fdf
 !else
   INF  CryptoPkg/Driver/CryptoPei.inf
 !endif
@@ -525,9 +525,11 @@ INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
 #SHARED_CRYPTO Crypto Bin Modules
 !if $(ENABLE_SHARED_CRYPTO) == TRUE
   !include CryptoPkg/Driver/Bin/CryptoDriver.DXE.inc.fdf
+  !include CryptoPkg/Driver/Bin/CryptoDriver.STANDALONEMM.inc.fdf
 !else
   INF  CryptoPkg/Driver/CryptoDxe.inf
   INF  CryptoPkg/Driver/CryptoSmm.inf
+  INF  CryptoPkg/Driver/CryptoStandaloneMm.inf
 !endif
 
 !if $(BUILD_UNIT_TESTS) == TRUE
@@ -736,6 +738,14 @@ FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
     PE32     PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
     UI       STRING="$(MODULE_NAME)" Optional
     VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.MM_STANDALONE.BINARY]
+  FILE MM_STANDALONE = $(NAMED_GUID) {
+    SMM_DEPEX SMM_DEPEX Optional      |.depex
+    PE32      PE32                    |.efi
+    UI        STRING="$(MODULE_NAME)" Optional
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
 [Rule.Common.UEFI_APPLICATION]
