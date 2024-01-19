@@ -52,9 +52,11 @@
     PEI_CRYPTO_SERVICES = TINY_SHA
     DXE_CRYPTO_SERVICES = STANDARD
     SMM_CRYPTO_SERVICES = STANDARD
+    STANDALONEMM_CRYPTO_SERVICES = STANDARD
     PEI_CRYPTO_ARCH = IA32
     DXE_CRYPTO_ARCH = X64
     SMM_CRYPTO_ARCH = X64
+    STANDALONEMM_CRYPTO_ARCH = X64
   !endif
 
 ################################################################################
@@ -357,6 +359,17 @@
         <PcdsFixedAtBuild>
           !include CryptoPkg/Driver/Bin/Crypto.pcd.STANDARD.inc.dsc
     }
+    CryptoPkg/Driver/CryptoStandaloneMm.inf {
+      <LibraryClasses>
+        BaseCryptLib  |CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
+        TlsLib        |CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
+        OpensslLib    |CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
+        IntrinsicLib  |CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+        FltUsedLib    |MdePkg/Library/FltUsedLib/FltUsedLib.inf
+        SafeIntLib    |MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
+      <PcdsFixedAtBuild>
+        !include CryptoPkg/Driver/Bin/Crypto.pcd.STANDARD.inc.dsc
+    }
 !endif
 
 [LibraryClasses]
@@ -579,8 +592,7 @@
   ReportStatusCodeLib|MdeModulePkg/Library/SmmReportStatusCodeLib/StandaloneMmReportStatusCodeLib.inf
   HwResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   StandaloneMmDriverEntryPoint|MmSupervisorPkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
-  # TODO: ShareCrypto support
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/StandaloneMmCryptLib.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
   AdvLoggerAccessLib|AdvLoggerPkg/Library/AdvLoggerMmAccessLib/AdvLoggerMmAccessLib.inf

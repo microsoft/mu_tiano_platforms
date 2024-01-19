@@ -33,7 +33,6 @@ name = "RustAdvancedLoggerDxe"
 version = "0.1.0"
 dependencies = [
  "r-efi",
- "spin",
 ]
 
 [[package]]
