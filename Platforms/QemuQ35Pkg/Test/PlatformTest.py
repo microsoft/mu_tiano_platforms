@@ -10,7 +10,8 @@ from edk2toolext.environment.uefi_build import UefiBuilder
 from edk2toollib.utility_functions import RunCmd
 from edk2toolext.edk2_logging import SECTION, SUB_SECTION 
 from edk2toollib.uefi.edk2.parsers.dsc_parser import DscParser
-from edk2toollib.database import Edk2DB
+from edk2toollib.database import Edk2DB, Environment, Inf, Source, InstancedInf
+from sqlalchemy import func, not_
 from pathlib import Path
 import logging
 import sys
@@ -26,40 +27,6 @@ PLATFORM_NAME = 'QemuQ35Pkg'
 PLATFORM_TEST_DSC = 'QemuQ35Pkg/Test/QemuQ35PkgHostTest.dsc'
 PLATFORM_DSC = 'QemuQ35Pkg/QemuQ35Pkg.dsc'
 PLATFORMBUILD_DIR = str(Path(__file__).parent.parent)
-
-# The query to determine which INFs test source files used by QemuQ35Pkg/QemuQ35Pkg.dsc
-TEST_QUERY = """
-WITH host_test_files AS (
-    SELECT inf.path as 'inf', junction.key2 as 'source'
-    FROM
-        inf,
-        junction
-    WHERE
-        junction.table1 = 'inf'
-        AND junction.table2 = 'source'
-        AND inf.module_type = 'HOST_APPLICATION'
-        AND inf.path = junction.key1
-)
-SELECT DISTINCT host_test_files.inf
-FROM
-    instanced_inf_source_junction AS iisj
-JOIN host_test_files ON iisj.source = host_test_files.source
-WHERE
-    iisj.instanced_inf NOT LIKE '%UnitTestApp.inf'
-    AND iisj.env = ?;
-"""
-
-ID_QUERY_BY_PACKAGE = """
-SELECT environment.id
-FROM
-    environment
-    LEFT JOIN environment_values ON environment.id = environment_values.id
-WHERE
-    environment_values.key = 'ACTIVE_PLATFORM'
-    AND environment_values.value = ?
-ORDER BY environment.date DESC
-LIMIT 1;
-"""
 
 
 class TestSettingsManager(PlatformBuild.SettingsManager):
@@ -135,7 +102,7 @@ class TestManager(BuildSettingsManager, UefiBuilder):
         logging.info(f'Report Types: {",".join(reporttypes)}')
 
         coverage_file = Path(self.env.GetValue("BUILD_OUTPUT_BASE"), "_coverage.xml")
-        coverage_file = str(coverage_file.rename(coverage_file.parent / f'{PLATFORM_NAME}_coverage.xml'))
+        coverage_file = str(coverage_file.replace(coverage_file.parent / f'{PLATFORM_NAME}_coverage.xml'))
         if not self._reorganize_coverage_report(coverage_file):
             return -1
 
@@ -153,10 +120,27 @@ class TestManager(BuildSettingsManager, UefiBuilder):
         dscp.SetEdk2Path(self.edk2path).SetInputVars(self.env.GetAllBuildKeyValues() | self.env.GetAllNonBuildKeyValues())
         dscp.ParseFile(self.env.GetValue("ACTIVE_PLATFORM")) # The test DSC
 
-        with Edk2DB(db_path) as db:
+        with Edk2DB(db_path).session() as session:
             used_tests = set([component for component, _, _ in dscp.Components])
-            env_id = db.connection.execute(ID_QUERY_BY_PACKAGE, (PLATFORM_DSC,)).fetchone()[0]
-            must_use_tests = set([module for module, in db.connection.execute(TEST_QUERY, (env_id,)).fetchall()])
+            env_id = session.query(Environment).filter(Environment.values.any(key="ACTIVE_PLATFORM", value=PLATFORM_DSC)).order_by(Environment.date.desc()).first().id
+
+            host_tests = (
+                session
+                    .query(Inf.path, Source.path)
+                    .join(Inf.sources)
+                    .filter(Inf.module_type == "HOST_APPLICATION")
+                    .all()
+            )
+            source_query = (
+                session
+                    .query(Source.path)
+                    .join(InstancedInf.sources)
+                    .filter(InstancedInf.env == env_id)
+                    .filter(not_(func.lower(InstancedInf.name).like("%testapp%")))
+            )
+            used_source = set([source for source, in source_query.all()])
+            must_use_tests = set([module for module, source in host_tests if source in used_source])
+
             unused_tests = must_use_tests - used_tests
         
         if len(unused_tests) > 0:
@@ -246,7 +230,7 @@ class TestManager(BuildSettingsManager, UefiBuilder):
         return True
 
     def _verify_db_data(self, db_path: Path) -> bool:
-        with Edk2DB(db_path, self.edk2path) as db:
-            if db.connection.execute("SELECT COUNT(*) from instanced_inf WHERE ? LIKE '%' || dsc || '%'", (PLATFORM_DSC,)).fetchone()[0] == 0:
+        with Edk2DB(db_path).session() as session:
+            if len(session.query(Environment).filter(Environment.values.any(key="ACTIVE_PLATFORM", value=PLATFORM_DSC)).all()) == 0:
                 return False
             return True
