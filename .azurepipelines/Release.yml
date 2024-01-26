@@ -18,6 +18,10 @@ resources:
       endpoint: microsoft
       name: microsoft/mu_devops
       ref: main
+  containers:
+    - container: linux-gcc
+      image: ghcr.io/microsoft/mu_devops/ubuntu-22-test:latest
+      options: --name mu_devops_build_container
 
 name: $(Date:yyyyMMdd)$(Rev:.r) Mu Tiano Platforms Release
 
@@ -34,7 +38,7 @@ stages:
         tool_chain_tag: 'GCC5'
         vm_image: ubuntu-latest
         os_type: Linux
-        container_image: ghcr.io/microsoft/mu_devops/ubuntu-22-test:latest
+        container_image: linux-gcc
         build_matrix:
           QemuQ35_GCC_DEBUG:
             BuildPackage: QemuQ35Pkg
@@ -44,7 +48,7 @@ stages:
             BuildTarget: "DEBUG"
             BuildExtraTag: ""
             BuildExtraStep:
-              - script: echo No extra steps provided
+              - template: Steps/RustSetupSteps.yml@mu_devops
             Run: true
             RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
             BuildArtifactsBinary: |
@@ -59,7 +63,7 @@ stages:
             BuildTarget: "RELEASE"
             BuildExtraTag: ""
             BuildExtraStep:
-              - script: echo No extra steps provided
+              - template: Steps/RustSetupSteps.yml@mu_devops
             Run: true
             RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
             BuildArtifactsBinary: |
@@ -74,7 +78,7 @@ stages:
             BuildTarget: "RELEASE"
             BuildExtraTag: "NO_SMM"
             BuildExtraStep:
-              - script: echo No extra steps provided
+              - template: Steps/RustSetupSteps.yml@mu_devops
             Run: true
             RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE"
             BuildArtifactsBinary: |
@@ -91,6 +95,7 @@ stages:
             BuildExtraStep:
               - script: sudo apt-get install -y libssl-dev
                 displayName: Install openssl
+              - template: Steps/RustSetupSteps.yml@mu_devops
             Run: true
             RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
             BuildArtifactsBinary: |
@@ -108,6 +113,7 @@ stages:
             BuildExtraStep:
               - script: sudo apt-get install -y libssl-dev
                 displayName: Install openssl
+              - template: Steps/RustSetupSteps.yml@mu_devops
             Run: true
             RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
             BuildArtifactsBinary: |
@@ -126,7 +132,10 @@ stages:
     - template: Platform-Build-Job.yml
       parameters:
         extra_install_step:
-        - powershell: choco install qemu --version=2022.8.31; Write-Host "##vso[task.prependpath]c:\Program Files\qemu"
+        - powershell: |
+            $qemuVersion = (Get-Content -Path WindowsQemuVersion.json | ConvertFrom-Json).version
+            choco install qemu --version=$qemuVersion; Write-Host "##vso[task.prependpath]c:\Program Files\qemu"
+          workingDirectory: .azurepipelines/
           displayName: Install QEMU and Set QEMU on path # friendly name displayed in the UI
           condition: and(gt(variables.pkg_count, 0), succeeded())
         tool_chain_tag: 'VS2022'
@@ -141,7 +150,7 @@ stages:
             BuildTarget: "DEBUG"
             BuildExtraTag: ""
             BuildExtraStep:
-              - script: echo No extra steps provided
+              - template: Steps/RustSetupSteps.yml@mu_devops
             Run: true
             RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
             BuildArtifactsBinary: |
@@ -156,7 +165,7 @@ stages:
             BuildTarget: "RELEASE"
             BuildExtraTag: ""
             BuildExtraStep:
-              - script: echo No extra steps provided
+              - template: Steps/RustSetupSteps.yml@mu_devops
             Run: true
             RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
             BuildArtifactsBinary: |
@@ -171,7 +180,7 @@ stages:
             BuildTarget: "RELEASE"
             BuildExtraTag: "NO_SMM"
             BuildExtraStep:
-              - script: echo No extra steps provided
+              - template: Steps/RustSetupSteps.yml@mu_devops
             Run: true
             RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE"
             BuildArtifactsBinary: |

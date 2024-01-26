@@ -1,5 +1,5 @@
 /** @file
-  Reset System Library functions for OVMF
+  Reset System Library functions for QEMU.
 
   Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent

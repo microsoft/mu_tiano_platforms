@@ -1,9 +1,13 @@
 /** @file
-  DXE Reset System Library Shutdown API implementation for OVMF.
+  Reset System Library Shutdown API implementation that can be used at
+  runtime.
 
   Copyright (C) 2020, Red Hat, Inc.
   Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation.
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
+
 **/
 
 #include <Base.h>                   // BIT13
@@ -15,14 +19,21 @@
 #include <Library/ResetSystemLib.h> // ResetShutdown()
 #include <OvmfPlatforms.h>          // PIIX4_PMBA_VALUE
 
+#include "ResetSystemLibInternal.h"
+
 STATIC UINT16  mAcpiPmBaseAddress;
 STATIC UINT16  mAcpiHwReducedSleepCtl;
 
+/**
+  Stores hardware reset context for later use.
+
+  @retval EFI_SUCCESS     The hardware information was saved successfully.
+  @retval EFI_UNSUPPORTED The host bridge PCI device ID is invalid or unexpected.
+
+**/
 EFI_STATUS
-EFIAPI
-DxeResetInit (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+SaveHardwareContext (
+  VOID
   )
 {
   UINT16  HostBridgeDevId;

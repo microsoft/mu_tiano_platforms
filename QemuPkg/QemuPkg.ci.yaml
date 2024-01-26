@@ -42,6 +42,7 @@
             "ShellPkg/ShellPkg.dec",
             "EmbeddedPkg/EmbeddedPkg.dec",
             "QemuPkg/QemuPkg.dec",
+            "TpmTestingPkg/TpmTestingPkg.dec"
         ],
         # For host based unit tests
         "AcceptableDependencies-HOST_APPLICATION":[],
@@ -101,7 +102,13 @@
             "pointee",
             "ramfb",
             "rebecca",
-            "tsegmb"
+            "tpmreplay",
+            "tsegmb",
+            "pygount",
+            "lcov",
+            "lcov_cobertura",
+            "pycobertura",
+            "cobertura",
           ],
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
         "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)

@@ -4,34 +4,27 @@
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
-import os
-import logging
-import io
-import shutil
-import glob
-import time
-import xml.etree.ElementTree
-import tempfile
-import uuid
-import string
 import datetime
+import logging
+import os
+import uuid
+from io import StringIO
+from pathlib import Path
 
 from edk2toolext.environment import shell_environment
 from edk2toolext.environment.uefi_build import UefiBuilder
 from edk2toolext.invocables.edk2_platform_build import BuildSettingsManager
-from edk2toolext.invocables.edk2_setup import SetupSettingsManager, RequiredSubmodule
-from edk2toolext.invocables.edk2_update import UpdateSettingsManager
 from edk2toolext.invocables.edk2_pr_eval import PrEvalSettingsManager
+from edk2toolext.invocables.edk2_setup import (RequiredSubmodule,
+                                               SetupSettingsManager)
+from edk2toolext.invocables.edk2_update import UpdateSettingsManager
+from edk2toolext.invocables.edk2_parse import ParseSettingsManager
 from edk2toollib.utility_functions import RunCmd
-from io import StringIO
-from pathlib import Path
-from io import StringIO
 
 # Declare test whose failure will not return a non-zero exit code
 FAILURE_EXEMPT_TESTS = {
-    "VariablePolicyFuncTestApp.efi": datetime.datetime(2023, 4, 21, 0, 0, 0),
-    "DxePagingAuditTestApp.efi": datetime.datetime(2023, 4, 21, 0, 0, 0),
-    "BaseCryptLibUnitTestApp.efi": datetime.datetime(2023, 4, 21, 0, 0, 0),
+    # example "PiValueTestApp.efi": datetime.datetime(3141, 5, 9, 2, 6, 53, 589793),
+    "DxePagingAuditTestApp.efi": datetime.datetime(2024, 1, 17, 0, 0, 0, 0)
 }
 
 # Allow failure exempt tests to be ignored for 90 days
@@ -47,7 +40,7 @@ class CommonPlatform():
     PackagesSupported = ("QemuSbsaPkg",)
     ArchSupported = ("AARCH64",)
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
-    Scopes = ('qemu', 'qemusbsa', 'gcc_aarch64_linux', 'edk2-build', 'cibuild', 'configdata')
+    Scopes = ('qemu', 'qemusbsa', 'gcc_aarch64_linux', 'edk2-build', 'cibuild', 'configdata', 'rust-ci')
     WorkspaceRoot = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     PackagesPath = (
         "Platforms",
@@ -65,7 +58,7 @@ class CommonPlatform():
     # ####################################################################################### #
     #                         Configuration for Update & Setup                                #
     # ####################################################################################### #
-class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSettingsManager):
+class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSettingsManager, ParseSettingsManager):
 
     def GetPackagesSupported(self):
         ''' return iterable of edk2 packages supported by this build.
@@ -158,7 +151,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
     # ####################################################################################### #
     #                         Actual Configuration for Platform Build                         #
     # ####################################################################################### #
-class PlatformBuilder( UefiBuilder, BuildSettingsManager):
+class PlatformBuilder(UefiBuilder, BuildSettingsManager):
     def __init__(self):
         UefiBuilder.__init__(self)
 
@@ -216,13 +209,22 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         return "QemuSbsaPkg"
 
     def GetLoggingLevel(self, loggerType):
-        ''' Get the logging level for a given type
-        base == lowest logging level supported
-        con  == Screen logging
-        txt  == plain text file logging
-        md   == markdown file logging
-        '''
-        return logging.DEBUG
+        """Get the logging level depending on logger type.
+
+        Args:
+            loggerType (str): type of logger being logged to
+
+        Returns:
+            (Logging.Level): The logging level
+
+        !!! note "loggerType possible values"
+            "base": lowest logging level supported
+
+            "con": logs to screen
+
+            "txt": logs to plain text file
+        """
+        return logging.INFO
         return super().GetLoggingLevel(loggerType)
 
     def SetPlatformEnv(self):
@@ -231,29 +233,28 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         self.env.SetValue("ACTIVE_PLATFORM", "QemuSbsaPkg/QemuSbsaPkg.dsc", "Platform Hardcoded")
         self.env.SetValue("TARGET_ARCH", "AARCH64", "Platform Hardcoded")
         self.env.SetValue("TOOL_CHAIN_TAG", "GCC5", "set default to gcc5")
-        # self.env.SetValue("EMPTY_DRIVE", "FALSE", "Default to false")
-        # self.env.SetValue("RUN_TESTS", "FALSE", "Default to false")
+        self.env.SetValue("EMPTY_DRIVE", "FALSE", "Default to false")
+        self.env.SetValue("RUN_TESTS", "FALSE", "Default to false")
         self.env.SetValue("QEMU_HEADLESS", "FALSE", "Default to false")
         self.env.SetValue("QEMU_PLATFORM", "qemu_sbsa", "Platform Hardcoded")
-        # self.env.SetValue("SHUTDOWN_AFTER_RUN", "FALSE", "Default to false")
+        self.env.SetValue("SHUTDOWN_AFTER_RUN", "FALSE", "Default to false")
         # needed to make FV size build report happy
-        # self.env.SetValue("BLD_*_BUILDID_STRING", "Unknown", "Default")
-        # # Default turn on build reporting.
+        self.env.SetValue("BLD_*_BUILDID_STRING", "Unknown", "Default")
+        # Default turn on build reporting.
         self.env.SetValue("BUILDREPORTING", "TRUE", "Enabling build report")
-        self.env.SetValue("BLD_*_MEMORY_PROTECTION", "TRUE", "Default")
         self.env.SetValue("BUILDREPORT_TYPES", "PCD DEPEX FLASH BUILD_FLAGS LIBRARY FIXED_ADDRESS HASH", "Setting build report types")
         self.env.SetValue("ARM_TFA_PATH", os.path.join (self.GetWorkspaceRoot (), "Silicon/Arm/TFA"), "Platform hardcoded")
         self.env.SetValue("BLD_*_QEMU_CORE_NUM", "4", "Default")
+        self.env.SetValue("BLD_*_MEMORY_PROTECTION", "TRUE", "Default")
         # Include the MFCI test cert by default, override on the commandline with "BLD_*_SHIP_MODE=TRUE" if you want the retail MFCI cert
         self.env.SetValue("BLD_*_SHIP_MODE", "FALSE", "Default")
-
-        self.env.SetValue("CONF_AUTOGEN_INCLUDE_PATH", self.mws.join(self.ws, "Platforms", "QemuSbsaPkg", "Include"), "Platform Hardcoded")
-        self.env.SetValue("MU_SCHEMA_DIR", self.mws.join(self.ws, "Platforms", "QemuSbsaPkg", "CfgData"), "Platform Defined")
+        self.env.SetValue("CONF_AUTOGEN_INCLUDE_PATH", self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuSbsaPkg", "Include"), "Platform Defined")
+        self.env.SetValue("MU_SCHEMA_DIR", self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuSbsaPkg", "CfgData"), "Platform Defined")
         self.env.SetValue("MU_SCHEMA_FILE_NAME", "QemuSbsaPkgCfgData.xml", "Platform Hardcoded")
 
-        self.env.SetValue("YAML_POLICY_FILE", self.mws.join(self.ws, "QemuQ35Pkg", "PolicyData", "PolicyDataUsb.yaml"), "Platform Hardcoded")
-        self.env.SetValue("POLICY_DATA_STRUCT_FOLDER", self.mws.join(self.ws, "QemuQ35Pkg", "Include"), "Platform Defined")
-        self.env.SetValue('POLICY_REPORT_FOLDER', self.mws.join(self.ws, "QemuQ35Pkg", "PolicyData"), "Platform Defined")
+        if self.Helper.generate_secureboot_pcds(self) != 0:
+            logging.error("Failed to generate include PCDs")
+            return -1
 
         return 0
 
@@ -346,7 +347,6 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         return
 
     def FlashRomImage(self):
-        #Make virtual drive - Allow caller to override path otherwise use default
         run_tests = (self.env.GetValue("RUN_TESTS", "FALSE").upper() == "TRUE")
         output_base = self.env.GetValue("BUILD_OUTPUT_BASE")
         shutdown_after_run = (self.env.GetValue("SHUTDOWN_AFTER_RUN", "FALSE").upper() == "TRUE")
@@ -359,7 +359,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         if run_tests:
             if test_regex == "":
                 logging.warning("Running tests, but no Tests specified. use TEST_REGEX to specify tests to run.")
-        
+
             if not empty_drive:
                 logging.info("EMPTY_DRIVE=FALSE. Old files can persist, could effect test results.")
 
@@ -384,7 +384,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 
             if any("DxePagingAuditTestApp.efi" in os.path.basename(test) for test in test_list):
                 run_paging_audit = True
-            
+
             self.Helper.add_tests(virtual_drive, test_list, auto_run = run_tests, auto_shutdown = shutdown_after_run, paging_audit = run_paging_audit)
         # Otherwise add an empty startup script
         else:
@@ -413,36 +413,36 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 
         if not run_tests:
             return 0
-        
+
         # Gather test results if they were run.
         now = datetime.datetime.now()
         FET = FAILURE_EXEMPT_TESTS
         FEOL = FAILURE_EXEMPT_OMISSION_LENGTH
 
         if run_paging_audit:
-            self.Helper.generate_paging_audit (virtual_drive, Path(drive_path).parent / "unit_test_results", self.env.GetValue("VERSION"), "SBSA", "AARCH64")
+            self.Helper.generate_paging_audit (virtual_drive, Path(drive_path).parent / "unit_test_results", self.env.GetValue("VERSION"), "SBSA")
 
         # Filter out tests that are exempt
         tests = list(filter(lambda file: file.name not in FET or not (now - FET.get(file.name)).total_seconds() < FEOL, test_list))
-        tests_exempt = list(filter(lambda file: file.name in FET and (now - FET.get(file.name)).total_seconds() < FEOL, test_list))       
+        tests_exempt = list(filter(lambda file: file.name in FET and (now - FET.get(file.name)).total_seconds() < FEOL, test_list))
         if len(tests_exempt) > 0:
             self.Helper.report_results(virtual_drive, tests_exempt, Path(drive_path).parent / "unit_test_results")
         # Helper located at QemuPkg/Plugins/VirtualDriveManager
         return self.Helper.report_results(virtual_drive, tests, Path(drive_path).parent / "unit_test_results")
 
-
 if __name__ == "__main__":
     import argparse
     import sys
-    from edk2toolext.invocables.edk2_update import Edk2Update
-    from edk2toolext.invocables.edk2_setup import Edk2PlatformSetup
+
     from edk2toolext.invocables.edk2_platform_build import Edk2PlatformBuild
-    print("Invoking Stuart")
-    print("     ) _     _")
-    print("    ( (^)-~-(^)")
-    print("__,-.\_( 0 0 )__,-.___")
-    print("  'W'   \   /   'W'")
-    print("         >o<")
+    from edk2toolext.invocables.edk2_setup import Edk2PlatformSetup
+    from edk2toolext.invocables.edk2_update import Edk2Update
+    print(r"Invoking Stuart")
+    print(r"     ) _     _")
+    print(r"    ( (^)-~-(^)")
+    print(r"__,-.\_( 0 0 )__,-.___")
+    print(r"  'W'   \   /   'W'")
+    print(r"         >o<")
     SCRIPT_PATH = os.path.relpath(__file__)
     parser = argparse.ArgumentParser(add_help=False)
     parse_group = parser.add_mutually_exclusive_group()

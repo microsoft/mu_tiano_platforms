@@ -12,6 +12,26 @@ By solely focusing on the Q35 chipset, this package can be optimized such that i
 with other QEMU supported chipsets. The Q35 chipset can be paired with an IA32 or X64 processor to enable a machine
 that can emulate PC class hardware with industry standard features like SMM and PCI-E.
 
+## Table of Contents
+
+- [QemuQ35Pkg](#qemuq35pkg)
+  - [Q35 Platform](#q35-platform)
+  - [Compiling and Running QEMU](#compiling-and-running-qemu)
+  - [Firmware Features](#firmware-features)
+    - [CodeQL](#codeql)
+    - [Color Bar](#color-bar)
+    - [Config](#config)
+    - [Device Firmware Configuration Interface (DFCI)](#device-firmware-configuration-interface-dfci)
+    - [Mu Front Page](#mu-front-page)
+    - [Mu Telemetry / WHEA / HwErrorRecord](#mu-telemetry--whea--hwerrorrecord)
+    - [Platform Runtime Mechanism (PRM)](#platform-runtime-mechanism-prm)
+    - [Trusted Platform Module (TPM)](#trusted-platform-module-tpm)
+    - [Trusted Platform Module (TPM) Replay](#trusted-platform-module-tpm-replay)
+    - [UEFI Memory Protections](#uefi-memory-protections)
+  - [Mu Customized Components](#mu-customized-components)
+    - [Modules](#modules)
+    - [Libraries](#libraries)
+
 ## Q35 Platform
 
 Q35 is a machine type that QEMU emulates.
@@ -34,15 +54,34 @@ Specific details can be found here [Development/building.md](../Common/building.
 QemuQ35Pkg is a great environment to demonstrate Project Mu features without any restricted or costly physical
 hardware. Current QEMU Q35 platform supports the following features provided by Project Mu:
 
-### Mu Front Page
+### CodeQL
 
-Enable the Project Mu OEM sample "front page".
-This is a touch friendly, graphical, UEFI HII based UI application that
-allows basic platform and boot device configuration.
+CodeQL is open source and free for open-source projects. It is maintained by GitHub and naturally has excellent
+integration with GitHub projects. CodeQL uses a semantic code analysis engine to discover vulnerabilities in a
+number of programming languages (both compiled and interpreted).
 
-[Details](../Common/Features/feature_frontpage.md)
+Project Mu (and TianoCore) use CodeQL C/C++ queries to find common programming errors and security vulnerabilities in
+firmware code. This platform leverages the CodeQL build plugin from Mu Basecore that makes it very easy to run CodeQL
+against this platform. You simply use provide the `--codeql` argument in your normal `stuart_update` and `stuart_build`
+commands.
 
-### Device Firmware Configuration Interface
+[Details](Features/feature_codeql.md)
+
+### Color Bar
+
+Color bars are used to quickly convey the Device state, based upon the DeviceStateLib. Color bars are displayed
+by the ColorBarDisplayDeviceStateLib.
+
+[Details](Features/feature_colorbar.md)
+
+### Config
+
+Project Mu offers a UEFI configuration feature with example implementation in `QemuQ35Pkg`. Background about the
+features and more details about its integration in this repo are available in the detailed readme.
+
+[Details](Features/feature_config.md)
+
+### Device Firmware Configuration Interface (DFCI)
 
 The DFCI feature enables cloud management services (MDM services like Microsoft Intune) to manage some PC
 bios settings **securely**.  DFCI is a foundational feature that provides a shared identity and ownership
@@ -50,6 +89,15 @@ model between the device firmware and the cloud.  Once a device is enrolled this
 to securely communicate across untrusted mediums (network or usb).
 
 [Details](../Common/Features/feature_dfci.md)
+
+### Mu Front Page
+
+This feature enables the Project Mu OEM sample "front page".
+
+This is a touch friendly, graphical, UEFI HII based UI application that allows basic platform and boot device
+configuration.
+
+[Details](../Common/Features/feature_frontpage.md)
 
 ### Mu Telemetry / WHEA / HwErrorRecord
 
@@ -69,25 +117,30 @@ sample PRM modules are used to demonstrate the feature and show how additional m
 
 [Details](Features/feature_prm.md)
 
-### CodeQL
+### Trusted Platform Module (TPM)
 
-CodeQL is open source and free for open-source projects. It is maintained by GitHub and naturally has excellent
-integration with GitHub projects. CodeQL uses a semantic code analysis engine to discover vulnerabilities in a
-number of programming languages (both compiled and interpreted).
+QEMU TPM emulation implements a TPM TIS hardware interface that follows the Trusted Computing Group's TCG PC Client
+Specific TPM Interface Specification (TIS) in addition to a TPM CRB interface that follows the TCG PC Client Platform
+TPM Profile (PTP) Specification. `QemuQ35Pkg` has support to include TPM drivers and connect to the software TPM
+socket interface. Usage is covered in the detailed feature readme.
 
-Project Mu (and TianoCore) use CodeQL C/C++ queries to find common programming errors and security vulnerabilities in
-firmware code. This platform leverages the CodeQL build plugin from Mu Basecore that makes it very easy to run CodeQL
-against this platform. You simply use provide the `--codeql` argument in your normal `stuart_update` and `stuart_build`
-commands.
+[Details](Features/feature_tpm.md)
 
-[Details](Features/feature_codeql.md)
+### Trusted Platform Module (TPM) Replay
 
-### Q35 Supported Color Bar
+An OS and firmware developer feature that allows a custom crafted TPM event log to be created and replayed during boot.
+Any PCRs specified in the input TPM Replay event log are exclusively extended to the PCR (any other firmware
+measurements that would normally target the PCR are blocked). This feature can be useful to test a wide range of inputs
+to OS and firmware features dependent on TPM measurements
 
-Color bars are used to quickly convey the Device state, based upon the DeviceStateLib. Color bars are displayed
-by the ColorBarDisplayDeviceStateLib.
+[Details](Features/feature_tpm_replay.md)
 
-[Details](Features/feature_colorbar.md)
+### UEFI Memory Protections
+
+UEFI Memory Protections add safety functionality such as page and pool guards, stack guard, and null pointer
+detection. The settings are split between MM and DXE environments for modularity.
+
+[Details](../Common/Features/feature_memoryprotection.md)
 
 ## Mu Customized Components
 

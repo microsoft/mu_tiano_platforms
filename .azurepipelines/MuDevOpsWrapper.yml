@@ -1,6 +1,8 @@
 ## @file
 # Azure Pipeline build file for a build using mu_devops.
 #
+# To upload coverage results, set `coverage_upload_target` to `ado` or `codecov`.
+#
 # NOTE: This file is automatically synchronized from Mu DevOps. Update the original file there
 #       instead of the file in this repo.
 #
@@ -17,7 +19,7 @@ resources:
       type: github
       endpoint: microsoft
       name: microsoft/mu_devops
-      ref: refs/tags/v5.0.4
+      ref: refs/tags/v9.0.1
 
 parameters:
 - name: do_ci_build
@@ -67,11 +69,22 @@ parameters:
   displayName: Extra Jobs to be run after build
   type: jobList
   default: []
+- name: rust_build
+  displayName: Whether Rust code is being built
+  type: boolean
+  default: false
+- name: extra_cargo_steps
+  displayName: Extra Steps to Run Before Standard Cargo Steps
+  type: stepList
+  default:
+    - script: echo No extra cargo steps provided
 
 jobs:
 - template: Jobs/PrGate.yml@mu_devops
   parameters:
-    linux_container_image: ghcr.io/microsoft/mu_devops/ubuntu-22-build:ea6d2e6
+    linux_container_image: ghcr.io/microsoft/mu_devops/ubuntu-22-build:1082f35
+    ${{ if eq(parameters.rust_build, true) }}:
+      linux_container_options: --security-opt seccomp=unconfined
     do_ci_build: ${{ parameters.do_ci_build }}
     do_ci_setup: ${{ parameters.do_ci_setup }}
     do_pr_eval: ${{ parameters.do_pr_eval }}
@@ -84,6 +97,25 @@ jobs:
     tool_chain_tag: $(tool_chain_tag)
     vm_image: $(vm_image)
     container_build: ${{ parameters.container_build }}
+    rust_build: ${{ parameters.rust_build }}
+
+- ${{ if eq(parameters.rust_build, true) }}:
+  - job: CargoCmds
+    displayName: Workspace Cargo Commands
+
+    container:
+
+      image: ghcr.io/microsoft/mu_devops/ubuntu-22-build:1082f35
+      options: --user root --name mu_devops_build_container --security-opt seccomp=unconfined
+
+    steps:
+    - checkout: self
+      fetchDepth: 1
+      clean: true
+    - ${{ parameters.extra_cargo_steps }}
+    - template: Steps/RustCargoSteps.yml@mu_devops
+      parameters:
+        container_build: true
 
 - ${{ parameters.extra_jobs }}
 
