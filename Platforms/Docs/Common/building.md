@@ -98,7 +98,8 @@ On most Linux distros this requires an extra step for mono and nuget support.
 
 ### Notes
 
-1. QEMU must be on your path. On Windows this is a manual process and not part of the QEMU installer.
+1. QEMU must be on your path or `QEMU_PATH` must be given. On Windows this is a manual process and not part of the
+   QEMU installer.
 2. QEMU output will be in Build directory.
 
 **NOTE:** Logging the execution output will be in the normal stuart log as well as to your console (if you have the
@@ -109,6 +110,8 @@ correct logging level set, by default it doesn't output to console).
 **SHUTDOWN_AFTER_RUN=TRUE** will output a *startup.nsh* file to the location mapped as fs0 with `reset -s` as
 the final line. This is used in CI in combination with the `--FlashOnly` feature to run QEMU to the UEFI shell
 and then execute the contents of *startup.nsh*.
+
+**QEMU_PATH** Can specify the path to a specific QEMU binary to use.
 
 **QEMU_HEADLESS=TRUE** Since CI servers run headless QEMU must be told to run with no display otherwise
 an error occurs. Locally you don't need to set this.

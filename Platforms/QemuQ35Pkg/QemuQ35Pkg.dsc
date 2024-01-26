@@ -38,6 +38,7 @@
   DEFINE BUILD_UNIT_TESTS               = TRUE
   DEFINE PEI_MM_IPL_ENABLED             = TRUE
   DEFINE GUI_FRONT_PAGE                 = FALSE
+  DEFINE TPM_REPLAY_ENABLED             = FALSE
 
   DEFINE NETWORK_HTTP_ENABLE            = TRUE
   DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS = TRUE
@@ -50,9 +51,11 @@
     PEI_CRYPTO_SERVICES = TINY_SHA
     DXE_CRYPTO_SERVICES = STANDARD
     SMM_CRYPTO_SERVICES = STANDARD
+    STANDALONEMM_CRYPTO_SERVICES = STANDARD
     PEI_CRYPTO_ARCH = IA32
     DXE_CRYPTO_ARCH = X64
     SMM_CRYPTO_ARCH = X64
+    STANDALONEMM_CRYPTO_ARCH = X64
   !endif
 
 ################################################################################
@@ -103,6 +106,7 @@
   OemHookStatusCodeLib    |MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
   PerformanceLib          |MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   ConsoleMsgLib           |PcBdsPkg/Library/ConsoleMsgLibNull/ConsoleMsgLibNull.inf
+  PanicLib                |MdePkg/Library/BasePanicLibSerialPort/BasePanicLibSerialPort.inf
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
   PeCoffExtraActionLib    |SourceLevelDebugPkg/Library/PeCoffExtraActionLibDebug/PeCoffExtraActionLibDebug.inf
   DebugCommunicationLib   |SourceLevelDebugPkg/Library/DebugCommunicationLibSerialPort/DebugCommunicationLibSerialPort.inf
@@ -129,7 +133,7 @@
   BootGraphicsProviderLib  |OemPkg/Library/BootGraphicsProviderLib/BootGraphicsProviderLib.inf #  uses PCDs and raw files in the firmware volumes to get Pcd
   CustomizedDisplayLib     |MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
   FrameBufferBltLib        |MdeModulePkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
-  FrameBufferMemDrawLib    |MsGraphicsPkg/Library/FrameBufferMemDrawLib/FrameBufferMemDrawLib.inf
+  FrameBufferMemDrawLib    |MsGraphicsPkg/Library/FrameBufferMemDrawLib/FrameBufferMemDrawLibDxe.inf
   BootGraphicsLib          |MsGraphicsPkg/Library/BootGraphicsLib/BootGraphicsLib.inf
   GraphicsConsoleHelperLib |PcBdsPkg/Library/GraphicsConsoleHelperLib/GraphicsConsoleHelper.inf
   DisplayDeviceStateLib    |MsGraphicsPkg/Library/ColorBarDisplayDeviceStateLib/ColorBarDisplayDeviceStateLib.inf # Display the On screen notifications for the platform using color bars
@@ -143,7 +147,6 @@
 
   # CPU/SMBUS/Peripherals Libraries
   CpuLib              |MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
-  UefiCpuLib          |UefiCpuPkg/Library/BaseUefiCpuLib/BaseUefiCpuLib.inf
   SynchronizationLib  |MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
   LocalApicLib        |UefiCpuPkg/Library/BaseXApicX2ApicLib/BaseXApicX2ApicLib.inf
   SmbusLib            |MdePkg/Library/BaseSmbusLibNull/BaseSmbusLibNull.inf
@@ -186,14 +189,13 @@
 
   # Security Libraries
   SecurityManagementLib |MdeModulePkg/Library/DxeSecurityManagementLib/DxeSecurityManagementLib.inf
-  BaseBinSecurityLib    |MdePkg/Library/BaseBinSecurityLibNull/BaseBinSecurityLibNull.inf
   SecurityLockAuditLib  |MdeModulePkg/Library/SecurityLockAuditDebugMessageLib/SecurityLockAuditDebugMessageLib.inf ##MU_CHANGE
   LockBoxLib            |QemuPkg/Library/LockBoxLib/LockBoxBaseLib.inf
-  PlatformSecureLib     |QemuPkg/Library/PlatformSecureLib/PlatformSecureLib.inf
+  PlatformSecureLib     |SecurityPkg/Library/PlatformSecureLibNull/PlatformSecureLibNull.inf
   PasswordStoreLib      |MsCorePkg/Library/PasswordStoreLibNull/PasswordStoreLibNull.inf
   PasswordPolicyLib     |OemPkg/Library/PasswordPolicyLib/PasswordPolicyLib.inf
   SecureBootVariableLib |SecurityPkg/Library/SecureBootVariableLib/SecureBootVariableLib.inf
-  SecureBootKeyStoreLib |OemPkg/Library/SecureBootKeyStoreLibOem/SecureBootKeyStoreLibOem.inf
+  SecureBootKeyStoreLib |MsCorePkg/Library/BaseSecureBootKeyStoreLib/BaseSecureBootKeyStoreLib.inf
   PlatformPKProtectionLib|SecurityPkg/Library/PlatformPKProtectionLibVarPolicy/PlatformPKProtectionLibVarPolicy.inf
   MuSecureBootKeySelectorLib|MsCorePkg/Library/MuSecureBootKeySelectorLib/MuSecureBootKeySelectorLib.inf
 
@@ -203,10 +205,10 @@
   MemoryTypeInfoSecVarCheckLib   |MdeModulePkg/Library/MemoryTypeInfoSecVarCheckLib/MemoryTypeInfoSecVarCheckLib.inf # MU_CHANGE TCBZ1086
   MemoryTypeInformationChangeLib |MdeModulePkg/Library/MemoryTypeInformationChangeLibNull/MemoryTypeInformationChangeLibNull.inf
   MtrrLib                        |UefiCpuPkg/Library/MtrrLib/MtrrLib.inf # Memory Type Range Register (https://en.wikipedia.org/wiki/Memory_type_range_register)
-  MmUnblockMemoryLib             |MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
   DxeMemoryProtectionHobLib      |MdeModulePkg/Library/MemoryProtectionHobLibNull/DxeMemoryProtectionHobLibNull.inf
   ExceptionPersistenceLib        |MsCorePkg/Library/ExceptionPersistenceLibCmos/ExceptionPersistenceLibCmos.inf
   CpuPageTableLib                |UefiCpuPkg/Library/CpuPageTableLib/CpuPageTableLib.inf
+  FlatPageTableLib               |UefiTestingPkg/Library/FlatPageTableLib/FlatPageTableLib.inf
 
   # Variable Libraries
   VariablePolicyLib         |MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLib.inf
@@ -306,17 +308,6 @@
   PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestLibNull/PlatformSmmProtectionsTestLibNull.inf
   FmpDependencyLib|FmpDevicePkg/Library/FmpDependencyLib/FmpDependencyLib.inf
 
-##MSCHANGE Begin
-!if $(TOOL_CHAIN_TAG) == VS2019 or $(TOOL_CHAIN_TAG) == VS2022
-[LibraryClasses.X64, LibraryClasses.IA32]
-  #if debug is enabled provide StackCookie support lib so that we can link to /GS exports on MSVC
-  RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
-[LibraryClasses.X64]
-  BaseBinSecurityLib|MdePkg/Library/BaseBinSecurityLibRng/BaseBinSecurityLibRng.inf
-  NULL|MdePkg/Library/BaseBinSecurityLibRng/BaseBinSecurityLibRng.inf
-!endif
-##MSCHANGE End
-
 #SHARED_CRYPTO
 !if $(ENABLE_SHARED_CRYPTO) == FALSE
   [LibraryClasses.IA32]
@@ -339,7 +330,7 @@
         <LibraryClasses>
           BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
           TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
-          !if $(TOOL_CHAIN_TAG) == VS2017 or $(TOOL_CHAIN_TAG) == VS2015 or $(TOOL_CHAIN_TAG) == VS2019 or $(TOOL_CHAIN_TAG) == VS2022
+          !if "MSFT" IN $(FAMILY)
             NULL|MdePkg/Library/VsIntrinsicLib/VsIntrinsicLib.inf
           !endif
           IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
@@ -366,6 +357,17 @@
           OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf # Contains openSSL library used by BaseCryptoLib
         <PcdsFixedAtBuild>
           !include CryptoPkg/Driver/Bin/Crypto.pcd.STANDARD.inc.dsc
+    }
+    CryptoPkg/Driver/CryptoStandaloneMm.inf {
+      <LibraryClasses>
+        BaseCryptLib  |CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
+        TlsLib        |CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
+        OpensslLib    |CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
+        IntrinsicLib  |CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+        FltUsedLib    |MdePkg/Library/FltUsedLib/FltUsedLib.inf
+        SafeIntLib    |MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
+      <PcdsFixedAtBuild>
+        !include CryptoPkg/Driver/Bin/Crypto.pcd.STANDARD.inc.dsc
     }
 !endif
 
@@ -416,8 +418,10 @@
   PeiServicesLib             |MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   MemoryAllocationLib        |MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   ReportStatusCodeLib        |MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
-  RngLib                     |MdePkg/Library/BaseRngLibNull/BaseRngLibNull.inf
+  RngLib                     |MdePkg/Library/BaseRngLib/BaseRngLib.inf
   MemEncryptSevLib           |QemuQ35Pkg/Library/BaseMemEncryptSevLib/PeiMemEncryptSevLib.inf
+  FrameBufferMemDrawLib      |MsGraphicsPkg/Library/FrameBufferMemDrawLib/FrameBufferMemDrawLibPei.inf
+  MmUnblockMemoryLib         |MmSupervisorPkg/Library/MmSupervisorUnblockMemoryLib/MmSupervisorUnblockMemoryLibPei.inf
 
 [LibraryClasses.common.PEI_CORE]
   PeiCoreEntryPoint |MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
@@ -463,7 +467,7 @@
   PcdLib                        |MdePkg/Library/DxePcdLib/DxePcdLib.inf
   HobLib                        |MdePkg/Library/DxeHobLib/DxeHobLib.inf
   ResetSystemLib                |MdeModulePkg/Library/DxeResetSystemLib/DxeResetSystemLib.inf
-  HwResetSystemLib              |MdeModulePkg/Library/DxeResetSystemLib/DxeResetSystemLib.inf
+  HwResetSystemLib              |QemuQ35Pkg/Library/ResetSystemLib/BaseResetSystemLib.inf
   DxeCoreEntryPoint             |MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
   MemoryAllocationLib           |MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   CpuExceptionHandlerLib        |UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
@@ -505,6 +509,7 @@
 
 [LibraryClasses.common.UEFI_APPLICATION]
   CheckHwErrRecHeaderLib|MsWheaPkg/Library/CheckHwErrRecHeaderLib/CheckHwErrRecHeaderLib.inf
+  FlatPageTableLib|UefiTestingPkg/Library/FlatPageTableLib/FlatPageTableLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   PlatformBootManagerLib|MsCorePkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
@@ -542,7 +547,7 @@
   MmServicesTableLib|MdePkg/Library/MmServicesTableLib/MmServicesTableLib.inf
   SmmServicesTableLib|MdePkg/Library/SmmServicesTableLib/SmmServicesTableLib.inf
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/SmmCpuExceptionHandlerLib.inf
-  RngLib|MdePkg/Library/BaseRngLibNull/BaseRngLibNull.inf
+  RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxSmmLib.inf
   AdvLoggerAccessLib|AdvLoggerPkg/Library/AdvLoggerSmmAccessLib/AdvLoggerSmmAccessLib.inf
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
@@ -570,7 +575,7 @@
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibStandaloneMm.inf
   SortLib|MdeModulePkg/Library/BaseSortLib/BaseSortLib.inf
   SmmPolicyGateLib|MmSupervisorPkg/Library/SmmPolicyGateLib/SmmPolicyGateLib.inf
-  HwResetSystemLib|PcAtChipsetPkg/Library/ResetSystemLib/ResetSystemLib.inf
+  HwResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   IhvSmmSaveStateSupervisionLib|MmSupervisorPkg/Library/IhvMmSaveStateSupervisionLib/IhvMmSaveStateSupervisionLib.inf
 
 [LibraryClasses.common.MM_STANDALONE]
@@ -582,15 +587,14 @@
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxStandaloneMmLib.inf
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/SmmCpuExceptionHandlerLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/SmmReportStatusCodeLib/StandaloneMmReportStatusCodeLib.inf
-  HwResetSystemLib|PcAtChipsetPkg/Library/ResetSystemLib/ResetSystemLib.inf
+  HwResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   StandaloneMmDriverEntryPoint|MmSupervisorPkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
-  # TODO: ShareCrypto support
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/StandaloneMmCryptLib.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-  AdvLoggerAccessLib|MdeModulePkg/Library/AdvLoggerAccessLibNull/AdvLoggerAccessLib.inf
+  AdvLoggerAccessLib|AdvLoggerPkg/Library/AdvLoggerMmAccessLib/AdvLoggerMmAccessLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibStandaloneMm.inf
-  RngLib|MdePkg/Library/BaseRngLibNull/BaseRngLibNull.inf
+  RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
   PciLib|QemuQ35Pkg/Library/DxePciLibI440FxQ35/DxePciLibI440FxQ35.inf
 
   BaseLib|MmSupervisorPkg/Library/BaseLibSysCall/BaseLib.inf
@@ -611,10 +615,17 @@
   AssertLib|AdvLoggerPkg/Library/AssertLib/AssertLib.inf
   AdvancedLoggerAccessLib|AdvLoggerPkg/Library/AdvancedLoggerAccessLib/AdvancedLoggerAccessLib.inf
 
-[LibraryClasses.common.MM_CORE_STANDALONE, LibraryClasses.common.MM_STANDALONE, LibraryClasses.common.PEIM, LibraryClasses.common.PEI_CORE]
+[LibraryClasses.IA32.PEI_CORE]
+  AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/PeiCore/AdvancedLoggerLib.inf
+
+[LibraryClasses.IA32.PEIM]
+  AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Pei/AdvancedLoggerLib.inf
 !ifndef $(DEBUG_ON_SERIAL_PORT)
-  DebugLib|QemuQ35Pkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
+  DebugLib|AdvLoggerPkg/Library/PeiDebugLibAdvancedLogger/PeiDebugLibAdvancedLogger.inf
 !endif
+
+[LibraryClasses.X64.PEIM]
+  AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Pei64/AdvancedLoggerLib.inf
 
 [LibraryClasses.X64]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Dxe/AdvancedLoggerLib.inf
@@ -622,27 +633,18 @@
 
 [LibraryClasses.X64.DXE_CORE]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/DxeCore/AdvancedLoggerLib.inf
-!ifndef $(DEBUG_ON_SERIAL_PORT)
-  DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
-!endif
 
 [LibraryClasses.X64.DXE_SMM_DRIVER]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Smm/AdvancedLoggerLib.inf
-!ifndef $(DEBUG_ON_SERIAL_PORT)
-  DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
-!endif
 
 [LibraryClasses.X64.SMM_CORE]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Smm/AdvancedLoggerLib.inf
-!ifndef $(DEBUG_ON_SERIAL_PORT)
-  DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
-!endif
 
 [LibraryClasses.X64.DXE_RUNTIME_DRIVER]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Runtime/AdvancedLoggerLib.inf
-!ifndef $(DEBUG_ON_SERIAL_PORT)
-  DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
-!endif
+
+[LibraryClasses.X64.MM_CORE_STANDALONE, LibraryClasses.X64.MM_STANDALONE]
+  AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/MmCore/AdvancedLoggerLib.inf
 
 ################################################################################
 #
@@ -679,14 +681,17 @@
 !endif
 
 [PcdsFixedAtBuild]
+  !include QemuPkg/AutoGen/SecurebootPcds.inc
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
-  gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|TRUE
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x8400
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x8400
   gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize|0x1000
   gPcBdsPkgTokenSpaceGuid.PcdEnableMemMapOutput|0x1
   gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedFileLoggerFlush|3
+  gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedLoggerPreMemPages|3
+  gEfiSecurityPkgTokenSpaceGuid.PcdUserPhysicalPresence|FALSE
 
 !if $(NETWORK_TLS_ENABLE) == FALSE
   # match PcdFlashNvStorageVariableSize purely for convenience
@@ -810,10 +815,10 @@
   # unknown) workloads / boot paths.
   #
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS|0x80
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0x10
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x80
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0x20
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x510
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0x100
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x100
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x1C0
 
 [PcdsFixedAtBuild.X64]
 
@@ -924,6 +929,12 @@
   !include CryptoPkg/Driver/Bin/CryptoDriver.inc.dsc
 !endif
 
+QemuQ35Pkg/Library/PeiFvMeasurementExclusionLib/PeiFvMeasurementExclusionLib.inf
+
+QemuQ35Pkg/Library/ResetSystemLib/BaseResetSystemLib.inf
+QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
+QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
+
 [Components.IA32]
   QemuQ35Pkg/ResetVector/ResetVector.inf
 
@@ -952,6 +963,19 @@
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+
+!if $(TPM_REPLAY_ENABLED) == TRUE
+  TpmTestingPkg/TpmReplayPei/Pei/TpmReplayPei.inf {
+    <LibraryClasses>
+      FvMeasurementExclusionLib|QemuQ35Pkg/Library/PeiFvMeasurementExclusionLib/PeiFvMeasurementExclusionLib.inf
+      InputChannelLib|QemuPkg/Library/BaseFwCfgInputChannelLib/BaseFwCfgInputChannelLib.inf
+      Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
+    <PcdsPatchableInModule>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x3F
+    <PcdsFixedAtBuild>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80480246
+  }
+!endif
 
   QemuQ35Pkg/PlatformPei/PlatformPei.inf {
     <LibraryClasses>
@@ -1077,13 +1101,25 @@
 
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 
+  # CPU branding information
+  QemuQ35Pkg/CpuInfoDxe/CpuInfoDxe.inf
+
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
     <LibraryClasses>
+!if $(TPM_REPLAY_ENABLED) == TRUE
+      NULL|TpmTestingPkg/Overrides/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
+!else
       NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
+!endif
 
 !if $(TPM_ENABLE) == TRUE
+!if $(TPM_REPLAY_ENABLED) == TRUE
+      # Only TPM 2.0 is supported by the feature
+      NULL|TpmTestingPkg/Overrides/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBootLib.inf
+!else
       NULL|SecurityPkg/Library/DxeTpmMeasureBootLib/DxeTpmMeasureBootLib.inf
       NULL|SecurityPkg/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBootLib.inf
+!endif
 !endif
   }
 
@@ -1162,6 +1198,7 @@
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
+  AdvLoggerPkg/Application/AdvancedLogDumper/AdvancedLogDumper.inf
 
   QemuQ35Pkg/QemuVideoDxe/QemuVideoDxe.inf
 
@@ -1231,6 +1268,12 @@
     <LibraryClasses>
       NULL|QemuQ35Pkg/Library/PxeBcPcdProducerLib/PxeBcPcdProducerLib.inf
   }
+
+  #
+  # HID Support
+  #
+  HidPkg/UefiHidDxe/UefiHidDxe.inf
+
   #
   # Usb Support
   #
@@ -1240,6 +1283,10 @@
   MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+  HidPkg/UsbHidDxe/UsbHidDxe.inf {
+    <LibraryClasses>
+      UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
+  }
 
   ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf {
     <PcdsFixedAtBuild>
@@ -1323,8 +1370,8 @@
       gDfciPkgTokenSpaceGuid.PcdSettingsManagerInstallProvider|TRUE
   }
   MdeModulePkg/Universal/EsrtFmpDxe/EsrtFmpDxe.inf
-  MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.inf
   MsCorePkg/AcpiRGRT/AcpiRgrt.inf
+  MsCorePkg/HelloWorldRustDxe/HelloWorldRustDxe.inf
   DfciPkg/Application/DfciMenu/DfciMenu.inf
 
   MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
@@ -1355,7 +1402,10 @@
   DfciPkg/UnitTests/DeviceIdTest/DeviceIdTestApp.inf
   # DfciPkg/UnitTests/DfciVarLockAudit/UEFI/DfciVarLockAuditTestApp.inf # DOESN'T PRODUCE OUTPUT
   FmpDevicePkg/Test/UnitTest/Library/FmpDependencyLib/FmpDependencyLibUnitTestApp.inf
-  MdeModulePkg/Test/ShellTest/VariablePolicyFuncTestApp/VariablePolicyFuncTestApp.inf
+  !if $(TARGET) == DEBUG
+    # VARIABLE POLICY MUST BE UNLOCKED FOR THE TEST TO RUN (POLICY CAN ONLY REMAIN UNLOCKED ON DEBUG BUILDS)
+    MdeModulePkg/Test/ShellTest/VariablePolicyFuncTestApp/VariablePolicyFuncTestApp.inf
+  !endif
   UefiTestingPkg/FunctionalSystemTests/MemoryAttributeProtocolFuncTestApp/MemoryAttributeProtocolFuncTestApp.inf
   MdePkg/Test/UnitTest/Library/BaseLib/BaseLibUnitTestApp.inf
   MdePkg/Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLibTestApp.inf
@@ -1382,12 +1432,14 @@
   # UefiTestingPkg/AuditTests/UefiVarLockAudit/UEFI/UefiVarLockAuditTestApp.inf # DOESN'T PRODUCE OUTPUT
   UefiTestingPkg/FunctionalSystemTests/ExceptionPersistenceTestApp/ExceptionPersistenceTestApp.inf
   UefiTestingPkg/FunctionalSystemTests/MemmapAndMatTestApp/MemmapAndMatTestApp.inf
-  # UefiTestingPkg/FunctionalSystemTests/SmmPagingProtectionsTest/App/SmmPagingProtectionsTestApp.inf # NOT APPLICABLE TO Q35
+  # UefiTestingPkg/FunctionalSystemTests/SmmPagingProtectionsTest/App/SmmPagingProtectionsTestApp.inf # NOT YET SUPPORTED
   # MOR LOCK NOT COMPATIBLE WITH STANDALONE MM: https://bugzilla.tianocore.org/show_bug.cgi?id=3513
   # UefiTestingPkg/FunctionalSystemTests/MorLockTestApp/MorLockTestApp.inf
-  UefiTestingPkg/FunctionalSystemTests/MemoryProtectionTest/App/MemoryProtectionTestApp.inf
-  UefiTestingPkg/FunctionalSystemTests/SmmPagingProtectionsTest/Smm/SmmPagingProtectionsTestSmm.inf
-  UefiTestingPkg/FunctionalSystemTests/MemoryProtectionTest/Smm/MemoryProtectionTestSmm.inf
+  UefiTestingPkg/FunctionalSystemTests/MemoryProtectionTest/App/DxeMemoryProtectionTestApp.inf
+  # UefiTestingPkg/FunctionalSystemTests/MemoryProtectionTest/App/SmmMemoryProtectionTestApp.inf # NOT APPLICABLE TO Q35
+  # UefiTestingPkg/FunctionalSystemTests/SmmPagingProtectionsTest/Smm/SmmPagingProtectionsTestSmm.inf # NOT APPLICABLE TO Q35
+  # UefiTestingPkg/FunctionalSystemTests/SmmPagingProtectionsTest/Smm/SmmPagingProtectionsTestStandaloneMm.inf # NOT YET SUPPORTED
+  # UefiTestingPkg/FunctionalSystemTests/MemoryProtectionTest/Driver/SmmMemoryProtectionTestDriver.inf # NOT APPLICABLE TO Q35
   # UefiTestingPkg/AuditTests/PagingAudit/UEFI/DxePagingAuditDriver.inf # TEST RUN VIA APPLICATION
   XmlSupportPkg/Test/UnitTest/XmlTreeLib/XmlTreeLibUnitTestApp.inf
   XmlSupportPkg/Test/UnitTest/XmlTreeQueryLib/XmlTreeQueryLibUnitTestApp.inf {
@@ -1462,6 +1514,19 @@
   # TPM support
   #
 !if $(TPM_ENABLE) == TRUE
+!if $(TPM_REPLAY_ENABLED) == TRUE
+  TpmTestingPkg/Overrides/Tcg2Dxe/Tcg2Dxe.inf {
+    <LibraryClasses>
+      Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibRouter/Tpm2DeviceLibRouterDxe.inf
+      NULL|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2InstanceLibDTpm.inf
+      HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCryptoRouterDxe.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSha256.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha384/HashInstanceLibSha384.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha512/HashInstanceLibSha512.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSm3/HashInstanceLibSm3.inf
+  }
+!else
   SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf {
     <LibraryClasses>
       Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibRouter/Tpm2DeviceLibRouterDxe.inf
@@ -1473,6 +1538,7 @@
       NULL|SecurityPkg/Library/HashInstanceLibSha512/HashInstanceLibSha512.inf
       NULL|SecurityPkg/Library/HashInstanceLibSm3/HashInstanceLibSm3.inf
   }
+!endif
 !endif
 !if $(TPM_CONFIG_ENABLE) == TRUE AND $(TPM_ENABLE) == TRUE
   SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
@@ -1510,6 +1576,8 @@
       MfciRetrievePolicyLib|MfciPkg/Library/MfciRetrievePolicyLibViaHob/MfciRetrievePolicyLibViaHob.inf
       MfciDeviceIdSupportLib|MfciPkg/Library/MfciDeviceIdSupportLibSmbios/MfciDeviceIdSupportLibSmbios.inf
   }
+
+!include TpmTestingPkg/TpmReplay.dsc.inc
 
 ################################################################################
 #

@@ -27,7 +27,6 @@
   DevicePathLib                |MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   UefiRuntimeServicesTableLib  |MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   PeiServicesLib               |MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
-  BaseBinSecurityLib           |MdePkg/Library/BaseBinSecurityLibNull/BaseBinSecurityLibNull.inf
   HiiLib                       |MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
 
   # Services tables/Entry points
@@ -97,13 +96,12 @@
   Tpm2DeviceLib              |SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
   SourceDebugEnabledLib      |SourceLevelDebugPkg/Library/SourceDebugEnabled/SourceDebugEnabledLib.inf
 
-!if $(TOOL_CHAIN_TAG) == VS2019 or $(TOOL_CHAIN_TAG) == VS2022
+# MU_CHANGE [BEGIN] - Add Stack Cookie Support
 [LibraryClasses.X64]
-  # Provide StackCookie support lib so that we can link to /GS exports for VS builds
   RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
-  BaseBinSecurityLib|MdePkg/Library/BaseBinSecurityLibRng/BaseBinSecurityLibRng.inf
-  NULL|MdePkg/Library/BaseBinSecurityLibRng/BaseBinSecurityLibRng.inf
-!endif
+  NULL|MdePkg/Library/StackCheckLib/StackCheckLib.inf
+  StackCheckFailureLib|MdePkg/Library/StackCheckFailureLibNull/StackCheckFailureLibNull.inf
+# MU_CHANGE [END] - Add Stack Cookie Support
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   NULL|MdePkg/Library/CompilerIntrinsicsLib/ArmCompilerIntrinsicsLib.inf
@@ -130,6 +128,7 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0
 
 [Components]
+  QemuPkg/Library/BaseFwCfgInputChannelLib/BaseFwCfgInputChannelLib.inf
   QemuPkg/Library/BasePciCapLib/BasePciCapLib.inf
   QemuPkg/Library/BasePciCapPciSegmentLib/BasePciCapPciSegmentLib.inf
   QemuPkg/Library/ConfigSystemModeLibQemu/ConfigSystemModeLib.inf

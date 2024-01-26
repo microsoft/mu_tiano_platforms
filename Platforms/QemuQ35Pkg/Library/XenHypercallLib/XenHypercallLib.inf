@@ -49,6 +49,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  QemuPkg/QemuPkg.dec
   QemuQ35Pkg/QemuQ35Pkg.dec
 
 [LibraryClasses.IA32, LibraryClasses.X64]

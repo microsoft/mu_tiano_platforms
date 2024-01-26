@@ -15,6 +15,7 @@ resources:
   containers:
     - container: linux-gcc
       image: ghcr.io/microsoft/mu_devops/ubuntu-22-test:latest
+      options: --name mu_devops_build_container
 
 variables:
 - group: tool-chain-ubuntu-gcc
@@ -35,7 +36,7 @@ jobs:
         BuildTarget: "DEBUG"
         BuildExtraTag: ""
         BuildExtraStep:
-          - script: echo No extra steps provided
+          - template: Steps/RustSetupSteps.yml@mu_devops
         Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
         BuildArtifactsBinary: |
@@ -50,7 +51,7 @@ jobs:
         BuildTarget: "RELEASE"
         BuildExtraTag: ""
         BuildExtraStep:
-          - script: echo No extra steps provided
+          - template: Steps/RustSetupSteps.yml@mu_devops
         Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
         BuildArtifactsBinary: |
@@ -99,7 +100,7 @@ jobs:
         BuildTarget: "RELEASE"
         BuildExtraTag: "NO_SMM"
         BuildExtraStep:
-          - script: echo No extra steps provided
+          - template: Steps/RustSetupSteps.yml@mu_devops
         Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE"
         BuildArtifactsBinary: |
@@ -116,6 +117,7 @@ jobs:
         BuildExtraStep:
           - script: sudo apt-get install -y libssl-dev
             displayName: Install openssl
+          - template: Steps/RustSetupSteps.yml@mu_devops
         Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
         BuildArtifactsBinary: |
@@ -133,6 +135,7 @@ jobs:
         BuildExtraStep:
           - script: sudo apt-get install -y libssl-dev
             displayName: Install openssl
+          - template: Steps/RustSetupSteps.yml@mu_devops
         Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
         BuildArtifactsBinary: |
