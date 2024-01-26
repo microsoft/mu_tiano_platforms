@@ -19,7 +19,7 @@ from typing import List
 # Constants
 #
 
-DEFAULT_VERSION = "4.0.2"
+DEFAULT_VERSION = "4.7.3"
 
 #
 # Setup and parse arguments.
@@ -60,6 +60,9 @@ parser.add_argument("--force", action="store_true",
                     help="Disables automatic correction of VM configurations.")
 parser.add_argument("--timeout", type=int, default=None,
                     help="The number of seconds to wait before killing the QEMU process.")
+parser.add_argument("--qemuargs", type=str, default=None,
+                    help="Additional arguments to provide to QEMU, using the format \" -foo bar\". "
+                    "The preceding space is required for parsing reasons.")
 
 args = parser.parse_args()
 
@@ -119,6 +122,11 @@ def main():
     # Debug & Serial ports
     if args.gdbport != None:
         qemu_args += ["-gdb", f"tcp::{args.gdbport}"]
+
+    # User provided arguments
+    if args.qemuargs != None:
+        print(f"qemu args {args.qemuargs}")
+        qemu_args.extend(args.qemuargs.split())
 
     # Launch QEMU
     run_qemu(qemu_args)
@@ -191,7 +199,8 @@ def run_qemu(qemu_args: List[str]):
     try:
         subprocess.run(qemu_args, timeout=args.timeout)
     except subprocess.TimeoutExpired as e:
-        print(f"QEMU Ran longer then {args.timeout} seconds.")
+        print(f"QEMU ran longer then {args.timeout} seconds.")
+        return
     except Exception as e:
         if swtpm_proc is not None:
             swtpm_proc.kill()
@@ -209,6 +218,7 @@ def update_firmware():
     elif args.version != latest_version:
         print("#############################################################")
         print(f"NOTE: A newer version of firmware available! {latest_version}")
+        print(f"use \"--version latest\" to download the latest version")
         print("#############################################################\n")
 
     #
