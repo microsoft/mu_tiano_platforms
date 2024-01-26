@@ -16,7 +16,8 @@ import argparse
 from typing import List
 
 #
-# Constants
+# Default version to download. This is used to ensure a given script will not by
+# default download a version of the firmware it may not be able to run.
 #
 
 DEFAULT_VERSION = "4.7.3"
@@ -182,6 +183,8 @@ def build_args_arm64(qemu_args: List[str]):
 
 
 def run_qemu(qemu_args: List[str]):
+    swtpm_proc = None
+
     if args.tpm:
         os.makedirs(f"{args.firmwaredir}/tpm", exist_ok=True)
         swtpm_args = ["swtpm",
