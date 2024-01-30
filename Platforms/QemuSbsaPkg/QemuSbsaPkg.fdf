@@ -413,8 +413,6 @@ READ_LOCK_STATUS   = TRUE
 #SHARED_CRYPTO Crypto Bin Modules
 !if $(ENABLE_SHARED_CRYPTO) == TRUE
   !include CryptoPkg/Driver/Bin/CryptoDriver.DXE.inc.fdf
-!else
-  INF  CryptoPkg/Driver/CryptoDxe.inf
 !endif
 
   #
@@ -514,8 +512,6 @@ READ_LOCK_STATUS   = TRUE
 #SHARED_CRYPTO Crypto Bin Modules
 !if $(ENABLE_SHARED_CRYPTO) == TRUE
   !include CryptoPkg/Driver/Bin/CryptoDriver.BOOTBLOCK.inc.fdf
-!else
-  INF  CryptoPkg/Driver/CryptoPei.inf
 !endif
 
   FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
@@ -547,6 +543,11 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStandaloneMm.inf
   INF QemuSbsaPkg/VirtNorFlashStandaloneMm/VirtNorFlashStandaloneMm.inf
   INF ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
+
+#SHARED_CRYPTO Crypto Bin Modules
+!if $(ENABLE_SHARED_CRYPTO) == TRUE
+  !include CryptoPkg/Driver/Bin/CryptoDriver.STANDALONEMM.inc.fdf
+!endif
 
 ################################################################################
 #

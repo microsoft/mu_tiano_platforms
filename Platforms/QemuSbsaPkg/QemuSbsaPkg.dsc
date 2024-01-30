@@ -90,9 +90,10 @@
     PEI_CRYPTO_SERVICES = TINY_SHA
     DXE_CRYPTO_SERVICES = STANDARD
     SMM_CRYPTO_SERVICES = STANDARD
-    PEI_CRYPTO_ARCH = IA32
-    DXE_CRYPTO_ARCH = X64
-    SMM_CRYPTO_ARCH = X64
+    PEI_CRYPTO_ARCH = AARCH64
+    DXE_CRYPTO_ARCH = AARCH64
+    SMM_CRYPTO_ARCH = AARCH64
+    STANDALONEMM_CRYPTO_ARCH = AARCH64
   !endif
 
 !if $(NETWORK_SNP_ENABLE) == TRUE
@@ -499,9 +500,6 @@
   HobLib|StandaloneMmPkg/Library/StandaloneMmHobLib/StandaloneMmHobLib.inf
   MmServicesTableLib|MdePkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
   MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
-  IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   RngLib|MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
   VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
@@ -908,40 +906,7 @@
 #
 ################################################################################
 #SHARED_CRYPTO
-!if $(ENABLE_SHARED_CRYPTO) == FALSE
-  [LibraryClasses.common.PEIM]
-    BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
-    TlsLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
-
-  [LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.UEFI_APPLICATION]
-    BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/DxeCryptLib.inf
-    TlsLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/DxeCryptLib.inf
-
-  [Components.common.PEIM]
-    CryptoPkg/Driver/CryptoPei.inf {
-        <LibraryClasses>
-          BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
-          TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
-          !if "MSFT" IN $(FAMILY)
-            NULL|MdePkg/Library/VsIntrinsicLib/VsIntrinsicLib.inf
-          !endif
-          IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf # Contains openSSL library used by BaseCryptoLib
-        <PcdsFixedAtBuild>
-          !include CryptoPkg/Driver/Bin/Crypto.pcd.TINY_SHA.inc.dsc
-    }
-
-  [Components.common.DXE_DRIVER]
-    CryptoPkg/Driver/CryptoDxe.inf {
-        <LibraryClasses>
-          BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
-          TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
-          IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
-        <PcdsFixedAtBuild>
-          !include CryptoPkg/Driver/Bin/Crypto.pcd.STANDARD.inc.dsc
-    }
-!else
+!if $(ENABLE_SHARED_CRYPTO) == TRUE
   # Shared Crypto Include
   [Components]
     !include CryptoPkg/Driver/Bin/CryptoDriver.inc.dsc
@@ -1272,16 +1237,12 @@
 !if $(BUILD_UNIT_TESTS) == TRUE
 
   AdvLoggerPkg/UnitTests/LineParser/LineParserTestApp.inf
-  CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf {
-    <LibraryClasses>
-      BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
-      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
-      IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-    <PcdsPatchableInModule>
-      #Turn off Halt on Assert and Print Assert so that libraries can
-      #be tested in more of a release mode environment
-      gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
-  }
+  # CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf {
+  #   <PcdsPatchableInModule>
+  #     #Turn off Halt on Assert and Print Assert so that libraries can
+  #     #be tested in more of a release mode environment
+  #     gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
+  # }
   DfciPkg/UnitTests/DeviceIdTest/DeviceIdTestApp.inf
   # DfciPkg/UnitTests/DfciVarLockAudit/UEFI/DfciVarLockAuditTestApp.inf # DOESN'T PRODUCE OUTPUT
   FmpDevicePkg/Test/UnitTest/Library/FmpDependencyLib/FmpDependencyLibUnitTestApp.inf
