@@ -277,8 +277,6 @@ INF  OemPkg/OemConfigPolicyCreatorPei/OemConfigPolicyCreatorPei.inf
 # Shared Crypto
 !if $(ENABLE_SHARED_CRYPTO) == TRUE
   !include CryptoPkg/Driver/Bin/CryptoDriver.PEI.inc.fdf
-!else
-  INF  CryptoPkg/Driver/CryptoPei.inf
 !endif
 
 ################################################################################
@@ -526,10 +524,6 @@ INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
 !if $(ENABLE_SHARED_CRYPTO) == TRUE
   !include CryptoPkg/Driver/Bin/CryptoDriver.DXE.inc.fdf
   !include CryptoPkg/Driver/Bin/CryptoDriver.STANDALONEMM.inc.fdf
-!else
-  INF  CryptoPkg/Driver/CryptoDxe.inf
-  INF  CryptoPkg/Driver/CryptoSmm.inf
-  INF  CryptoPkg/Driver/CryptoStandaloneMm.inf
 !endif
 
 !if $(BUILD_UNIT_TESTS) == TRUE

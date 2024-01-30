@@ -44,10 +44,9 @@
   DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS = TRUE
 
   # Configure Shared Crypto
-  # !ifndef ENABLE_SHARED_CRYPTO # by default true
-  #   ENABLE_SHARED_CRYPTO = TRUE
-  # !endif
-  ENABLE_SHARED_CRYPTO = FALSE
+  !ifndef ENABLE_SHARED_CRYPTO # by default true
+    ENABLE_SHARED_CRYPTO = TRUE
+  !endif
   !if $(ENABLE_SHARED_CRYPTO) == TRUE
     PEI_CRYPTO_SERVICES = TINY_SHA
     DXE_CRYPTO_SERVICES = STANDARD
@@ -309,69 +308,6 @@
   PlatformSmmProtectionsTestLib|UefiTestingPkg/Library/PlatformSmmProtectionsTestLibNull/PlatformSmmProtectionsTestLibNull.inf
   FmpDependencyLib|FmpDevicePkg/Library/FmpDependencyLib/FmpDependencyLib.inf
 
-#SHARED_CRYPTO
-!if $(ENABLE_SHARED_CRYPTO) == FALSE
-  [LibraryClasses.IA32]
-    BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
-    TlsLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
-
-  [LibraryClasses.X64]
-    BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/DxeCryptLib.inf
-    TlsLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/DxeCryptLib.inf
-
-  [LibraryClasses.X64.DXE_SMM_DRIVER]
-    BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/SmmCryptLib.inf
-    TlsLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/SmmCryptLib.inf
-
-  [LibraryClasses.X64.MM_STANDALONE]
-    BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
-
-  [Components.IA32]
-    CryptoPkg/Driver/CryptoPei.inf {
-        <LibraryClasses>
-          BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
-          TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
-          !if "MSFT" IN $(FAMILY)
-            NULL|MdePkg/Library/VsIntrinsicLib/VsIntrinsicLib.inf
-          !endif
-          IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf # Contains openSSL library used by BaseCryptoLib
-        <PcdsFixedAtBuild>
-          !include CryptoPkg/Driver/Bin/Crypto.pcd.TINY_SHA.inc.dsc
-    }
-
-  [Components.X64]
-    CryptoPkg/Driver/CryptoDxe.inf {
-        <LibraryClasses>
-          BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
-          TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
-          IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
-        <PcdsFixedAtBuild>
-          !include CryptoPkg/Driver/Bin/Crypto.pcd.STANDARD.inc.dsc
-    }
-    CryptoPkg/Driver/CryptoSmm.inf {
-        <LibraryClasses>
-          BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
-          TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
-          IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-          OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
-        <PcdsFixedAtBuild>
-          !include CryptoPkg/Driver/Bin/Crypto.pcd.STANDARD.inc.dsc
-    }
-    CryptoPkg/Driver/CryptoStandaloneMm.inf {
-      <LibraryClasses>
-        BaseCryptLib  |CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
-        TlsLib        |CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
-        OpensslLib    |CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
-        IntrinsicLib  |CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-        FltUsedLib    |MdePkg/Library/FltUsedLib/FltUsedLib.inf
-        SafeIntLib    |MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
-      <PcdsFixedAtBuild>
-        !include CryptoPkg/Driver/Bin/Crypto.pcd.STANDARD.inc.dsc
-    }
-!endif
-
 [LibraryClasses]
   # Platform Runtime Mechanism (PRM) libraries
   PrmContextBufferLib|PrmPkg/Library/DxePrmContextBufferLib/DxePrmContextBufferLib.inf
@@ -592,9 +528,6 @@
   ReportStatusCodeLib|MdeModulePkg/Library/SmmReportStatusCodeLib/StandaloneMmReportStatusCodeLib.inf
   HwResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   StandaloneMmDriverEntryPoint|MmSupervisorPkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/StandaloneMmCryptLib.inf
-  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
-  IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
   AdvLoggerAccessLib|AdvLoggerPkg/Library/AdvLoggerMmAccessLib/AdvLoggerMmAccessLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibStandaloneMm.inf
   RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
@@ -663,6 +596,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol|TRUE
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|TRUE
   gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedLoggerLocator|TRUE
+  gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedLoggerAutoWrapEnable|TRUE
 
   gQemuPkgTokenSpaceGuid.PcdSmmSmramRequire|$(SMM_ENABLED)
   gUefiQemuQ35PkgTokenSpaceGuid.PcdStandaloneMmEnable|$(SMM_ENABLED)
@@ -1390,18 +1324,14 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
 !if $(BUILD_UNIT_TESTS) == TRUE
 
   AdvLoggerPkg/UnitTests/LineParser/LineParserTestApp.inf
-  CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf {
-    <LibraryClasses>
-      BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
-      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf # Contains openSSL library used by BaseCryptoLib
-      IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-    <PcdsPatchableInModule>
-      #Turn off Halt on Assert and Print Assert so that libraries can
-      #be tested in more of a release mode environment
-      gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
-    <PcdsFixedAtBuild>
-      !include CryptoPkg/Test/Crypto.pcd.ALL.inc.dsc
-  }
+  # CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf {
+  #   <PcdsPatchableInModule>
+  #     #Turn off Halt on Assert and Print Assert so that libraries can
+  #     #be tested in more of a release mode environment
+  #     gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
+  #   <PcdsFixedAtBuild>
+  #     !include CryptoPkg/Test/Crypto.pcd.ALL.inc.dsc
+  # }
   DfciPkg/UnitTests/DeviceIdTest/DeviceIdTestApp.inf
   # DfciPkg/UnitTests/DfciVarLockAudit/UEFI/DfciVarLockAuditTestApp.inf # DOESN'T PRODUCE OUTPUT
   FmpDevicePkg/Test/UnitTest/Library/FmpDependencyLib/FmpDependencyLibUnitTestApp.inf
@@ -1505,13 +1435,7 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   # Variable driver stack (NO SMM)
   #
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
-  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
-    <LibraryClasses>
-      BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
-      TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
-      IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf # Contains openSSL library used by BaseCryptoLib
-  }
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 
   #
   # TPM support
