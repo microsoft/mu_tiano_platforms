@@ -171,7 +171,7 @@ jobs:
 
     - name: Attempt to Load cargo-make From Cache
       id: cargo_make_cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ${{ steps.get_cargo_tool_details.outputs.cargo_bin_path }}
         key: ${{ steps.get_cargo_tool_details.outputs.cargo_make_cache_key }}
@@ -324,7 +324,9 @@ jobs:
         from pathlib import Path
 
         # Find the plugin directory that contains the CodeQL plugin
-        plugin_dir = list(Path(os.environ['GITHUB_WORKSPACE']).rglob('.pytool/Plugin/CodeQL'))
+        plugin_dir = list(Path(os.environ['GITHUB_WORKSPACE']).rglob('BaseTools/Plugin/CodeQL'))
+        if not plugin_dir:
+          plugin_dir = list(Path(os.environ['GITHUB_WORKSPACE']).rglob('.pytool/Plugin/CodeQL'))
 
         # This should only be found once
         if len(plugin_dir) == 1:
@@ -363,7 +365,7 @@ jobs:
 
     - name: Attempt to Load CodeQL CLI From Cache
       id: codeqlcli_cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ${{ steps.cache_key_gen.outputs.codeql_cli_ext_dep_dir }}
         key: ${{ steps.cache_key_gen.outputs.codeql_cli_cache_key }}
