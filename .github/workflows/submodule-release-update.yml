@@ -23,9 +23,13 @@ jobs:
     name: Check for Submodule Releases
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+      pull-requests: write
+
     steps:
       - name: Update Submodules to Latest Release
-        uses: microsoft/mu_devops/.github/actions/submodule-release-updater@v9.0.1
+        uses: microsoft/mu_devops/.github/actions/submodule-release-updater@v9.1.1
         with:
           GH_PAT: ${{ secrets.SUBMODULE_UPDATER_TOKEN }}
           GH_USER: "ProjectMuBot"
