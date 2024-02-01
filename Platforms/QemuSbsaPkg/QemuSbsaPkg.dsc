@@ -46,21 +46,6 @@
   #  DEBUG_ERROR     0x80000000  // Error
   DEFINE DEBUG_PRINT_ERROR_LEVEL = 0x80080246
 
-!if $(TARGET) != NOOPT
-  DEFINE FD_SIZE_IN_MB    = 2
-!else
-  DEFINE FD_SIZE_IN_MB    = 3
-!endif
-
-!if $(FD_SIZE_IN_MB) == 2
-  DEFINE FD_SIZE          = 0x200000
-  DEFINE FD_NUM_BLOCKS    = 0x200
-!endif
-!if $(FD_SIZE_IN_MB) == 3
-  DEFINE FD_SIZE          = 0x300000
-  DEFINE FD_NUM_BLOCKS    = 0x300
-!endif
-
   #
   # Defines for default states.  These can be changed on the command line.
   # -D FLAG=VALUE
@@ -80,21 +65,13 @@
   DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS  = TRUE
   DEFINE NETWORK_ISCSI_ENABLE            = FALSE
 
-  #
-  # Configure Shared Crypto
-  #
-  !ifndef ENABLE_SHARED_CRYPTO # by default false, because it is not supported on ARM platforms for now
-    ENABLE_SHARED_CRYPTO = FALSE
-  !endif
-  !if $(ENABLE_SHARED_CRYPTO) == TRUE
-    PEI_CRYPTO_SERVICES = TINY_SHA
-    DXE_CRYPTO_SERVICES = STANDARD
-    SMM_CRYPTO_SERVICES = STANDARD
-    PEI_CRYPTO_ARCH = AARCH64
-    DXE_CRYPTO_ARCH = AARCH64
-    SMM_CRYPTO_ARCH = AARCH64
-    STANDALONEMM_CRYPTO_ARCH = AARCH64
-  !endif
+  PEI_CRYPTO_SERVICES           = TINY_SHA
+  DXE_CRYPTO_SERVICES           = STANDARD
+  STANDALONEMM_CRYPTO_SERVICES  = STANDARD
+  SMM_CRYPTO_SERVICES           = NONE
+  PEI_CRYPTO_ARCH               = AARCH64
+  DXE_CRYPTO_ARCH               = AARCH64
+  STANDALONEMM_CRYPTO_ARCH      = AARCH64
 
 !if $(NETWORK_SNP_ENABLE) == TRUE
   !error "NETWORK_SNP_ENABLE is IA32/X64/EBC only"
@@ -105,6 +82,7 @@
 !include MdePkg/MdeLibs.dsc.inc
 
 [LibraryClasses.common]
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLibNull/BaseCryptLibNull.inf
   DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
 
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
@@ -153,9 +131,6 @@
 
   # Networking Requirements
 !include NetworkPkg/NetworkLibs.dsc.inc
-!if $(NETWORK_TLS_ENABLE) == TRUE
-  TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
-!endif
 
   NonDiscoverableDeviceRegistrationLib|MdeModulePkg/Library/NonDiscoverableDeviceRegistrationLib/NonDiscoverableDeviceRegistrationLib.inf
 
@@ -217,10 +192,7 @@
   # USB Libraries
   UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
 
-  #
-  # CryptoPkg libraries needed by multiple firmware features
-  #
-  RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
+  RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
   ArmMonitorLib|ArmPkg/Library/ArmMonitorLib/ArmMonitorLib.inf
   ArmTrngLib|ArmPkg/Library/ArmTrngLib/ArmTrngLib.inf
   Hash2CryptoLib|SecurityPkg/Library/BaseHash2CryptoLibNull/BaseHash2CryptoLibNull.inf
@@ -918,6 +890,8 @@
 #
 ################################################################################
 [Components.common]
+  !include CryptoPkg/Driver/Bin/CryptoDriver.inc.dsc
+
   #
   # PEI Phase modules
   #
@@ -1237,12 +1211,6 @@
 !if $(BUILD_UNIT_TESTS) == TRUE
 
   AdvLoggerPkg/UnitTests/LineParser/LineParserTestApp.inf
-  # CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf {
-  #   <PcdsPatchableInModule>
-  #     #Turn off Halt on Assert and Print Assert so that libraries can
-  #     #be tested in more of a release mode environment
-  #     gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
-  # }
   DfciPkg/UnitTests/DeviceIdTest/DeviceIdTestApp.inf
   # DfciPkg/UnitTests/DfciVarLockAudit/UEFI/DfciVarLockAuditTestApp.inf # DOESN'T PRODUCE OUTPUT
   FmpDevicePkg/Test/UnitTest/Library/FmpDependencyLib/FmpDependencyLibUnitTestApp.inf

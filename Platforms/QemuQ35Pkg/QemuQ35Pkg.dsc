@@ -43,20 +43,14 @@
   DEFINE NETWORK_HTTP_ENABLE            = TRUE
   DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS = TRUE
 
-  # Configure Shared Crypto
-  !ifndef ENABLE_SHARED_CRYPTO # by default true
-    ENABLE_SHARED_CRYPTO = TRUE
-  !endif
-  !if $(ENABLE_SHARED_CRYPTO) == TRUE
-    PEI_CRYPTO_SERVICES = TINY_SHA
-    DXE_CRYPTO_SERVICES = STANDARD
-    SMM_CRYPTO_SERVICES = STANDARD
-    STANDALONEMM_CRYPTO_SERVICES = STANDARD
-    PEI_CRYPTO_ARCH = IA32
-    DXE_CRYPTO_ARCH = X64
-    SMM_CRYPTO_ARCH = X64
-    STANDALONEMM_CRYPTO_ARCH = X64
-  !endif
+
+  PEI_CRYPTO_SERVICES = TINY_SHA
+  DXE_CRYPTO_SERVICES = STANDARD
+  SMM_CRYPTO_SERVICES = NONE
+  STANDALONEMM_CRYPTO_SERVICES = STANDARD
+  PEI_CRYPTO_ARCH = IA32
+  DXE_CRYPTO_ARCH = X64
+  STANDALONEMM_CRYPTO_ARCH = X64
 
 ################################################################################
 #
@@ -861,10 +855,7 @@
 #
 ################################################################################
 [Components]
-# Shared Crypto Include
-!if $(ENABLE_SHARED_CRYPTO) == TRUE
   !include CryptoPkg/Driver/Bin/CryptoDriver.inc.dsc
-!endif
 
 QemuQ35Pkg/Library/PeiFvMeasurementExclusionLib/PeiFvMeasurementExclusionLib.inf
 
@@ -1324,14 +1315,6 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
 !if $(BUILD_UNIT_TESTS) == TRUE
 
   AdvLoggerPkg/UnitTests/LineParser/LineParserTestApp.inf
-  # CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf {
-  #   <PcdsPatchableInModule>
-  #     #Turn off Halt on Assert and Print Assert so that libraries can
-  #     #be tested in more of a release mode environment
-  #     gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
-  #   <PcdsFixedAtBuild>
-  #     !include CryptoPkg/Test/Crypto.pcd.ALL.inc.dsc
-  # }
   DfciPkg/UnitTests/DeviceIdTest/DeviceIdTestApp.inf
   # DfciPkg/UnitTests/DfciVarLockAudit/UEFI/DfciVarLockAuditTestApp.inf # DOESN'T PRODUCE OUTPUT
   FmpDevicePkg/Test/UnitTest/Library/FmpDependencyLib/FmpDependencyLibUnitTestApp.inf
@@ -1435,7 +1418,13 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   # Variable driver stack (NO SMM)
   #
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
-  # MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
+    <LibraryClasses>
+      # TODO: Replace with DxeRuntimeCryptLib.
+      #       In the meantime, a pre-built VariableRuntimeDxe driver is used.
+      #       Kept in the DSC to verify build during this time.
+      BaseCryptLib|CryptoPkg/Library/BaseCryptLibNull/BaseCryptLibNull.inf
+  }
 
   #
   # TPM support
