@@ -813,7 +813,7 @@
   # UefiCpuPkg PCDs related to initial AP bringup and general AP management.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuBootLogicalProcessorNumber|0
 
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdQ35TsegMbytes|32
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdQ35TsegMbytes|8
   gUefiQemuQ35PkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase|FALSE
 
 
