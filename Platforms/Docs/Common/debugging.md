@@ -29,6 +29,31 @@ This will scan for image headers between the specified addresses and load their
 symbols. More information on this command can be found in the Windbg help
 window.
 
+## Debugging Using GDB in VS Code
+
+For GCC builds, GDB can be used to debug instead. The symbols can be loaded by
+running `source MU_BASECORE/BaseTools/Scripts/efi_gdb.py` from within GDB while
+stopped. To connect GDB to the built in VS Code debugger, you can use the following
+launch configuration.
+
+```json
+{
+    "name": "Connect to GDB Server",
+    "type": "cppdbg",
+    "request": "launch",
+    "program": "${workspaceRoot}/Build/QemuSbsaPkg/DEBUG_GCC5/AARCH64/MdeModulePkg/Core/Dxe/DxeMain/DEBUG/DxeCore.debug",
+    "miDebuggerServerAddress": "localhost:1234",
+    "cwd": "${workspaceRoot}",
+    "environment": [],
+    "MIMode": "gdb",
+    "miDebuggerPath": "gdb-multiarch"
+},
+```
+
+Once attached, you can stop and run `-exec source MU_BASECORE/BaseTools/Scripts/efi_gdb.py`
+from the DEBUG CONSOLE tab to load the EFI symbols and commands. You may need to
+single step after this for symbols to take affect.
+
 ## Debugging Windows on QEMU
 
 ### Boot to OS
