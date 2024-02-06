@@ -38,7 +38,7 @@ launch configuration.
 
 ```json
 {
-    "name": "Connect to GDB Server",
+    "name": "Connect to GDB Server (AARCH64)",
     "type": "cppdbg",
     "request": "launch",
     "program": "${workspaceRoot}/Build/QemuSbsaPkg/DEBUG_GCC5/AARCH64/MdeModulePkg/Core/Dxe/DxeMain/DEBUG/DxeCore.debug",
@@ -46,9 +46,14 @@ launch configuration.
     "cwd": "${workspaceRoot}",
     "environment": [],
     "MIMode": "gdb",
-    "miDebuggerPath": "gdb-multiarch"
+    "miDebuggerPath": "gdb-multiarch",
+    "stopAtConnect": true
 },
 ```
+
+Note that the `program` value must be a legitimate binary, but does not seem to
+have any affect on the debugging. Additionally, `gdb` may need to be used instead
+of `gdb` if debugging x64 from an x64 machine.
 
 Once attached, you can stop and run `-exec source MU_BASECORE/BaseTools/Scripts/efi_gdb.py`
 from the DEBUG CONSOLE tab to load the EFI symbols and commands. You may need to
