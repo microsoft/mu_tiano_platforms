@@ -50,6 +50,7 @@
   STANDALONEMM_CRYPTO_SERVICES = STANDARD
   PEI_CRYPTO_ARCH = IA32
   DXE_CRYPTO_ARCH = X64
+  SMM_CRYPTO_ARCH = NONE
   STANDALONEMM_CRYPTO_ARCH = X64
 
 ################################################################################
