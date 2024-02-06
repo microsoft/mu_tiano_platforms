@@ -34,14 +34,26 @@ window.
 For GCC builds, GDB can be used to debug instead. The symbols can be loaded by
 running `source MU_BASECORE/BaseTools/Scripts/efi_gdb.py` from within GDB while
 stopped. To connect GDB to the built in VS Code debugger, you can use the following
-launch configuration.
+launch configuration to connect to a running instance of QEMU.
 
 ```json
+{
+    "name": "Connect to GDB Server (X64)",
+    "type": "cppdbg",
+    "request": "launch",
+    "program": "${workspaceRoot}/Build/QemuQ35Pkg/DEBUG_GCC5/X64/DxeCore.debug",
+    "miDebuggerServerAddress": "localhost:1234",
+    "cwd": "${workspaceRoot}",
+    "environment": [],
+    "MIMode": "gdb",
+    "miDebuggerPath": "gdb",
+    "stopAtConnect": true
+},
 {
     "name": "Connect to GDB Server (AARCH64)",
     "type": "cppdbg",
     "request": "launch",
-    "program": "${workspaceRoot}/Build/QemuSbsaPkg/DEBUG_GCC5/AARCH64/MdeModulePkg/Core/Dxe/DxeMain/DEBUG/DxeCore.debug",
+    "program": "${workspaceRoot}/Build/QemuSbsaPkg/DEBUG_GCC5/AARCH64/DxeCore.debug",
     "miDebuggerServerAddress": "localhost:1234",
     "cwd": "${workspaceRoot}",
     "environment": [],
