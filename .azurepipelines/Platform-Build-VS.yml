@@ -20,12 +20,6 @@ jobs:
 - template: Platform-Build-Job.yml
   parameters:
     extra_install_step:
-    - powershell: |
-        $qemuVersion = (Get-Content -Path WindowsQemuVersion.json | ConvertFrom-Json).version
-        choco install qemu --version=$qemuVersion; Write-Host "##vso[task.prependpath]c:\Program Files\qemu"
-      workingDirectory: .azurepipelines/
-      displayName: Install QEMU and Set QEMU on path # friendly name displayed in the UI
-      condition: and(gt(variables.pkg_count, 0), succeeded())
     - template: Steps/InstallCoverageTools.yml@mu_devops
     tool_chain_tag: 'VS2022'
     vm_image: $(vm_image)
