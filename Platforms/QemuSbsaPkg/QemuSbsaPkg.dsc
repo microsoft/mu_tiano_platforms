@@ -556,6 +556,7 @@
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|TRUE
   gQemuPkgTokenSpaceGuid.PcdEnableMemoryProtection|$(MEMORY_PROTECTION)
   gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedLoggerLocator|TRUE
+  gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedLoggerAutoWrapEnable|TRUE
 
 [PcdsFeatureFlag.AARCH64]
   #
@@ -871,18 +872,6 @@
 #
 ################################################################################
 !include MfciPkg/MfciPkg.dsc.inc
-
-################################################################################
-#
-# Crypto magic, be it shared binary or on protocol/ppi
-#
-################################################################################
-#SHARED_CRYPTO
-!if $(ENABLE_SHARED_CRYPTO) == TRUE
-  # Shared Crypto Include
-  [Components]
-    !include CryptoPkg/Driver/Bin/CryptoDriver.inc.dsc
-!endif
 
 ################################################################################
 #
