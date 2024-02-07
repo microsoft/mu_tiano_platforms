@@ -30,4 +30,4 @@
 	url = https://github.com/microsoft/mu_feature_config.git
 [submodule "Features/MM_SUPV"]
 	path = Features/MM_SUPV
-	url = https://github.com/kuqin12/mu_feature_mm_supv.git
+	url = https://github.com/microsoft/mu_feature_mm_supv.git
