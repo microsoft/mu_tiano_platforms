@@ -2,7 +2,7 @@
 # Azure Pipeline build file for building platforms with VS.
 #
 # Copyright (c) Microsoft Corporation.
-# SPDX-License-Identifier: BSD-2-Clause-Patent
+# SPDX-License-Identifier: BSD-2-Clause-Patent.
 ##
 
 resources:
