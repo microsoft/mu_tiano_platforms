@@ -67,11 +67,14 @@
 
   PEI_CRYPTO_SERVICES           = TINY_SHA
   DXE_CRYPTO_SERVICES           = STANDARD
+  RUNTIMEDXE_CRYPTO_SERVICES    = NONE
   STANDALONEMM_CRYPTO_SERVICES  = STANDARD
   SMM_CRYPTO_SERVICES           = NONE
   PEI_CRYPTO_ARCH               = AARCH64
   DXE_CRYPTO_ARCH               = AARCH64
+  RUNTIMEDXE_CRYPTO_ARCH        = NONE
   STANDALONEMM_CRYPTO_ARCH      = AARCH64
+  SMM_CRYPTO_ARCH               = NONE
 
 !if $(NETWORK_SNP_ENABLE) == TRUE
   !error "NETWORK_SNP_ENABLE is IA32/X64/EBC only"
@@ -879,7 +882,7 @@
 #
 ################################################################################
 [Components.common]
-  !include CryptoPkg/Driver/Bin/CryptoDriver.inc.dsc
+  !include $(SHARED_CRYPTO_PATH)/Driver/Bin/CryptoDriver.inc.dsc
 
   #
   # PEI Phase modules

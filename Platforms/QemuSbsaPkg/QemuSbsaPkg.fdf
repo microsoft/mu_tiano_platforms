@@ -218,7 +218,7 @@ READ_LOCK_STATUS   = TRUE
   INF EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
   INF MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 
-  !include CryptoPkg/Driver/Bin/CryptoDriver.DXE.inc.fdf
+  !include $(SHARED_CRYPTO_PATH)/Driver/Bin/CryptoDriver.DXE.inc.fdf
 
   #
   # Multiple Console IO support
@@ -489,7 +489,7 @@ READ_LOCK_STATUS   = TRUE
   INF MsWheaPkg/MsWheaReport/Pei/MsWheaReportPei.inf
   INF OemPkg/DeviceStatePei/DeviceStatePei.inf
 
-  !include CryptoPkg/Driver/Bin/CryptoDriver.PEI.inc.fdf
+  !include $(SHARED_CRYPTO_PATH)/Driver/Bin/CryptoDriver.PEI.inc.fdf
 
   INF MfciPkg/MfciPei/MfciPei.inf
 
@@ -529,7 +529,7 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
   INF StandaloneMmPkg/Core/StandaloneMmCore.inf
-  !include CryptoPkg/Driver/Bin/CryptoDriver.STANDALONEMM.inc.fdf
+  !include $(SHARED_CRYPTO_PATH)/Driver/Bin/CryptoDriver.STANDALONEMM.inc.fdf
   INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteStandaloneMm.inf
   INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStandaloneMm.inf
   INF QemuSbsaPkg/VirtNorFlashStandaloneMm/VirtNorFlashStandaloneMm.inf
