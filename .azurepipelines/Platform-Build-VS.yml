@@ -11,7 +11,7 @@ resources:
       type: github
       endpoint: microsoft
       name: microsoft/mu_devops
-      ref: main
+      ref: personal/javagedes/sync-rust-tool-versions 
 
 variables:
 - group: tool-chain-windows-visual-studio-latest
