@@ -227,7 +227,7 @@
 
   # Crypto Libraries
   RngLib          |MdePkg/Library/BaseRngLib/BaseRngLib.inf
-  Hash2CryptoLib  |SecurityPkg/Library/BaseHash2CryptoLibNull/BaseHash2CryptoLibNull.inf
+  Hash2CryptoLib  |SecurityPkg/Library/DxeHash2CryptoLib/DxeHash2CryptoLib.inf
 
   # Power/Thermal/Power State Libraries
   MsNVBootReasonLib       |OemPkg/Library/MsNVBootReasonLib/MsNVBootReasonLib.inf # interface on Reboot Reason non volatile variables
