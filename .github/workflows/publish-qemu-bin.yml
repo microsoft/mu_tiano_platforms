@@ -118,11 +118,6 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Install dependencies
-        run: |
-          pip install edk2-pytool-extensions
       - name: Download Windows Qemu Artifact
         uses: actions/download-artifact@v4
         with:
@@ -135,16 +130,15 @@ jobs:
           path: linux
       - name: Stage Ext-Dep
         run: |
-          mkdir -p qemu
-          mv windows/ qemu/Windows/
-          mv linux/ qemu/Linux/
-          ls qemu/Windows
-          ls qemu/Linux
-          chmod a+x qemu/Linux/*
+          mkdir -p qemu/Windows/
+          mkdir -p qemu/Linux/
+          mv windows/ qemu/Windows/bin/
+          mv linux/ qemu/Linux/bin/
+          chmod a+x qemu/Linux/bin/*
       - name: Package Ext-Dep
         run: |
-          zip -r qemu-${{github.event.release.tag_name}}.zip qemu/*
-          tar -czf qemu-${{github.event.release.tag_name}}.tar.gz qemu/*
+          zip -r qemu-windows-${{github.event.release.tag_name}}.zip qemu/Windows/bin*
+          tar -czf qemu-linux-${{github.event.release.tag_name}}.tar.gz qemu/Linux/bin*
 
       - name: Upload Ext-Dep (Artifact)
         uses: actions/upload-artifact@v4
