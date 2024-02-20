@@ -6,13 +6,13 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
-  "scope": "edk2-build",
+  "scope": "global-nix",
   "type": "web",
   "name": "qemu",
-  "source": "https://github.com/Javagedes/mu_tiano_platforms/releases/download/v0.1.9/qemu-v0.1.9.tar.gz",
-  "version": "v0.1.9",
+  "source": "https://github.com/Javagedes/mu_tiano_platforms/releases/download/v0.1.10/qemu-linux-v0.1.10.tar.gz",
+  "version": "v0.1.10",
   "sha256": "4921a4598a11f60179cf0169eaa1b91eae8d2e00972a62172e55093605ba256c",
-  "internal_path": "/qemu/",
+  "internal_path": "/bin/",
   "compression_type": "tar",
   "flags": ["set_path", "host_specific", "set_build_var"],
   "var_name": "QEMU_DIR",
