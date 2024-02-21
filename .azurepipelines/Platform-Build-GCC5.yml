@@ -23,13 +23,6 @@ variables:
 jobs:
 - template: Platform-Build-Job.yml
   parameters:
-    extra_install_step:
-    - script: |
-        which qemu-system-aarch64
-        which qemu-system-x86_64
-        sudo rm $(which qemu-system-x86_64)
-        sudo rm $(which qemu-system-aarch64)
-
     tool_chain_tag: 'GCC5'
     vm_image: $(vm_image)
     os_type: Linux

@@ -11,7 +11,7 @@
   "name": "qemu",
   "source": "https://github.com/microsoft/mu_tiano_platforms/releases/download/v5.1.0/qemu-windows-v5.1.0.zip",
   "version": "v5.1.0",
-  "sha256": "f5ecc1a6b935402b2983b9b3607e7215fa12da07a3db75ddc1fd55d1f492a737",
+  "sha256": "356f5ba4d110b33d0440945005f051ca4b40019162187f2929997020937ceb52",
   "internal_path": "/bin/",
   "compression_type": "zip",
   "flags": ["set_path", "set_build_var"],
