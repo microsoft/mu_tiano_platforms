@@ -1,0 +1,174 @@
+name: Publish Qemu External Dependency
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/publish-qemu-bin.yml
+      - .github/publish-qemu-config.yml
+
+env:
+  QEMU_VERSION_FILE: .github/publish-qemu-config.yml
+
+jobs:
+  qemu-windows:
+    name: Build Qemu for Windows
+    runs-on: windows-latest
+  
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Get current Qemu version
+      id: qemu-version
+      run: |
+        $qemuVersion = (Get-Content -Path $env:QEMU_VERSION_FILE | ConvertFrom-Json).windows
+        "QEMU_VERSION=$qemuVersion" | Out-File -FilePath "$env:GITHUB_OUTPUT" -Append
+      shell: pwsh
+    - name: Download Qemu v${{ steps.qemu-version.outputs.QEMU_VERSION }}
+      env:
+        QEMU_VERSION: ${{ steps.qemu-version.outputs.QEMU_VERSION }}
+      run: |
+        choco install qemu --version=$env:QEMU_VERSION
+    - name: Stage Qemu Binaries
+      run: |
+        mkdir temp
+        mkdir temp\share
+        cp "C:\Program Files\qemu\qemu-system-x86_64.exe" temp
+        cp "C:\Program Files\qemu\qemu-system-aarch64.exe" temp
+        cp "C:\Program Files\qemu\share\kvmvapic.bin" temp\share
+        cp "C:\Program Files\qemu\share\vgabios-cirrus.bin" temp\share
+        cp "C:\Program Files\qemu\share\vgabios-stdvga.bin" temp\share
+        Get-ChildItem -Path "C:\Program Files\qemu" -Filter *.dll | Move-Item -Destination "temp"
+        
+    - name: Upload Qemu Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: qemu-windows
+        path: |
+          temp\*
+        if-no-files-found: error
+
+  qemu-linux:
+    name: Build Qemu for Linux
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Get current Qemu version
+      id: qemu-version
+      run: |
+        qemuVersion=$(jq -r .linux $QEMU_VERSION_FILE)
+        echo "QEMU_VERSION=$qemuVersion" >> $GITHUB_OUTPUT
+      shell: bash
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install --yes --no-install-recommends \
+          autoconf \
+          automake \
+          autotools-dev \
+          bc \
+          build-essential \
+          dosfstools \
+          gcc \
+          libglib2.0-dev \
+          libgtk-3-dev \
+          libpixman-1-dev \
+          libsdl2-dev \
+          mtools \
+          ninja-build \
+          tar
+    - name: Compile Qemu ${{ steps.qemu-version.outputs.QEMU_VERSION }}
+      env:
+        QEMU_VERSION: ${{ steps.qemu-version.outputs.QEMU_VERSION }}
+        QEMU_URL: "https://gitlab.com/qemu-project/qemu.git"
+        DEBIAN_FRONTEND: "noninteractive"
+      run: |
+        git clone $QEMU_URL --branch $QEMU_VERSION --depth 1 qemu
+        cd qemu
+        mkdir bin
+        cd bin
+        ./../configure --target-list=x86_64-softmmu,aarch64-softmmu --enable-gtk
+        sudo make -j $(nproc)
+    - name: Stage Qemu Binaries
+      run: |
+        mkdir -p temp/share
+        cp qemu/bin/qemu-system-x86_64 qemu/bin/qemu-system-aarch64 temp
+        cp qemu/bin/qemu-bundle/usr/local/share/qemu/vgabios-cirrus.bin temp/share
+        cp qemu/bin/qemu-bundle/usr/local/share/qemu/vgabios-stdvga.bin temp/share
+        cp qemu/bin/qemu-bundle/usr/local/share/qemu/kvmvapic.bin temp/share
+    - name: Upload Qemu Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: qemu-linux
+        path: |
+          temp/*
+        if-no-files-found: error
+  
+  prepare-extdep:
+    name: Prepare and Upload Qemu External Dependency
+    needs: [qemu-windows, qemu-linux]
+    runs-on: Ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Get current Qemu version
+        id: qemu-version
+        run: |
+          qemuVersion=$(jq -r .linux $QEMU_VERSION_FILE)
+          echo "QEMU_VERSION=$qemuVersion" >> $GITHUB_OUTPUT
+      - name: Download Windows Qemu Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: qemu-windows
+          path: windows
+      - name: Download Linux Qemu Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: qemu-linux
+          path: linux
+      - name: Download Qemu License
+        env:
+          QEMU_VERSION: ${{ steps.qemu-version.outputs.QEMU_VERSION }}
+        run: |
+          curl -L https://raw.githubusercontent.com/qemu/qemu/$QEMU_VERSION/COPYING -o COPYING
+          curl -L https://raw.githubusercontent.com/qemu/qemu/QEMU_VERSION/LICENSE -o LICENSE
+      - name: Stage Ext-Dep
+        run: |
+          mkdir -p qemu/Windows/
+          mkdir -p qemu/Linux/
+          mv windows/ qemu/Windows/bin/
+          mv linux/ qemu/Linux/bin/
+          cp COPYING qemu/Windows/
+          cp COPYING qemu/Linux/
+          cp LICENSE qemu/Windows/
+          cp LICENSE qemu/Linux/
+          chmod a+x qemu/Linux/bin/*
+      - name: Package Ext-Dep
+        run: |
+          cd qemu/Windows/ && zip -r ${{github.workspace}}/qemu-windows-${{github.event.release.tag_name}}.zip *
+          cd ../Linux/ && tar -czf ${{github.workspace}}/qemu-linux-${{github.event.release.tag_name}}.tar.gz *
+
+      - name: Upload Ext-Dep (Artifact)
+        uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
+        with:
+          name: qemu-extdep-binaries
+          path: |
+            qemu-*.zip
+            qemu-*.gz
+      - name: Upload Ext-Dep (Release)
+        if: github.event_name == 'release'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${{ github.event.release.tag_name }} qemu-*.zip
+          gh release upload ${{ github.event.release.tag_name }} qemu-*.tar.gz 
