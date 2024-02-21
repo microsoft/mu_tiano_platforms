@@ -11,9 +11,9 @@
   "name": "qemu",
   "source": "https://github.com/Javagedes/mu_tiano_platforms/releases/download/v0.1.10/qemu-linux-v0.1.10.tar.gz",
   "version": "v0.1.10",
-  "sha256": "4921a4598a11f60179cf0169eaa1b91eae8d2e00972a62172e55093605ba256c",
+  "sha256": "89a8dabb93a4080a5c19636b9a73c46cf370caf525eea72e092b657df804f397",
   "internal_path": "/bin/",
   "compression_type": "tar",
-  "flags": ["set_path", "host_specific", "set_build_var"],
+  "flags": ["set_path", "set_build_var"],
   "var_name": "QEMU_DIR",
 }
