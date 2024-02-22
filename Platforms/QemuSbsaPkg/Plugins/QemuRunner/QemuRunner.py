@@ -50,13 +50,20 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         OutputPath_FV = os.path.join(env.GetValue("BUILD_OUTPUT_BASE"), "FV")
         repo_version = env.GetValue("VERSION", "Unknown")
 
-        # Use a provided QEMU path. Default to the system path if not provided.
-        executable = env.GetValue("QEMU_PATH", "qemu-system-aarch64")
-
+        # Use a provided QEMU path. Otherwise use what is provided through the extdep
+        executable = env.GetValue("QEMU_PATH", None)
+        if not executable:
+            executable = str(Path(env.GetValue("QEMU_DIR", ''),"qemu-system-aarch64"))
+            
         qemu_version = QemuRunner.QueryQemuVersion(executable)
 
         # turn off network
         args = "-net none"
+
+        # If we are using the QEMU external dependency, we need to tell it
+        # where to look for roms
+        if not env.GetValue("QEMU_PATH") and env.GetValue("QEMU_DIR"):
+            args += f" -L {str(Path(env.GetValue('QEMU_DIR'), 'share'))}"
 
         # Mount disk with either startup.nsh or OS image
         path_to_os = env.GetValue("PATH_TO_OS")

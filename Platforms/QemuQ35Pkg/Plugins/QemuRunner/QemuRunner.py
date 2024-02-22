@@ -35,6 +35,8 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         result = io.StringIO()
         ret = utility_functions.RunCmd(exec, "--version", outstream=result)
         if ret != 0:
+            logging.error(result.getvalue())
+            logging.error(ret)
             return None
 
         # expected version string will be "QEMU emulator version maj.min.rev"
@@ -51,14 +53,22 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         OutputPath_FV = os.path.join(env.GetValue("BUILD_OUTPUT_BASE"), "FV")
         repo_version = env.GetValue("VERSION", "Unknown")
 
-        # Use a provided QEMU path. Default to the system path if not provided.
-        executable = env.GetValue("QEMU_PATH", "qemu-system-x86_64")
+        # Use a provided QEMU path. Otherwise use what is provided through the extdep
+        executable = env.GetValue("QEMU_PATH", None)
+        if not executable:
+            executable = str(Path(env.GetValue("QEMU_DIR", ''), "qemu-system-x86_64"))
 
         # First query the version
         qemu_version = QemuRunner.QueryQemuVersion(executable)
 
         # write messages to stdio
         args = "-debugcon stdio"
+
+        # If we are using the QEMU external dependency, we need to tell it
+        # where to look for roms
+        if not env.GetValue("QEMU_PATH") and env.GetValue("QEMU_DIR"):
+            args += f" -L {str(Path(env.GetValue('QEMU_DIR'), 'share'))}"
+
         # debug messages out thru virtual io port
         args += " -global isa-debugcon.iobase=0x402"
         # Turn off S3 support
