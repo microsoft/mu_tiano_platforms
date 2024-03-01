@@ -35,6 +35,16 @@ class TestSettingsManager(PlatformBuild.SettingsManager):
 
 
 class TestManager(BuildSettingsManager, UefiBuilder):
+    def AddCommandLineOptions(self, parserObj):
+        # In an effort to support common server based builds this parameter is added.  It is
+        # checked for correctness but is never uses as this platform only supports a single set of
+        # architectures.
+        parserObj.add_argument('-a', "--arch", dest="build_arch", type=str, default="AARCH64",
+            help="Optional - CSV of architecture to build.")
+
+    def RetrieveCommandLineOptions(self, args):
+        if args.build_arch.upper() != "AARCH64":
+            raise Exception("Invalid Arch Specified.  Please see comments in PlatformBuild.py::PlatformBuilder::AddCommandLineOptions")
 
     def GetLoggingLevel(self, loggerType):
         if loggerType == 'con':
