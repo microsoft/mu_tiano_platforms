@@ -28,6 +28,7 @@
   UefiRuntimeServicesTableLib  |MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   PeiServicesLib               |MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   HiiLib                       |MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
+  NULL                         |MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
 
   # Services tables/Entry points
   UefiBootServicesTableLib    |MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
@@ -95,13 +96,6 @@
   Tpm12DeviceLib             |SecurityPkg/Library/Tpm12DeviceLibDTpm/Tpm12DeviceLibDTpm.inf
   Tpm2DeviceLib              |SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
   SourceDebugEnabledLib      |SourceLevelDebugPkg/Library/SourceDebugEnabled/SourceDebugEnabledLib.inf
-
-# MU_CHANGE [BEGIN] - Add Stack Cookie Support
-[LibraryClasses.X64]
-  RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
-  NULL|MdePkg/Library/StackCheckLib/StackCheckLib.inf
-  StackCheckFailureLib|MdePkg/Library/StackCheckFailureLibNull/StackCheckFailureLibNull.inf
-# MU_CHANGE [END] - Add Stack Cookie Support
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   NULL|MdePkg/Library/CompilerIntrinsicsLib/ArmCompilerIntrinsicsLib.inf

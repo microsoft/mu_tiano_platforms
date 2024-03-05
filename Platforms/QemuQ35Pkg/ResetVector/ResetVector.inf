@@ -64,3 +64,6 @@
   gUefiQemuQ35PkgTokenSpaceGuid.PcdQemuHashTableSize
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSnpSecretsBase
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSnpSecretsSize
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /GS-
