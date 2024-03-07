@@ -18,7 +18,7 @@ jobs:
   qemu-windows:
     name: Build Qemu for Windows
     runs-on: windows-latest
-  
+
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -39,11 +39,12 @@ jobs:
         mkdir temp\share
         cp "C:\Program Files\qemu\qemu-system-x86_64.exe" temp
         cp "C:\Program Files\qemu\qemu-system-aarch64.exe" temp
+        cp "C:\Program Files\qemu\share\efi-e1000.rom" temp\share
         cp "C:\Program Files\qemu\share\kvmvapic.bin" temp\share
         cp "C:\Program Files\qemu\share\vgabios-cirrus.bin" temp\share
         cp "C:\Program Files\qemu\share\vgabios-stdvga.bin" temp\share
         Get-ChildItem -Path "C:\Program Files\qemu" -Filter *.dll | Move-Item -Destination "temp"
-        
+
     - name: Upload Qemu Artifact
       uses: actions/upload-artifact@v4
       with:
@@ -99,6 +100,7 @@ jobs:
       run: |
         mkdir -p temp/share
         cp qemu/bin/qemu-system-x86_64 qemu/bin/qemu-system-aarch64 temp
+        cp qemu/bin/qemu-bundle/usr/local/share/qemu/efi-e1000.rom temp/share
         cp qemu/bin/qemu-bundle/usr/local/share/qemu/vgabios-cirrus.bin temp/share
         cp qemu/bin/qemu-bundle/usr/local/share/qemu/vgabios-stdvga.bin temp/share
         cp qemu/bin/qemu-bundle/usr/local/share/qemu/kvmvapic.bin temp/share
@@ -109,7 +111,7 @@ jobs:
         path: |
           temp/*
         if-no-files-found: error
-  
+
   prepare-extdep:
     name: Prepare and Upload Qemu External Dependency
     needs: [qemu-windows, qemu-linux]
@@ -171,4 +173,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release upload ${{ github.event.release.tag_name }} qemu-*.zip
-          gh release upload ${{ github.event.release.tag_name }} qemu-*.tar.gz 
+          gh release upload ${{ github.event.release.tag_name }} qemu-*.tar.gz
