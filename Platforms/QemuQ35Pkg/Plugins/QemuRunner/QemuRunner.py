@@ -120,7 +120,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         logging.log(logging.INFO, "CPU model: " + cpu_model)
 
         #args += " -cpu qemu64,+rdrand,umip,+smep,+popcnt" # most compatible x64 CPU model + RDRAND + UMIP + SMEP +POPCNT support (not included by default)
-        cpu_arg = " -cpu " + cpu_model + ",rdrand=on,umip=on,smep=on,pdpe1gb=on,popcnt=on"
+        cpu_arg = " -cpu " + cpu_model + ",rdrand=on,umip=on,smep=on,pdpe1gb=on,popcnt=on,+sse4.2"
         args += cpu_arg
 
         if env.GetBuildValue ("QEMU_CORE_NUM") is not None:
