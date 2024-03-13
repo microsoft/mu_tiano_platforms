@@ -538,9 +538,7 @@ INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
 INF PrmPkg/PrmConfigDxe/PrmConfigDxe.inf
 
 # PRM Sample Modules
-INF PrmPkg/Samples/PrmSampleAcpiParameterBufferModule/PrmSampleAcpiParameterBufferModule.inf
-INF PrmPkg/Samples/PrmSampleHardwareAccessModule/PrmSampleHardwareAccessModule.inf
-INF PrmPkg/Samples/PrmSampleContextBufferModule/PrmSampleContextBufferModule.inf
+INF AdvLoggerPkg/AdvLoggerOsConnectorPrm/AdvLoggerOsConnectorPrm.inf
 
 # PRM Module Loader Driver
 INF PrmPkg/PrmLoaderDxe/PrmLoaderDxe.inf
@@ -570,6 +568,8 @@ FILE FREEFORM = PCD(gZeroTouchPkgTokenSpaceGuid.PcdZeroTouchCertificateFile) {
   INF MsGraphicsPkg/OnScreenKeyboardDxe/OnScreenKeyboardDxe.inf
   INF MsGraphicsPkg/SimpleWindowManagerDxe/SimpleWindowManagerDxe.inf
   INF AdvLoggerPkg/Application/AdvancedLogDumper/AdvancedLogDumper.inf
+  INF MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
+  INF PrmPkg/Application/PrmInfo/PrmInfo.inf
 !if $(SMM_ENABLED) == TRUE
   INF MmSupervisorPkg/Drivers/MmSupervisorErrorReport/MmSupervisorErrorReport.inf
 !endif
