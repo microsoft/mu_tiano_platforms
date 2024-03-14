@@ -8,7 +8,7 @@
 {
   "scope": "global-win",
   "type": "web",
-  "name": "qemu",
+  "name": "qemu-win",
   "source": "https://github.com/microsoft/mu_tiano_platforms/releases/download/v5.1.2/qemu-windows-v5.1.2.zip",
   "version": "v5.1.2",
   "sha256": "7870fb96640f0c9ad652b7ae68f168753d16c8e4f1d0f011f2459537d37f8139",
