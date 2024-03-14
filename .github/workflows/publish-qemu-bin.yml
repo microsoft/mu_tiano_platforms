@@ -40,6 +40,8 @@ jobs:
         cp "C:\Program Files\qemu\qemu-system-x86_64.exe" temp
         cp "C:\Program Files\qemu\qemu-system-aarch64.exe" temp
         cp "C:\Program Files\qemu\share\efi-e1000.rom" temp\share
+        cp "C:\Program Files\qemu\share\efi-e1000e.rom" temp\share
+        cp "C:\Program Files\qemu\share\efi-virtio.rom" temp\share
         cp "C:\Program Files\qemu\share\kvmvapic.bin" temp\share
         cp "C:\Program Files\qemu\share\vgabios-cirrus.bin" temp\share
         cp "C:\Program Files\qemu\share\vgabios-stdvga.bin" temp\share
@@ -101,6 +103,8 @@ jobs:
         mkdir -p temp/share
         cp qemu/bin/qemu-system-x86_64 qemu/bin/qemu-system-aarch64 temp
         cp qemu/bin/qemu-bundle/usr/local/share/qemu/efi-e1000.rom temp/share
+        cp qemu/bin/qemu-bundle/usr/local/share/qemu/efi-e1000e.rom temp/share
+        cp qemu/bin/qemu-bundle/usr/local/share/qemu/efi-virtio.rom temp/share
         cp qemu/bin/qemu-bundle/usr/local/share/qemu/vgabios-cirrus.bin temp/share
         cp qemu/bin/qemu-bundle/usr/local/share/qemu/vgabios-stdvga.bin temp/share
         cp qemu/bin/qemu-bundle/usr/local/share/qemu/kvmvapic.bin temp/share
