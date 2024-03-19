@@ -46,6 +46,7 @@
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdSystemMemorySize
   gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
+  gArmVirtTokenSpaceGuid.PcdDeviceTreeAllocationPadding
   gArmTokenSpaceGuid.PcdMmBufferBase
 
 [FixedPcd]

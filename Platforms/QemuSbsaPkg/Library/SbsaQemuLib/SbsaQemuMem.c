@@ -61,6 +61,7 @@ SbsaQemuLibConstructor (
   RETURN_STATUS                   PcdStatus;
   DXE_MEMORY_PROTECTION_SETTINGS  DxeSettings;
   MM_MEMORY_PROTECTION_SETTINGS   MmSettings;
+  UINTN                           FdtSize;
 
   if (FeaturePcdGet (PcdEnableMemoryProtection) == TRUE) {
     DxeSettings = (DXE_MEMORY_PROTECTION_SETTINGS)DXE_MEMORY_PROTECTION_SETTINGS_DEBUG;
@@ -134,6 +135,15 @@ SbsaQemuLibConstructor (
       }
     }
   }
+
+  FdtSize = fdt_totalsize (DeviceTreeBase) + PcdGet32 (PcdDeviceTreeAllocationPadding);
+
+  // Create a memory allocation HOB for the device tree blob
+  BuildMemoryAllocationHob (
+    (EFI_PHYSICAL_ADDRESS)(((UINTN)DeviceTreeBase / EFI_PAGE_SIZE) * EFI_PAGE_SIZE),
+    ALIGN_VALUE (FdtSize, EFI_PAGE_SIZE),
+    EfiBootServicesData
+    );
 
   // Make sure the start of DRAM matches our expectation
   ASSERT (FixedPcdGet64 (PcdSystemMemoryBase) == NewBase);
