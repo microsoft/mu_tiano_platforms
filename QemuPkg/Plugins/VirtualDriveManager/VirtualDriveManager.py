@@ -468,10 +468,7 @@ class VirtualDriveManager(IUefiHelperPlugin):
                                                    "PagingAudit", "Windows", "PagingReportGenerator.py")
         report_output_dir.mkdir(exist_ok=True)
         for file in paging_audit_data_files:
-            try:
-                drive.get_file(file, os.path.join(report_output_dir, file))
-            except RuntimeError as e:
-                logger.error(f"Failed to get {file} from drive.")
+            drive.get_file(file, os.path.join(report_output_dir, file))
         output_audit = os.path.join(report_output_dir, "pagingaudit.html")
         output_debug = os.path.join(report_output_dir, "pagingauditdebug.txt")
         cmd = "python"
