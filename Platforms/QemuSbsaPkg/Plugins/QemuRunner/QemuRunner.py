@@ -131,9 +131,10 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             args += " -gdb tcp::" + gdb_port
 
         # write ConOut messages to telnet localhost port
+        # Force QEMU to wait for serial connection before booting
         serial_port = env.GetValue("SERIAL_PORT")
         if serial_port != None:
-            args += " -serial tcp:127.0.0.1:" + serial_port + ",server,nowait"
+            args += " -serial tcp:127.0.0.1:" + serial_port + ",server"
         else:
             # write messages to stdio
             args += " -serial stdio"
