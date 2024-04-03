@@ -393,8 +393,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         # Add tests if requested, auto run if requested
         # Creates a startup script with the requested tests
+        test_list = []
         if test_regex != "":
-            test_list = []
             for pattern in test_regex.split(","):
                 test_list.extend(Path(output_base, "X64").glob(pattern))
 
