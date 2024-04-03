@@ -13,11 +13,11 @@
 EFI_HANDLE  mNvVarsFileLibFsHandle = NULL;
 
 /**
-  AtQemuQ35Pkgts to connect the NvVarsFileLib to the specified file system.
+  Attempts to connect the NvVarsFileLib to the specified file system.
 
   @param[in]  FsHandle - Handle for a gEfiSimpleFileSystemProtocolGuid instance
 
-  @return     The EFI_STATUS while atQemuQ35Pkgting to connect the NvVarsFileLib
+  @return     The EFI_STATUS while attempting to connect the NvVarsFileLib
               to the file system instance.
   @retval     EFI_SUCCESS - The given file system was connected successfully
 
@@ -51,7 +51,7 @@ ConnectNvVarsToFileSystem (
 /**
   Update non-volatile variables stored on the file system.
 
-  @return     The EFI_STATUS while atQemuQ35Pkgting to update the variable on
+  @return     The EFI_STATUS while attempting to update the variable on
               the connected file system.
   @retval     EFI_SUCCESS - The non-volatile variables were saved to the disk
   @retval     EFI_NOT_STARTED - A file system has not been connected

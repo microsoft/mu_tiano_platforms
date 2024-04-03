@@ -41,6 +41,7 @@
   MdeModulePkg/MdeModulePkg.dec
   SecurityPkg/SecurityPkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
+  QemuPkg/QemuPkg.dec
   QemuQ35Pkg/QemuQ35Pkg.dec
 
 [Guids]
@@ -52,6 +53,7 @@
 [LibraryClasses]
   BaseLib
   CacheMaintenanceLib
+  CcExitLib
   DebugLib
   HobLib
   IoLib
@@ -66,25 +68,24 @@
   MtrrLib
   MemEncryptSevLib
   PcdLib
-  VmgExitLib
 
 [Pcd]
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfPeiMemFvBase
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfPeiMemFvSize
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfDxeMemFvBase
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecPeiQemuQ35PkgRamBase
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecPeiQemuQ35PkgRamSize
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdSecPeiTemporaryRamBase
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdSecPeiTemporaryRamSize
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecPageTablesBase
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecPageTablesSize
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecGhcbPageTableBase
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecGhcbPageTableSize
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecGhcbBase
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecGhcbSize
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize
+  gQemuPkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase
+  gQemuPkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize
   gUefiQemuQ35PkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+  gQemuPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
   gUefiQemuQ35PkgTokenSpaceGuid.PcdPciIoBase
   gUefiQemuQ35PkgTokenSpaceGuid.PcdPciIoSize
   gUefiQemuQ35PkgTokenSpaceGuid.PcdPciMmio32Base
@@ -130,10 +131,13 @@
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfWorkAreaSize
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSnpSecretsBase
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSnpSecretsSize
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfFdBaseAddress   # MU_CHANGE: Report flash region as MMIO hob
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfFirmwareFdSize  # MU_CHANGE: Report flash region as MMIO hob
 
 [FeaturePcd]
   gUefiQemuQ35PkgTokenSpaceGuid.PcdCsmEnable
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdSmmSmramRequire
+  gQemuPkgTokenSpaceGuid.PcdSmmSmramRequire
+  gQemuPkgTokenSpaceGuid.PcdEnableMemoryProtection
 
 [Ppis]
   gEfiPeiMasterBootModePpiGuid

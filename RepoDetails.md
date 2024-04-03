@@ -1,74 +1,17 @@
 # Mu Tiano Platforms Repository
 
 ??? info "Git Details"
-    Repository Url: {{mu_tiano_platforms.url}}  
-      Branch:         {{mu_tiano_platforms.branch}}  
-      Commit:         [{{mu_tiano_platforms.commit}}]({{mu_tiano_platforms.commitlink}})  
-      Commit Date:    {{mu_tiano_platforms.date}}  
-
-Mu Tiano Platform is a public repository of Project Mu based firmware for the QEMU processor emulator. It contains
-a QemuQ35Pkg that is customized to enable many of the features of Project Mu. It also contains the original
-upstream OvmfPkg from edk2 which supports IA32/X64 virtual firmware for QEMU.
-
-This repository is to provide a readily available, free, and feature rich platform to use as an example for feature
-enablement and validation, demonstrating how a single firmware codebase can be shared across multiple products and
-architectures, promoting serviceable, maintainable, up-to-date and secure firmware. Eventually there may be numerous
-feature branches that demonstrate how to enable advanced capabilities.  By providing an end-to-end example, these
-features can be easily tested and evaluated before being integrated into other platforms.
-
-## Upstream Alignment
-
-This repo has a filtered version of edk2 as an upstream, which can be found in the `upstream/main` branch. The Azure
-Pipeline definition, which performs the upstream syncing process, can be found in `upstream/sync`. When edk2 is tagged,
-a new branch with the corresponding tag will be created (example: `upstream/202005`). Since it is a filtered branch, the
-exact commit that edk2 is tagged at won't be represented but it will be the closest applicable commit before edk2 was tagged.
-
-In addition, the current release branch of this repo will be rebased on those upstream release commits and a new release
-branch will be created and set as default. For example `upstream/202005` will have a development branch of `release/202005`.
-The expectation is that only the latest release branch is in active development.
-
-!!! Warning "Long Term Support/Security Patches"
-    This repository and all code within it is not part of an officially supported customer
-    facing product and therefore long term servicing will not be supported.  Security issues
-    will also not be backported.
-
-## Platform Firmware Support
-
-Buildable platforms can be found under the `Platforms` folder inside the root of this repo.
-Details about the platform and how to build/use each platform can be found in their respective directories.
-
-- [Q35 Platform](Platforms/QemuQ35Pkg/Docs/QemuQ35_ReadMe.md)
-- [Ovmf upstream Platform](Platforms/OvmfPkg/ReadMe.md)
-
-For general details about Project Mu please see the Project Mu docs (<https://github.com/Microsoft/mu>).
-
-This project has adopted the [Microsoft Open Source Code of
-Conduct](https://opensource.microsoft.com/codeofconduct/).
-
-For more information see the [Code of Conduct
-FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact
-[opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional
-questions or comments.
-
-## Issues
-
-Please open any issues in the Project Mu GitHub tracker. [More
-Details](https://microsoft.github.io/mu/How/contributing/)
-
-## Contributing Code or Docs
-
-Please follow the general Project Mu Pull Request process.  [More
-Details](https://microsoft.github.io/mu/How/contributing/)
-
-- [Code Requirements](https://microsoft.github.io/mu/CodeDevelopment/requirements/)
-- [Doc Requirements](https://microsoft.github.io/mu/DeveloperDocs/requirements/)
+    Repository Url: {{mu_tiano_platforms.url}}
+      Branch:         {{mu_tiano_platforms.branch}}
+      Commit:         [{{mu_tiano_platforms.commit}}]({{mu_tiano_platforms.commitlink}})
+      Commit Date:    {{mu_tiano_platforms.date}}
 
 ## Copyright & License
 
 Project Mu contributions will be licensed as BSD-2-Clause-Patent and will contain the SPDX-License-Identifier.
 
 ```text
-Copyright (C) Microsoft Corporation  
+Copyright (C) Microsoft Corporation
 SPDX-License-Identifier: BSD-2-Clause-Patent
 ```
 

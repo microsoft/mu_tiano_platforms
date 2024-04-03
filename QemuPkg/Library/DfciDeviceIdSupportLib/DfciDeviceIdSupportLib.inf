@@ -1,0 +1,44 @@
+## @file
+# DfciDeviceIdSupportLib.inf
+#
+# Return the device ID for this platform.
+#
+# Copyright (C) Microsoft Corporation. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.27
+  BASE_NAME                      = DfciDeviceIdSupportLib
+  FILE_GUID                      = 087e75ea-66dd-41cf-a581-ede70be1fc822
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DfciDeviceIdSupportLib|DXE_DRIVER UEFI_APPLICATION
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  DfciDeviceIdSupportLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  DfciPkg/DfciPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  BaseLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiSmbiosProtocolGuid
+
+[Depex]
+  TRUE

@@ -1,5 +1,5 @@
 ## @file
-#  DXE library instance for ResetSystem library class for OVMF
+#  DXE library instance for ResetSystem library class for QEMU.
 #
 #  Copyright (C) 2020, Red Hat, Inc.
 #  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
@@ -28,6 +28,7 @@
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
+  QemuPkg/QemuPkg.dec
   QemuQ35Pkg/QemuQ35Pkg.dec
 
 [LibraryClasses]

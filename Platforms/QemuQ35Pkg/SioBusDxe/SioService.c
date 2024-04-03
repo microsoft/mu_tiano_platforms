@@ -77,10 +77,10 @@ SIO_DEVICE_INFO  mDevicesInfo[] = {
 };
 
 //
-// ACPI Device Path Node QemuQ35Pkglate
+// ACPI Device Path Node template
 //
 GLOBAL_REMOVE_IF_UNREFERENCED
-ACPI_HID_DEVICE_PATH  mAcpiDeviceNodeQemuQ35Pkglate = {
+ACPI_HID_DEVICE_PATH  mAcpiDeviceNodeTemplate = {
   {        // Header
     ACPI_DEVICE_PATH,
     ACPI_DP,
@@ -300,11 +300,11 @@ SioCreateChildDevice (
   //
   // Construct the child device path
   //
-  mAcpiDeviceNodeQemuQ35Pkglate.HID = mDevicesInfo[DeviceIndex].Hid;
-  mAcpiDeviceNodeQemuQ35Pkglate.UID = mDevicesInfo[DeviceIndex].Uid;
+  mAcpiDeviceNodeTemplate.HID = mDevicesInfo[DeviceIndex].Hid;
+  mAcpiDeviceNodeTemplate.UID = mDevicesInfo[DeviceIndex].Uid;
   SioDevice->DevicePath       = AppendDevicePathNode (
                                   ParentDevicePath,
-                                  (EFI_DEVICE_PATH_PROTOCOL *)&mAcpiDeviceNodeQemuQ35Pkglate
+                                  (EFI_DEVICE_PATH_PROTOCOL *)&mAcpiDeviceNodeTemplate
                                   );
   if (SioDevice->DevicePath == NULL) {
     Status = EFI_OUT_OF_RESOURCES;

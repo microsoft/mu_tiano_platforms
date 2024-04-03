@@ -1,22 +1,68 @@
 ## @file
-# Azure Pipeline build file for a build using ubuntu and GCC5
+# Azure Pipeline build file for a build using Ubuntu and GCC.
+#
+# IMPORTANT: This file requires the local repo to contain a .azurepipelines/Matrix-Build-Job.yml file that
+#            performs the actual build steps for the configurations and packages supported by the repo.
+#
+# NOTE: This file is automatically synchronized from Mu DevOps. Update the original file there
+#       instead of the file in this repo.
+#
+# - Mu DevOps Repo: https://github.com/microsoft/mu_devops
+# - File Sync Settings: https://github.com/microsoft/mu_devops/blob/main/.sync/Files.yml
 #
 # Copyright (c) Microsoft Corporation.
-# Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
-# MU_CHANGE BEGIN
-trigger: none
 
-pr:
-- dev/*
-- release/*
-# MU_CHANGE END
+variables:
+- group: architectures-arm-64-x86-64
+- group: tool-chain-ubuntu-gcc
 
-jobs:
-- template: templates/pr-gate-build-job.yml
+extends:
+  template: MuDevOpsWrapper.yml
   parameters:
-    tool_chain_tag: 'GCC5'
-    vm_image: 'ubuntu-latest'
-    arch_list: "IA32,X64"
-
+    do_ci_build: true
+    do_ci_setup: true
+    do_non_ci_build: false
+    do_non_ci_setup: true
+    do_pr_eval: true
+    container_build: true
+    os_type: Linux
+    rust_build: true
+    extra_cargo_steps:
+      - script: pip install -r pip-requirements.txt --upgrade
+        displayName: Install and Upgrade pip Modules
+        condition: succeeded()
+      - task: CmdLine@2
+        displayName: Repo Setup
+        inputs:
+          script: stuart_setup -c .pytool/CISettings.py
+        condition: succeeded()
+    build_matrix:
+      TARGET_QEMU:
+        Pkgs: 'QemuPkg'
+        Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        ArchList: IA32,X64,AARCH64
+      TARGET_Q35:
+        Pkgs: 'QemuQ35Pkg'
+        Targets: 'NO-TARGET'
+        ArchList: IA32,X64
+      TARGET_SBSA:
+        Pkgs: 'QemuSbsaPkg'
+        Targets: 'NO-TARGET'
+        ArchList: AARCH64
+      TARGET_QEMU_ARM:
+        Pkgs: 'QemuPkg'
+        Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        ArchList: IA32,X64,AARCH64
+        SelfHostAgent: true
+      TARGET_Q35_ARM:
+        Pkgs: 'QemuQ35Pkg'
+        Targets: 'NO-TARGET'
+        ArchList: IA32,X64
+        SelfHostAgent: true
+      TARGET_SBSA_ARM:
+        Pkgs: 'QemuSbsaPkg'
+        Targets: 'NO-TARGET'
+        ArchList: AARCH64
+        SelfHostAgent: true

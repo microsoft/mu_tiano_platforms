@@ -1,0 +1,196 @@
+## @file
+# Azure Pipeline build file to perform a release in this repo.
+#
+# Note: This file should be invoked immediately after a release has been published
+#       on GitHub.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+trigger: none
+pr: none
+
+resources:
+  repositories:
+    - repository: mu_devops
+      type: github
+      endpoint: microsoft
+      name: microsoft/mu_devops
+      ref: main
+  containers:
+    - container: linux-gcc
+      image: ghcr.io/microsoft/mu_devops/ubuntu-22-test:latest
+      options: --name mu_devops_build_container
+
+name: $(Date:yyyyMMdd)$(Rev:.r) Mu Tiano Platforms Release
+
+stages:
+- stage: LinuxBuildQemuPlatforms
+  displayName: Build QEMU Platforms on Linux
+
+  variables:
+  - group: tool-chain-ubuntu-gcc
+
+  jobs:
+    - template: Platform-Build-Job.yml
+      parameters:
+        tool_chain_tag: 'GCC5'
+        vm_image: ubuntu-latest
+        os_type: Linux
+        container_image: linux-gcc
+        build_matrix:
+          QemuQ35_GCC_DEBUG:
+            BuildPackage: QemuQ35Pkg
+            BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+            BuildArch: IA32,X64
+            BuildFlags: ""
+            BuildTarget: "DEBUG"
+            BuildExtraTag: ""
+            BuildExtraStep:
+              - template: Steps/RustSetupSteps.yml@mu_devops
+            Run: true
+            RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+            BuildArtifactsBinary: |
+              **/QEMUQ35_*.fd
+            BuildArtifactsOther: "**/unit_test_results/*"
+
+          QemuQ35_GCC_RELEASE:
+            BuildPackage: QemuQ35Pkg
+            BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+            BuildArch: IA32,X64
+            BuildFlags: ""
+            BuildTarget: "RELEASE"
+            BuildExtraTag: ""
+            BuildExtraStep:
+              - template: Steps/RustSetupSteps.yml@mu_devops
+            Run: true
+            RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+            BuildArtifactsBinary: |
+              **/QEMUQ35_*.fd
+            BuildArtifactsOther: "**/unit_test_results/*"
+
+          QemuQ35_GCC_NO_SMM_RELEASE:
+            BuildPackage: QemuQ35Pkg
+            BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+            BuildArch: IA32,X64
+            BuildFlags: "BLD_*_SMM_ENABLED=FALSE"
+            BuildTarget: "RELEASE"
+            BuildExtraTag: "NO_SMM"
+            BuildExtraStep:
+              - template: Steps/RustSetupSteps.yml@mu_devops
+            Run: true
+            RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE"
+            BuildArtifactsBinary: |
+              **/QEMUQ35_*.fd
+            BuildArtifactsOther: ""
+
+          QemuSbsa_GCC_DEBUG:
+            BuildPackage: QemuSbsaPkg
+            BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+            BuildArch: AARCH64
+            BuildFlags: ""
+            BuildTarget: "DEBUG"
+            BuildExtraTag: ""
+            BuildExtraStep:
+              - script: sudo apt-get install -y libssl-dev
+                displayName: Install openssl
+              - template: Steps/RustSetupSteps.yml@mu_devops
+            Run: true
+            RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+            BuildArtifactsBinary: |
+              **/QEMU_EFI.fd
+              **/SECURE_FLASH0.fd
+            BuildArtifactsOther: "**/unit_test_results/*"
+
+          QemuSbsa_GCC_RELEASE:
+            BuildPackage: QemuSbsaPkg
+            BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+            BuildArch: AARCH64
+            BuildFlags: ""
+            BuildTarget: "RELEASE"
+            BuildExtraTag: ""
+            BuildExtraStep:
+              - script: sudo apt-get install -y libssl-dev
+                displayName: Install openssl
+              - template: Steps/RustSetupSteps.yml@mu_devops
+            Run: true
+            RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+            BuildArtifactsBinary: |
+              **/QEMU_EFI.fd
+              **/SECURE_FLASH0.fd
+            BuildArtifactsOther: "**/unit_test_results/*"
+
+- stage: WindowsBuildQemuPlatforms
+  displayName: Build QEMU Platforms on Windows
+  dependsOn: []
+
+  variables:
+  - group: tool-chain-windows-visual-studio-latest
+
+  jobs:
+    - template: Platform-Build-Job.yml
+      parameters:
+        extra_install_step:
+        - powershell: |
+            $qemuVersion = (Get-Content -Path WindowsQemuVersion.json | ConvertFrom-Json).version
+            choco install qemu --version=$qemuVersion; Write-Host "##vso[task.prependpath]c:\Program Files\qemu"
+          workingDirectory: .azurepipelines/
+          displayName: Install QEMU and Set QEMU on path # friendly name displayed in the UI
+          condition: and(gt(variables.pkg_count, 0), succeeded())
+        tool_chain_tag: 'VS2022'
+        vm_image: windows-latest
+        os_type: Windows_NT
+        build_matrix:
+          QemuQ35_VS_DEBUG:
+            BuildPackage: QemuQ35Pkg
+            BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+            BuildArch: IA32,X64
+            BuildFlags: ""
+            BuildTarget: "DEBUG"
+            BuildExtraTag: ""
+            BuildExtraStep:
+              - template: Steps/RustSetupSteps.yml@mu_devops
+            Run: true
+            RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+            BuildArtifactsBinary: |
+              **/QEMUQ35_*.fd
+            BuildArtifactsOther: "**/unit_test_results/*"
+
+          QemuQ35_VS_RELEASE:
+            BuildPackage: QemuQ35Pkg
+            BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+            BuildArch: IA32,X64
+            BuildFlags: ""
+            BuildTarget: "RELEASE"
+            BuildExtraTag: ""
+            BuildExtraStep:
+              - template: Steps/RustSetupSteps.yml@mu_devops
+            Run: true
+            RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+            BuildArtifactsBinary: |
+              **/QEMUQ35_*.fd
+            BuildArtifactsOther: "**/unit_test_results/*"
+
+          QemuQ35_VS_NO_SMM_RELEASE:
+            BuildPackage: QemuQ35Pkg
+            BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+            BuildArch: IA32,X64
+            BuildFlags: "BLD_*_SMM_ENABLED=FALSE"
+            BuildTarget: "RELEASE"
+            BuildExtraTag: "NO_SMM"
+            BuildExtraStep:
+              - template: Steps/RustSetupSteps.yml@mu_devops
+            Run: true
+            RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE"
+            BuildArtifactsBinary: |
+              **/QEMUQ35_*.fd
+            BuildArtifactsOther: ""
+
+- stage: PublishReleaseArtifacts
+  displayName: Publish Release Artifacts
+  dependsOn:
+  - LinuxBuildQemuPlatforms
+  - WindowsBuildQemuPlatforms
+  jobs:
+    - template: templates/Job-Publish.yml

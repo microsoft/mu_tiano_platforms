@@ -36,6 +36,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
+  QemuPkg/QemuPkg.dec
   QemuQ35Pkg/QemuQ35Pkg.dec
 
 [LibraryClasses]
@@ -44,7 +45,7 @@
   BaseMemoryLib
   PeiServicesLib
   PcdLib
-  UefiCpuLib
+  CpuLib
   DebugAgentLib
   IoLib
   PeCoffLib
@@ -67,8 +68,8 @@
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecGhcbBase
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecGhcbSize
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecPageTablesBase
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecPeiQemuQ35PkgRamBase
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecPeiQemuQ35PkgRamSize
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdSecPeiTemporaryRamBase
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdSecPeiTemporaryRamSize
   gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress
   gUefiQemuQ35PkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfDecompressionScratchEnd
@@ -79,4 +80,7 @@
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecValidatedEnd
 
 [FeaturePcd]
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdSmmSmramRequire
+  gQemuPkgTokenSpaceGuid.PcdSmmSmramRequire
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /GS-

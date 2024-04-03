@@ -18,10 +18,12 @@
   CONSTRUCTOR                    = SmmCpuFeaturesLibConstructor
 
 [Sources]
-  SmmCpuFeaturesLib.c
+  MmCpuFeaturesLib.c
+  TraditionalMmCpuFeaturesLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
+  QemuPkg/QemuPkg.dec
   QemuQ35Pkg/QemuQ35Pkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
@@ -33,7 +35,7 @@
   MemoryAllocationLib
   PcdLib
   SafeIntLib
-  SmmServicesTableLib
+  MmServicesTableLib
   UefiBootServicesTableLib
 
 [Pcd]

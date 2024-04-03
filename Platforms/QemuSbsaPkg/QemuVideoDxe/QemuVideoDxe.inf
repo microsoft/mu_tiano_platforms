@@ -1,0 +1,75 @@
+## @file
+#  This driver is a sample implementation of the Graphics Output Protocol for
+#  the QEMU (Cirrus Logic 5446) video controller.
+#
+#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = QemuVideoDxe
+  FILE_GUID                      = 6DBEFC28-97EF-4DB5-950F-5D57C8C24E86
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeQemuVideo
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64 EBC
+#
+#  DRIVER_BINDING                =  gQemuVideoDriverBinding
+#  COMPONENT_NAME                =  gQemuVideoComponentName
+#
+
+[Sources.common]
+  ComponentName.c
+  Driver.c
+  Gop.c
+  Initialize.c
+  Qemu.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MsGraphicsPkg/MsGraphicsPkg.dec # MU_CHANGE use MsGopOverrideProtocolGuid
+  PolicyServicePkg/PolicyServicePkg.dec
+  QemuSbsaPkg/QemuSbsaPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  FrameBufferBltLib
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  PcdLib
+  PciLib
+  PrintLib
+  TimerLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Guids]
+  gSbsaPolicyDataGFXGuid                            # CONSUMES
+
+[Protocols]
+  gPolicyProtocolGuid                           ## CONSUMES
+  gEfiGraphicsOutputProtocolGuid                # PROTOCOL BY_START
+  gEfiDevicePathProtocolGuid                    # PROTOCOL BY_START
+  gEfiPciIoProtocolGuid                         # PROTOCOL TO_START
+
+[Pcd]
+  gQemuSbsaPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+  gQemuSbsaPkgTokenSpaceGuid.PcdVideoResolutionSource
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
+  gMsGraphicsPkgTokenSpaceGuid.PcdMsGopOverrideProtocolGuid   # MU_CHANGE use MsGopOverrideProtocolGuid
+
+[Depex]
+  gPolicyProtocolGuid AND   ## Policy Service
+  gSbsaPolicyDataGFXGuid    ## GFX Silicon Policy

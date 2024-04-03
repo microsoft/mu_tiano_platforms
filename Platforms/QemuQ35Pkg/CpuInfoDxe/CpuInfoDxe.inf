@@ -1,0 +1,36 @@
+## @file CpuInfoDxe.inf
+#
+# Cpu Info Debug Dxe
+#
+# Copyright (c) Microsoft Corportaion. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION       = 1.27
+  BASE_NAME         = CpuInfoDxe
+  FILE_GUID         = F5E4F8D3-9975-4263-8BB5-67178988429E
+  VERSION_STRING    = 1.0
+  MODULE_TYPE       = DXE_DRIVER
+  ENTRY_POINT       = CpuInfoDxeEntryPoint
+
+[Sources]
+  CpuInfoDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  QemuQ35Pkg/QemuQ35Pkg.dec
+
+[LibraryClasses]
+  DebugLib
+  UefiLib
+  BaseLib
+  PrintLib
+  CpuLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+
+[Depex]
+  TRUE

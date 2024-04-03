@@ -43,9 +43,9 @@ typedef
 STATIC GDT_ENTRIES  *mGdt = NULL;
 
 //
-// Global descriptor table (GDT) QemuQ35Pkglate
+// Global descriptor table (GDT) Template
 //
-STATIC GDT_ENTRIES  GdtQemuQ35Pkglate = {
+STATIC GDT_ENTRIES  GdtTemplate = {
   //
   // Null
   //
@@ -137,14 +137,14 @@ InitLinuxDescriptorTables (
   //
   // Allocate Runtime Data for the GDT
   //
-  mGdt = AllocateRuntimePool (sizeof (GdtQemuQ35Pkglate) + 8);
+  mGdt = AllocateRuntimePool (sizeof (GdtTemplate) + 8);
   ASSERT (mGdt != NULL);
   mGdt = ALIGN_POINTER (mGdt, 8);
 
   //
   // Initialize all GDT entries
   //
-  CopyMem (mGdt, &GdtQemuQ35Pkglate, sizeof (GdtQemuQ35Pkglate));
+  CopyMem (mGdt, &GdtTemplate, sizeof (GdtTemplate));
 }
 
 /**
@@ -163,7 +163,7 @@ SetLinuxDescriptorTables (
   // Write GDT register
   //
   GdtPtr.Base  = (UINT32)(UINTN)(VOID *)mGdt;
-  GdtPtr.Limit = (UINT16)(sizeof (GdtQemuQ35Pkglate) - 1);
+  GdtPtr.Limit = (UINT16)(sizeof (GdtTemplate) - 1);
   AsmWriteGdtr (&GdtPtr);
 
   IdtPtr.Base  = (UINT32)0;

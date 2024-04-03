@@ -2,19 +2,102 @@
 # Dependabot configuration file to enable GitHub services for managing and updating
 # dependencies.
 #
+# This dependabot configuration expects submodules to be placed in specific directory paths
+# relative to the root of the repo. These are also the paths generally recommended to place
+# these submodules for consistency across Project Mu projects.
+#
+# NOTE: This file is automatically synchronized from Mu DevOps. Update the original file there
+#       instead of the file in this repo.
+#
+#       This dependabot file is limited to syncing the following type of dependencies. Other files
+#       are already available in Mu DevOps to sync other dependency types.
+#         - Rust Crate Dependencies (`cargo`)
+#         - GitHub Actions (`github-actions`)
+#         - Git Submodules (`gitsubmodule`)
+#         - Python PIP Modules (`pip`)
+#
+#       Dependabot does not update the microsoft/mu_devops version because that is updated once in mu_devops
+#       and then synced to all repos when the file sync occurs.
+#
+# - Mu DevOps Repo: https://github.com/microsoft/mu_devops
+# - File Sync Settings: https://github.com/microsoft/mu_devops/blob/main/.sync/Files.yml
+#
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
-# Please see the documentation for all configuration options:
+# Please see the documentation for all dependabot configuration options:
 # https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
 ##
+
 version: 2
+
 updates:
-  - package-ecosystem: "gitsubmodule" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: "cargo"
+    directory: "/"
     schedule:
-      interval: "daily"
-  - package-ecosystem: "pip" # See documentation for possible values
-    directory: "/" # Location of package manifests
+      interval: "weekly"
+      day: "monday"
+      timezone: "America/Los_Angeles"
+      time: "03:00"
+    commit-message:
+      prefix: "Rust Dependency"
+    labels:
+      - "type:dependencies"
+      - "type:dependabot"
+    rebase-strategy: "disabled"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "monday"
+      timezone: "America/Los_Angeles"
+      time: "06:00"
+    ignore:
+      - dependency-name: "microsoft/mu_devops"
+    commit-message:
+      prefix: "GitHub Action"
+    labels:
+      - "type:dependencies"
+      - "type:dependabot"
+    rebase-strategy: "disabled"
+
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      timezone: "America/Los_Angeles"
+      time: "23:00"
+    labels:
+      - "type:submodules"
+      - "type:dependencies"
+    rebase-strategy: "disabled"
+    ignore:
+      - dependency-name: "Common/MIN_PLAT"
+      - dependency-name: "Common/MU_BASECORE"
+      - dependency-name: "Common/MU_OEM_SAMPLE"
+      - dependency-name: "Common/MU_TIANO"
+      - dependency-name: "Common/MU"
+      - dependency-name: "Features/CONFIG"
+      - dependency-name: "Features/DFCI"
+      - dependency-name: "Features/IPMI"
+      - dependency-name: "Features/MM_SUPV"
+      - dependency-name: "MU_BASECORE"
+      - dependency-name: "Silicon/Arm/MU_TIANO"
+      - dependency-name: "Silicon/Intel/MU_TIANO"
+
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      timezone: "America/Los_Angeles"
+      time: "01:00"
+    commit-message:
+      prefix: "pip"
+    labels:
+      - "language:python"
+      - "type:dependencies"
+      - "type:dependabot"
+    rebase-strategy: "disabled"

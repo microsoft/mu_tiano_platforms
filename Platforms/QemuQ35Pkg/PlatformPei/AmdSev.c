@@ -19,7 +19,7 @@
 #include <PiPei.h>
 #include <Register/Amd/Msr.h>
 #include <Register/Intel/SmramSaveStateMap.h>
-#include <Library/VmgExitLib.h>
+#include <Library/CcExitLib.h>
 #include <ConfidentialComputingGuestAttr.h>
 
 #include "Platform.h"
@@ -129,19 +129,19 @@ GetHypervisorFeature (
   //
   // Initialize the GHCB
   //
-  VmgInit (Ghcb, &InterruptState);
+  CcExitVmgInit (Ghcb, &InterruptState);
 
   //
   // Query the Hypervisor Features.
   //
-  Status = VmgExit (Ghcb, SVM_EXIT_HYPERVISOR_FEATURES, 0, 0);
+  Status = CcExitVmgExit (Ghcb, SVM_EXIT_HYPERVISOR_FEATURES, 0, 0);
   if ((Status != 0)) {
     SevEsProtocolFailure (GHCB_TERMINATE_GHCB_GENERAL);
   }
 
   Features = Ghcb->SaveArea.SwExitInfo2;
 
-  VmgDone (Ghcb, InterruptState);
+  CcExitVmgDone (Ghcb, InterruptState);
 
   return Features;
 }
@@ -345,7 +345,8 @@ AmdSevInitialize (
   // Set Memory Encryption Mask PCD
   //
   EncryptionMask = MemEncryptSevGetEncryptionMask ();
-  PcdStatus      = PcdSet64S (PcdPteMemoryEncryptionAddressOrMask, EncryptionMask);
+  // MU_CHANGE: Remove dynamic PCD set to support Standalone MM
+  PcdStatus = (PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) != EncryptionMask) ? EFI_UNSUPPORTED : EFI_SUCCESS;
   ASSERT_RETURN_ERROR (PcdStatus);
 
   DEBUG ((DEBUG_INFO, "SEV is enabled (mask 0x%lx)\n", EncryptionMask));

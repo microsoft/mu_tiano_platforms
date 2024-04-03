@@ -1,16 +1,33 @@
 [submodule "MU_BASECORE"]
 	path = MU_BASECORE
 	url = https://github.com/microsoft/mu_basecore.git
-	branch = release/202208
+	branch = release/202302
 [submodule "Common/MU_TIANO"]
 	path = Common/MU_TIANO
 	url = https://github.com/microsoft/mu_tiano_plus.git
-	branch = release/202208
+	branch = release/202302
 [submodule "Common/MU"]
 	path = Common/MU
 	url = https://github.com/microsoft/mu_plus.git
-	branch = release/202208
+	branch = release/202302
 [submodule "Common/MU_OEM_SAMPLE"]
 	path = Common/MU_OEM_SAMPLE
 	url = https://github.com/microsoft/mu_oem_sample.git
-	branch = release/202208
+	branch = release/202302
+[submodule "Silicon/Arm/MU_TIANO"]
+	path = Silicon/Arm/MU_TIANO
+	url = https://github.com/microsoft/mu_silicon_arm_tiano.git
+	branch = release/202302
+[submodule "Silicon/Arm/TFA"]
+	path = Silicon/Arm/TFA
+	url = https://github.com/ARM-software/arm-trusted-firmware.git
+	branch = v2.9.0
+[submodule "Features/DFCI"]
+	path = Features/DFCI
+	url = https://github.com/microsoft/mu_feature_dfci
+[submodule "Features/CONFIG"]
+	path = Features/CONFIG
+	url = https://github.com/microsoft/mu_feature_config.git
+[submodule "Features/MM_SUPV"]
+	path = Features/MM_SUPV
+	url = https://github.com/microsoft/mu_feature_mm_supv.git

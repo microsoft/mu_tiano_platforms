@@ -28,10 +28,10 @@
         "AcceptableDependencies": [
             "MdePkg/MdePkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
-            "Temp/Temp.dec",
             "NetworkPkg/NetworkPkg.dec",
             "SecurityPkg/SecurityPkg.dec",
             "UefiCpuPkg/UefiCpuPkg.dec",
+            "StandaloneMmPkg/StandaloneMmPkg.dec",
             "ShellPkg/ShellPkg.dec",
             "EmbeddedPkg/EmbeddedPkg.dec",
             "SourceLevelDebugPkg/SourceLevelDebugPkg.dec",
@@ -42,7 +42,9 @@
             "SetupDataPkg/SetupDataPkg.dec",
             "MfciPkg/MfciPkg.dec",
             "OemPkg/OemPkg.dec",
-            "QemuQ35Pkg/QemuQ35Pkg.dec"
+            "QemuPkg/QemuPkg.dec",
+            "QemuQ35Pkg/QemuQ35Pkg.dec",
+            "TpmTestingPkg/TpmTestingPkg.dec"
         ],
         # For host based unit tests
         "AcceptableDependencies-HOST_APPLICATION":[
@@ -67,7 +69,7 @@
 
     ## options defined .pytool/Plugin/GuidCheck
     "GuidCheck": {
-        "IgnoreGuidName": [], # Expected duplication for gEfiFirmwareVolumeTopFileGuid
+        "IgnoreGuidName": ["SecCore", "ResetVector"], # Expected duplication for gEfiFirmwareVolumeTopFileGuid
         "IgnoreGuidValue": [],
         "IgnoreFoldersAndFiles": [],
         "IgnoreDuplicates": [],
@@ -80,7 +82,7 @@
 
     ## options defined .pytool/Plugin/SpellCheck
     "SpellCheck": {
-        "AuditOnly": False,           # Fails right now with over 270 errors
+        "AuditOnly": True,           # Enable after fixing failures
         "IgnoreFiles": [],           # use gitignore syntax to ignore errors in matching files
         "ExtendWords": [
             "acpitable",

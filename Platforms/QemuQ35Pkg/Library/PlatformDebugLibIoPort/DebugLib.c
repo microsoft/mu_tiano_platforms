@@ -86,6 +86,7 @@ DebugPrintMarker (
 {
   CHAR8  Buffer[MAX_DEBUG_MESSAGE_LENGTH];
   UINTN  Length;
+  UINT8  *Buffer8;
 
   //
   // If Format is NULL, then ASSERT().
@@ -113,7 +114,10 @@ DebugPrintMarker (
   //
   // Send the print string to the debug I/O port
   //
-  IoWriteFifo8 (PcdGet16 (PcdDebugIoPort), Length, Buffer);
+  Buffer8 = (UINT8 *)Buffer;
+  while (Length-- > 0) {
+    IoWrite8 (PcdGet16 (PcdDebugIoPort), *Buffer8++);
+  }
 }
 
 /**
@@ -201,6 +205,7 @@ DebugAssert (
 {
   CHAR8  Buffer[MAX_DEBUG_MESSAGE_LENGTH];
   UINTN  Length;
+  UINT8  *Buffer8;
 
   //
   // Generate the ASSERT() message in Ascii format
@@ -218,7 +223,10 @@ DebugAssert (
   // Send the print string to the debug I/O port, if present
   //
   if (PlatformDebugLibIoPortFound ()) {
-    IoWriteFifo8 (PcdGet16 (PcdDebugIoPort), Length, Buffer);
+    Buffer8 = (UINT8 *)Buffer;
+    while (Length-- > 0) {
+      IoWrite8 (PcdGet16 (PcdDebugIoPort), *Buffer8++);
+    }
   }
 
   //

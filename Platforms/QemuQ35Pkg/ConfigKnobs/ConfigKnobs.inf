@@ -1,0 +1,51 @@
+## @file
+# Consumer module for GFX policy and configurations.
+#
+# Copyright (C) Microsoft Corporation. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION         = 0x00010017
+  BASE_NAME           = ConfigKnobs
+  FILE_GUID           = 21A70D99-5FFE-4190-BCAA-5E6EDDA54951
+  VERSION_STRING      = 1.0
+  MODULE_TYPE         = PEIM
+  ENTRY_POINT         = ConfigKnobsEntry
+
+[Sources]
+  ConfigKnobs.c
+  ConfigKnobs.h
+  ConfigDataGfx/ConfigDataGfx.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SetupDataPkg/SetupDataPkg.dec
+  PolicyServicePkg/PolicyServicePkg.dec
+  QemuQ35Pkg/QemuQ35Pkg.dec
+  OemPkg/OemPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  MemoryAllocationLib
+  PeimEntryPoint
+  PeiServicesLib
+  PrintLib
+  PcdLib
+  PolicyLib
+
+[Guids]
+  gPolicyDataGFXGuid                ## CONSUMES
+  gOemConfigPolicyGuid              ## CONSUMES
+
+[Ppis]
+  gPeiPolicyPpiGuid                 ## CONSUMES
+
+[Pcd]
+  gSetupDataPkgTokenSpaceGuid.PcdConfigurationPolicyGuid   ## CONSUMES in autogen header
+
+[Depex]
+  gPeiPolicyPpiGuid AND       ## Policy Service
+  gOemConfigPolicyGuid        ## Oem Published Config Policy

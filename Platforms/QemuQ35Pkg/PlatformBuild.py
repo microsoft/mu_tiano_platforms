@@ -4,28 +4,42 @@
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
-import os
-import logging
-import io
-import shutil
+import datetime
 import glob
-import time
-import xml.etree.ElementTree
-import tempfile
+import logging
+import os
+import sys
 import uuid
+from io import StringIO
+from pathlib import Path
+from typing import Tuple
 
+from edk2toolext import codeql as codeql_helpers
 from edk2toolext.environment import shell_environment
 from edk2toolext.environment.uefi_build import UefiBuilder
 from edk2toolext.invocables.edk2_platform_build import BuildSettingsManager
-from edk2toolext.invocables.edk2_setup import SetupSettingsManager, RequiredSubmodule
-from edk2toolext.invocables.edk2_update import UpdateSettingsManager
 from edk2toolext.invocables.edk2_pr_eval import PrEvalSettingsManager
-from edk2toollib.utility_functions import RunCmd, RunPythonScript
+from edk2toolext.invocables.edk2_setup import (RequiredSubmodule,
+                                               SetupSettingsManager)
+from edk2toolext.invocables.edk2_update import UpdateSettingsManager
+from edk2toolext.invocables.edk2_parse import ParseSettingsManager
+from edk2toollib.utility_functions import GetHostInfo, RunCmd
+
+WORKSPACE_ROOT = str(Path(__file__).parent.parent.parent)
+
+# Declare test whose failure will not return a non-zero exit code
+FAILURE_EXEMPT_TESTS = {
+    # example "PiValueTestApp.efi": datetime.datetime(3141, 5, 9, 2, 6, 53, 589793),
+    "DxePagingAuditTestApp.efi": datetime.datetime(2024, 1, 17, 0, 0, 0, 0)
+}
+
+# Allow failure exempt tests to be ignored for 90 days
+FAILURE_EXEMPT_OMISSION_LENGTH = 90*24*60*60
 
 
-    # ####################################################################################### #
-    #                                Common Configuration                                     #
-    # ####################################################################################### #
+# ####################################################################################### #
+#                                Common Configuration                                     #
+# ####################################################################################### #
 class CommonPlatform():
     ''' Common settings for this platform.  Define static data here and use
         for the different parts of stuart
@@ -33,14 +47,57 @@ class CommonPlatform():
     PackagesSupported = ("QemuQ35Pkg",)
     ArchSupported = ("IA32", "X64")
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
-    Scopes = ('qemuq35', 'edk2-build', 'cibuild', 'setupdata')
-    WorkspaceRoot = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    PackagesPath = ("Platforms", "MU_BASECORE", "Common/MU", "Common/MU_TIANO", "Common/MU_OEM_SAMPLE")
+    Scopes = ('qemu', 'qemuq35', 'edk2-build', 'cibuild', 'configdata', 'rust-ci')
+    PackagesPath = (
+        "Platforms",
+        "MU_BASECORE",
+        "Common/MU",
+        "Common/MU_TIANO",
+        "Common/MU_OEM_SAMPLE",
+        "Features/DFCI",
+        "Features/CONFIG",
+        "Features/MM_SUPV"
+    )
+
+    @staticmethod
+    def add_common_command_line_options(parserObj) -> None:
+        """Adds command line options common to settings managers."""
+        codeql_helpers.add_command_line_option(parserObj)
+
+    @staticmethod
+    def is_codeql_enabled(args) -> bool:
+        """Retrieves whether CodeQL is enabled."""
+        return codeql_helpers.is_codeql_enabled_on_command_line(args)
+
+    @staticmethod
+    def get_active_scopes(codeql_enabled: bool) -> Tuple[str]:
+        """Returns the active scopes for the platform."""
+        active_scopes = CommonPlatform.Scopes
+        active_scopes += codeql_helpers.get_scopes(codeql_enabled)
+
+        if codeql_enabled:
+            codeql_filter_files = [str(n) for n in glob.glob(
+                os.path.join(WORKSPACE_ROOT,
+                             '**/CodeQlFilters.yml'), recursive=True)]
+            shell_environment.GetBuildVars().SetValue(
+                "STUART_CODEQL_FILTER_FILES",
+                ','.join(codeql_filter_files),
+                "Set in CISettings.py")
+
+        return active_scopes
 
     # ####################################################################################### #
     #                         Configuration for Update & Setup                                #
     # ####################################################################################### #
-class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSettingsManager):
+class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSettingsManager, ParseSettingsManager):
+
+    def AddCommandLineOptions(self, parserObj):
+        """Add command line options to the argparser"""
+        CommonPlatform.add_common_command_line_options(parserObj)
+
+    def RetrieveCommandLineOptions(self, args):
+        """Retrieve command line options from the argparser"""
+        self.codeql = CommonPlatform.is_codeql_enabled(args)
 
     def GetPackagesSupported(self):
         ''' return iterable of edk2 packages supported by this build.
@@ -56,29 +113,20 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
         return CommonPlatform.TargetsSupported
 
     def GetRequiredSubmodules(self):
-        ''' return iterable containing RequiredSubmodule objects.
-        If no RequiredSubmodules return an empty iterable
-        '''
-        rs = []
+        """Return iterable containing RequiredSubmodule objects.
 
-        # To avoid maintenance of this file for every new submodule
-        # lets just parse the .gitmodules and add each if not already in list.
-        # The GetRequiredSubmodules is designed to allow a build to optimize
-        # the desired submodules but it isn't necessary for this repository.
-        result = io.StringIO()
-        ret = RunCmd("git", "config --file .gitmodules --get-regexp path",
-                     workingdir=self.GetWorkspaceRoot(), outstream=result)
-        # Cmd output is expected to look like:
-        # submodule.CryptoPkg/Library/OpensslLib/openssl.path CryptoPkg/Library/OpensslLib/openssl
-        # submodule.SoftFloat.path ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3
-        if ret == 0:
-            for line in result.getvalue().splitlines():
-                _, _, path = line.partition(" ")
-                if path is not None:
-                    if path not in [x.path for x in rs]:
-                        # add it with recursive since we don't know
-                        rs.append(RequiredSubmodule(path, True))
-        return rs
+        !!! note
+            If no RequiredSubmodules return an empty iterable
+        """
+        return [
+            RequiredSubmodule("MU_BASECORE", True),
+            RequiredSubmodule("Common/MU", True),
+            RequiredSubmodule("Common/MU_TIANO", True),
+            RequiredSubmodule("Common/MU_OEM_SAMPLE", True),
+            RequiredSubmodule("Features/DFCI", True),
+            RequiredSubmodule("Features/CONFIG", True),
+            RequiredSubmodule("Features/MM_SUPV", True),
+        ]
 
     def SetArchitectures(self, list_of_requested_architectures):
         ''' Confirm the requests architecture list is valid and configure SettingsManager
@@ -97,11 +145,11 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
     def GetWorkspaceRoot(self):
         ''' get WorkspacePath '''
-        return CommonPlatform.WorkspaceRoot
+        return WORKSPACE_ROOT
 
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
-        return CommonPlatform.Scopes
+        return CommonPlatform.get_active_scopes(self.codeql)
 
     def FilterPackagesToTest(self, changedFilesList: list, potentialPackagesList: list) -> list:
         ''' Filter other cases that this package should be built
@@ -136,17 +184,12 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
     def GetPackagesPath(self):
         ''' Return a list of paths that should be mapped as edk2 PackagesPath '''
-        result = [
-            shell_environment.GetBuildVars().GetValue("FEATURE_CONFIG_PATH", "")
-        ]
-        for a in CommonPlatform.PackagesPath:
-            result.append(a)
-        return result
+        return CommonPlatform.PackagesPath
 
     # ####################################################################################### #
     #                         Actual Configuration for Platform Build                         #
     # ####################################################################################### #
-class PlatformBuilder( UefiBuilder, BuildSettingsManager):
+class PlatformBuilder(UefiBuilder, BuildSettingsManager):
     def __init__(self):
         UefiBuilder.__init__(self)
 
@@ -160,20 +203,24 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             help="Optional - CSV of architecture to build.  IA32,X64 will use IA32 for PEI and "
             "X64 for DXE and is the only valid option for this platform.")
 
+        CommonPlatform.add_common_command_line_options(parserObj)
+
     def RetrieveCommandLineOptions(self, args):
         '''  Retrieve command line options from the argparser '''
         if args.build_arch.upper() != "IA32,X64":
             raise Exception("Invalid Arch Specified.  Please see comments in PlatformBuild.py::PlatformBuilder::AddCommandLineOptions")
 
+        self.codeql = CommonPlatform.is_codeql_enabled(args)
 
     def GetWorkspaceRoot(self):
         ''' get WorkspacePath '''
-        return CommonPlatform.WorkspaceRoot
+        return WORKSPACE_ROOT
 
     def GetPackagesPath(self):
         ''' Return a list of workspace relative paths that should be mapped as edk2 PackagesPath '''
         result = [
-            shell_environment.GetBuildVars().GetValue("FEATURE_CONFIG_PATH", "")
+            shell_environment.GetBuildVars().GetValue("FEATURE_CONFIG_PATH", ""),
+            shell_environment.GetBuildVars().GetValue("FEATURE_MM_SUPV_PATH", "")
         ]
         for a in CommonPlatform.PackagesPath:
             result.append(a)
@@ -181,7 +228,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
-        return CommonPlatform.Scopes
+        return CommonPlatform.get_active_scopes(self.codeql)
 
     def GetName(self):
         ''' Get the name of the repo, platform, or product being build '''
@@ -195,12 +242,21 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         return "QemuQ35Pkg"
 
     def GetLoggingLevel(self, loggerType):
-        ''' Get the logging level for a given type
-        base == lowest logging level supported
-        con  == Screen logging
-        txt  == plain text file logging
-        md   == markdown file logging
-        '''
+        """Get the logging level depending on logger type.
+
+        Args:
+            loggerType (str): type of logger being logged to
+
+        Returns:
+            (Logging.Level): The logging level
+
+        !!! note "loggerType possible values"
+            "base": lowest logging level supported
+
+            "con": logs to screen
+
+            "txt": logs to plain text file
+        """
         return logging.INFO
         return super().GetLoggingLevel(loggerType)
 
@@ -218,253 +274,194 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         # Default turn on build reporting.
         self.env.SetValue("BUILDREPORTING", "TRUE", "Enabling build report")
         self.env.SetValue("BUILDREPORT_TYPES", "PCD DEPEX FLASH BUILD_FLAGS LIBRARY FIXED_ADDRESS HASH", "Setting build report types")
+        self.env.SetValue("BLD_*_QEMU_CORE_NUM", "4", "Default")
+        self.env.SetValue("BLD_*_MEMORY_PROTECTION", "TRUE", "Default")
         # Include the MFCI test cert by default, override on the commandline with "BLD_*_SHIP_MODE=TRUE" if you want the retail MFCI cert
         self.env.SetValue("BLD_*_SHIP_MODE", "FALSE", "Default")
-        self.__SetEsrtGuidVars("CONF_POLICY_GUID", "6E08E434-8E04-47B5-9A77-78A3A24523EA", "Platform Hardcoded")
-        self.env.SetValue("YAML_CONF_FILE", self.mws.join(self.ws, "QemuQ35Pkg", "CfgData", "CfgDataDef.yaml"), "Platform Hardcoded")
-        self.env.SetValue("DELTA_CONF_POLICY", self.mws.join(self.ws, "QemuQ35Pkg", "CfgData", "Profile1.dlt") + ";" +\
-                          self.mws.join(self.ws, "QemuQ35Pkg", "CfgData", "Profile2.dlt") + ";" +\
-                          self.mws.join(self.ws, "QemuQ35Pkg", "CfgData", "Profile3.dlt"), "Platform Hardcoded")
-        self.env.SetValue("CONF_DATA_STRUCT_FOLDER", self.mws.join(self.ws, "QemuQ35Pkg", "Include"), "Platform Defined")
-        self.env.SetValue('CONF_REPORT_FOLDER', self.mws.join(self.ws, "QemuQ35Pkg", "CfgData"), "Platform Defined")
+        self.env.SetValue("CONF_AUTOGEN_INCLUDE_PATH", self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuQ35Pkg", "Include"), "Platform Defined")
 
-        self.env.SetValue("YAML_POLICY_FILE", self.mws.join(self.ws, "QemuQ35Pkg", "PolicyData", "PolicyDataUsb.yaml"), "Platform Hardcoded")
-        self.env.SetValue("POLICY_DATA_STRUCT_FOLDER", self.mws.join(self.ws, "QemuQ35Pkg", "Include"), "Platform Defined")
-        self.env.SetValue('POLICY_REPORT_FOLDER', self.mws.join(self.ws, "QemuQ35Pkg", "PolicyData"), "Platform Defined")
+        self.env.SetValue('MU_SCHEMA_DIR', self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuQ35Pkg", "CfgData"), "Platform Defined")
+        self.env.SetValue('MU_SCHEMA_FILE_NAME', "QemuQ35PkgCfgData.xml", "Platform Hardcoded")
+        self.env.SetValue('CONF_PROFILE_PATHS',
+                          self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath('QemuQ35Pkg', 'CfgData', 'Profile0QemuQ35PkgCfgData.csv') + " " +
+                          self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath('QemuQ35Pkg', 'CfgData', 'Profile1QemuQ35PkgCfgData.csv'),
+                          "Platform Hardcoded"
+        )
+        self.env.SetValue('CONF_PROFILE_NAMES', "P0,P1", "Platform Hardcoded")
+
+        # Globally set CodeQL failures to be ignored in this repo.
+        # Note: This has no impact if CodeQL is not active/enabled.
+        self.env.SetValue("STUART_CODEQL_AUDIT_ONLY", "true", "Platform Defined")
+
+        # Enabled all of the SMM modules
+        self.env.SetValue("BLD_*_SMM_ENABLED", "TRUE", "Default")
+
+        if self.Helper.generate_secureboot_pcds(self) != 0:
+            logging.error("Failed to generate include PCDs")
+            return -1
 
         return 0
+
+    def SetPlatformEnvAfterTarget(self):
+        logging.debug("PlatformBuilder SetPlatformEnvAfterTarget")
+        if os.name == 'nt':
+            self.env.SetValue("VIRTUAL_DRIVE_PATH", Path(self.env.GetValue("BUILD_OUTPUT_BASE"), "VirtualDrive.vhd"), "Platform Hardcoded.")
+        else:
+            self.env.SetValue("VIRTUAL_DRIVE_PATH", Path(self.env.GetValue("BUILD_OUTPUT_BASE"), "VirtualDrive.img"), "Platform Hardcoded.")
+
+        return 0
+
+    def PlatformPreBuild(self):
+        # Here we build the secure policy blob for build system to use and add into the targeted FV
+        policy_example_dir = self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("MmSupervisorPkg", "SupervisorPolicyTools", "MmIsolationPoliciesExample.xml")
+        output_dir = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "Policy")
+        if (not os.path.isdir(output_dir)):
+            os.makedirs (output_dir)
+        output_name = os.path.join(output_dir, "secure_policy.bin")
+
+        ret = self.Helper.MakeSupervisorPolicy(xml_file_path=policy_example_dir, output_binary_path=output_name)
+        if(ret != 0):
+            raise Exception("SupervisorPolicyMaker Failed: Errorcode %d" % ret)
+        self.env.SetValue("BLD_*_POLICY_BIN_PATH", output_name, "Set generated secure policy path")
+        return ret
+
+    # TODO: Validation should be done by parsing the cpu.c file from qemu
+    def __ValidateCpuModelInfo(self):
+        output_file = os.path.join(self.ws, "Build", "BUILDLOG_" +  self.GetName() + ".txt")
+        cpu_brandname_dict = {
+            "phenom": "AMD Phenom(tm) 9550 Quad-Core Processor",
+            "coreduo": "Genuine Intel(R) CPU           T2600  @ 2.16GHz",
+            "core2duo": "Intel(R) Core(TM)2 Duo CPU     T7700  @ 2.40GHz",
+            "Skylake-Client-v1": "Intel Core Processor (Skylake)",
+            "Skylake-Client-v2": "Intel Core Processor (Skylake, IBRS)",
+            "Skylake-Client-v3": "Intel Core Processor (Skylake, IBRS, no TSX)",
+            "Skylake-Client-v4": "Intel Core Processor (Skylake)",
+        }
+
+        cpu_model = self.env.GetValue("CPU_MODEL")
+        cpu_brandname_log = 'CPU Brand Name:'
+
+        with open(output_file, 'r') as handle:
+            logs = handle.readlines()
+            for line in logs:
+                if cpu_brandname_log in line:
+                    cpu_brandname = line.split(cpu_brandname_log)[-1].strip()
+
+                    if cpu_brandname_dict[cpu_model] == cpu_brandname:
+                        logging.critical("CPU brandname matches")
+                        return 0
+
+        # If the right logs are not found
+        logging.error("CPU branding logs missing or incorrect")
+        return -1
+
 
     def __SetEsrtGuidVars(self, var_name, guid_str, desc_string):
         cur_guid = uuid.UUID(guid_str)
         self.env.SetValue("BLD_*_%s_REGISTRY" % var_name, guid_str, desc_string)
-        self.env.SetValue("BLD_*_%s_BYTES" % var_name, "{" + (",".join(("0x%X" % byte) for byte in cur_guid.bytes_le)) + "}", desc_string)
+        self.env.SetValue("BLD_*_%s_BYTES" % var_name, "'{" + (",".join(("0x%X" % byte) for byte in cur_guid.bytes_le)) + "}'", desc_string)
         return
 
     def FlashRomImage(self):
-        #Make virtual drive - Allow caller to override path otherwise use default
-        startup_nsh = StartUpScriptManager()
         run_tests = (self.env.GetValue("RUN_TESTS", "FALSE").upper() == "TRUE")
         output_base = self.env.GetValue("BUILD_OUTPUT_BASE")
         shutdown_after_run = (self.env.GetValue("SHUTDOWN_AFTER_RUN", "FALSE").upper() == "TRUE")
         empty_drive = (self.env.GetValue("EMPTY_DRIVE", "FALSE").upper() == "TRUE")
+        test_regex = self.env.GetValue("TEST_REGEX", "")
+        drive_path = self.env.GetValue("VIRTUAL_DRIVE_PATH")
+        run_paging_audit = False
 
-        if os.name == 'nt':
-            VirtualDrivePath = self.env.GetValue("VIRTUAL_DRIVE_PATH", os.path.join(output_base, "VirtualDrive.vhd"))
-            VirtualDrive = VirtualDriveManager(VirtualDrivePath, self.env)
-            self.env.SetValue("VIRTUAL_DRIVE_PATH", VirtualDrivePath, "Set Virtual Drive path in case not set")
-            ut = UnitTestSupport(os.path.join(output_base, "X64"))
+        # General debugging information for users
+        if run_tests:
+            if test_regex == "":
+                logging.warning("Running tests, but no Tests specified. use TEST_REGEX to specify tests to run.")
 
-            if empty_drive and os.path.isfile(VirtualDrivePath):
-                    os.remove(VirtualDrivePath)
+            if not empty_drive:
+                logging.info("EMPTY_DRIVE=FALSE. Old files can persist, could effect test results.")
 
-            if not os.path.isfile(VirtualDrivePath):
-                VirtualDrive.MakeDrive()
+            if not shutdown_after_run:
+                logging.info("SHUTDOWN_AFTER_RUN=FALSE. You will need to close qemu manually to gather test results.")
 
-            test_regex = self.env.GetValue("TEST_REGEX", "")
+        # Get a reference to the virtual drive, creating / wiping as necessary
+        # Helper located at QemuPkg/Plugins/VirtualDriveManager
+        virtual_drive = self.Helper.get_virtual_drive(drive_path)
+        if empty_drive:
+            virtual_drive.wipe()
 
-            if test_regex != "":
-                ut.set_test_regex(test_regex)
-                ut.find_tests()
-                ut.copy_tests_to_virtual_drive(VirtualDrive)
+        if not virtual_drive.exists():
+            virtual_drive.make_drive()
 
-            if run_tests:
-                if test_regex == "":
-                    logging.warning("No tests specified using TEST_REGEX flag but RUN_TESTS is TRUE")
-                elif not empty_drive:
-                    logging.info("EMPTY_DRIVE=FALSE. This could impact your test results")
+        # Add tests if requested, auto run if requested
+        # Creates a startup script with the requested tests
+        test_list = []
+        if test_regex != "":
+            for pattern in test_regex.split(","):
+                test_list.extend(Path(output_base, "X64").glob(pattern))
 
-                if not shutdown_after_run:
-                    logging.info("SHUTDOWN_AFTER_RUN=FALSE (default). XML test results will not be \
-                        displayed until after the QEMU instance ends")
-                ut.write_tests_to_startup_nsh(startup_nsh)
+            if any("DxePagingAuditTestApp.efi" in os.path.basename(test) for test in test_list):
+                run_paging_audit = True
 
-            nshpath = os.path.join(output_base, "startup.nsh")
-            startup_nsh.WriteOut(nshpath, shutdown_after_run)
-
-            VirtualDrive.AddFile(nshpath)
-
+            self.Helper.add_tests(virtual_drive, test_list, auto_run = run_tests, auto_shutdown = shutdown_after_run, paging_audit = run_paging_audit)
+        # Otherwise add an empty startup script
         else:
-            VirtualDrivePath = self.env.GetValue("VIRTUAL_DRIVE_PATH", os.path.join(output_base, "VirtualDrive"))
-            logging.warning("Linux currently isn't supported for the virtual drive. Falling back to an older method")
+            virtual_drive.add_startup_script([], auto_shutdown=shutdown_after_run)
 
-            if run_tests:
-                logging.critical("Linux doesn't support running unit tests due to lack of VHD support")
+        # Get the version number (repo release)
+        outstream = StringIO()
+        version = "Unknown"
+        ret = RunCmd('git', "rev-parse HEAD", outstream=outstream)
+        if ret == 0:
+            commithash = outstream.getvalue().strip()
+            outstream = StringIO()
+            # See git-describe docs for a breakdown of this command output
+            ret = RunCmd("git", f'describe {commithash} --tags', outstream=outstream)
+            if ret == 0:
+                version = outstream.getvalue().strip()
 
-            if os.path.exists(VirtualDrivePath) and empty_drive:
-                shutil.rmtree(VirtualDrivePath)
+        self.env.SetValue("VERSION", version, "Set Version value")
 
-            if not os.path.exists(VirtualDrivePath):
-                os.makedirs(VirtualDrivePath)
-
-            nshpath = os.path.join(VirtualDrivePath, "startup.nsh")
-            self.env.SetValue("VIRTUAL_DRIVE_PATH", VirtualDrivePath, "Set Virtual Drive path in case not set")
-            startup_nsh.WriteOut(nshpath, shutdown_after_run)
-
+        # Run Qemu
+        # Helper located at Platforms/QemuQ35Pkg/Plugins/QemuRunner
         ret = self.Helper.QemuRun(self.env)
         if ret != 0:
             logging.critical("Failed running Qemu")
             return ret
 
-        failures = 0
-        if run_tests and os.name == 'nt':
-            failures = ut.report_results(VirtualDrive)
+        if self.env.GetValue("CPU_MODEL") is not None:
+            self.__ValidateCpuModelInfo()
 
-        # do stuff with unit test results here
-        return failures
+        if not run_tests:
+            return 0
 
-class UnitTestSupport(object):
+        # Gather test results if they were run.
+        now = datetime.datetime.now()
+        FET = FAILURE_EXEMPT_TESTS
+        FEOL = FAILURE_EXEMPT_OMISSION_LENGTH
 
-    def __init__(self, host_efi_build_output_path: os.PathLike):
-        self.test_list = []
-        self._globlist = []
-        self.host_efi_path = host_efi_build_output_path
+        if run_paging_audit:
+            self.Helper.generate_paging_audit (virtual_drive, Path(drive_path).parent / "unit_test_results", self.env.GetValue("VERSION"), "Q35")
 
-    def set_test_regex(self, csv_string):
-        self._globlist = csv_string.split(",")
-
-    def find_tests(self):
-        test_list = []
-        for globpattern in self._globlist:
-            test_list.extend(glob.glob(os.path.join(self.host_efi_path, globpattern)))
-        self.test_list = list(dict.fromkeys(test_list))
-
-    def copy_tests_to_virtual_drive(self, virtualdrive):
-        for test in self.test_list:
-            virtualdrive.AddFile(test)
-
-    def write_tests_to_startup_nsh(self,nshfile):
-        for test in self.test_list:
-            nshfile.AddLine(os.path.basename(test))
-
-    def report_results(self, virtualdrive) -> int:
-        from html import unescape
-
-        report_folder_path = os.path.join(os.path.dirname(virtualdrive.path_to_vhd), "unit_test_results")
-        os.makedirs(report_folder_path, exist_ok=True)
-        #now parse the xml for errors
-        failure_count = 0
-        logging.info("UnitTest Completed")
-        for unit_test in self.test_list:
-            xml_result_file = os.path.basename(unit_test)[:-4] + "_JUNIT.XML"
-            output_xml_file = os.path.join(report_folder_path, xml_result_file)
-            try:
-                data = virtualdrive.GetFileContent(xml_result_file, output_xml_file)
-            except:
-                logging.error(f"unit test ({unit_test}) produced no result file")
-                failure_count += 1
-                continue
-
-            logging.info('\n' + os.path.basename(unit_test) + "\n  Full Log: " + output_xml_file)
-
-            try:
-                root = xml.etree.ElementTree.fromstring(data)
-                for suite in root:
-                    logging.info(" ")
-                    for case in suite:
-                        logging.info('\t\t' + case.attrib['classname'] + " - ")
-                        caseresult = "\t\t\tPASS"
-                        level = logging.INFO
-                        for result in case:
-                            if result.tag == 'failure':
-                                failure_count += 1
-                                level = logging.ERROR
-                                caseresult = "\t\tFAIL" + " - " + unescape(result.attrib['message'])
-                        logging.log( level, caseresult)
-            except Exception as ex:
-                logging.error("Exception trying to read xml." + str(ex))
-                failure_count += 1
-        return failure_count
-
-
-
-class VirtualDriveManager(object):
-
-    def __init__(self, vhd_path:os.PathLike, env:object):
-        self.path_to_vhd = os.path.abspath(vhd_path)
-        self._env = env
-
-    def MakeDrive(self, size: int=60):
-        ret = RunCmd("VHDCreate", f'-sz {size}MB {self.path_to_vhd}')
-        if ret != 0:
-            logging.error("Failed to create VHD")
-            return ret
-
-        ret = RunCmd("DiskFormat", f"-ft fat -ptt bios {self.path_to_vhd}")
-        if ret != 0:
-            logging.error("Failed to format VHD")
-            return ret
-        return ret
-
-    def AddFile(self, HostFilePath:os.PathLike):
-        file_name = os.path.basename(HostFilePath)
-        ret = RunCmd("FileInsert", f"{HostFilePath} {file_name} {self.path_to_vhd}")
-        return ret
-
-    def GetFileContent(self, VirtualFilePath, HostFilePath: os.PathLike=None):
-        temp_extract_path = HostFilePath
-        if temp_extract_path == None:
-            temp_extract_path = tempfile.mktemp()
-        logging.info(f"Extracting {VirtualFilePath} to {temp_extract_path}")
-        ret = self.ExtractFile(VirtualFilePath, temp_extract_path)
-        if ret != 0:
-            raise FileNotFoundError(VirtualFilePath)
-        with open(temp_extract_path, "rb") as f:
-            return f.read()
-
-    def ExtractFile(self, VirtualFilePath, HostFilePath:os.PathLike):
-        ret = RunCmd("FileExtract", f"{VirtualFilePath} {HostFilePath} {self.path_to_vhd}")
-        return ret
-
-
-class StartUpScriptManager(object):
-
-    FS_FINDER_SCRIPT = r'''
-#!/bin/nsh
-echo -off
-for %a run (0 10)
-    if exist fs%a:\{first_file} then
-        fs%a:
-        goto FOUND_IT
-    endif
-endfor
-
-:FOUND_IT
-'''
-
-    def __init__(self):
-        self._use_fs_finder = False
-        self._lines = []
-
-    def WriteOut(self, host_file_path, shutdown:bool):
-        with open(host_file_path, "w") as nsh:
-            if self._use_fs_finder:
-                this_file = os.path.basename(host_file_path)
-                nsh.write(StartUpScriptManager.FS_FINDER_SCRIPT.format(first_file=this_file))
-
-            for l in self._lines:
-                nsh.write(l + "\n")
-
-            if shutdown:
-                nsh.write("reset -s\n")
-
-    def AddLine(self, line):
-        self._lines.append(line.strip())
-        self._use_fs_finder = True
-
-
+        # Filter out tests that are exempt
+        tests = list(filter(lambda file: file.name not in FET or not (now - FET.get(file.name)).total_seconds() < FEOL, test_list))
+        tests_exempt = list(filter(lambda file: file.name in FET and (now - FET.get(file.name)).total_seconds() < FEOL, test_list))
+        if len(tests_exempt) > 0:
+            self.Helper.report_results(virtual_drive, tests_exempt, Path(drive_path).parent / "unit_test_results")
+        # Helper located at QemuPkg/Plugins/VirtualDriveManager
+        return self.Helper.report_results(virtual_drive, tests, Path(drive_path).parent / "unit_test_results")
 
 if __name__ == "__main__":
     import argparse
     import sys
-    from edk2toolext.invocables.edk2_update import Edk2Update
-    from edk2toolext.invocables.edk2_setup import Edk2PlatformSetup
+
     from edk2toolext.invocables.edk2_platform_build import Edk2PlatformBuild
-    print("Invoking Stuart")
-    print("     ) _     _")
-    print("    ( (^)-~-(^)")
-    print("__,-.\_( 0 0 )__,-.___")
-    print("  'W'   \   /   'W'")
-    print("         >o<")
+    from edk2toolext.invocables.edk2_setup import Edk2PlatformSetup
+    from edk2toolext.invocables.edk2_update import Edk2Update
+    print(r"Invoking Stuart")
+    print(r"     ) _     _")
+    print(r"    ( (^)-~-(^)")
+    print(r"__,-.\_( 0 0 )__,-.___")
+    print(r"  'W'   \   /   'W'")
+    print(r"         >o<")
     SCRIPT_PATH = os.path.relpath(__file__)
     parser = argparse.ArgumentParser(add_help=False)
     parse_group = parser.add_mutually_exclusive_group()

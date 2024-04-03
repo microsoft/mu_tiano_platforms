@@ -12,7 +12,8 @@
 # https://www.python.org/dev/peps/pep-0440/#version-specifiers
 ##
 
-edk2-pytool-library~=0.11.6 # MU_CHANGE - update to 0.11.0 or later
-edk2-pytool-extensions~=0.17.2 # MU_CHANGE - update to 0.17.0 or later
-xmlschema==2.0.1 # MU_CHANGE - update to 2.0.1 or later
-regex==2022.8.17
+edk2-pytool-library==0.21.4
+edk2-pytool-extensions==0.27.3
+xmlschema==3.2.0
+regex==2023.12.25
+pygount==1.6.1

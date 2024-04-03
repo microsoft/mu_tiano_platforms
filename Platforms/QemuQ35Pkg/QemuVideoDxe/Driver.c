@@ -687,10 +687,10 @@ SetPaletteColor (
   UINT8                    Blue
   )
 {
-  VgaOutb (Private, PALETTE_INDEX_REGISTER, (UINT8)Index);
-  VgaOutb (Private, PALETTE_DATA_REGISTER, (UINT8)(Red >> 2));
-  VgaOutb (Private, PALETTE_DATA_REGISTER, (UINT8)(Green >> 2));
-  VgaOutb (Private, PALETTE_DATA_REGISTER, (UINT8)(Blue >> 2));
+  outb (Private, PALETTE_INDEX_REGISTER, (UINT8)Index);
+  outb (Private, PALETTE_DATA_REGISTER, (UINT8)(Red >> 2));
+  outb (Private, PALETTE_DATA_REGISTER, (UINT8)(Green >> 2));
+  outb (Private, PALETTE_DATA_REGISTER, (UINT8)(Blue >> 2));
 }
 
 /**
@@ -827,16 +827,6 @@ InitializeCirrusGraphicsMode (
   ClearScreen (Private);
 }
 
-VOID
-VgaOutb (
-  QEMU_VIDEO_PRIVATE_DATA  *Private,
-  UINTN                    Reg,
-  UINT8                    Data
-  )
-{
-  outb (Private, Reg, Data);
-}
-
 EFI_STATUS
 EFIAPI
 InitializeQemuVideo (
@@ -879,8 +869,11 @@ InitializeQemuVideo (
                                  &PolicySize
                                  );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Failed to get USB policy from database - %r!\n", __FUNCTION__, Status));
-    return Status;
+    DEBUG ((DEBUG_WARN, "%a: Failed to get GFX policy from database, configuration is not setup properly - %r! Default to disabled state.\n", __FUNCTION__, Status));
+    mGfxPolicy[0].Power_State_Port = FALSE;
+    // don't return a failed status in this case
+    PolicySize = sizeof (mGfxPolicy);
+    Status     = EFI_SUCCESS;
   }
 
   if (PolicySize != sizeof (mGfxPolicy)) {

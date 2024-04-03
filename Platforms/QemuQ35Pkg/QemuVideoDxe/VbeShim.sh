@@ -16,7 +16,7 @@ set -e -u
 STEM=$(dirname -- "$0")/$(basename -- "$0" .sh)
 
 #
-# Install exit handler -- remove QemuQ35Pkgorary files.
+# Install exit handler -- remove temporary files.
 #
 exit_handler()
 {

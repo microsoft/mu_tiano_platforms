@@ -82,7 +82,7 @@ typedef struct {
 
 typedef enum {
   QEMU_VIDEO_CIRRUS_5430 = 1,
-  QEMU_VIDEO_CIRRUS_5446
+  QEMU_VIDEO_CIRRUS_5446,
 } QEMU_VIDEO_VARIANT;
 
 typedef struct {
@@ -112,6 +112,8 @@ typedef struct {
   FRAME_BUFFER_CONFIGURE          *FrameBufferBltConfigure;
   UINTN                           FrameBufferBltConfigureSize;
   UINT8                           FrameBufferVramBarIndex;
+
+  UINT8                           Edid[128];
 } QEMU_VIDEO_PRIVATE_DATA;
 
 ///
@@ -416,6 +418,13 @@ SetDefaultPalette (
   );
 
 VOID
+DrawLogo (
+  QEMU_VIDEO_PRIVATE_DATA  *Private,
+  UINTN                    ScreenWidth,
+  UINTN                    ScreenHeight
+  );
+
+VOID
 outb (
   QEMU_VIDEO_PRIVATE_DATA  *Private,
   UINTN                    Address,
@@ -441,16 +450,15 @@ inw (
   UINTN                    Address
   );
 
-VOID
-VgaOutb (
-  QEMU_VIDEO_PRIVATE_DATA  *Private,
-  UINTN                    Reg,
-  UINT8                    Data
-  );
-
 EFI_STATUS
 QemuVideoCirrusModeSetup (
   QEMU_VIDEO_PRIVATE_DATA  *Private
+  );
+
+VOID
+InstallVbeShim (
+  IN CONST CHAR16          *CardName,
+  IN EFI_PHYSICAL_ADDRESS  FrameBufferBase
   );
 
 #endif
