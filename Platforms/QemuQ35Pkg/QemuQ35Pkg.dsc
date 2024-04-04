@@ -523,6 +523,7 @@
   IhvSmmSaveStateSupervisionLib|MmSupervisorPkg/Library/IhvMmSaveStateSupervisionLib/IhvMmSaveStateSupervisionLib.inf
   MmServicesTableLib|StandaloneMmPkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLibCore.inf
   MmSaveStateLib|UefiCpuPkg/Library/MmSaveStateLib/AmdMmSaveStateLib.inf
+  SmmCpuSyncLib|MmSupervisorPkg/Library/StandaloneMmCpuSyncLib/StandaloneMmCpuSyncLib.inf
 
 [LibraryClasses.common.MM_STANDALONE]
   TimerLib|QemuQ35Pkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
