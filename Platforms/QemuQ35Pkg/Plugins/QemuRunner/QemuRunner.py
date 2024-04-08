@@ -243,4 +243,12 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             # Tested same FDs on QEMU 6 and 7, not observing the same.
             ret = 0
 
+        ## TODO: Recover the console. Remove this once QEMU fixes the issue: https://gitlab.com/qemu-project/qemu/-/issues/1674
+        if os.name == 'nt' and qemu_version[0] >= '8':
+            import win32console
+            h = win32console.GetStdHandle(win32console.STD_INPUT_HANDLE)
+            mode = h.GetConsoleMode()
+            # pywin32 does not have the constants for ENABLE_VIRTUAL_TERMINAL_INPUT
+            h.SetConsoleMode(mode & ~0x0200)
+
         return ret
