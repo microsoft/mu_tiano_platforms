@@ -246,8 +246,8 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             # Tested same FDs on QEMU 6 and 7, not observing the same.
             ret = 0
 
-        ## TODO: Save the console mode. The original issue comes from: https://gitlab.com/qemu-project/qemu/-/issues/1674
         if os.name == 'nt' and qemu_version[0] >= '8':
+            # Restore the console mode for Windows on QEMU v8+.
             std_handle.SetConsoleMode(console_mode)
         elif os.name != 'nt':
             # Linux version of QEMU will mess with the print if its run failed, let's just restore it anyway
