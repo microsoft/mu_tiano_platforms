@@ -251,6 +251,6 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             std_handle.SetConsoleMode(console_mode)
         elif os.name != 'nt':
             # Linux version of QEMU will mess with the print if its run failed, let's just restore it anyway
-            utility_functions.RunCmd ('stty', 'sane')
+            utility_functions.RunCmd('stty', 'sane', capture=False)
 
         return ret
