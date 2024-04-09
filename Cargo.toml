@@ -19,7 +19,7 @@ num-traits = { version = "0.2", default-features = false}
 num-derive = { version = "0.4", default-features = false}
 r-efi = "4.4.0"
 scroll = { version = "0.11", default-features = false, features = ["derive"]}
-rustversion = "1.0.14"
+rustversion = "1.0.15"
 spin = "0.5.2"
 
 # By default, the dev profile is used. The default build settings for the dev profile are documented here:
