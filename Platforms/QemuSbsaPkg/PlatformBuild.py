@@ -50,6 +50,7 @@ class CommonPlatform():
         "Common/MU_OEM_SAMPLE",
         "Silicon/Arm/MU_TIANO",
         "Silicon/Arm/TFA",
+        "Features/DEBUGGER",
         "Features/DFCI",
         "Features/CONFIG"
     )

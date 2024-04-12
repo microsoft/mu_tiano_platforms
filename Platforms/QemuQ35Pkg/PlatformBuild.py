@@ -54,6 +54,7 @@ class CommonPlatform():
         "Common/MU",
         "Common/MU_TIANO",
         "Common/MU_OEM_SAMPLE",
+        "Features/DEBUGGER",
         "Features/DFCI",
         "Features/CONFIG",
         "Features/MM_SUPV"
