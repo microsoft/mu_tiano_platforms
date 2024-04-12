@@ -641,7 +641,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|TRUE
   gPcAtChipsetPkgTokenSpaceGuid.PcdUartIoPortBaseAddress|0x402
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdDebuggerPortUartBase|0x3F8
 
   # DEBUG_INIT      0x00000001  // Initialization
   # DEBUG_WARN      0x00000002  // Warnings
