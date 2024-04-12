@@ -282,6 +282,7 @@
   MmUnblockMemoryLib|MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
   ResetSystemLib|MdeModulePkg/Library/DxeResetSystemLib/DxeResetSystemLib.inf
   FlatPageTableLib|UefiTestingPkg/Library/FlatPageTableLib/FlatPageTableLib.inf
+  ImagePropertiesRecordLib|MdeModulePkg/Library/ImagePropertiesRecordLib/ImagePropertiesRecordLib.inf
 
   FdtHelperLib|QemuSbsaPkg/Library/FdtHelperLib/FdtHelperLib.inf
   OemMiscLib|QemuSbsaPkg/Library/OemMiscLib/OemMiscLib.inf
