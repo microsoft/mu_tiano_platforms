@@ -16,6 +16,10 @@ TCP port.
 stuart_build -c Platforms\QemuQ35Pkg\PlatformBuild.py BLD_*_DEBUGGER_ENABLED=TRUE SERIAL_PORT=5555 --flashrom
 ```
 
+On Q35 this allows for debugging over a different port then the usual debug output
+because Q35 has a seperate serial port available to it. On SBSA the serial port
+will be shared with the logging output.
+
 Currently this will only enable the DXE debugger. The MM debugger must be manually
 enabled using the PcdForceEnableDebugger if the DebugAgent has been configured.
 By default, the DXE debugger will stall for 30 seconds on the initial breakpoint
