@@ -183,7 +183,7 @@ MdeModulePkg/Library/VariablePolicyLib/VariablePolicyUnitTest/VariablePolicyUnit
   <PcdsFixedAtBuild>
     gEfiMdeModulePkgTokenSpaceGuid.PcdAllowVariablePolicyEnforcementDisable|TRUE
 }
-MdeModulePkg/Core/Dxe/UnitTest/MemoryProtectionUnitTestHost.inf {
+MdeModulePkg/Library/ImagePropertiesRecordLib/UnitTest/ImagePropertiesRecordLibUnitTestHost.inf {
   <LibraryClasses>
     HobLib|MdeModulePkg/Library/BaseHobLibNull/BaseHobLibNull.inf
     PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf

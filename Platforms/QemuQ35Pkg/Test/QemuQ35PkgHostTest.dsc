@@ -180,7 +180,7 @@ MdeModulePkg/Universal/Variable/RuntimeDxe/RuntimeDxeUnitTest/VariableRuntimeDxe
     gUnitTestFrameworkPkgTokenSpaceGuid.PcdUnitTestLogLevel|0x00000007
 }
 MdeModulePkg/Bus/Pci/NvmExpressDxe/UnitTest/MediaSanitizeUnitTestHost.inf
-MdeModulePkg/Core/Dxe/UnitTest/MemoryProtectionUnitTestHost.inf {
+MdeModulePkg/Library/ImagePropertiesRecordLib/UnitTest/ImagePropertiesRecordLibUnitTestHost.inf {
   <LibraryClasses>
     HobLib|MdeModulePkg/Library/BaseHobLibNull/BaseHobLibNull.inf
     PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
