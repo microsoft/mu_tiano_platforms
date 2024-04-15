@@ -65,7 +65,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         args = "-debugcon stdio"
 
         # If we are using the QEMU external dependency, we need to tell it
-        # where to look for roms
+        # where to look for roms.
         if not env.GetValue("QEMU_PATH") and env.GetValue("QEMU_DIR"):
             args += f" -L {str(Path(env.GetValue('QEMU_DIR'), 'share'))}"
 
