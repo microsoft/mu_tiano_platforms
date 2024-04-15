@@ -1,0 +1,37 @@
+## @file
+#  Implementation of the DebugTransportLib that wraps the IO implementation
+#  of serial port lib to change port address.
+#
+#  Copyright (c) Microsoft Corporation.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.26
+  BASE_NAME                      = DebugTransportSerialIoWrapperLib
+  FILE_GUID                      = 917CFE9C-0E35-43FB-BDCC-3D39F15A8BBA
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DebugTransportLib
+
+#
+#  VALID_ARCHITECTURES           = X64 AARCH64
+#
+
+[Sources]
+  DebugTransportSerialIoWrapperLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  DebuggerFeaturePkg/DebuggerFeaturePkg.dec
+  QemuQ35Pkg/QemuQ35Pkg.dec
+
+[LibraryClasses]
+  SerialPortLib
+
+[FixedPcd]
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdDebuggerPortUartBase
+
+[Depex]
+  TRUE

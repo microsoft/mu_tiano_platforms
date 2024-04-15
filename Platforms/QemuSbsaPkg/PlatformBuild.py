@@ -50,6 +50,7 @@ class CommonPlatform():
         "Common/MU_OEM_SAMPLE",
         "Silicon/Arm/MU_TIANO",
         "Silicon/Arm/TFA",
+        "Features/DEBUGGER",
         "Features/DFCI",
         "Features/CONFIG"
     )
@@ -86,6 +87,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
             RequiredSubmodule("Common/MU_OEM_SAMPLE", True),
             RequiredSubmodule("Silicon/Arm/MU_TIANO", True),
             RequiredSubmodule("Silicon/Arm/TFA", True),
+            RequiredSubmodule("Features/DEBUGGER", True),
             RequiredSubmodule("Features/DFCI", True),
             RequiredSubmodule("Features/CONFIG", True),
         ]

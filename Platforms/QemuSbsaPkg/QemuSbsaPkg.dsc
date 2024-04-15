@@ -50,6 +50,9 @@
   # Defines for default states.  These can be changed on the command line.
   # -D FLAG=VALUE
   #
+  !ifndef DEBUGGER_ENABLED
+    DEFINE DEBUGGER_ENABLED               = FALSE
+  !endif
   DEFINE TTY_TERMINAL            = FALSE
   DEFINE TPM2_ENABLE             = FALSE
   DEFINE TPM2_CONFIG_ENABLE      = FALSE
@@ -362,6 +365,12 @@
 
   # Stack cookie support
   StackCheckFailureHookLib|MdePkg/Library/StackCheckFailureHookLibNull/StackCheckFailureHookLibNull.inf
+
+  # Debugger Libraries
+  DebugTransportLib|DebuggerFeaturePkg/Library/DebugTransportSerialLib/DebugTransportSerialLib.inf
+  WatchdogTimerLib|DebuggerFeaturePkg/Library/WatchdogTimerLibNull/WatchdogTimerLibNull.inf
+  TransportLogControlLib|DebuggerFeaturePkg/Library/TransportLogControlLibNull/TransportLogControlLibNull.inf
+
 [LibraryClasses.common.SEC, LibraryClasses.common.PEI_CORE]
   NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
 
@@ -436,6 +445,7 @@
   ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
   PerformanceLib|MdeModulePkg/Library/DxeCorePerformanceLib/DxeCorePerformanceLib.inf
   MemoryBinOverrideLib|MdeModulePkg/Library/MemoryBinOverrideLibNull/MemoryBinOverrideLibNull.inf
+  DebugAgentLib|DebuggerFeaturePkg/Library/DebugAgent/DebugAgentDxe.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   SecurityManagementLib|MdeModulePkg/Library/DxeSecurityManagementLib/DxeSecurityManagementLib.inf
@@ -854,6 +864,11 @@
     gEfiMdeModulePkgTokenSpaceGuid.PcdDeviceStateBitmask|0x20
   !endif
 
+  # Set to debug if debugger is enabled.
+  !if $(DEBUGGER_ENABLED) == TRUE
+    gEfiMdeModulePkgTokenSpaceGuid.PcdDeviceStateBitmask|0x08
+  !endif
+
   #
   # TPM2 support
   #
@@ -939,6 +954,7 @@
   MfciPkg/MfciPei/MfciPei.inf
 
   PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
+  DebuggerFeaturePkg/DebugConfigPei/DebugConfigPei.inf
 
   QemuSbsaPkg/ConfigKnobs/ConfigKnobs.inf
   OemPkg/OemConfigPolicyCreatorPei/OemConfigPolicyCreatorPei.inf {

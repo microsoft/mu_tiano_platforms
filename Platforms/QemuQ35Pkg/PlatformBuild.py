@@ -54,6 +54,7 @@ class CommonPlatform():
         "Common/MU",
         "Common/MU_TIANO",
         "Common/MU_OEM_SAMPLE",
+        "Features/DEBUGGER",
         "Features/DFCI",
         "Features/CONFIG",
         "Features/MM_SUPV"
@@ -123,6 +124,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
             RequiredSubmodule("Common/MU", True),
             RequiredSubmodule("Common/MU_TIANO", True),
             RequiredSubmodule("Common/MU_OEM_SAMPLE", True),
+            RequiredSubmodule("Features/DEBUGGER", True),
             RequiredSubmodule("Features/DFCI", True),
             RequiredSubmodule("Features/CONFIG", True),
             RequiredSubmodule("Features/MM_SUPV", True),
