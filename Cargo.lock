@@ -66,7 +66,7 @@ checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 [[package]]
 name = "hidparser"
 version = "0.2.0"
-source = "git+https://github.com/microsoft/mu_rust_hid.git?branch=main#1b0cbe920800c20fb53846481700f2c3ab48e0c3"
+source = "git+https://github.com/microsoft/mu_rust_hid.git?branch=main#16f204a3a09e31c3f8edc5b9681aa9c1d06cbd93"
 
 [[package]]
 name = "memoffset"
