@@ -54,7 +54,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         executable = env.GetValue("QEMU_PATH", None)
         if not executable:
             executable = str(Path(env.GetValue("QEMU_DIR", ''),"qemu-system-aarch64"))
-            
+
         qemu_version = QemuRunner.QueryQemuVersion(executable)
 
         # turn off network
