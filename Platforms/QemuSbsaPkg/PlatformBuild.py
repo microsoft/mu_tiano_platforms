@@ -276,6 +276,11 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
     # Copy a file into the designated region of target FD.
     #
     def PatchRegion(self, fdfile, mainStart, size, srcfile):
+        src_size = os.stat(srcfile).st_size
+        if src_size > size:
+            logging.error("Source file size is larger than the target region")
+            return -1
+
         with open(fdfile, "r+b") as fd, open(srcfile, "rb") as src:
             fd.seek(mainStart)
             patchImage = src.read(size)
@@ -310,21 +315,24 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             self.env.GetValue("TARGET").lower())
 
         logging.info("Patching BL1 region")
-        print (self.env.GetValue("SECURE_FLASH_REGION_BL1_OFFSET"))
-        self.PatchRegion(
-            os.path.join(op_fv, "SECURE_FLASH0.fd"),
-            int(self.env.GetValue("SECURE_FLASH_REGION_BL1_OFFSET"), 16),
-            int( self.env.GetValue("SECURE_FLASH_REGION_BL1_SIZE"), 16),
-            os.path.join(op_tfa, "bl1.bin"),
-            )
+        ret = self.PatchRegion(
+                os.path.join(op_fv, "SECURE_FLASH0.fd"),
+                int(self.env.GetValue("SECURE_FLASH_REGION_BL1_OFFSET"), 16),
+                int( self.env.GetValue("SECURE_FLASH_REGION_BL1_SIZE"), 16),
+                os.path.join(op_tfa, "bl1.bin"),
+                )
+        if ret != 0:
+            return ret
 
         logging.info("Patching FIP region")
-        self.PatchRegion(
-            os.path.join(op_fv, "SECURE_FLASH0.fd"),
-            int(self.env.GetValue("SECURE_FLASH_REGION_FIP_OFFSET"), 16),
-            int( self.env.GetValue("SECURE_FLASH_REGION_FIP_SIZE"), 16),
-            os.path.join(op_tfa, "fip.bin")
-            )
+        ret = self.PatchRegion(
+                os.path.join(op_fv, "SECURE_FLASH0.fd"),
+                int(self.env.GetValue("SECURE_FLASH_REGION_FIP_OFFSET"), 16),
+                int( self.env.GetValue("SECURE_FLASH_REGION_FIP_SIZE"), 16),
+                os.path.join(op_tfa, "fip.bin")
+                )
+        if ret != 0:
+            return ret
 
         # Pad both fd to 256mb, as required by QEMU
         OutputPath_FV = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
