@@ -28,13 +28,13 @@ DEFINE FVMAIN_COMPACT_SIZE  = 0x2ff000
   # SECURE_FLASH0 Layout
 #===================================================================================
   DEFINE SECURE_FLASH_REGION_BL1_OFFSET                               = 0x00000000
-  DEFINE SECURE_FLASH_REGION_BL1_SIZE                                 = 0x00008000
+  DEFINE SECURE_FLASH_REGION_BL1_SIZE                                 = 0x00012000
 #===================================================================================
-  DEFINE SECURE_FLASH_REGION_FIP_OFFSET                               = 0x00008000
-  DEFINE SECURE_FLASH_REGION_FIP_SIZE                                 = 0x002D0000
+  DEFINE SECURE_FLASH_REGION_FIP_OFFSET                               = 0x00012000
+  DEFINE SECURE_FLASH_REGION_FIP_SIZE                                 = 0x00300000
 #===================================================================================
-  # Unused bytes offset                                                 0x002D8000
-  # Unused bytes size                                                   0x00D28000
+  # Unused bytes offset                                                 0x00312000
+  # Unused bytes size                                                   0x00CEE000
 #===================================================================================
   DEFINE SECURE_FLASH_NVSTORAGE_OFFSET                                = 0x01000000
   DEFINE SECURE_FLASH_NVSTORAGE_SIZE                                  = 0x000C0000
