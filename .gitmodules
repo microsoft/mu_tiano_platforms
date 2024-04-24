@@ -31,3 +31,6 @@
 [submodule "Features/MM_SUPV"]
 	path = Features/MM_SUPV
 	url = https://github.com/microsoft/mu_feature_mm_supv.git
+[submodule "Features/DEBUGGER"]
+	path = Features/DEBUGGER
+	url = https://github.com/microsoft/mu_feature_debugger.git

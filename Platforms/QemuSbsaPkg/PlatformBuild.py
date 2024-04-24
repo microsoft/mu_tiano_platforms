@@ -24,7 +24,7 @@ from edk2toollib.utility_functions import RunCmd
 # Declare test whose failure will not return a non-zero exit code
 FAILURE_EXEMPT_TESTS = {
     # example "PiValueTestApp.efi": datetime.datetime(3141, 5, 9, 2, 6, 53, 589793),
-    "DxePagingAuditTestApp.efi": datetime.datetime(2024, 1, 17, 0, 0, 0, 0)
+    "DxePagingAuditTestApp.efi": datetime.datetime(2024, 4, 17, 0, 0, 0, 0)
 }
 
 # Allow failure exempt tests to be ignored for 90 days
@@ -50,6 +50,7 @@ class CommonPlatform():
         "Common/MU_OEM_SAMPLE",
         "Silicon/Arm/MU_TIANO",
         "Silicon/Arm/TFA",
+        "Features/DEBUGGER",
         "Features/DFCI",
         "Features/CONFIG"
     )
@@ -86,6 +87,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
             RequiredSubmodule("Common/MU_OEM_SAMPLE", True),
             RequiredSubmodule("Silicon/Arm/MU_TIANO", True),
             RequiredSubmodule("Silicon/Arm/TFA", True),
+            RequiredSubmodule("Features/DEBUGGER", True),
             RequiredSubmodule("Features/DFCI", True),
             RequiredSubmodule("Features/CONFIG", True),
         ]
@@ -274,6 +276,11 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
     # Copy a file into the designated region of target FD.
     #
     def PatchRegion(self, fdfile, mainStart, size, srcfile):
+        src_size = os.stat(srcfile).st_size
+        if src_size > size:
+            logging.error("Source file size is larger than the target region")
+            return -1
+
         with open(fdfile, "r+b") as fd, open(srcfile, "rb") as src:
             fd.seek(mainStart)
             patchImage = src.read(size)
@@ -308,21 +315,24 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             self.env.GetValue("TARGET").lower())
 
         logging.info("Patching BL1 region")
-        print (self.env.GetValue("SECURE_FLASH_REGION_BL1_OFFSET"))
-        self.PatchRegion(
-            os.path.join(op_fv, "SECURE_FLASH0.fd"),
-            int(self.env.GetValue("SECURE_FLASH_REGION_BL1_OFFSET"), 16),
-            int( self.env.GetValue("SECURE_FLASH_REGION_BL1_SIZE"), 16),
-            os.path.join(op_tfa, "bl1.bin"),
-            )
+        ret = self.PatchRegion(
+                os.path.join(op_fv, "SECURE_FLASH0.fd"),
+                int(self.env.GetValue("SECURE_FLASH_REGION_BL1_OFFSET"), 16),
+                int( self.env.GetValue("SECURE_FLASH_REGION_BL1_SIZE"), 16),
+                os.path.join(op_tfa, "bl1.bin"),
+                )
+        if ret != 0:
+            return ret
 
         logging.info("Patching FIP region")
-        self.PatchRegion(
-            os.path.join(op_fv, "SECURE_FLASH0.fd"),
-            int(self.env.GetValue("SECURE_FLASH_REGION_FIP_OFFSET"), 16),
-            int( self.env.GetValue("SECURE_FLASH_REGION_FIP_SIZE"), 16),
-            os.path.join(op_tfa, "fip.bin")
-            )
+        ret = self.PatchRegion(
+                os.path.join(op_fv, "SECURE_FLASH0.fd"),
+                int(self.env.GetValue("SECURE_FLASH_REGION_FIP_OFFSET"), 16),
+                int( self.env.GetValue("SECURE_FLASH_REGION_FIP_SIZE"), 16),
+                os.path.join(op_tfa, "fip.bin")
+                )
+        if ret != 0:
+            return ret
 
         # Pad both fd to 256mb, as required by QEMU
         OutputPath_FV = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")

@@ -183,7 +183,7 @@ MdeModulePkg/Library/VariablePolicyLib/VariablePolicyUnitTest/VariablePolicyUnit
   <PcdsFixedAtBuild>
     gEfiMdeModulePkgTokenSpaceGuid.PcdAllowVariablePolicyEnforcementDisable|TRUE
 }
-MdeModulePkg/Core/Dxe/UnitTest/MemoryProtectionUnitTestHost.inf {
+MdeModulePkg/Library/ImagePropertiesRecordLib/UnitTest/ImagePropertiesRecordLibUnitTestHost.inf {
   <LibraryClasses>
     HobLib|MdeModulePkg/Library/BaseHobLibNull/BaseHobLibNull.inf
     PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
@@ -203,6 +203,7 @@ MdeModulePkg/Core/Dxe/UnitTest/MemoryProtectionUnitTestHost.inf {
     CpuExceptionHandlerLib|MdeModulePkg/Library/CpuExceptionHandlerLibNull/CpuExceptionHandlerLibNull.inf
     UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
     MemoryBinOverrideLib|MdeModulePkg/Library/MemoryBinOverrideLibNull/MemoryBinOverrideLibNull.inf
+    ImagePropertiesRecordLib|MdeModulePkg/Library/ImagePropertiesRecordLib/ImagePropertiesRecordLib.inf
   <PcdsFixedAtBuild>
     gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable|0
     gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressRuntimeCodePageNumber|0
