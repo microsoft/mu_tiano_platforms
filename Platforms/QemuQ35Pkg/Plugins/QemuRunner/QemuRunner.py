@@ -231,6 +231,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         if os.name == 'nt' and qemu_version[0] >= '8':
             import win32console
             std_handle = win32console.GetStdHandle(win32console.STD_INPUT_HANDLE)
+            logging.critical(std_handle)
             console_mode = std_handle.GetConsoleMode()
 
         # Run QEMU
