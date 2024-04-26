@@ -149,7 +149,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             std_handle = win32console.GetStdHandle(win32console.STD_INPUT_HANDLE)
             try:
                 console_mode = std_handle.GetConsoleMode()
-            except:
+            except Exception:
                 std_handle = None
 
         # Run QEMU
