@@ -231,7 +231,10 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         if os.name == 'nt' and qemu_version[0] >= '8':
             import win32console
             std_handle = win32console.GetStdHandle(win32console.STD_INPUT_HANDLE)
-            console_mode = std_handle.GetConsoleMode()
+            try:
+                console_mode = std_handle.GetConsoleMode()
+            except Exception:
+                std_handle = None
 
         # Run QEMU
         ret = utility_functions.RunCmd(executable, args)
@@ -246,7 +249,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             # Tested same FDs on QEMU 6 and 7, not observing the same.
             ret = 0
 
-        if os.name == 'nt' and qemu_version[0] >= '8':
+        if os.name == 'nt' and qemu_version[0] >= '8' and std_handle is not None:
             # Restore the console mode for Windows on QEMU v8+.
             std_handle.SetConsoleMode(console_mode)
         elif os.name != 'nt':
