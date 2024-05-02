@@ -1145,9 +1145,6 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
 
   QemuQ35Pkg/QemuRamfbDxe/QemuRamfbDxe.inf
 
-  MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
-  PrmPkg/Application/PrmInfo/PrmInfo.inf
-
   #
   # ISA Support
   #
@@ -1477,6 +1474,9 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   # PRM Configuration Driver
   PrmPkg/PrmConfigDxe/PrmConfigDxe.inf {
     <LibraryClasses>
+      NULL|PrmPkg/Samples/PrmSampleAcpiParameterBufferModule/Library/DxeAcpiParameterBufferModuleConfigLib/DxeAcpiParameterBufferModuleConfigLib.inf
+      NULL|PrmPkg/Samples/PrmSampleContextBufferModule/Library/DxeContextBufferModuleConfigLib/DxeContextBufferModuleConfigLib.inf
+      NULL|PrmPkg/Samples/PrmSampleHardwareAccessModule/Library/DxeHardwareAccessModuleConfigLib/DxeHardwareAccessModuleConfigLib.inf
       NULL|AdvLoggerPkg/AdvLoggerOsConnectorPrm/Library/AdvLoggerOsConnectorPrmConfigLib/AdvLoggerOsConnectorPrmConfigLib.inf
   }
 
@@ -1491,6 +1491,9 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   PrmPkg/PrmSsdtInstallDxe/PrmSsdtInstallDxe.inf
 
   # PRM Sample Modules
+  PrmPkg/Samples/PrmSampleAcpiParameterBufferModule/PrmSampleAcpiParameterBufferModule.inf
+  PrmPkg/Samples/PrmSampleHardwareAccessModule/PrmSampleHardwareAccessModule.inf
+  PrmPkg/Samples/PrmSampleContextBufferModule/PrmSampleContextBufferModule.inf
   AdvLoggerPkg/AdvLoggerOsConnectorPrm/AdvLoggerOsConnectorPrm.inf
 
   # PRM Information UEFI Application
