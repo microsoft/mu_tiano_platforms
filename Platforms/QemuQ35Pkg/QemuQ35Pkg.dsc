@@ -80,7 +80,6 @@
   UefiLib         |MdePkg/Library/UefiLib/UefiLib.inf
   HiiLib          |MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
   ResetSystemLib  |QemuQ35Pkg/Library/ResetSystemLib/BaseResetSystemLib.inf
-   ImagePropertiesRecordLib|MdeModulePkg/Library/ImagePropertiesRecordLib/ImagePropertiesRecordLib.inf
 
   # Services tables/Entry points
   UefiBootServicesTableLib    |MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
