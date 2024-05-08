@@ -227,11 +227,17 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         if monitor_port is not None:
             args += " -monitor tcp:127.0.0.1:" + monitor_port + ",server,nowait"
 
+        ## TODO: Save the console mode. The original issue comes from: https://gitlab.com/qemu-project/qemu/-/issues/1674
+        if os.name == 'nt' and qemu_version[0] >= '8':
+            import win32console
+            std_handle = win32console.GetStdHandle(win32console.STD_INPUT_HANDLE)
+            try:
+                console_mode = std_handle.GetConsoleMode()
+            except Exception:
+                std_handle = None
+
         # Run QEMU
         ret = utility_functions.RunCmd(executable, args)
-        if ret != 0 and os.name != 'nt':
-            # Linux version of QEMU will mess with the print if its run failed, this is to restore it
-            utility_functions.RunCmd ('stty', 'echo')
 
         ## TODO: restore the customized RunCmd once unit tests with asserts are figured out
         if ret == 0xc0000005:
@@ -242,5 +248,12 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             # QEMU v4 will return segmentation fault when shutting down.
             # Tested same FDs on QEMU 6 and 7, not observing the same.
             ret = 0
+
+        if os.name == 'nt' and qemu_version[0] >= '8' and std_handle is not None:
+            # Restore the console mode for Windows on QEMU v8+.
+            std_handle.SetConsoleMode(console_mode)
+        elif os.name != 'nt':
+            # Linux version of QEMU will mess with the print if its run failed, let's just restore it anyway
+            utility_functions.RunCmd('stty', 'sane', capture=False)
 
         return ret

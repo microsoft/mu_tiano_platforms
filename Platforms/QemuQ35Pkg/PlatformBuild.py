@@ -30,7 +30,7 @@ WORKSPACE_ROOT = str(Path(__file__).parent.parent.parent)
 # Declare test whose failure will not return a non-zero exit code
 FAILURE_EXEMPT_TESTS = {
     # example "PiValueTestApp.efi": datetime.datetime(3141, 5, 9, 2, 6, 53, 589793),
-    "DxePagingAuditTestApp.efi": datetime.datetime(2024, 1, 17, 0, 0, 0, 0)
+    "DxePagingAuditTestApp.efi": datetime.datetime(2024, 4, 17, 0, 0, 0, 0)
 }
 
 # Allow failure exempt tests to be ignored for 90 days
@@ -54,6 +54,7 @@ class CommonPlatform():
         "Common/MU",
         "Common/MU_TIANO",
         "Common/MU_OEM_SAMPLE",
+        "Features/DEBUGGER",
         "Features/DFCI",
         "Features/CONFIG",
         "Features/MM_SUPV"
@@ -123,6 +124,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
             RequiredSubmodule("Common/MU", True),
             RequiredSubmodule("Common/MU_TIANO", True),
             RequiredSubmodule("Common/MU_OEM_SAMPLE", True),
+            RequiredSubmodule("Features/DEBUGGER", True),
             RequiredSubmodule("Features/DFCI", True),
             RequiredSubmodule("Features/CONFIG", True),
             RequiredSubmodule("Features/MM_SUPV", True),

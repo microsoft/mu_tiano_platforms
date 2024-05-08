@@ -1,5 +1,31 @@
 
-# Debugging QEMU
+# Debugger QEMU Platforms
+
+This document described different ways to debug on the QEMU platforms.
+
+## Debugging using UEFI debugger
+
+Both Q35 and SBSA are setup to debug debugged using the MU debugger package. for
+more details on using this debugger, see the [FeatureDebuggerPkg Readme](https://github.com/microsoft/mu_feature_debugger/blob/main/DebuggerFeaturePkg/Readme.md).
+
+By default the debugger is disabled, to enable you must both enable the debugger
+build flag to enable the source debug device state flag and specify a serial port
+TCP port.
+
+```
+stuart_build -c Platforms\QemuQ35Pkg\PlatformBuild.py BLD_*_DEBUGGER_ENABLED=TRUE SERIAL_PORT=5555 --flashrom
+```
+
+On Q35 this allows for debugging over a different port then the usual debug output
+because Q35 has a seperate serial port available to it. On SBSA the serial port
+will be shared with the logging output.
+
+Currently this will only enable the DXE debugger. The MM debugger must be manually
+enabled using the PcdForceEnableDebugger if the DebugAgent has been configured.
+By default, the DXE debugger will stall for 30 seconds on the initial breakpoint
+before attempting to continue execution.
+
+## Debugging using QEMU GDB Server
 
 QEMU has the ability to expose a GDB port for debugging. This can be leveraged
 several ways. To start enable the GDB server, add the following parameter when
