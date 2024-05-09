@@ -40,7 +40,7 @@ class CommonPlatform():
     PackagesSupported = ("QemuSbsaPkg",)
     ArchSupported = ("AARCH64",)
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
-    Scopes = ('qemu', 'qemusbsa', 'gcc_aarch64_linux', 'edk2-build', 'cibuild', 'configdata', 'rust-ci')
+    Scopes = ('qemu', 'qemusbsa', 'edk2-build', 'cibuild', 'configdata', 'rust-ci')
     WorkspaceRoot = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     PackagesPath = (
         "Platforms",
@@ -158,12 +158,12 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         UefiBuilder.__init__(self)
 
     def CleanTree(self, RemoveConfTemplateFilesToo=False):
-        # Add a step to clean up BL31 as well, if asked
-        cmd = "make"
-        args = "distclean"
-        ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_TFA_PATH"))
-        if ret != 0:
-            return ret
+        # # Add a step to clean up BL31 as well, if asked
+        # cmd = "make"
+        # args = "distclean"
+        # ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_TFA_PATH"))
+        # if ret != 0:
+        #     return ret
 
         return super().CleanTree(RemoveConfTemplateFilesToo)
 
@@ -234,7 +234,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         self.env.SetValue("PRODUCT_NAME", "QemuSbsa", "Platform Hardcoded")
         self.env.SetValue("ACTIVE_PLATFORM", "QemuSbsaPkg/QemuSbsaPkg.dsc", "Platform Hardcoded")
         self.env.SetValue("TARGET_ARCH", "AARCH64", "Platform Hardcoded")
-        self.env.SetValue("TOOL_CHAIN_TAG", "GCC5", "set default to gcc5")
+        self.env.SetValue("TOOL_CHAIN_TAG", "CLANGPDB", "set default to clangpdb")
         self.env.SetValue("EMPTY_DRIVE", "FALSE", "Default to false")
         self.env.SetValue("RUN_TESTS", "FALSE", "Default to false")
         self.env.SetValue("QEMU_HEADLESS", "FALSE", "Default to false")
@@ -294,7 +294,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         logging.info("Building TF-A")
         cmd = "make"
-        args = "CROSS_COMPILE=" + shell_environment.GetEnvironment().get_shell_var("GCC5_AARCH64_PREFIX")
+        args = "CC=\"" + shell_environment.GetEnvironment().get_shell_var("CLANG_BIN") + "clang\""
         args += " PLAT=" + self.env.GetValue("QEMU_PLATFORM").lower()
         args += " ARCH=" + self.env.GetValue("TARGET_ARCH").lower()
         args += " DEBUG=" + str(1 if self.env.GetValue("TARGET").lower() == 'debug' else 0)
@@ -303,7 +303,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         # args += " FEATURE_DETECTION=1" # Enforces support for features enabled.
         args += " BL32=" + os.path.join(op_fv, "BL32_AP_MM.fd")
         args += " all fip"
-        args += " -j $(nproc)"
+        # args += " -j $(nproc)"
         ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_TFA_PATH"))
         if ret != 0:
             return ret

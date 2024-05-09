@@ -6,7 +6,7 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
-  "scope": "global-win",
+  "scope": "glssdobal-win",
   "type": "web",
   "name": "qemu-win",
   "source": "https://github.com/microsoft/mu_tiano_platforms/releases/download/v7.0.0/qemu-windows-v7.0.0.zip",
