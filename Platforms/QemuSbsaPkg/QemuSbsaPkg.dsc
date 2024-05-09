@@ -600,6 +600,7 @@
 !endif
 
 [PcdsFixedAtBuild.common]
+  gArmTokenSpaceGuid.PcdFfaEnable|0
   !include QemuPkg/AutoGen/SecurebootPcds.inc
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000
