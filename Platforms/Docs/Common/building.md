@@ -120,6 +120,9 @@ an error occurs. Locally you don't need to set this.
 
 **SERIAL_PORT=\<Serial Port\>** Enables the specified serial port to be used as console.
 
+**ENABLE_NETWORK=TRUE** will enable networking (currently supported on the QEMU Q35 platform). If `DFCI_VAR_STORE` is
+set, networking will also be enabled with TCP ports 8270 and 8271 forwarded for the robot framework.
+
 ### Passing Build Defines
 
 To pass build defines through *stuart_build*, prepend `BLD_*_` to the define name and pass it on the
