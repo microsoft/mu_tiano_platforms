@@ -168,11 +168,9 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             if alt_boot_enable.upper() == "TRUE":
                 boot_selection += ",version=Vol-"
 
-        # If DFCI_VAR_STORE is enabled, don't enable the Virtual Drive, and enable the network
+        # If DFCI_VAR_STORE is enabled, don't enable the Virtual Drive
         dfci_var_store = env.GetValue("DFCI_VAR_STORE")
         if dfci_var_store is None:
-            # turn off network
-            args += " -net none"
             # Mount disk with startup.nsh
             if os.path.isfile(VirtualDrive):
                 args += f" -drive file={VirtualDrive},if=virtio"
@@ -180,16 +178,22 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
                 args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
             else:
                 logging.critical("Virtual Drive Path Invalid")
-        else:
+
+        if env.GetValue("ENABLE_NETWORK") or dfci_var_store:
+            args += " -netdev user,id=net0"
+
+            if dfci_var_store:
+                # forward ports for robotframework 8270 and 8271
+                args += ",hostfwd=tcp::8270-:8270,hostfwd=tcp::8271-:8271"
+
             if boot_to_front_page is None:
                 # Booting to Windows, use a PCI nic
                 args += " -device e1000,netdev=net0"
             else:
                 # Booting to UEFI, use virtio-net-pci
                 args += " -device virtio-net-pci,netdev=net0"
-
-            # forward ports for robotframework 8270 and 8271
-            args += " -netdev user,id=net0,hostfwd=tcp::8270-:8270,hostfwd=tcp::8271-:8271"
+        else:
+            args += " -net none"
 
         creation_time = Path(code_fd).stat().st_ctime
         creation_datetime = datetime.datetime.fromtimestamp(creation_time)
