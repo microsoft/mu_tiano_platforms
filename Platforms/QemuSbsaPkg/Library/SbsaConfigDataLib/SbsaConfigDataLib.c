@@ -16,3 +16,4 @@
 
 PROFILE  gProfileData = { 0 };
 UINTN    gNumProfiles = 0;
+CHAR8    *gProfileFlavorNames[] = { NULL };

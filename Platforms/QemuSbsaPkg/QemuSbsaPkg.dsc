@@ -627,9 +627,9 @@
   #
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0x40
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS|0x0
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x505
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x258
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0x260
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x30
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x40
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0x300
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesCode|0x5DC
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesData|0x2EE0
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderCode|0x14
@@ -965,7 +965,7 @@
   OemPkg/OemConfigPolicyCreatorPei/OemConfigPolicyCreatorPei.inf {
     <LibraryClasses>
       # producer of config data
-      NULL|SetupDataPkg/Library/PlatformConfigDataLibNull/PlatformConfigDataLibNull.inf
+      NULL|QemuSbsaPkg/Library/SbsaConfigDataLib/SbsaConfigDataLib.inf
   }
 
   #
