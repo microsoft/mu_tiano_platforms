@@ -120,7 +120,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
                 "TOOL_CHAIN_TAG", ""
             )
         if actual_tool_chain_tag.upper().startswith("GCC"):
-            scopes = scopes + "gcc_aarch64_linux"
+            scopes = scopes + ("gcc_aarch64_linux")
         return scopes
 
     def FilterPackagesToTest(self, changedFilesList: list, potentialPackagesList: list) -> list:
@@ -207,7 +207,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         # Add a step to clean up BL31 as well, if asked
         cmd = "make"
-        args = "clean"
+        args = "distclean"
         RunCmd(cmd, args, workingdir=self.env.GetValue("ARM_TFA_PATH"))
 
         return super().CleanTree(RemoveConfTemplateFilesToo)
@@ -247,7 +247,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                 "TOOL_CHAIN_TAG", ""
             )
         if actual_tool_chain_tag.upper().startswith("GCC"):
-            scopes = scopes + "gcc_aarch64_linux"
+            scopes = scopes + ("gcc_aarch64_linux")
         return scopes
 
     def GetName(self):
