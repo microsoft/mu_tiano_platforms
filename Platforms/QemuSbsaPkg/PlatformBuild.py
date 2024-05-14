@@ -347,7 +347,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         # Need to build fiptool separately because the build system will override LIB with LIBC for firmware builds
         cmd = "make"
-        args = " fiptool LIB=\"" + shell_environment.GetEnvironment().get_shell_var("LIB") + "\""
+        args = " DEBUG=1 V=1 fiptool LIB=\"" + shell_environment.GetEnvironment().get_shell_var("LIB") + "\""
         ret = RunCmd(cmd, args, workingdir=self.env.GetValue("ARM_TFA_PATH"))
         if ret != 0:
             return ret
