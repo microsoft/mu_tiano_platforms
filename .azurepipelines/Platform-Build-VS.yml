@@ -11,7 +11,7 @@ resources:
       type: github
       endpoint: microsoft
       name: kuqin12/mu_devops
-      ref: main
+      ref: add_clangpdb
 
 variables:
 - group: tool-chain-windows-visual-studio-latest
