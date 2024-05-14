@@ -14,6 +14,6 @@
 #include <Generated/ConfigClientGenerated.h>
 #include <Generated/ConfigDataGenerated.h>
 
-PROFILE  gProfileData = { 0 };
-UINTN    gNumProfiles = 0;
+PROFILE  gProfileData           = { 0 };
+UINTN    gNumProfiles           = 0;
 CHAR8    *gProfileFlavorNames[] = { NULL };
