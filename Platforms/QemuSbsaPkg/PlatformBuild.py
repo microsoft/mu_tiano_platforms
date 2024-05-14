@@ -115,7 +115,13 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
-        return CommonPlatform.Scopes
+        scopes = CommonPlatform.Scopes
+        actual_tool_chain_tag = shell_environment.GetBuildVars().GetValue(
+                "TOOL_CHAIN_TAG", ""
+            )
+        if actual_tool_chain_tag.upper().startswith("GCC"):
+            scopes = scopes + "gcc_aarch64_linux"
+        return scopes
 
     def FilterPackagesToTest(self, changedFilesList: list, potentialPackagesList: list) -> list:
         ''' Filter other cases that this package should be built
@@ -236,7 +242,13 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
-        return CommonPlatform.Scopes
+        scopes = CommonPlatform.Scopes
+        actual_tool_chain_tag = shell_environment.GetBuildVars().GetValue(
+                "TOOL_CHAIN_TAG", ""
+            )
+        if actual_tool_chain_tag.upper().startswith("GCC"):
+            scopes = scopes + "gcc_aarch64_linux"
+        return scopes
 
     def GetName(self):
         ''' Get the name of the repo, platform, or product being build '''
@@ -333,48 +345,9 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         logging.info("Building TF-A")
 
-        interesting_keys = ["LIB"]
-        if self.env.GetValue("TOOL_CHAIN_TAG") == "CLANGPDB":
-            HostInfo = GetHostInfo()
-
-            # check to see if host is configured
-            # HostType for VS tools should be (defined in tools_def):
-            # x86   == 32bit Intel
-            # x64   == 64bit Intel
-            # arm   == 32bit Arm
-            # arm64 == 64bit Arm
-            #
-            HostType = shell_environment.GetEnvironment().get_shell_var("CLANG_VS_HOST")
-            if HostType is not None:
-                HostType = HostType.lower()
-                self.Logger.info(
-                    f"CLANG_VS_HOST defined by environment.  Value is {HostType}")
-            else:
-                #figure it out based on host info
-                if HostInfo.arch == "x86":
-                    if HostInfo.bit == "32":
-                        HostType = "x86"
-                    elif HostInfo.bit == "64":
-                        HostType = "x64"
-                else:
-                    # anything other than x86 or x64 is not supported
-                    raise NotImplementedError()
-
-            # CLANG_VS_HOST options are not exactly the same as QueryVcVariables. This translates.
-            VC_HOST_ARCH_TRANSLATOR = {
-                "x86": "x86", "x64": "AMD64", "arm": "not supported", "arm64": "not supported"}
-
-            # now get the environment variables for the platform
-            shell_env = shell_environment.GetEnvironment()
-            # Use the tools lib to determine the correct values for the vars that interest us.
-            vs_vars = QueryVcVariables(
-                interesting_keys, VC_HOST_ARCH_TRANSLATOR[HostType])
-            for (k, v) in vs_vars.items():
-                shell_env.set_shell_var(k, v)
-
         # Need to build fiptool separately because the build system will override LIB with LIBC for firmware builds
         cmd = "make"
-        args = " fiptool LIB=\"" + shell_env.get_shell_var("LIB") + "\""
+        args = " fiptool LIB=\"" + shell_environment.GetEnvironment().get_shell_var("LIB") + "\""
         ret = RunCmd(cmd, args, workingdir=self.env.GetValue("ARM_TFA_PATH"))
         if ret != 0:
             return ret
