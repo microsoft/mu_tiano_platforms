@@ -92,7 +92,7 @@ jobs:
 
       - template: Steps/BuildPlatform.yml@mu_devops
         parameters:
-          tool_chain_tag: $(tool_chain_tag)
+          tool_chain_tag: ${{ parameters.tool_chain_tag }}
           build_pkg: ${{ item.Value.BuildPackage }}
           build_target: ${{ item.Value.BuildTarget }}
           build_arch: ${{ item.Value.BuildArch }}
