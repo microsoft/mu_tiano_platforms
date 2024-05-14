@@ -45,6 +45,7 @@ jobs:
         cp "C:\Program Files\qemu\share\kvmvapic.bin" temp\share
         cp "C:\Program Files\qemu\share\vgabios-cirrus.bin" temp\share
         cp "C:\Program Files\qemu\share\vgabios-stdvga.bin" temp\share
+        cp "C:\Program Files\qemu\share\vgabios-bochs-display.bin" temp\share
         Get-ChildItem -Path "C:\Program Files\qemu" -Filter *.dll | Move-Item -Destination "temp"
 
     - name: Upload Qemu Artifact
