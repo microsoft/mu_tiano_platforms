@@ -129,3 +129,43 @@ jobs:
             displayName: Install Report Generator
         BuildArtifactsOther: "**/Coverage/**"
         Run: false
+
+- template: Platform-Build-Job.yml
+  parameters:
+    extra_install_step:
+    - template: Steps/InstallCoverageTools.yml@mu_devops
+    tool_chain_tag: 'CLANGPDB'
+    vm_image: $(vm_image)
+    os_type: Windows_NT
+    build_matrix:
+      QemuSbsa_DEBUG:
+        BuildPackage: QemuSbsaPkg
+        BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+        BuildArch: AARCH64
+        BuildFlags: ""
+        BuildTarget: "DEBUG"
+        BuildExtraTag: ""
+        BuildExtraStep:
+          - template: Steps/RustSetupSteps.yml@mu_devops
+        Run: true
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+        BuildArtifactsBinary: |
+          **/QEMU_EFI.fd
+          **/SECURE_FLASH0.fd
+        BuildArtifactsOther: "**/unit_test_results/*"
+      
+      QemuSbsa_RELEASE:
+        BuildPackage: QemuSbsaPkg
+        BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+        BuildArch: AARCH64
+        BuildFlags: ""
+        BuildTarget: "RELEASE"
+        BuildExtraTag: ""
+        BuildExtraStep:
+          - template: Steps/RustSetupSteps.yml@mu_devops
+        Run: true
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+        BuildArtifactsBinary: |
+          **/QEMU_EFI.fd
+          **/SECURE_FLASH0.fd
+        BuildArtifactsOther: "**/unit_test_results/*"
