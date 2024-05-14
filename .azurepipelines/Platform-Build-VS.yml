@@ -10,7 +10,7 @@ resources:
     - repository: mu_devops
       type: github
       endpoint: microsoft
-      name: microsoft/mu_devops
+      name: kuqin12/mu_devops
       ref: main
 
 variables:
