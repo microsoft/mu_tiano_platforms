@@ -10,6 +10,7 @@ import os
 import uuid
 from io import StringIO
 from pathlib import Path
+import posixpath
 
 from edk2toolext.environment import shell_environment
 from edk2toolext.environment.uefi_build import UefiBuilder
@@ -354,7 +355,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         # Then we can make the firmware images with the fiptool built above
         cmd = "make"
-        args = "CC=\"" + shell_environment.GetEnvironment().get_shell_var("CLANG_BIN") + "clang\""
+        args = "CC=\"" + shell_environment.GetEnvironment().get_shell_var("CLANG_BIN").replace(os.sep, posixpath.sep) + "clang\""
         args += " PLAT=" + self.env.GetValue("QEMU_PLATFORM").lower()
         args += " ARCH=" + self.env.GetValue("TARGET_ARCH").lower()
         args += " DEBUG=" + str(1 if self.env.GetValue("TARGET").lower() == 'debug' else 0)
