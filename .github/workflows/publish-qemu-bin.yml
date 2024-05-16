@@ -108,6 +108,7 @@ jobs:
         cp qemu/bin/qemu-bundle/usr/local/share/qemu/efi-virtio.rom temp/share
         cp qemu/bin/qemu-bundle/usr/local/share/qemu/vgabios-cirrus.bin temp/share
         cp qemu/bin/qemu-bundle/usr/local/share/qemu/vgabios-stdvga.bin temp/share
+        cp qemu/bin/qemu-bundle/usr/local/share/qemu/vgabios-bochs-display.bin temp/share
         cp qemu/bin/qemu-bundle/usr/local/share/qemu/kvmvapic.bin temp/share
     - name: Upload Qemu Artifact
       uses: actions/upload-artifact@v4
