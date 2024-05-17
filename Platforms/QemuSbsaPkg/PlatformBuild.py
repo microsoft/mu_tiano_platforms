@@ -351,6 +351,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         if os_type is not None and "msys" in os_type:
 
+            logging.critical("Running under Msys2, using msys-2.0.dll to convert paths")
+
             import ctypes
             import sys
 
@@ -373,10 +375,13 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                 msys_dll_init.restype = None
                 msys_dll_init.argtypes = []
                 msys_dll_init()
+                logging.critical("msys_dll_init() called")
 
             free = msys.free
             free.restype = None
             free.argtypes = [ctypes.c_void_p]
+
+            logging.critical("msys-2.0.dll loaded")
 
             CCP_WIN_W_TO_POSIX = 3
 
@@ -389,9 +394,14 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                 free(result)
                 return value
 
+            logging.critical("win2posix() defined")
+            clang_path = shell_environment.GetEnvironment().get_shell_var("CLANG_BIN")
+            logging.critical("clang_path before = %s" % clang_path)
             clang_path = win2posix(shell_environment.GetEnvironment().get_shell_var("CLANG_BIN"))
+            logging.critical("clang_path after = %s" % clang_path)
         else:
             clang_path = shell_environment.GetEnvironment().get_shell_var("CLANG_BIN")
+            logging.critical("clang_path simply = %s" % clang_path)
 
         # Need to build fiptool separately because the build system will override LIB with LIBC for firmware builds
         cmd = "make"
