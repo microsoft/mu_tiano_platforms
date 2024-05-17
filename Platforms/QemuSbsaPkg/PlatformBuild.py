@@ -412,6 +412,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         if ret != 0:
             return ret
 
+        RunCmd('set', '')
+
         # Then we can make the firmware images with the fiptool built above
         cmd = "make"
         args = "CC=\"" + clang_path + "clang\""
