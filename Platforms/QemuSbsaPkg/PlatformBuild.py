@@ -348,6 +348,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         # HACKHACK: This is to tell if this is running from a POSIX compatible shell
         os_type = shell_environment.GetEnvironment().get_shell_var("OSTYPE")
+        RunCmd('set', '')
+        logging.info(os_type)
 
         if os_type is not None and "msys" in os_type:
 
