@@ -347,10 +347,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         logging.info("Building TF-A")
 
         # HACKHACK: This is to tell if this is running from a POSIX compatible shell
-        os_type = shell_environment.GetEnvironment().get_shell_var("OSTYPE")
-        RunCmd('where', 'make')
-        logging.info(os_type)
-
+        os_type = shell_environment.GetEnvironment().get_shell_var("GHCUP_MSYS2")
         if os_type is not None and "msys" in os_type:
 
             logging.critical("Running under Msys2, using msys-2.0.dll to convert paths")
