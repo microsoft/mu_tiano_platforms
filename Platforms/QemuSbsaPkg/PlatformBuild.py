@@ -348,7 +348,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         # HACKHACK: This is to tell if this is running from a POSIX compatible shell
         os_type = shell_environment.GetEnvironment().get_shell_var("GHCUP_MSYS2")
-        if os_type is not None and "msys" in os_type:
+        if os_type is None and "msys" in os_type:
 
             logging.critical("Running under Msys2, using msys-2.0.dll to convert paths")
 
@@ -414,7 +414,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         # Then we can make the firmware images with the fiptool built above
         cmd = "make"
         args = "CC=\"" + clang_path + "clang\""
-        args += " PLAT=" + self.env.GetValue("QEMU_PLATFORM").lower()
+        args += " DEBUG=1 V=1 PLAT=" + self.env.GetValue("QEMU_PLATFORM").lower()
         args += " ARCH=" + self.env.GetValue("TARGET_ARCH").lower()
         args += " DEBUG=" + str(1 if self.env.GetValue("TARGET").lower() == 'debug' else 0)
         args += " SPM_MM=1 EL3_EXCEPTION_HANDLING=1 ENABLE_SME_FOR_NS=0 ENABLE_SVE_FOR_NS=0"
