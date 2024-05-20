@@ -411,9 +411,13 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         RunCmd('set', '')
 
+        current_path = shell_environment.GetEnvironment().get_shell_var("PATH")
+        current_path = os.pathsep.join([current_path, os.path.dirname(clang_path)])
+        shell_environment.GetEnvironment().set_shell_var("PATH", current_path)
+
         # Then we can make the firmware images with the fiptool built above
         cmd = "make"
-        args = "CC=\"" + clang_path + "clang\""
+        args = "CC=clang"
         args += " DEBUG=1 V=1 PLAT=" + self.env.GetValue("QEMU_PLATFORM").lower()
         args += " ARCH=" + self.env.GetValue("TARGET_ARCH").lower()
         args += " DEBUG=" + str(1 if self.env.GetValue("TARGET").lower() == 'debug' else 0)
