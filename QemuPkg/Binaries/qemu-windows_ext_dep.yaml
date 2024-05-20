@@ -10,7 +10,6 @@
   "type": "web",
   "name": "qemu-win",
   "source": "https://github.com/microsoft/mu_tiano_platforms/releases/download/v7.0.1/qemu-windows-v7.0.1.zip",
-
   "version": "v7.0.1",
   "sha256": "7520F6EE4360F5C71FFE4FB452EC8915DFFA30F9E319097A2F1ABD752C297A5B",
   "internal_path": "/bin/",
