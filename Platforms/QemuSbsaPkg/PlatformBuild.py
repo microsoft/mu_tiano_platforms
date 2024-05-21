@@ -346,61 +346,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         logging.info("Building TF-A")
 
-        # HACKHACK: This is to tell if this is running from a POSIX compatible shell
-        os_type = shell_environment.GetEnvironment().get_shell_var("GHCUP_MSYS2")
-        if os_type is None and "msys" in os_type:
-
-            logging.critical("Running under Msys2, using msys-2.0.dll to convert paths")
-
-            import ctypes
-            import sys
-
-            xunicode = str if sys.version_info[0] > 2 else eval("unicode")
-
-            # If running under Msys2 Python, just use DLL name
-            # If running under non-Msys2 Windows Python, use full path to msys-2.0.dll
-            # Note Python and msys-2.0.dll must match bitness (i.e. 32-bit Python must
-            # use 32-bit msys-2.0.dll, 64-bit Python must use 64-bit msys-2.0.dll.)
-            msys = ctypes.cdll.LoadLibrary("msys-2.0.dll")
-            msys_create_path = msys.cygwin_create_path
-            msys_create_path.restype = ctypes.c_void_p
-            msys_create_path.argtypes = [ctypes.c_int32, ctypes.c_void_p]
-
-            # Initialise the msys DLL. This step should only be done if using
-            # non-msys Python. If you are using msys Python don't do this because
-            # it has already been done for you.
-            if sys.platform != "msys":
-                msys_dll_init = msys.msys_dll_init
-                msys_dll_init.restype = None
-                msys_dll_init.argtypes = []
-                msys_dll_init()
-                logging.critical("msys_dll_init() called")
-
-            free = msys.free
-            free.restype = None
-            free.argtypes = [ctypes.c_void_p]
-
-            logging.critical("msys-2.0.dll loaded")
-
-            CCP_WIN_W_TO_POSIX = 3
-
-            def win2posix(path):
-                """Convert a Windows path to a msys path"""
-                result = msys_create_path(CCP_WIN_W_TO_POSIX, xunicode(path))
-                if result is None:
-                    raise Exception("msys_create_path failed")
-                value = ctypes.cast(result, ctypes.c_char_p).value
-                free(result)
-                return value
-
-            logging.critical("win2posix() defined")
-            clang_path = shell_environment.GetEnvironment().get_shell_var("CLANG_BIN")
-            logging.critical("clang_path before = %s" % clang_path)
-            clang_path = win2posix(shell_environment.GetEnvironment().get_shell_var("CLANG_BIN"))
-            logging.critical("clang_path after = %s" % clang_path)
-        else:
-            clang_path = shell_environment.GetEnvironment().get_shell_var("CLANG_BIN")
-            logging.critical("clang_path simply = %s" % clang_path)
+        clang_path = shell_environment.GetEnvironment().get_shell_var("CLANG_BIN")
+        logging.critical("clang_path simply = %s" % clang_path)
 
         # Need to build fiptool separately because the build system will override LIB with LIBC for firmware builds
         cmd = "make"
