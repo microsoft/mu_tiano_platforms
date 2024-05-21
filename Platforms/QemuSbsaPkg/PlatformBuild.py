@@ -411,9 +411,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         RunCmd('set', '')
 
-        current_path = shell_environment.GetEnvironment().get_shell_var("PATH")
-        current_path = os.pathsep.join([current_path, os.path.dirname(clang_path)])
-        shell_environment.GetEnvironment().set_shell_var("PATH", current_path)
+        shell_environment.GetEnvironment().insert_path(clang_path)
 
         # Then we can make the firmware images with the fiptool built above
         cmd = "make"
