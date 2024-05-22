@@ -369,7 +369,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         ClangBin_Default = "UNDEFINED"
 
         if HostInfo.os == "Windows":
-            ClangBin_Default = "D:\\LLVM\\bin\\\\"  #need to escape the last slash as it seems to be removed
+            ClangBin_Default = "C:\\Program Files\\LLVM\\bin\\\\"  #need to escape the last slash as it seems to be removed
             clang_exe += ".exe"
         elif HostInfo.os == "Linux":
             ClangBin_Default = "/LLVM/bin/"  #this isn't right
