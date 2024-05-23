@@ -372,6 +372,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             ClangBin_Default = shell_environment.GetEnvironment().get_shell_var("AGENT_TEMPDIRECTORY")
             if ClangBin_Default is None:
                 ClangBin_Default = "C:\\Program Files\\LLVM\\bin\\\\"  #need to escape the last slash as it seems to be removed
+            else:
+                ClangBin_Default += "\\LLVM\\bin\\\\"
             logging.critical("ClangBin_Default = %s" % ClangBin_Default)
             clang_exe += ".exe"
         elif HostInfo.os == "Linux":
