@@ -83,7 +83,9 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
         !!! note
             If no RequiredSubmodules return an empty iterable
         """
-        return []
+        return [
+            RequiredSubmodule("MU_BASECORE", True),
+        ]
 
     def SetArchitectures(self, list_of_requested_architectures):
         ''' Confirm the requests architecture list is valid and configure SettingsManager
