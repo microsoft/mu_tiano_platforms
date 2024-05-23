@@ -84,15 +84,15 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
             If no RequiredSubmodules return an empty iterable
         """
         return [
-            RequiredSubmodule("MU_BASECORE", True),
-            RequiredSubmodule("Common/MU", True),
-            RequiredSubmodule("Common/MU_TIANO", True),
-            RequiredSubmodule("Common/MU_OEM_SAMPLE", True),
-            RequiredSubmodule("Silicon/Arm/MU_TIANO", True),
-            RequiredSubmodule("Silicon/Arm/TFA", True),
-            RequiredSubmodule("Features/DEBUGGER", True),
-            RequiredSubmodule("Features/DFCI", True),
-            RequiredSubmodule("Features/CONFIG", True),
+            RequiredSubmodule("MU_BASECORE", False),
+            RequiredSubmodule("Common/MU", False),
+            RequiredSubmodule("Common/MU_TIANO", False),
+            RequiredSubmodule("Common/MU_OEM_SAMPLE", False),
+            RequiredSubmodule("Silicon/Arm/MU_TIANO", False),
+            RequiredSubmodule("Silicon/Arm/TFA", False),
+            RequiredSubmodule("Features/DEBUGGER", False),
+            RequiredSubmodule("Features/DFCI", False),
+            RequiredSubmodule("Features/CONFIG", False),
         ]
 
     def SetArchitectures(self, list_of_requested_architectures):
