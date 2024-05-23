@@ -396,10 +396,11 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             shell_environment.GetEnvironment().set_shell_var("CLANG_BIN", ClangBin)
 
         shell_environment.GetEnvironment().insert_path(ClangBin)
+        choco_path = shell_environment.GetEnvironment().get_shell_var("ChocolateyInstall")
         RunCmd("set", "")
 
         # Then we can make the firmware images with the fiptool built above
-        cmd = "make"
+        cmd = os.path.join(choco_path, "bin", "make")
         args = "CC=\"" + ClangBin.replace(os.sep, posixpath.sep) + "clang.exe\""
         args += " DEBUG=1 PLAT=" + self.env.GetValue("QEMU_PLATFORM").lower()
         args += " ARCH=" + self.env.GetValue("TARGET_ARCH").lower()
