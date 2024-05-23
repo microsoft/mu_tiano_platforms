@@ -278,7 +278,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
             "txt": logs to plain text file
         """
-        return logging.INFO
+        return logging.DEBUG
         return super().GetLoggingLevel(loggerType)
 
     def SetPlatformEnv(self):
@@ -396,8 +396,10 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             shell_environment.GetEnvironment().set_shell_var("CLANG_BIN", ClangBin)
 
         shell_environment.GetEnvironment().insert_path(ClangBin)
-        choco_path = shell_environment.GetEnvironment().get_shell_var("ChocolateyInstall")
         RunCmd("set", "")
+        shell_environment.GetEnvironment().log_environment()
+        choco_path = shell_environment.GetEnvironment().get_shell_var("CHOCOLATEYINSTALL")
+        print(f"choco_path = {choco_path}")
 
         # Then we can make the firmware images with the fiptool built above
         cmd = os.path.join(choco_path, "bin", "make")
