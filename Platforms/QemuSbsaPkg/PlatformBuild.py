@@ -85,6 +85,14 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
         """
         return [
             RequiredSubmodule("MU_BASECORE", True),
+            RequiredSubmodule("Common/MU", True),
+            RequiredSubmodule("Common/MU_TIANO", True),
+            RequiredSubmodule("Common/MU_OEM_SAMPLE", True),
+            RequiredSubmodule("Silicon/Arm/MU_TIANO", True),
+            RequiredSubmodule("Silicon/Arm/TFA", True),
+            RequiredSubmodule("Features/DEBUGGER", True),
+            RequiredSubmodule("Features/DFCI", True),
+            RequiredSubmodule("Features/CONFIG", True),
         ]
 
     def SetArchitectures(self, list_of_requested_architectures):
