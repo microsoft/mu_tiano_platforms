@@ -373,7 +373,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             if ClangBin_Default is None:
                 ClangBin_Default = "C:\\Program Files\\LLVM\\bin\\\\"  #need to escape the last slash as it seems to be removed
             else:
-                ClangBin_Default += "\\LLVM\\bin\\\\"
+                ClangBin_Default += "\\LLVM\\bin\\"
             logging.critical("ClangBin_Default = %s" % ClangBin_Default)
             clang_exe += ".exe"
         elif HostInfo.os == "Linux":
@@ -387,7 +387,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             for path_entry in os.getenv("PATH").split(os.pathsep):
                 path_entry = os.path.normpath(path_entry)
                 if os.path.isfile(os.path.join(path_entry, clang_exe)):
-                    ClangBin = os.path.abspath(path_entry) + os.sep
+                    ClangBin = os.path.abspath(path_entry)
                     break
             if ClangBin is None:
                 # Didn't find it on path - try the install default.
