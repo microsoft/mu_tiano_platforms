@@ -322,6 +322,30 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         return 0
 
     def PlatformPreBuild(self):
+        return 0
+
+    #
+    # Copy a file into the designated region of target FD.
+    #
+    def PatchRegion(self, fdfile, mainStart, size, srcfile):
+        src_size = os.stat(srcfile).st_size
+        if src_size > size:
+            logging.error("Source file size is larger than the target region")
+            return -1
+
+        with open(fdfile, "r+b") as fd, open(srcfile, "rb") as src:
+            fd.seek(mainStart)
+            patchImage = src.read(size)
+            fd.seek(mainStart)
+            fd.write(patchImage)
+        return 0
+
+    def PlatformPostBuild(self):
+        # Add a post build step to build BL31 and assemble the FD files
+        op_fv = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
+
+        logging.info("Building TF-A")
+
         interesting_keys = ["LIB", "LIBPATH", "VCToolsInstallDir", "Path"]
         if self.env.GetValue("TOOL_CHAIN_TAG") == "CLANGPDB":
             HostInfo = GetHostInfo()
@@ -393,17 +417,18 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
             shell_environment.GetEnvironment().set_shell_var("CLANG_BIN", ClangBin)
 
+        # Need to build fiptool separately because the build system will override LIB with LIBC for firmware builds
         cmd = "make"
         args = " DEBUG=1 fiptool MAKEFLAGS= LIB=\"" + shell_environment.GetEnvironment().get_shell_var("LIB") + "\""
         ret = RunCmd(cmd, args, workingdir=self.env.GetValue("ARM_TFA_PATH"))
         if ret != 0:
             return ret
 
+        logging.info(f"ClangBin = {ClangBin}")
         path = os.environ["PATH"]
         shell_environment.GetEnvironment().set_path('')
         shell_environment.GetEnvironment().insert_path(ClangBin)
         RunCmd("set", "")
-        shell_environment.GetEnvironment().log_environment()
         choco_path = shell_environment.GetEnvironment().get_shell_var("CHOCOLATEYINSTALL")
         print(f"choco_path = {choco_path}")
 
@@ -422,44 +447,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_TFA_PATH"))
         if ret != 0:
             return ret
-
-        return 0
-
-    #
-    # Copy a file into the designated region of target FD.
-    #
-    def PatchRegion(self, fdfile, mainStart, size, srcfile):
-        src_size = os.stat(srcfile).st_size
-        if src_size > size:
-            logging.error("Source file size is larger than the target region")
-            return -1
-
-        with open(fdfile, "r+b") as fd, open(srcfile, "rb") as src:
-            fd.seek(mainStart)
-            patchImage = src.read(size)
-            fd.seek(mainStart)
-            fd.write(patchImage)
-        return 0
-
-    def PlatformPostBuild(self):
-        # Add a post build step to build BL31 and assemble the FD files
-        op_fv = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
-
-        logging.info("Building TF-A")
-
-        clang_path = shell_environment.GetEnvironment().get_shell_var("CLANG_BIN")
-        logging.critical("clang_path simply = %s" % clang_path)
-
-        # Need to build fiptool separately because the build system will override LIB with LIBC for firmware builds
-        # cmd = "make"
-        # args = " DEBUG=1 fiptool MAKEFLAGS= LIB=\"" + shell_environment.GetEnvironment().get_shell_var("LIB") + "\""
-        # ret = RunCmd(cmd, args, workingdir=self.env.GetValue("ARM_TFA_PATH"))
-        # if ret != 0:
-        #     return ret
-
-        RunCmd('set', '')
-
-        shell_environment.GetEnvironment().insert_path(clang_path)
 
         # Then we can make the firmware images with the fiptool built above
         cmd = "make"
