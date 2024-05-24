@@ -434,23 +434,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         # Then we can make the firmware images with the fiptool built above
         cmd = os.path.join(choco_path, "bin", "make")
-        args = "CC=clang.exe"
-        args += " DEBUG=1 PLAT=" + self.env.GetValue("QEMU_PLATFORM").lower()
-        args += " ARCH=" + self.env.GetValue("TARGET_ARCH").lower()
-        args += " DEBUG=" + str(1 if self.env.GetValue("TARGET").lower() == 'debug' else 0)
-        args += " SPM_MM=1 EL3_EXCEPTION_HANDLING=1 ENABLE_SME_FOR_NS=0 ENABLE_SVE_FOR_NS=0"
-        args += " ENABLE_FEAT_HCX=1" # Features used by hypervisor
-        # args += " FEATURE_DETECTION=1" # Enforces support for features enabled.
-        # args += " BL32=" + os.path.join(op_fv, "BL32_AP_MM.fd")
-        args += " all fip"
-        # args += " -j $(nproc)"
-        ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_TFA_PATH"))
-        if ret != 0:
-            return ret
-
-        # Then we can make the firmware images with the fiptool built above
-        cmd = "make"
-        args = "CC=clang"
+        args = "CC="+clang_exe
         args += " DEBUG=1 PLAT=" + self.env.GetValue("QEMU_PLATFORM").lower()
         args += " ARCH=" + self.env.GetValue("TARGET_ARCH").lower()
         args += " DEBUG=" + str(1 if self.env.GetValue("TARGET").lower() == 'debug' else 0)
