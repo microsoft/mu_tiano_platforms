@@ -403,7 +403,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         # Then we can make the firmware images with the fiptool built above
         cmd = os.path.join(choco_path, "bin", "make")
-        args = "CC=\"" + ClangBin.replace(os.sep, posixpath.sep) + "clang.exe\""
+        args = "CC=clang.exe"
         args += " DEBUG=1 PLAT=" + self.env.GetValue("QEMU_PLATFORM").lower()
         args += " ARCH=" + self.env.GetValue("TARGET_ARCH").lower()
         args += " DEBUG=" + str(1 if self.env.GetValue("TARGET").lower() == 'debug' else 0)
