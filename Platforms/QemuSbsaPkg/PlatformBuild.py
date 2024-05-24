@@ -393,6 +393,12 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
             shell_environment.GetEnvironment().set_shell_var("CLANG_BIN", ClangBin)
 
+        cmd = "make"
+        args = " DEBUG=1 fiptool MAKEFLAGS= LIB=\"" + shell_environment.GetEnvironment().get_shell_var("LIB") + "\""
+        ret = RunCmd(cmd, args, workingdir=self.env.GetValue("ARM_TFA_PATH"))
+        if ret != 0:
+            return ret
+
         path = os.environ["PATH"]
         shell_environment.GetEnvironment().set_path('')
         shell_environment.GetEnvironment().insert_path(ClangBin)
