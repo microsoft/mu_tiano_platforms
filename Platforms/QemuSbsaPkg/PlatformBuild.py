@@ -393,6 +393,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
             shell_environment.GetEnvironment().set_shell_var("CLANG_BIN", ClangBin)
 
+        path = os.environ["PATH"]
+        shell_environment.GetEnvironment().set_path('')
         shell_environment.GetEnvironment().insert_path(ClangBin)
         RunCmd("set", "")
         shell_environment.GetEnvironment().log_environment()
