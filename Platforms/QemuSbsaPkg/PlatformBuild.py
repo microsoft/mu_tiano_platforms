@@ -397,7 +397,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             else:
                 ClangBin_Default += "\\LLVM\\bin\\"
             logging.critical("ClangBin_Default = %s" % ClangBin_Default)
-            clang_exe += ".exe"
         elif HostInfo.os == "Linux":
             ClangBin_Default = "/LLVM/bin/"  #this isn't right
         else:
