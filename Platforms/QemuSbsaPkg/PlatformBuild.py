@@ -181,7 +181,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             HostType = shell_environment.GetEnvironment().get_shell_var("CLANG_VS_HOST")
             if HostType is not None:
                 HostType = HostType.lower()
-                self.Logger.info(
+                logging.info(
                     f"CLANG_VS_HOST defined by environment.  Value is {HostType}")
             else:
                 #figure it out based on host info
@@ -360,7 +360,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             HostType = shell_environment.GetEnvironment().get_shell_var("CLANG_VS_HOST")
             if HostType is not None:
                 HostType = HostType.lower()
-                self.Logger.info(
+                logging.info(
                     f"CLANG_VS_HOST defined by environment.  Value is {HostType}")
             else:
                 #figure it out based on host info
@@ -403,7 +403,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         else:
             pass
         if ClangBin is not None:
-            self.Logger.info("CLANG_BIN is already set.")
+            logging.info("CLANG_BIN is already set.")
         else:
             # see if clang is on path.
             for path_entry in os.getenv("PATH").split(os.pathsep):
