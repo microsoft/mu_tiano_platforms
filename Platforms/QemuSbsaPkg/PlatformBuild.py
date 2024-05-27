@@ -418,7 +418,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         # Need to build fiptool separately because the build system will override LIB with LIBC for firmware builds
         cmd = "make"
-        args = " DEBUG=1 fiptool MAKEFLAGS= LIB=\"" + shell_environment.GetEnvironment().get_shell_var("LIB") + "\""
+        args = " fiptool MAKEFLAGS= LIB=\"" + shell_environment.GetEnvironment().get_shell_var("LIB") + "\""
         ret = RunCmd(cmd, args, workingdir=self.env.GetValue("ARM_TFA_PATH"))
         if ret != 0:
             return ret
@@ -434,7 +434,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         # Then we can make the firmware images with the fiptool built above
         cmd = os.path.join(choco_path, "bin", "make")
         args = "CC="+clang_exe
-        args += " DEBUG=1 PLAT=" + self.env.GetValue("QEMU_PLATFORM").lower()
+        args += " PLAT=" + self.env.GetValue("QEMU_PLATFORM").lower()
         args += " ARCH=" + self.env.GetValue("TARGET_ARCH").lower()
         args += " DEBUG=" + str(1 if self.env.GetValue("TARGET").lower() == 'debug' else 0)
         args += " SPM_MM=1 EL3_EXCEPTION_HANDLING=1 ENABLE_SME_FOR_NS=0 ENABLE_SVE_FOR_NS=0"
