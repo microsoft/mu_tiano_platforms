@@ -416,8 +416,11 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
             shell_environment.GetEnvironment().set_shell_var("CLANG_BIN", ClangBin)
 
+        choco_path = shell_environment.GetEnvironment().get_shell_var("CHOCOLATEYINSTALL")
+        print(f"choco_path = {choco_path}")
+
         # Need to build fiptool separately because the build system will override LIB with LIBC for firmware builds
-        cmd = "make"
+        cmd = os.path.join(choco_path, "bin", "make")
         args = " fiptool MAKEFLAGS= LIB=\"" + shell_environment.GetEnvironment().get_shell_var("LIB") + "\""
         ret = RunCmd(cmd, args, workingdir=self.env.GetValue("ARM_TFA_PATH"))
         if ret != 0:
@@ -428,8 +431,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         shell_environment.GetEnvironment().set_path('')
         shell_environment.GetEnvironment().insert_path(ClangBin)
         RunCmd("set", "")
-        choco_path = shell_environment.GetEnvironment().get_shell_var("CHOCOLATEYINSTALL")
-        print(f"choco_path = {choco_path}")
 
         # Then we can make the firmware images with the fiptool built above
         cmd = os.path.join(choco_path, "bin", "make")
