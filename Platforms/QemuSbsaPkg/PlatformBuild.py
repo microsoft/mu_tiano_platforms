@@ -346,6 +346,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         logging.info("Building TF-A")
 
+        path = os.environ["PATH"]
+        shell_environment.GetEnvironment().set_path('')
         interesting_keys = ["LIB", "LIBPATH", "VCToolsInstallDir", "Path"]
         if self.env.GetValue("TOOL_CHAIN_TAG") == "CLANGPDB":
             HostInfo = GetHostInfo()
@@ -427,8 +429,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             return ret
 
         logging.info(f"ClangBin = {ClangBin}")
-        path = os.environ["PATH"]
-        shell_environment.GetEnvironment().set_path('')
         shell_environment.GetEnvironment().insert_path(ClangBin)
         RunCmd("set", "")
 
