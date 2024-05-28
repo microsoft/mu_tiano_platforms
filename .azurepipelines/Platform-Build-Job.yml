@@ -95,7 +95,6 @@ jobs:
           tool_chain_tag: $(tool_chain_tag)
           build_pkg: ${{ item.Value.BuildPackage }}
           build_target: ${{ item.Value.BuildTarget }}
-          build_arch: ${{ item.Value.BuildArch }}
           build_file: ${{ item.Value.BuildFile }}
           build_flags: ${{ item.Value.BuildFlags }}
           run_flags: ${{ item.Value.RunFlags }}
