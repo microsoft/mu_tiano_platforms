@@ -432,8 +432,6 @@ InitializeSbsaQemuAcpiDxe (
 
   // Parse the device tree and get the number of CPUs
   NumCores = FdtHelperCountCpus ();
-  DEBUG ((DEBUG_ERROR, "Number of Cores: %d\n", NumCores));
-  DEBUG ((DEBUG_ERROR, "Number of Cores from PCD: %d\n", PcdGet32 (PcdCoreCount)));
   ASSERT (PcdGet32 (PcdCoreCount) == NumCores);
 
   // Check if ACPI Table Protocol has been installed
