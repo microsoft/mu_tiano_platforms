@@ -10,7 +10,6 @@ import os
 import uuid
 from io import StringIO
 from pathlib import Path
-import posixpath
 
 from edk2toolext.environment import shell_environment
 from edk2toolext.environment.uefi_build import UefiBuilder
@@ -278,7 +277,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
             "txt": logs to plain text file
         """
-        return logging.DEBUG
+        return logging.INFO
         return super().GetLoggingLevel(loggerType)
 
     def SetPlatformEnv(self):
