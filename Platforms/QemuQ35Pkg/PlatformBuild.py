@@ -201,9 +201,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
     def RetrieveCommandLineOptions(self, args):
         '''  Retrieve command line options from the argparser '''
-        if args.build_arch.upper() != "IA32,X64":
-            raise Exception("Invalid Arch Specified.  Please see comments in PlatformBuild.py::PlatformBuilder::AddCommandLineOptions")
-
         self.codeql = CommonPlatform.is_codeql_enabled(args)
 
     def GetWorkspaceRoot(self):

@@ -167,11 +167,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         return super().CleanTree(RemoveConfTemplateFilesToo)
 
-    def RetrieveCommandLineOptions(self, args):
-        '''  Retrieve command line options from the argparser '''
-        if args.build_arch.upper() != "AARCH64":
-            raise Exception("Invalid Arch Specified.  Please see comments in PlatformBuild.py::PlatformBuilder::AddCommandLineOptions")
-
     def GetWorkspaceRoot(self):
         ''' get WorkspacePath '''
         return CommonPlatform.WorkspaceRoot
