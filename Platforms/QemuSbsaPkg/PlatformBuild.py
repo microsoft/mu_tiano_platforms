@@ -167,21 +167,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         return super().CleanTree(RemoveConfTemplateFilesToo)
 
-    def AddCommandLineOptions(self, parserObj):
-        ''' Add command line options to the argparser '''
-
-        # In an effort to support common server based builds this parameter is added.  It is
-        # checked for correctness but is never uses as this platform only supports a single set of
-        # architectures.
-        parserObj.add_argument('-a', "--arch", dest="build_arch", type=str, default="AARCH64",
-            help="Optional - CSV of architecture to build.  AARCH64 is used for PEI and "
-            "DXE and is the only valid option for this platform.")
-
-    def RetrieveCommandLineOptions(self, args):
-        '''  Retrieve command line options from the argparser '''
-        if args.build_arch.upper() != "AARCH64":
-            raise Exception("Invalid Arch Specified.  Please see comments in PlatformBuild.py::PlatformBuilder::AddCommandLineOptions")
-
     def GetWorkspaceRoot(self):
         ''' get WorkspacePath '''
         return CommonPlatform.WorkspaceRoot
