@@ -29,6 +29,7 @@ extends:
     container_build: true
     os_type: Linux
     rust_build: true
+    tool_chain_tag: 'CLANGPDB'
     extra_cargo_steps:
       - script: pip install -r pip-requirements.txt --upgrade
         displayName: Install and Upgrade pip Modules

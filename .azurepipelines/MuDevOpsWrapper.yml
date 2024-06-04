@@ -73,6 +73,10 @@ parameters:
   displayName: Whether Rust code is being built
   type: boolean
   default: false
+- name: tool_chain_tag
+  displayName: Tool Chain (e.g. VS2022)
+  type: string
+  default: '$(tool_chain_tag)'
 - name: extra_cargo_steps
   displayName: Extra Steps to Run Before Standard Cargo Steps
   type: stepList
@@ -94,7 +98,7 @@ jobs:
     os_type: ${{ parameters.os_type }}
     pool_name: ${{ parameters.pool_name }}
     extra_install_step: ${{ parameters.extra_install_step }}
-    tool_chain_tag: $(tool_chain_tag)
+    tool_chain_tag: ${{ parameters.tool_chain_tag }}
     vm_image: $(vm_image)
     container_build: ${{ parameters.container_build }}
     rust_build: ${{ parameters.rust_build }}

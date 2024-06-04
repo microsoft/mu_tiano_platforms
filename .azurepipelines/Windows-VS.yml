@@ -28,6 +28,7 @@ extends:
     do_pr_eval: true
     os_type: Windows_NT
     rust_build: true
+    tool_chain_tag: 'CLANGPDB'
     extra_cargo_steps:
       - script: pip install -r pip-requirements.txt --upgrade
         displayName: Install and Upgrade pip Modules
