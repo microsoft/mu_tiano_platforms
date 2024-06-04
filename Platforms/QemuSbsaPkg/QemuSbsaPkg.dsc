@@ -1019,7 +1019,6 @@
   #
   # Platform Driver
   #
-  EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
   QemuPkg/VirtioBlkDxe/VirtioBlk.inf
   QemuPkg/VirtioScsiDxe/VirtioScsi.inf
   QemuPkg/VirtioNetDxe/VirtioNet.inf
