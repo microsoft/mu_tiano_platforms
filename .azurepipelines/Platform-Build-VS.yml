@@ -28,7 +28,6 @@ jobs:
       QemuSbsa_DEBUG:
         BuildPackage: QemuSbsaPkg
         BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
-        BuildArch: AARCH64
         BuildFlags: "BLD_*_QEMU_CORE_NUM=2"
         BuildTarget: "DEBUG"
         BuildExtraTag: ""
