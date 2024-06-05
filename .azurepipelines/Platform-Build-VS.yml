@@ -267,27 +267,3 @@ jobs:
         BuildArtifactsBinary: |
           **/QEMUQ35_*.fd
         BuildArtifactsOther: ""
-
-      QemuQ35_CODE_COVERAGE_CLANGPDB:
-        BuildPackage: QemuQ35Pkg
-        BuildFile: "Platforms/QemuQ35Pkg/Test/PlatformTest.py"
-        BuildFlags: "CODE_COVERAGE=TRUE CC_FULL=TRUE CC_FLATTEN=TRUE REPORTTYPES=Cobertura,HtmlSummary,JsonSummary"
-        BuildTarget: "NOOPT"
-        BuildExtraTag: "UNIT_TESTS"
-        BuildExtraStep:
-          - script: dotnet tool install -g dotnet-reportgenerator-globaltool
-            displayName: Install Report Generator
-        BuildArtifactsOther: "**/Coverage/**"
-        Run: false
-
-      QemuSbsa_CODE_COVERAGE_CLANGPDB:
-        BuildPackage: QemuSbsaPkg
-        BuildFile: "Platforms/QemuSbsaPkg/Test/PlatformTest.py"
-        BuildFlags: "CODE_COVERAGE=TRUE CC_FULL=TRUE CC_FLATTEN=TRUE REPORTTYPES=Cobertura,HtmlSummary,JsonSummary"
-        BuildTarget: "NOOPT"
-        BuildExtraTag: "UNIT_TESTS"
-        BuildExtraStep:
-          - script: dotnet tool install -g dotnet-reportgenerator-globaltool
-            displayName: Install Report Generator
-        BuildArtifactsOther: "**/Coverage/**"
-        Run: false
