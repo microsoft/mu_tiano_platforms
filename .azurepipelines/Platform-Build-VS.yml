@@ -10,8 +10,8 @@ resources:
     - repository: mu_devops
       type: github
       endpoint: microsoft
-      name: kuqin12/mu_devops
-      ref: add_clangpdb
+      name: microsoft/mu_devops
+      ref: main
 
 variables:
 - group: tool-chain-windows-visual-studio-latest
@@ -21,15 +21,181 @@ jobs:
   parameters:
     extra_install_step:
     - template: Steps/InstallCoverageTools.yml@mu_devops
+    tool_chain_tag: 'VS2022'
+    vm_image: $(vm_image)
+    os_type: Windows_NT
+    build_matrix:
+      QemuQ35_DEBUG:
+        BuildPackage: QemuQ35Pkg
+        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+        BuildFlags: ""
+        BuildTarget: "DEBUG"
+        BuildExtraTag: ""
+        BuildExtraStep:
+          - template: Steps/RustSetupSteps.yml@mu_devops
+        Run: true
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+        BuildArtifactsBinary: |
+          **/QEMUQ35_*.fd
+        BuildArtifactsOther: "**/unit_test_results/*"
+
+      QemuQ35_RELEASE:
+        BuildPackage: QemuQ35Pkg
+        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+        BuildFlags: ""
+        BuildTarget: "RELEASE"
+        BuildExtraTag: ""
+        BuildExtraStep:
+          - template: Steps/RustSetupSteps.yml@mu_devops
+        Run: true
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+        BuildArtifactsBinary: |
+          **/QEMUQ35_*.fd
+        BuildArtifactsOther: "**/unit_test_results/*"
+
+      QemuQ35_DEBUG_ARM:
+        BuildPackage: QemuQ35Pkg
+        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+        BuildFlags: ""
+        BuildTarget: "DEBUG"
+        BuildExtraTag: "ON_ARM"
+        BuildExtraStep:
+          - script: echo No extra steps provided
+        Run: false
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+        SelfHostAgent: true
+        BuildArtifactsBinary: |
+          **/QEMUQ35_*.fd
+          **/*/*TestApp.efi
+        BuildArtifactsOther: "**/unit_test_results/*"
+
+      QemuQ35_RELEASE_ARM:
+        BuildPackage: QemuQ35Pkg
+        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+        BuildFlags: ""
+        BuildTarget: "RELEASE"
+        BuildExtraTag: "ON_ARM"
+        BuildExtraStep:
+          - script: echo No extra steps provided
+        Run: false
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+        SelfHostAgent: true
+        BuildArtifactsBinary: |
+          **/QEMUQ35_*.fd
+          **/*/*TestApp.efi
+        BuildArtifactsOther: "**/unit_test_results/*"
+
+      QemuQ35_NO_SMM_RELEASE:
+        BuildPackage: QemuQ35Pkg
+        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+        BuildFlags: "BLD_*_SMM_ENABLED=FALSE"
+        BuildTarget: "RELEASE"
+        BuildExtraTag: "NO_SMM"
+        BuildExtraStep:
+          - template: Steps/RustSetupSteps.yml@mu_devops
+        Run: true
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE"
+        BuildArtifactsBinary: |
+          **/QEMUQ35_*.fd
+        BuildArtifactsOther: ""
+
+      QemuQ35_CODE_COVERAGE:
+        BuildPackage: QemuQ35Pkg
+        BuildFile: "Platforms/QemuQ35Pkg/Test/PlatformTest.py"
+        BuildFlags: "CODE_COVERAGE=TRUE CC_FULL=TRUE CC_FLATTEN=TRUE REPORTTYPES=Cobertura,HtmlSummary,JsonSummary"
+        BuildTarget: "NOOPT"
+        BuildExtraTag: "UNIT_TESTS"
+        BuildExtraStep:
+          - script: dotnet tool install -g dotnet-reportgenerator-globaltool
+            displayName: Install Report Generator
+        BuildArtifactsOther: "**/Coverage/**"
+        Run: false
+
+      QemuSbsa_CODE_COVERAGE:
+        BuildPackage: QemuSbsaPkg
+        BuildFile: "Platforms/QemuSbsaPkg/Test/PlatformTest.py"
+        BuildFlags: "CODE_COVERAGE=TRUE CC_FULL=TRUE CC_FLATTEN=TRUE REPORTTYPES=Cobertura,HtmlSummary,JsonSummary"
+        BuildTarget: "NOOPT"
+        BuildExtraTag: "UNIT_TESTS"
+        BuildExtraStep:
+          - script: dotnet tool install -g dotnet-reportgenerator-globaltool
+            displayName: Install Report Generator
+        BuildArtifactsOther: "**/Coverage/**"
+        Run: false
+
+- template: Platform-Build-Job.yml
+  parameters:
+    extra_install_step:
+    - template: Steps/InstallCoverageTools.yml@mu_devops
     tool_chain_tag: 'CLANGPDB'
     vm_image: $(vm_image)
     os_type: Windows_NT
     build_matrix:
+      QemuQ35_DEBUG:
+        BuildPackage: QemuQ35Pkg
+        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+        BuildFlags: ""
+        BuildTarget: "DEBUG"
+        BuildExtraTag: "CLANGPDB"
+        BuildExtraStep:
+          - template: Steps/RustSetupSteps.yml@mu_devops
+        Run: true
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+        BuildArtifactsBinary: |
+          **/QEMUQ35_*.fd
+        BuildArtifactsOther: "**/unit_test_results/*"
+
+      QemuQ35_RELEASE:
+        BuildPackage: QemuQ35Pkg
+        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+        BuildFlags: ""
+        BuildTarget: "RELEASE"
+        BuildExtraTag: "CLANGPDB"
+        BuildExtraStep:
+          - template: Steps/RustSetupSteps.yml@mu_devops
+        Run: true
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+        BuildArtifactsBinary: |
+          **/QEMUQ35_*.fd
+        BuildArtifactsOther: "**/unit_test_results/*"
+
+      QemuQ35_DEBUG_ARM:
+        BuildPackage: QemuQ35Pkg
+        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+        BuildFlags: ""
+        BuildTarget: "DEBUG"
+        BuildExtraTag: "CLANGPDB_ON_ARM"
+        BuildExtraStep:
+          - script: echo No extra steps provided
+        Run: false
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+        SelfHostAgent: true
+        BuildArtifactsBinary: |
+          **/QEMUQ35_*.fd
+          **/*/*TestApp.efi
+        BuildArtifactsOther: "**/unit_test_results/*"
+
+      QemuQ35_RELEASE_ARM:
+        BuildPackage: QemuQ35Pkg
+        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+        BuildFlags: ""
+        BuildTarget: "RELEASE"
+        BuildExtraTag: "CLANGPDB_ON_ARM"
+        BuildExtraStep:
+          - script: echo No extra steps provided
+        Run: false
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+        SelfHostAgent: true
+        BuildArtifactsBinary: |
+          **/QEMUQ35_*.fd
+          **/*/*TestApp.efi
+        BuildArtifactsOther: "**/unit_test_results/*"
+
       QemuSbsa_DEBUG:
         BuildPackage: QemuSbsaPkg
         BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
         BuildTarget: "DEBUG"
-        BuildExtraTag: ""
+        BuildExtraTag: "CLANGPDB"
         BuildExtraStep:
           - template: Steps/RustSetupSteps.yml@mu_devops
           - template: Steps/SetupToolChainTagPreReqs.yml@mu_devops
@@ -39,3 +205,89 @@ jobs:
           **/QEMU_EFI.fd
           **/SECURE_FLASH0.fd
         BuildArtifactsOther: "**/unit_test_results/*"
+
+      QemuSbsa_RELEASE:
+        BuildPackage: QemuSbsaPkg
+        BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+        BuildFlags: ""
+        BuildTarget: "RELEASE"
+        BuildExtraTag: "CLANGPDB"
+        BuildExtraStep:
+          - template: Steps/RustSetupSteps.yml@mu_devops
+          - template: Steps/SetupToolChainTagPreReqs.yml@mu_devops
+        Run: true
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+        BuildArtifactsBinary: |
+          **/QEMU_EFI.fd
+          **/SECURE_FLASH0.fd
+        BuildArtifactsOther: "**/unit_test_results/*"
+
+      QemuSbsa_DEBUG_ARM:
+        BuildPackage: QemuSbsaPkg
+        BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+        BuildFlags: ""
+        BuildTarget: "DEBUG"
+        BuildExtraTag: "CLANGPDB_ON_AARCH64"
+        BuildExtraStep:
+          - script: echo No extra steps provided
+        Run: true
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+        SelfHostAgent: true
+        BuildArtifactsBinary: |
+          **/QEMU_EFI.fd
+          **/SECURE_FLASH0.fd
+        BuildArtifactsOther: "**/unit_test_results/*"
+
+      QemuSbsa_RELEASE_ARM:
+        BuildPackage: QemuSbsaPkg
+        BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+        BuildFlags: ""
+        BuildTarget: "RELEASE"
+        BuildExtraTag: "CLANGPDB_ON_AARCH64"
+        BuildExtraStep:
+          - script: echo No extra steps provided
+        Run: true
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+        SelfHostAgent: true
+        BuildArtifactsBinary: |
+          **/QEMU_EFI.fd
+          **/SECURE_FLASH0.fd
+        BuildArtifactsOther: "**/unit_test_results/*"
+
+      QemuQ35_NO_SMM_RELEASE:
+        BuildPackage: QemuQ35Pkg
+        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+        BuildFlags: "BLD_*_SMM_ENABLED=FALSE"
+        BuildTarget: "RELEASE"
+        BuildExtraTag: "CLANGPDB_NO_SMM"
+        BuildExtraStep:
+          - template: Steps/RustSetupSteps.yml@mu_devops
+        Run: true
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE"
+        BuildArtifactsBinary: |
+          **/QEMUQ35_*.fd
+        BuildArtifactsOther: ""
+
+      QemuQ35_CODE_COVERAGE:
+        BuildPackage: QemuQ35Pkg
+        BuildFile: "Platforms/QemuQ35Pkg/Test/PlatformTest.py"
+        BuildFlags: "CODE_COVERAGE=TRUE CC_FULL=TRUE CC_FLATTEN=TRUE REPORTTYPES=Cobertura,HtmlSummary,JsonSummary"
+        BuildTarget: "NOOPT"
+        BuildExtraTag: "CLANGPDB_UNIT_TESTS"
+        BuildExtraStep:
+          - script: dotnet tool install -g dotnet-reportgenerator-globaltool
+            displayName: Install Report Generator
+        BuildArtifactsOther: "**/Coverage/**"
+        Run: false
+
+      QemuSbsa_CODE_COVERAGE:
+        BuildPackage: QemuSbsaPkg
+        BuildFile: "Platforms/QemuSbsaPkg/Test/PlatformTest.py"
+        BuildFlags: "CODE_COVERAGE=TRUE CC_FULL=TRUE CC_FLATTEN=TRUE REPORTTYPES=Cobertura,HtmlSummary,JsonSummary"
+        BuildTarget: "NOOPT"
+        BuildExtraTag: "CLANGPDB_UNIT_TESTS"
+        BuildExtraStep:
+          - script: dotnet tool install -g dotnet-reportgenerator-globaltool
+            displayName: Install Report Generator
+        BuildArtifactsOther: "**/Coverage/**"
+        Run: false
