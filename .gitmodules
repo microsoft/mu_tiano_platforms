@@ -8,7 +8,7 @@
 	branch = release/202302
 [submodule "Common/MU"]
 	path = Common/MU
-	url = https://github.com/microsoft/mu_plus.git
+	url = https://github.com/kuqin12/mu_plus.git
 	branch = release/202302
 [submodule "Common/MU_OEM_SAMPLE"]
 	path = Common/MU_OEM_SAMPLE
