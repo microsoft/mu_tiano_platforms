@@ -159,38 +159,6 @@ jobs:
           **/QEMUQ35_*.fd
         BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuQ35_DEBUG_ARM_CLANGPDB:
-        BuildPackage: QemuQ35Pkg
-        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-        BuildFlags: ""
-        BuildTarget: "DEBUG"
-        BuildExtraTag: "ON_ARM"
-        BuildExtraStep:
-          - script: echo No extra steps provided
-        Run: false
-        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-        SelfHostAgent: true
-        BuildArtifactsBinary: |
-          **/QEMUQ35_*.fd
-          **/*/*TestApp.efi
-        BuildArtifactsOther: "**/unit_test_results/*"
-
-      QemuQ35_RELEASE_ARM_CLANGPDB:
-        BuildPackage: QemuQ35Pkg
-        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-        BuildFlags: ""
-        BuildTarget: "RELEASE"
-        BuildExtraTag: "ON_ARM"
-        BuildExtraStep:
-          - script: echo No extra steps provided
-        Run: false
-        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-        SelfHostAgent: true
-        BuildArtifactsBinary: |
-          **/QEMUQ35_*.fd
-          **/*/*TestApp.efi
-        BuildArtifactsOther: "**/unit_test_results/*"
-
       QemuSbsa_DEBUG_CLANGPDB:
         BuildPackage: QemuSbsaPkg
         BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
@@ -221,49 +189,3 @@ jobs:
           **/QEMU_EFI.fd
           **/SECURE_FLASH0.fd
         BuildArtifactsOther: "**/unit_test_results/*"
-
-      QemuSbsa_DEBUG_ARM_CLANGPDB:
-        BuildPackage: QemuSbsaPkg
-        BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
-        BuildFlags: ""
-        BuildTarget: "DEBUG"
-        BuildExtraTag: "ON_AARCH64"
-        BuildExtraStep:
-          - script: echo No extra steps provided
-        Run: true
-        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-        SelfHostAgent: true
-        BuildArtifactsBinary: |
-          **/QEMU_EFI.fd
-          **/SECURE_FLASH0.fd
-        BuildArtifactsOther: "**/unit_test_results/*"
-
-      QemuSbsa_RELEASE_ARM_CLANGPDB:
-        BuildPackage: QemuSbsaPkg
-        BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
-        BuildFlags: ""
-        BuildTarget: "RELEASE"
-        BuildExtraTag: "ON_AARCH64"
-        BuildExtraStep:
-          - script: echo No extra steps provided
-        Run: true
-        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-        SelfHostAgent: true
-        BuildArtifactsBinary: |
-          **/QEMU_EFI.fd
-          **/SECURE_FLASH0.fd
-        BuildArtifactsOther: "**/unit_test_results/*"
-
-      QemuQ35_NO_SMM_RELEASE_CLANGPDB:
-        BuildPackage: QemuQ35Pkg
-        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-        BuildFlags: "BLD_*_SMM_ENABLED=FALSE"
-        BuildTarget: "RELEASE"
-        BuildExtraTag: "NO_SMM"
-        BuildExtraStep:
-          - template: Steps/RustSetupSteps.yml@mu_devops
-        Run: true
-        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE"
-        BuildArtifactsBinary: |
-          **/QEMUQ35_*.fd
-        BuildArtifactsOther: ""
