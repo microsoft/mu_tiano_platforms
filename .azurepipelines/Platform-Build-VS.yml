@@ -131,12 +131,12 @@ jobs:
     vm_image: $(vm_image)
     os_type: Windows_NT
     build_matrix:
-      QemuQ35_DEBUG:
+      QemuQ35_DEBUG_CLANGPDB:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
         BuildFlags: ""
         BuildTarget: "DEBUG"
-        BuildExtraTag: "CLANGPDB"
+        BuildExtraTag: ""
         BuildExtraStep:
           - template: Steps/RustSetupSteps.yml@mu_devops
         Run: true
@@ -145,12 +145,12 @@ jobs:
           **/QEMUQ35_*.fd
         BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuQ35_RELEASE:
+      QemuQ35_RELEASE_CLANGPDB:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
         BuildFlags: ""
         BuildTarget: "RELEASE"
-        BuildExtraTag: "CLANGPDB"
+        BuildExtraTag: ""
         BuildExtraStep:
           - template: Steps/RustSetupSteps.yml@mu_devops
         Run: true
@@ -159,12 +159,12 @@ jobs:
           **/QEMUQ35_*.fd
         BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuQ35_DEBUG_ARM:
+      QemuQ35_DEBUG_ARM_CLANGPDB:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
         BuildFlags: ""
         BuildTarget: "DEBUG"
-        BuildExtraTag: "CLANGPDB_ON_ARM"
+        BuildExtraTag: "ON_ARM"
         BuildExtraStep:
           - script: echo No extra steps provided
         Run: false
@@ -175,12 +175,12 @@ jobs:
           **/*/*TestApp.efi
         BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuQ35_RELEASE_ARM:
+      QemuQ35_RELEASE_ARM_CLANGPDB:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
         BuildFlags: ""
         BuildTarget: "RELEASE"
-        BuildExtraTag: "CLANGPDB_ON_ARM"
+        BuildExtraTag: "ON_ARM"
         BuildExtraStep:
           - script: echo No extra steps provided
         Run: false
@@ -191,11 +191,11 @@ jobs:
           **/*/*TestApp.efi
         BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuSbsa_DEBUG:
+      QemuSbsa_DEBUG_CLANGPDB:
         BuildPackage: QemuSbsaPkg
         BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
         BuildTarget: "DEBUG"
-        BuildExtraTag: "CLANGPDB"
+        BuildExtraTag: ""
         BuildExtraStep:
           - template: Steps/RustSetupSteps.yml@mu_devops
           - template: Steps/SetupToolChainTagPreReqs.yml@mu_devops
@@ -206,12 +206,12 @@ jobs:
           **/SECURE_FLASH0.fd
         BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuSbsa_RELEASE:
+      QemuSbsa_RELEASE_CLANGPDB:
         BuildPackage: QemuSbsaPkg
         BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
         BuildFlags: ""
         BuildTarget: "RELEASE"
-        BuildExtraTag: "CLANGPDB"
+        BuildExtraTag: ""
         BuildExtraStep:
           - template: Steps/RustSetupSteps.yml@mu_devops
           - template: Steps/SetupToolChainTagPreReqs.yml@mu_devops
@@ -222,12 +222,12 @@ jobs:
           **/SECURE_FLASH0.fd
         BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuSbsa_DEBUG_ARM:
+      QemuSbsa_DEBUG_ARM_CLANGPDB:
         BuildPackage: QemuSbsaPkg
         BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
         BuildFlags: ""
         BuildTarget: "DEBUG"
-        BuildExtraTag: "CLANGPDB_ON_AARCH64"
+        BuildExtraTag: "ON_AARCH64"
         BuildExtraStep:
           - script: echo No extra steps provided
         Run: true
@@ -238,12 +238,12 @@ jobs:
           **/SECURE_FLASH0.fd
         BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuSbsa_RELEASE_ARM:
+      QemuSbsa_RELEASE_ARM_CLANGPDB:
         BuildPackage: QemuSbsaPkg
         BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
         BuildFlags: ""
         BuildTarget: "RELEASE"
-        BuildExtraTag: "CLANGPDB_ON_AARCH64"
+        BuildExtraTag: "ON_AARCH64"
         BuildExtraStep:
           - script: echo No extra steps provided
         Run: true
@@ -254,12 +254,12 @@ jobs:
           **/SECURE_FLASH0.fd
         BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuQ35_NO_SMM_RELEASE:
+      QemuQ35_NO_SMM_RELEASE_CLANGPDB:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
         BuildFlags: "BLD_*_SMM_ENABLED=FALSE"
         BuildTarget: "RELEASE"
-        BuildExtraTag: "CLANGPDB_NO_SMM"
+        BuildExtraTag: "NO_SMM"
         BuildExtraStep:
           - template: Steps/RustSetupSteps.yml@mu_devops
         Run: true
@@ -268,24 +268,24 @@ jobs:
           **/QEMUQ35_*.fd
         BuildArtifactsOther: ""
 
-      QemuQ35_CODE_COVERAGE:
+      QemuQ35_CODE_COVERAGE_CLANGPDB:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/Test/PlatformTest.py"
         BuildFlags: "CODE_COVERAGE=TRUE CC_FULL=TRUE CC_FLATTEN=TRUE REPORTTYPES=Cobertura,HtmlSummary,JsonSummary"
         BuildTarget: "NOOPT"
-        BuildExtraTag: "CLANGPDB_UNIT_TESTS"
+        BuildExtraTag: "UNIT_TESTS"
         BuildExtraStep:
           - script: dotnet tool install -g dotnet-reportgenerator-globaltool
             displayName: Install Report Generator
         BuildArtifactsOther: "**/Coverage/**"
         Run: false
 
-      QemuSbsa_CODE_COVERAGE:
+      QemuSbsa_CODE_COVERAGE_CLANGPDB:
         BuildPackage: QemuSbsaPkg
         BuildFile: "Platforms/QemuSbsaPkg/Test/PlatformTest.py"
         BuildFlags: "CODE_COVERAGE=TRUE CC_FULL=TRUE CC_FLATTEN=TRUE REPORTTYPES=Cobertura,HtmlSummary,JsonSummary"
         BuildTarget: "NOOPT"
-        BuildExtraTag: "CLANGPDB_UNIT_TESTS"
+        BuildExtraTag: "UNIT_TESTS"
         BuildExtraStep:
           - script: dotnet tool install -g dotnet-reportgenerator-globaltool
             displayName: Install Report Generator
