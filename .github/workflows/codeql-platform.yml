@@ -125,6 +125,7 @@ jobs:
       matrix:
         build_file: ${{ fromJson(needs.gather_build_files.outputs.platform_build_files) }}
         include:
+          - archs: IA32,X64
           - tool_chain_tag: VS2022
 
     steps:
@@ -287,7 +288,7 @@ jobs:
       if: steps.get_platform_info.outputs.setup_supported == 'true'
       shell: pwsh
       working-directory: "Z:"
-      run: stuart_setup -c ${{ matrix.build_file }} -t DEBUG TOOL_CHAIN_TAG=${{ matrix.tool_chain_tag }}
+      run: stuart_setup -c ${{ matrix.build_file }} -t DEBUG -a ${{ matrix.archs }} TOOL_CHAIN_TAG=${{ matrix.tool_chain_tag }}
 
     - name: Upload Setup Log As An Artifact
       uses: actions/upload-artifact@v4
@@ -303,7 +304,7 @@ jobs:
       if: steps.get_platform_info.outputs.ci_setup_supported == 'true'
       shell: pwsh
       working-directory: "Z:"
-      run: stuart_ci_setup -c ${{ matrix.build_file }} -t DEBUG TOOL_CHAIN_TAG=${{ matrix.tool_chain_tag }}
+      run: stuart_ci_setup -c ${{ matrix.build_file }} -t DEBUG -a ${{ matrix.archs }} TOOL_CHAIN_TAG=${{ matrix.tool_chain_tag }}
 
     - name: Upload CI Setup Log As An Artifact
       uses: actions/upload-artifact@v4
@@ -318,7 +319,7 @@ jobs:
     - name: Update
       shell: pwsh
       working-directory: "Z:"
-      run: stuart_update -c ${{ matrix.build_file }} -t DEBUG TOOL_CHAIN_TAG=${{ matrix.tool_chain_tag }}
+      run: stuart_update -c ${{ matrix.build_file }} -t DEBUG -a ${{ matrix.archs }} TOOL_CHAIN_TAG=${{ matrix.tool_chain_tag }}
 
     - name: Upload Update Log As An Artifact
       uses: actions/upload-artifact@v4
@@ -396,7 +397,7 @@ jobs:
       if: steps.codeqlcli_cache.outputs.cache-hit != 'true'
       shell: pwsh
       working-directory: "Z:"
-      run: stuart_update -c ${{ matrix.build_file }} -t DEBUG TOOL_CHAIN_TAG=${{ matrix.tool_chain_tag }} --codeql
+      run: stuart_update -c ${{ matrix.build_file }} -t DEBUG -a ${{ matrix.archs }} TOOL_CHAIN_TAG=${{ matrix.tool_chain_tag }} --codeql
 
     - name: Find pytool Plugin Directory
       id: find_pytool_dir
