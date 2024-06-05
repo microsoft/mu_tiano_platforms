@@ -120,7 +120,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
                 "TOOL_CHAIN_TAG", ""
             )
         if actual_tool_chain_tag.upper().startswith("GCC"):
-            scopes += ("gcc_aarch64_linux")
+            scopes += ("gcc_aarch64_linux",)
         return scopes
 
     def FilterPackagesToTest(self, changedFilesList: list, potentialPackagesList: list) -> list:
@@ -232,7 +232,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                 "TOOL_CHAIN_TAG", ""
             )
         if actual_tool_chain_tag.upper().startswith("GCC"):
-            scopes += ("gcc_aarch64_linux")
+            scopes += ("gcc_aarch64_linux",)
         return scopes
 
     def GetName(self):
