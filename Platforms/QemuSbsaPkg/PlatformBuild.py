@@ -380,6 +380,13 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             else:
                 clang_exe = "clang"
 
+        # Need to build fiptool separately because the build system will override LIB with LIBC for firmware builds
+        cmd = "make"
+        args = " fiptool MAKEFLAGS= LIB=\"" + shell_environment.GetEnvironment().get_shell_var("LIB") + "\""
+        ret = RunCmd(cmd, args, workingdir=self.env.GetValue("ARM_TFA_PATH"))
+        if ret != 0:
+            return ret
+
         # Then we can make the firmware images with the fiptool built above
         cmd = "make"
         if self.env.GetValue("TOOL_CHAIN_TAG") == "CLANGPDB":
