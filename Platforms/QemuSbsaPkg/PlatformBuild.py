@@ -332,7 +332,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         path = os.environ["PATH"]
         shell_environment.GetEnvironment().set_path('')
-        interesting_keys = ["LIB", "LIBPATH", "VCToolsInstallDir", "Path"]
+        interesting_keys = ["Path"]
         if self.env.GetValue("TOOL_CHAIN_TAG") == "CLANGPDB":
             HostInfo = GetHostInfo()
 
@@ -371,44 +371,24 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             for (k, v) in vs_vars.items():
                 shell_env.set_shell_var(k, v)
 
-        HostInfo = GetHostInfo()
-        clang_exe = "clang.exe" if HostInfo.os == "Windows" else "clang"
-        ClangBin = shell_environment.GetEnvironment().get_shell_var("CLANG_BIN")
-        ClangBin_Default = "UNDEFINED"
-
-        if HostInfo.os == "Windows":
-            ClangBin_Default = shell_environment.GetEnvironment().get_shell_var("AGENT_TEMPDIRECTORY")
-            if ClangBin_Default is None:
-                ClangBin_Default = "C:\\Program Files\\LLVM\\bin\\\\"  #need to escape the last slash as it seems to be removed
+        if self.env.GetValue("TOOL_CHAIN_TAG") == "CLANGPDB":
+            if os.name == 'nt':
+                clang_exe = "clang.exe"
+                choco_path = shell_environment.GetEnvironment().get_shell_var("CHOCOLATEYINSTALL")
+                shell_environment.GetEnvironment().insert_path(os.path.join(choco_path, "bin"))
+                shell_environment.GetEnvironment().insert_path(shell_environment.GetEnvironment().get_shell_var("CLANG_BIN"))
             else:
-                ClangBin_Default += "\\LLVM\\bin\\"
-            logging.critical("ClangBin_Default = %s" % ClangBin_Default)
-        elif HostInfo.os == "Linux":
-            ClangBin_Default = "/LLVM/bin/"  #this isn't right
-        else:
-            pass
-        if ClangBin is not None:
-            logging.info("CLANG_BIN is already set.")
-        else:
-            # see if clang is on path.
-            for path_entry in os.getenv("PATH").split(os.pathsep):
-                path_entry = os.path.normpath(path_entry)
-                if os.path.isfile(os.path.join(path_entry, clang_exe)):
-                    ClangBin = os.path.abspath(path_entry)
-                    break
-            if ClangBin is None:
-                # Didn't find it on path - try the install default.
-                ClangBin = ClangBin_Default
-
-            shell_environment.GetEnvironment().set_shell_var("CLANG_BIN", ClangBin)
-
-        choco_path = shell_environment.GetEnvironment().get_shell_var("CHOCOLATEYINSTALL")
-        shell_environment.GetEnvironment().insert_path(os.path.join(choco_path, "bin"))
-        shell_environment.GetEnvironment().insert_path(ClangBin)
+                clang_exe = "clang"
 
         # Then we can make the firmware images with the fiptool built above
         cmd = "make"
-        args = "CC="+clang_exe
+        if self.env.GetValue("TOOL_CHAIN_TAG") == "CLANGPDB":
+            args = "CC="+clang_exe
+        elif self.env.GetValue("TOOL_CHAIN_TAG") == "GCC5":
+            args = "CROSS_COMPILE=" + shell_environment.GetEnvironment().get_shell_var("GCC5_AARCH64_PREFIX")
+        else:
+            logging.error("Unsupported toolchain")
+            return -1
         args += " PLAT=" + self.env.GetValue("QEMU_PLATFORM").lower()
         args += " ARCH=" + self.env.GetValue("TARGET_ARCH").lower()
         args += " DEBUG=" + str(1 if self.env.GetValue("TARGET").lower() == 'debug' else 0)
