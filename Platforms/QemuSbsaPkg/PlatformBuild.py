@@ -332,7 +332,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         path = os.environ["PATH"]
         shell_environment.GetEnvironment().set_path('')
-        interesting_keys = ["Path"]
+        interesting_keys = ["LIB", "Path"]
         if self.env.GetValue("TOOL_CHAIN_TAG") == "CLANGPDB":
             HostInfo = GetHostInfo()
 
