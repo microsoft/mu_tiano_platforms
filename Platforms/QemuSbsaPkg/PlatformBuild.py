@@ -380,12 +380,12 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             else:
                 clang_exe = "clang"
 
-        # Need to build fiptool separately because the build system will override LIB with LIBC for firmware builds
-        cmd = "make"
-        args = " fiptool MAKEFLAGS= LIB=\"" + shell_environment.GetEnvironment().get_shell_var("LIB") + "\""
-        ret = RunCmd(cmd, args, workingdir=self.env.GetValue("ARM_TFA_PATH"))
-        if ret != 0:
-            return ret
+            # Need to build fiptool separately because the build system will override LIB with LIBC for firmware builds
+            cmd = "make"
+            args = " fiptool MAKEFLAGS= LIB=\"" + shell_environment.GetEnvironment().get_shell_var("LIB") + "\""
+            ret = RunCmd(cmd, args, workingdir=self.env.GetValue("ARM_TFA_PATH"))
+            if ret != 0:
+                return ret
 
         # Then we can make the firmware images with the fiptool built above
         cmd = "make"
@@ -393,6 +393,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             args = "CC="+clang_exe
         elif self.env.GetValue("TOOL_CHAIN_TAG") == "GCC5":
             args = "CROSS_COMPILE=" + shell_environment.GetEnvironment().get_shell_var("GCC5_AARCH64_PREFIX")
+            args += " -j $(nproc)"
         else:
             logging.error("Unsupported toolchain")
             return -1
@@ -404,7 +405,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         # args += " FEATURE_DETECTION=1" # Enforces support for features enabled.
         args += " BL32=" + os.path.join(op_fv, "BL32_AP_MM.fd")
         args += " all fip"
-        # args += " -j $(nproc)"
         ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_TFA_PATH"))
         if ret != 0:
             return ret
