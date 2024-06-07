@@ -628,7 +628,11 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x258
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0x260
 !else
+!if $(TARGET) == RELEASE
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x505
+!else
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x30
+!endif
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x40
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0x300
 !endif
@@ -1390,6 +1394,10 @@
   RVCT:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
 
   GCC:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
+
+  # Exception tables are required for stack walks in the debugger.
+  MSFT:*_*_AARCH64_GENFW_FLAGS  = --keepexceptiontable
+  GCC:*_*_AARCH64_GENFW_FLAGS   = --keepexceptiontable
 
   #
   # Disable deprecated APIs.
