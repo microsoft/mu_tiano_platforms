@@ -475,6 +475,7 @@ READ_LOCK_STATUS   = TRUE
 
   INF ArmPlatformPkg/PrePeiCore/PrePeiCoreUniCore.inf
   INF MdeModulePkg/Core/Pei/PeiMain.inf
+  INF SecurityPkg/RandomNumberGenerator/RngPei/RngPei.inf
   INF ArmPlatformPkg/PlatformPei/PlatformPeim.inf
   INF ArmPlatformPkg/MemoryInitPei/MemoryInitPeim.inf
   INF ArmPkg/Drivers/CpuPei/CpuPei.inf
