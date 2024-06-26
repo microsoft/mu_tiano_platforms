@@ -20,6 +20,8 @@ from edk2toolext.invocables.edk2_setup import (RequiredSubmodule,
 from edk2toolext.invocables.edk2_update import UpdateSettingsManager
 from edk2toolext.invocables.edk2_parse import ParseSettingsManager
 from edk2toollib.utility_functions import RunCmd
+from edk2toollib.windows.locate_tools import QueryVcVariables
+from edk2toollib.utility_functions import GetHostInfo
 
 # Declare test whose failure will not return a non-zero exit code
 FAILURE_EXEMPT_TESTS = {
@@ -40,7 +42,7 @@ class CommonPlatform():
     PackagesSupported = ("QemuSbsaPkg",)
     ArchSupported = ("AARCH64",)
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
-    Scopes = ('qemu', 'qemusbsa', 'gcc_aarch64_linux', 'edk2-build', 'cibuild', 'configdata', 'rust-ci')
+    Scopes = ('qemu', 'qemusbsa', 'edk2-build', 'cibuild', 'configdata', 'rust-ci')
     WorkspaceRoot = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     PackagesPath = (
         "Platforms",
@@ -113,7 +115,13 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
-        return CommonPlatform.Scopes
+        scopes = CommonPlatform.Scopes
+        actual_tool_chain_tag = shell_environment.GetBuildVars().GetValue(
+                "TOOL_CHAIN_TAG", ""
+            )
+        if actual_tool_chain_tag.upper().startswith("GCC"):
+            scopes += ("gcc_aarch64_linux",)
+        return scopes
 
     def FilterPackagesToTest(self, changedFilesList: list, potentialPackagesList: list) -> list:
         ''' Filter other cases that this package should be built
@@ -157,13 +165,54 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
     def __init__(self):
         UefiBuilder.__init__(self)
 
+    # Helper function to query the VC variables of interest and inject them into the environment
+    def InjectVcVarsOfInterests(self, vcvars: list):
+        HostInfo = GetHostInfo()
+
+        # check to see if host is configured
+        # HostType for VS tools should be (defined in tools_def):
+        # x86   == 32bit Intel
+        # x64   == 64bit Intel
+        # arm   == 32bit Arm
+        # arm64 == 64bit Arm
+        #
+        HostType = shell_environment.GetEnvironment().get_shell_var("CLANG_VS_HOST")
+        if HostType is not None:
+            HostType = HostType.lower()
+            logging.info(
+                f"CLANG_VS_HOST defined by environment.  Value is {HostType}")
+        else:
+            #figure it out based on host info
+            if HostInfo.arch == "x86":
+                if HostInfo.bit == "32":
+                    HostType = "x86"
+                elif HostInfo.bit == "64":
+                    HostType = "x64"
+            else:
+                # anything other than x86 or x64 is not supported
+                raise NotImplementedError()
+
+        # CLANG_VS_HOST options are not exactly the same as QueryVcVariables. This translates.
+        VC_HOST_ARCH_TRANSLATOR = {
+            "x86": "x86", "x64": "AMD64", "arm": "not supported", "arm64": "not supported"}
+
+        # now get the environment variables for the platform
+        shell_env = shell_environment.GetEnvironment()
+        # Use the tools lib to determine the correct values for the vars that interest us.
+        vs_vars = QueryVcVariables(
+            vcvars, VC_HOST_ARCH_TRANSLATOR[HostType])
+        for (k, v) in vs_vars.items():
+            shell_env.set_shell_var(k, v)
+
     def CleanTree(self, RemoveConfTemplateFilesToo=False):
+        # If this is a Windows Clang build, we need to inject the VC variables of interest
+        if self.env.GetValue("TOOL_CHAIN_TAG") == "CLANGPDB" and os.name == 'nt':
+            self.InjectVcVarsOfInterests(["VCToolsInstallDir", "Path", "LIB"])
+
         # Add a step to clean up BL31 as well, if asked
         cmd = "make"
         args = "distclean"
-        ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_TFA_PATH"))
-        if ret != 0:
-            return ret
+        RunCmd(cmd, args, workingdir=self.env.GetValue("ARM_TFA_PATH"))
 
         return super().CleanTree(RemoveConfTemplateFilesToo)
 
@@ -182,7 +231,13 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
-        return CommonPlatform.Scopes
+        scopes = CommonPlatform.Scopes
+        actual_tool_chain_tag = shell_environment.GetBuildVars().GetValue(
+                "TOOL_CHAIN_TAG", ""
+            )
+        if actual_tool_chain_tag.upper().startswith("GCC"):
+            scopes += ("gcc_aarch64_linux",)
+        return scopes
 
     def GetName(self):
         ''' Get the name of the repo, platform, or product being build '''
@@ -278,8 +333,39 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         op_fv = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
 
         logging.info("Building TF-A")
+
+        shell_environment.CheckpointBuildVars()  # checkpoint our config before we mess with it
+        if self.env.GetValue("TOOL_CHAIN_TAG") == "CLANGPDB":
+            if os.name == 'nt':
+                # If this is a Windows build, we need to demolish the path and inject the VC variables of interest
+                # otherwise the build could pick up wrong tools
+                shell_environment.GetEnvironment().set_path('')
+                self.InjectVcVarsOfInterests(["LIB", "Path"])
+
+                clang_exe = "clang.exe"
+                choco_path = shell_environment.GetEnvironment().get_shell_var("CHOCOLATEYINSTALL")
+                shell_environment.GetEnvironment().insert_path(os.path.join(choco_path, "bin"))
+                shell_environment.GetEnvironment().insert_path(shell_environment.GetEnvironment().get_shell_var("CLANG_BIN"))
+
+                # Need to build fiptool separately because the build system will override LIB with LIBC for firmware builds
+                cmd = "make"
+                args = " fiptool MAKEFLAGS= LIB=\"" + shell_environment.GetEnvironment().get_shell_var("LIB") + "\""
+                ret = RunCmd(cmd, args, workingdir=self.env.GetValue("ARM_TFA_PATH"))
+                if ret != 0:
+                    return ret
+                # Then we can make the firmware images with the fiptool built above
+            else:
+                clang_exe = "clang"
+
         cmd = "make"
-        args = "CROSS_COMPILE=" + shell_environment.GetEnvironment().get_shell_var("GCC5_AARCH64_PREFIX")
+        if self.env.GetValue("TOOL_CHAIN_TAG") == "CLANGPDB":
+            args = "CC="+clang_exe
+        elif self.env.GetValue("TOOL_CHAIN_TAG") == "GCC5":
+            args = "CROSS_COMPILE=" + shell_environment.GetEnvironment().get_shell_var("GCC5_AARCH64_PREFIX")
+            args += " -j $(nproc)"
+        else:
+            logging.error("Unsupported toolchain")
+            return -1
         args += " PLAT=" + self.env.GetValue("QEMU_PLATFORM").lower()
         args += " ARCH=" + self.env.GetValue("TARGET_ARCH").lower()
         args += " DEBUG=" + str(1 if self.env.GetValue("TARGET").lower() == 'debug' else 0)
@@ -288,10 +374,12 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         # args += " FEATURE_DETECTION=1" # Enforces support for features enabled.
         args += " BL32=" + os.path.join(op_fv, "BL32_AP_MM.fd")
         args += " all fip"
-        args += " -j $(nproc)"
         ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_TFA_PATH"))
         if ret != 0:
             return ret
+
+        # Revert the build vars to the original state
+        shell_environment.RevertBuildVars()
 
         # Now that BL31 is built with BL32 supplied, patch BL1 and BL31 built fip.bin into the SECURE_FLASH0.fd
         op_tfa = os.path.join (

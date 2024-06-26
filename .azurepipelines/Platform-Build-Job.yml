@@ -91,7 +91,7 @@ jobs:
 
       - template: Steps/BuildPlatform.yml@mu_devops
         parameters:
-          tool_chain_tag: $(tool_chain_tag)
+          tool_chain_tag: ${{ parameters.tool_chain_tag }}
           build_pkg: ${{ item.Value.BuildPackage }}
           build_target: ${{ item.Value.BuildTarget }}
           build_file: ${{ item.Value.BuildFile }}
@@ -100,7 +100,7 @@ jobs:
           run_timeout: ${{ parameters.run_timeout }}
           extra_install_step: ${{ parameters.extra_install_step }}
           install_tools: ${{ and(ne(item.Value.SelfHostAgent, true), eq(parameters.container_image, '')) }}
-          artifacts_identifier: '${{ item.Value.BuildPackage }} $(tool_chain_tag) ${{ item.Value.BuildTarget }} ${{ item.Value.BuildExtraTag }}'
+          artifacts_identifier: '${{ item.Value.BuildPackage }} ${{ parameters.tool_chain_tag }} ${{ item.Value.BuildTarget }} ${{ item.Value.BuildExtraTag }}'
           artifacts_binary: ${{ item.Value.BuildArtifactsBinary }}
           ${{ if or(eq(item.Value.Run, true), eq(parameters.os_type, 'Linux'), EndsWith(item.Key, 'CODE_COVERAGE')) }}:
             artifacts_other: ${{ item.Value.BuildArtifactsOther }}
