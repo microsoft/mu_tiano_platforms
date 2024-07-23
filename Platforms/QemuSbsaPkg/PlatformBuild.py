@@ -26,7 +26,6 @@ from edk2toollib.utility_functions import GetHostInfo
 # Declare test whose failure will not return a non-zero exit code
 FAILURE_EXEMPT_TESTS = {
     # example "PiValueTestApp.efi": datetime.datetime(3141, 5, 9, 2, 6, 53, 589793),
-    "DxePagingAuditTestApp.efi": datetime.datetime(2024, 7, 22, 0, 0, 0, 0)
 }
 
 # Allow failure exempt tests to be ignored for 90 days
