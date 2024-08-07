@@ -38,6 +38,9 @@
   MmServicesTableLib
   UefiBootServicesTableLib
 
+[Guids]
+  gSmmBaseHobGuid                ## CONSUMES
+
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber
   gUefiQemuQ35PkgTokenSpaceGuid.PcdCpuHotEjectDataAddress
