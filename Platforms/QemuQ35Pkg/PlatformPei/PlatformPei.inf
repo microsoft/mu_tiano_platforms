@@ -2,7 +2,7 @@
 #  Platform PEI driver
 #
 #  This module provides platform specific function to detect boot mode.
-#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2024, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -33,7 +33,7 @@
   MemTypeInfo.c
   Platform.c
   Platform.h
-
+  SmmRelocation.c
 
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
@@ -68,6 +68,7 @@
   MtrrLib
   MemEncryptSevLib
   PcdLib
+  SmmRelocationLib
 
 [Pcd]
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfPeiMemFvBase
@@ -143,6 +144,7 @@
   gEfiPeiMasterBootModePpiGuid
   gEfiPeiMpServicesPpiGuid
   gEfiPeiReadOnlyVariable2PpiGuid
+  gEdkiiPeiMpServices2PpiGuid
 
 [Depex]
   TRUE
