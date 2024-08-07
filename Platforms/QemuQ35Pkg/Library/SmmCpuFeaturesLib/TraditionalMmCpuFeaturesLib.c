@@ -26,6 +26,18 @@
 STATIC CPU_HOT_EJECT_DATA  *mCpuHotEjectData = NULL;
 
 /**
+  The common constructor function
+
+  @retval EFI_SUCCESS      The constructor always returns EFI_SUCCESS.
+
+**/
+EFI_STATUS
+EFIAPI
+MmCpuFeaturesLibConstructorCommon (
+  VOID
+  );
+
+/**
   Initialize mCpuHotEjectData if PcdCpuMaxLogicalProcessorNumber > 1.
 
   Also setup the corresponding PcdCpuHotEjectDataAddress.
@@ -216,4 +228,23 @@ SmmCpuFeaturesRendezvousExit (
       Handler (CpuIndex);
     }
   }
+}
+
+/**
+  The constructor function
+
+  @param[in]  ImageHandle  The firmware allocated handle for the EFI image.
+  @param[in]  SystemTable  A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS      The constructor always returns EFI_SUCCESS.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmCpuFeaturesLibConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  return MmCpuFeaturesLibConstructorCommon ();
 }
