@@ -28,6 +28,7 @@
   MdePkg/MdePkg.dec
   QemuPkg/QemuPkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  QemuSbsaPkg/QemuSbsaPkg.dec
 
 [LibraryClasses]
   ArmLib
@@ -45,8 +46,8 @@
 [Pcd]
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdSystemMemorySize
-  gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
-  gArmVirtTokenSpaceGuid.PcdDeviceTreeAllocationPadding
+  gQemuSbsaPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
+  gQemuSbsaPkgTokenSpaceGuid.PcdDeviceTreeAllocationPadding
   gArmTokenSpaceGuid.PcdMmBufferBase
 
 [FixedPcd]

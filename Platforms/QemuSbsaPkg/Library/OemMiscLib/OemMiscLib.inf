@@ -41,7 +41,7 @@
 [Pcd]
   gArmTokenSpaceGuid.PcdEmbeddedControllerFirmwareRelease
   gArmTokenSpaceGuid.PcdSystemBiosRelease
-  gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
+  gQemuSbsaPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
 
   gQemuSbsaPkgTokenSpaceGuid.PcdSystemManufacturer
   gQemuSbsaPkgTokenSpaceGuid.PcdSystemSerialNumber
