@@ -60,6 +60,13 @@
   gQemuSbsaPkgTokenSpaceGuid.PcdPciExpressBarSize|0x10000000|UINT64|0x0000000A
   gQemuSbsaPkgTokenSpaceGuid.PcdPciExpressBarLimit|0xFFFFFFFF|UINT64|0x0000000B
 
+  # Device Tree PCDs
+  gQemuSbsaPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress|0x10000000000|UINT64|0x0000000C
+  # Padding in bytes to add to the device tree allocation, so that the DTB can
+  # be modified in place (default: 256 bytes)
+  #
+  gQemuSbsaPkgTokenSpaceGuid.PcdDeviceTreeAllocationPadding|256|UINT32|0x0000000D
+
 [PcdsDynamic.common]
   gQemuSbsaPkgTokenSpaceGuid.PcdSystemManufacturer|L""|VOID*|0x00000110
   gQemuSbsaPkgTokenSpaceGuid.PcdSystemSerialNumber|L""|VOID*|0x00000111

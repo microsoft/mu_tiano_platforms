@@ -26,7 +26,6 @@
   MsCorePkg/MsCorePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   QemuPkg/QemuPkg.dec
-  SourceLevelDebugPkg/SourceLevelDebugPkg.dec
 
 [LibraryClasses]
   BaseMemoryLib
