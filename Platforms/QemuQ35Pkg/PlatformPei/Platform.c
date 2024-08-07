@@ -830,7 +830,7 @@ InitializePlatform (
     MmSettings.HeapGuardPolicy.Fields.MmPageGuard                    = 1;
     MmSettings.HeapGuardPolicy.Fields.MmPoolGuard                    = 1;
     DxeSettings.ImageProtectionPolicy.Fields.ProtectImageFromUnknown = 1;
-    // THE /NXCOMPAT DLL flag cannot be set using non MinGW GCC
+    // THE /NXCOMPAT DLL flag is not set on Linux today, so do not block loading
     DxeSettings.ImageProtectionPolicy.Fields.BlockImagesWithoutNxFlag = 0;
 
     BuildGuidDataHob (
