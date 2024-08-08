@@ -34,7 +34,6 @@
             "StandaloneMmPkg/StandaloneMmPkg.dec",
             "ShellPkg/ShellPkg.dec",
             "EmbeddedPkg/EmbeddedPkg.dec",
-            "SourceLevelDebugPkg/SourceLevelDebugPkg.dec",
             "MsGraphicsPkg/MsGraphicsPkg.dec",
             "MsCorePkg/MsCorePkg.dec",
             "PcBdsPkg/PcBdsPkg.dec",
