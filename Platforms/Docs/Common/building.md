@@ -97,10 +97,12 @@ On most Linux distros this requires an extra step for mono and nuget support.
     - Under the hood, it just does the invocation of Stuart for you.
 
 ### Notes
-
-1. QEMU must be on your path or `QEMU_PATH` must be given. On Windows this is a manual process and not part of the
-   QEMU installer.
-2. QEMU output will be in Build directory.
+1. QEMU is provided on windows via an external dependency located at QemuPkg/Binaries, however; Qemu must be
+   manually downloaded on linux.
+1. QEMU for linux requires at least **version 9.0.2** when booting an operating system; if you are only booting to
+   shell, matching the version to the windows external dependency is acceptable.
+2. If you want to override the external dependency on windows, or the installed version on linux, you can use
+   `QEMU_PATH = <path>` on the command line.
 
 **NOTE:** Logging the execution output will be in the normal stuart log as well as to your console (if you have the
 correct logging level set, by default it doesn't output to console).
