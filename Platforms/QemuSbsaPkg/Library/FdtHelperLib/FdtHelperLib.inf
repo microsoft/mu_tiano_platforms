@@ -22,7 +22,6 @@
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
-  ArmVirtPkg/ArmVirtPkg.dec
   QemuSbsaPkg/QemuSbsaPkg.dec
 
 [LibraryClasses]
