@@ -97,8 +97,8 @@ On most Linux distros this requires an extra step for mono and nuget support.
     - Under the hood, it just does the invocation of Stuart for you.
 
 ### Notes
-1. QEMU is provided on windows via an external dependency located at QemuPkg/Binaries, however; Qemu must be
-   manually downloaded on linux.
+1. QEMU is provided on windows via an external dependency located at QemuPkg/Binaries; Qemu must be manually downloaded
+   on linux.
 1. QEMU for linux requires at least **version 9.0.2** when booting an operating system; if you are only booting to
    shell, matching the version to the windows external dependency is acceptable.
 2. If you want to override the external dependency on windows, or the installed version on linux, you can use
