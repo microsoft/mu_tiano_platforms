@@ -30,8 +30,8 @@
 	url = https://github.com/microsoft/mu_feature_config.git
 [submodule "Features/MM_SUPV"]
 	path = Features/MM_SUPV
-	url = https://github.com/kuqin12/mu_feature_mm_supv.git
-	branch = 202405
+	url = https://github.com/microsoft/mu_feature_mm_supv.git
+	branch = v13.0.0
 [submodule "Features/DEBUGGER"]
 	path = Features/DEBUGGER
 	url = https://github.com/microsoft/mu_feature_debugger.git
