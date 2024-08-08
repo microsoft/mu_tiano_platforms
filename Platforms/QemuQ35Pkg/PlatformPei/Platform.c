@@ -830,7 +830,8 @@ InitializePlatform (
     MmSettings.HeapGuardPolicy.Fields.MmPageGuard                    = 1;
     MmSettings.HeapGuardPolicy.Fields.MmPoolGuard                    = 1;
     DxeSettings.ImageProtectionPolicy.Fields.ProtectImageFromUnknown = 1;
-    // THE /NXCOMPAT DLL flag is not set on Linux today, so do not block loading
+    // THE /NXCOMPAT DLL flag is not set on grub/shim today, so do not block loading
+    // otherwise we cannot boot Linux
     DxeSettings.ImageProtectionPolicy.Fields.BlockImagesWithoutNxFlag = 0;
 
     BuildGuidDataHob (
