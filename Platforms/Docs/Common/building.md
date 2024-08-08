@@ -8,7 +8,7 @@ This is a Project Mu platform and thus the default environment requirements can 
 here at the [Project Mu Prerequisites page.](https://microsoft.github.io/mu/CodeDevelopment/prerequisites/)
 
 QEMU is used to run the locally compiled firmware on a virtual platform. If you are on windows,
-no action is needed, we provide an external dependency that includes the necessary QEMU binaries.
+no action is needed, we provide an [external dependency](https://www.tianocore.org/edk2-pytool-extensions/features/extdep/) that includes the necessary QEMU binaries.
 If you are on Linux, [install it](https://www.qemu.org/download/#linux).
 
 This build uses edk2-pytools for functionality.  Documentation can be
