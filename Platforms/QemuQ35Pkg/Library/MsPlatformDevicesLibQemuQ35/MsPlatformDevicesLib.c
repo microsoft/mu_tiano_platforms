@@ -1,8 +1,8 @@
 /** @file
- *MsPlatformDevicesLib  - Device specific library.
+  MsPlatformDevicesLib - Device specific library.
 
-Copyright (C) Microsoft Corporation. All rights reserved.
-SPDX-License-Identifier: BSD-2-Clause-Patent
+  Copyright (C) Microsoft Corporation.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -11,7 +11,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <IndustryStandard/Pci.h>
 #include <IndustryStandard/Virtio095.h>
 
-#include <Guid/DebugAgentGuid.h>
 #include <Guid/QemuRamfb.h>
 #include <Guid/SerialPortLibVendor.h>
 
@@ -177,40 +176,6 @@ ACPI_HID_DEVICE_PATH  gPnp16550ComPortDeviceNode = gPnp16550ComPort;
 UART_DEVICE_PATH      gUartDeviceNode            = gUart;
 VENDOR_DEVICE_PATH    gTerminalTypeDeviceNode    = gPcAnsiTerminal;
 
-//
-// Debug Agent UART Device Path
-//
-VENDOR_UART_DEVICE_PATH  gDebugAgentUartDevicePath = {
-  {
-    {
-      HARDWARE_DEVICE_PATH,
-      HW_VENDOR_DP,
-      {
-        (UINT8)(sizeof (VENDOR_DEVICE_PATH)),
-        (UINT8)((sizeof (VENDOR_DEVICE_PATH)) >> 8)
-      }
-    },
-    EFI_DEBUG_AGENT_GUID,
-  },
-  {
-    {
-      MESSAGING_DEVICE_PATH,
-      MSG_UART_DP,
-      {
-        (UINT8)(sizeof (UART_DEVICE_PATH)),
-        (UINT8)((sizeof (UART_DEVICE_PATH)) >> 8)
-      }
-    },
-    0,  // Reserved
-    0,  // BaudRate - Default
-    0,  // DataBits - Default
-    0,  // Parity   - Default
-    0,  // StopBits - Default
-  },
-  gPcAnsiTerminal,
-  gEndEntire
-};
-
 STATIC USB_KEYBOARD_DEVICE_PATH  gUsbKeyboardDevicePath = {
   {
     {
@@ -313,10 +278,6 @@ STATIC PREFERRED_VIDEO_DEVICE  gPreferredVideo = {
 // Predefined platform default console device path
 //
 BDS_CONSOLE_CONNECT_ENTRY  gPlatformConsoles[] = {
-  {
-    (EFI_DEVICE_PATH_PROTOCOL *)&gDebugAgentUartDevicePath,
-    (CONSOLE_OUT | CONSOLE_IN | STD_ERROR)
-  },
   {
     (EFI_DEVICE_PATH_PROTOCOL *)&gUsbKeyboardDevicePath,
     CONSOLE_IN

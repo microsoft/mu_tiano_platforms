@@ -1,7 +1,7 @@
 /**@file
   Memory Detection for Virtual Machines.
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2024, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 Module Name:
@@ -19,6 +19,7 @@ Module Name:
 #include <IndustryStandard/CloudHv.h>
 #include <PiPei.h>
 #include <Register/Intel/SmramSaveStateMap.h>
+#include <Guid/SmramMemoryReserve.h>
 
 //
 // The Library classes this module consumes
@@ -736,6 +737,57 @@ PublishPeiMemory (
   return Status;
 }
 
+/**
+  Create gEfiSmmSmramMemoryGuid HOB defined in the PI specification Vol. 3,
+  section 5, which is used to describe the SMRAM memory regions supported
+  by the platform.
+
+  @param[in] StartAddress      StartAddress of smram.
+  @param[in] Size              Size of smram.
+
+**/
+STATIC
+VOID
+CreateSmmSmramMemoryHob (
+  IN EFI_PHYSICAL_ADDRESS  StartAddress,
+  IN UINT32                Size
+  )
+{
+  UINTN                           BufferSize;
+  UINT8                           SmramRanges;
+  EFI_PEI_HOB_POINTERS            Hob;
+  EFI_SMRAM_HOB_DESCRIPTOR_BLOCK  *SmramHobDescriptorBlock;
+
+  SmramRanges = 2;
+  BufferSize  = sizeof (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK) + (SmramRanges - 1) * sizeof (EFI_SMRAM_DESCRIPTOR);
+
+  Hob.Raw = BuildGuidHob (
+              &gEfiSmmSmramMemoryGuid,
+              BufferSize
+              );
+  ASSERT (Hob.Raw);
+
+  SmramHobDescriptorBlock                             = (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK *)(Hob.Raw);
+  SmramHobDescriptorBlock->NumberOfSmmReservedRegions = SmramRanges;
+
+  //
+  // 1. Create first SMRAM descriptor, which contains data structures used in S3 resume.
+  // One page is enough for the data structure
+  //
+  SmramHobDescriptorBlock->Descriptor[0].PhysicalStart = StartAddress;
+  SmramHobDescriptorBlock->Descriptor[0].CpuStart      = StartAddress;
+  SmramHobDescriptorBlock->Descriptor[0].PhysicalSize  = EFI_PAGE_SIZE;
+  SmramHobDescriptorBlock->Descriptor[0].RegionState   = EFI_SMRAM_CLOSED | EFI_CACHEABLE | EFI_ALLOCATED;
+
+  //
+  // 2. Create second SMRAM descriptor, which is free and will be used by SMM foundation.
+  //
+  SmramHobDescriptorBlock->Descriptor[1].PhysicalStart = SmramHobDescriptorBlock->Descriptor[0].PhysicalStart + EFI_PAGE_SIZE;
+  SmramHobDescriptorBlock->Descriptor[1].CpuStart      = SmramHobDescriptorBlock->Descriptor[0].CpuStart + EFI_PAGE_SIZE;
+  SmramHobDescriptorBlock->Descriptor[1].PhysicalSize  = Size - EFI_PAGE_SIZE;
+  SmramHobDescriptorBlock->Descriptor[1].RegionState   = EFI_SMRAM_CLOSED | EFI_CACHEABLE;
+}
+
 STATIC
 VOID
 QemuInitializeRamBelow1gb (
@@ -813,15 +865,21 @@ QemuInitializeRam (
     QemuInitializeRamBelow1gb ();
 
     if (FeaturePcdGet (PcdSmmSmramRequire)) {
-      UINT32  TsegSize;
+      UINT32                TsegSize;
+      EFI_PHYSICAL_ADDRESS  TsegBase;
 
       TsegSize = mQ35TsegMbytes * SIZE_1MB;
-      AddMemoryRangeHob (BASE_1MB, LowerMemorySize - TsegSize);
+      TsegBase = LowerMemorySize - TsegSize;
+      AddMemoryRangeHob (BASE_1MB, TsegBase);
       AddReservedMemoryBaseSizeHob (
-        LowerMemorySize - TsegSize,
+        TsegBase,
         TsegSize,
         TRUE
         );
+      //
+      // Create gEfiSmmSmramMemoryGuid HOB
+      //
+      CreateSmmSmramMemoryHob (TsegBase, TsegSize);
     } else {
       AddMemoryRangeHob (BASE_1MB, LowerMemorySize);
     }

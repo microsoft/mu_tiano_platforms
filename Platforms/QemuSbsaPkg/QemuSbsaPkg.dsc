@@ -105,7 +105,7 @@
   PanicLib|MdePkg/Library/BasePanicLibSerialPort/BasePanicLibSerialPort.inf
 
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
-  HobLib|ArmVirtPkg/Library/ArmVirtDxeHobLib/ArmVirtDxeHobLib.inf
+  HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLibDevicePathProtocol/UefiDevicePathLibDevicePathProtocol.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
@@ -424,7 +424,7 @@
   FrameBufferMemDrawLib|MsGraphicsPkg/Library/FrameBufferMemDrawLib/FrameBufferMemDrawLibPei.inf
 
   PeiServicesTablePointerLib|ArmPkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
-  ArmVirtMemInfoLib|ArmVirtPkg/Library/QemuVirtMemInfoLib/QemuVirtMemInfoPeiLib.inf
+  ArmVirtMemInfoLib|QemuSbsaPkg/Library/QemuVirtMemInfoLib/QemuVirtMemInfoPeiLib.inf
   PcdDatabaseLoaderLib|MdeModulePkg/Library/PcdDatabaseLoaderLib/Pei/PcdDatabaseLoaderLibPei.inf
 
   MsPlatformEarlyGraphicsLib |MsGraphicsPkg/Library/MsEarlyGraphicsLibNull/Pei/MsEarlyGraphicsLibNull.inf
@@ -445,7 +445,6 @@
   DxeCoreEntryPoint|MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
   ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
   PerformanceLib|MdeModulePkg/Library/DxeCorePerformanceLib/DxeCorePerformanceLib.inf
-  MemoryBinOverrideLib|MdeModulePkg/Library/MemoryBinOverrideLibNull/MemoryBinOverrideLibNull.inf
   DebugAgentLib|DebuggerFeaturePkg/Library/DebugAgent/DebugAgentDxe.inf
   RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
 
@@ -497,7 +496,6 @@
 
   VirtNorFlashPlatformLib|QemuSbsaPkg/Library/SbsaQemuNorFlashLib/SbsaQemuNorFlashLib.inf
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
-  AdvLoggerAccessLib|AdvLoggerPkg/Library/AdvLoggerMmAccessLib/AdvLoggerMmAccessLib.inf
   MemoryTypeInfoSecVarCheckLib|MdeModulePkg/Library/MemoryTypeInfoSecVarCheckLib/MemoryTypeInfoSecVarCheckLib.inf
   FltUsedLib|MdePkg/Library/FltUsedLib/FltUsedLib.inf
 
@@ -570,8 +568,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdRequireIommu|FALSE # don't require IOMMU
   gEfiMdeModulePkgTokenSpaceGuid.PcdHiiOsRuntimeSupport|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache|FALSE
-
-  gArmVirtTokenSpaceGuid.PcdTpm2SupportEnabled|$(TPM2_ENABLE)
 
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|TRUE
   gQemuPkgTokenSpaceGuid.PcdEnableMemoryProtection|$(MEMORY_PROTECTION)
@@ -698,8 +694,6 @@
   ## 0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8, 4-TTYTERM
 !if $(TTY_TERMINAL) == TRUE
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|4
-  # Set terminal type to TtyTerm, the value encoded is EFI_TTY_TERM_GUID
-  gArmVirtTokenSpaceGuid.PcdTerminalTypeGuidBuffer|{0x80, 0x6d, 0x91, 0x7d, 0xb1, 0x5b, 0x8c, 0x45, 0xa4, 0x8f, 0xe2, 0x5f, 0xdd, 0x51, 0xef, 0x94}
 !else
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|1
 !endif
@@ -751,9 +745,6 @@
 
   # System Memory Base -- fixed at 0x100_0000_0000
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x10000000000
-
-  # initial location of the device tree blob passed by QEMU -- base of DRAM
-  gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress|0x10000000000
 
   # Non discoverable devices (AHCI,EHCI)
   gQemuSbsaPkgTokenSpaceGuid.PcdPlatformAhciBase|0x60100000
@@ -915,7 +906,7 @@
 # Components Section - list of all EDK II Modules needed by this Platform
 #
 ################################################################################
-[Components.common]
+[Components]
   !include $(SHARED_CRYPTO_PATH)/Driver/Bin/CryptoDriver.inc.dsc
 
   #
@@ -1345,7 +1336,6 @@
   QemuSbsaPkg/SbsaQemuPlatformDxe/SbsaQemuPlatformDxe.inf
   MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
 
-[Components.AARCH64]
   #
   # ACPI Support
   #
@@ -1383,6 +1373,7 @@
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteStandaloneMm.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStandaloneMm.inf {
     <LibraryClasses>
+      AdvLoggerAccessLib|MdeModulePkg/Library/AdvLoggerAccessLibNull/AdvLoggerAccessLib.inf
       DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibStandaloneMm.inf
       NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
       NULL|MdeModulePkg/Library/VarCheckPolicyLib/VarCheckPolicyLibStandaloneMm.inf
