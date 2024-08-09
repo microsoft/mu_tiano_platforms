@@ -7,9 +7,9 @@ Steps to setup your environment, compile, and run QemuQ35Pkg and QemuSbsaPkg.
 This is a Project Mu platform and thus the default environment requirements can be found
 here at the [Project Mu Prerequisites page.](https://microsoft.github.io/mu/CodeDevelopment/prerequisites/)
 
-In addition if you want to run your locally compiled firmware you need
-
-- [QEMU - Download, Install, and add to your path](https://www.qemu.org/download/)
+QEMU is used to run the locally compiled firmware on a virtual platform. If you are on windows,
+no action is needed, we provide an [external dependency](https://www.tianocore.org/edk2-pytool-extensions/features/extdep/) that includes the necessary QEMU binaries.
+If you are on Linux, [install it](https://www.qemu.org/download/#linux).
 
 This build uses edk2-pytools for functionality.  Documentation can be
 found [here](https://github.com/tianocore/edk2-pytool-extensions/tree/master/docs).
@@ -97,10 +97,12 @@ On most Linux distros this requires an extra step for mono and nuget support.
     - Under the hood, it just does the invocation of Stuart for you.
 
 ### Notes
-
-1. QEMU must be on your path or `QEMU_PATH` must be given. On Windows this is a manual process and not part of the
-   QEMU installer.
-2. QEMU output will be in Build directory.
+1. QEMU is provided on windows via an external dependency located at QemuPkg/Binaries; Qemu must be manually downloaded
+   on linux.
+2. QEMU for linux requires at least **version 9.0.2** when booting an operating system; if you are only booting to
+   shell, matching the version to the windows external dependency is acceptable.
+3. If you want to override the external dependency on windows, or the installed version on linux, you can use
+   `QEMU_PATH = <path>` on the command line.
 
 **NOTE:** Logging the execution output will be in the normal stuart log as well as to your console (if you have the
 correct logging level set, by default it doesn't output to console).
