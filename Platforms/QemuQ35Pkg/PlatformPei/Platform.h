@@ -98,6 +98,11 @@ InstallClearCacheCallback (
   );
 
 VOID
+RelocateSmBase (
+  VOID
+  );
+
+VOID
 AmdSevInitialize (
   VOID
   );

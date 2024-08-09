@@ -17,6 +17,7 @@
   VERSION_STRING                 = 1.0
   PI_SPECIFICATION_VERSION       = 0x00010032
   LIBRARY_CLASS                  = SmmCpuFeaturesLib
+  CONSTRUCTOR                    = StandalonMmCpuFeaturesLibConstructor
 
 [Sources]
   MmCpuFeaturesLib.c
@@ -34,6 +35,9 @@
   DebugLib
   MemEncryptSevLib
   PcdLib
+
+[Guids]
+  gSmmBaseHobGuid                ## CONSUMES
 
 [Pcd]
   gUefiQemuQ35PkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase

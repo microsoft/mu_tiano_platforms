@@ -12,6 +12,18 @@
 #include <Library/MmServicesTableLib.h>
 
 /**
+  The common constructor function
+
+  @retval EFI_SUCCESS      The constructor always returns EFI_SUCCESS.
+
+**/
+EFI_STATUS
+EFIAPI
+MmCpuFeaturesLibConstructorCommon (
+  VOID
+  );
+
+/**
   Hook point in normal execution mode that allows the one CPU that was elected
   as monarch during System Management Mode initialization to perform additional
   initialization actions immediately after all of the CPUs have processed their
@@ -41,4 +53,23 @@ SmmCpuFeaturesRendezvousExit (
   )
 {
   // Do nothing for Standalone MM instance.
+}
+
+/**
+  The constructor function
+
+  @param[in]  ImageHandle  The firmware allocated handle for the EFI image.
+  @param[in]  SystemTable  A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS      The constructor always returns EFI_SUCCESS.
+
+**/
+EFI_STATUS
+EFIAPI
+StandalonMmCpuFeaturesLibConstructor (
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_MM_SYSTEM_TABLE  *SystemTable
+  )
+{
+  return MmCpuFeaturesLibConstructorCommon ();
 }
