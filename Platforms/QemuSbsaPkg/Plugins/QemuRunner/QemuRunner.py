@@ -82,8 +82,9 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             if storage_format == "iso":
                 args += f" -cdrom \"{path_to_os}\""
             else:
-                args += f" -drive file=\"{path_to_os}\",format={storage_format},if=none,id=os_nvme"
-                args += " -device nvme,serial=nvme-1,drive=os_nvme"
+                args += f" -drive file=\"{path_to_os}\",format={storage_format},if=none,id=os_disk"
+                args += " -device ahci,id=ahci"
+                args += " -device ide-hd,drive=os_disk,bus=ahci.0"
         elif os.path.isfile(VirtualDrive):
             args += f" -drive file={VirtualDrive},if=virtio"
         elif os.path.isdir(VirtualDrive):
