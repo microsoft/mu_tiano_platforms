@@ -25,7 +25,6 @@
   EmbeddedPkg/EmbeddedPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
-  ArmVirtPkg/ArmVirtPkg.dec
   QemuSbsaPkg/QemuSbsaPkg.dec
 
 [LibraryClasses]
@@ -41,7 +40,7 @@
 [Pcd]
   gArmTokenSpaceGuid.PcdEmbeddedControllerFirmwareRelease
   gArmTokenSpaceGuid.PcdSystemBiosRelease
-  gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
+  gQemuSbsaPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
 
   gQemuSbsaPkgTokenSpaceGuid.PcdSystemManufacturer
   gQemuSbsaPkgTokenSpaceGuid.PcdSystemSerialNumber

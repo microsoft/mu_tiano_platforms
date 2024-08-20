@@ -81,10 +81,9 @@ SbsaQemuLibConstructor (
     DxeSettings.HeapGuardPoolType.Fields.EfiRuntimeServicesCode = 0;
     DxeSettings.HeapGuardPoolType.Fields.EfiRuntimeServicesData = 0;
 
-    // THE /NXCOMPAT DLL flag cannot be set using non MinGW GCC
- #ifdef __GNUC__
+    // THE /NXCOMPAT DLL flag is not set on grub/shim today, so do not block loading
+    // otherwise we cannot boot Linux
     DxeSettings.ImageProtectionPolicy.Fields.BlockImagesWithoutNxFlag = 0;
- #endif
 
     BuildGuidDataHob (
       &gDxeMemoryProtectionSettingsGuid,
