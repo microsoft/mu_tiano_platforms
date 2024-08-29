@@ -163,7 +163,8 @@ jobs:
         BuildPackage: QemuSbsaPkg
         BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
         BuildTarget: "DEBUG"
-        BuildExtraTag: "-v"
+        BuildFlags: "-v"
+        BuildExtraTag: ""
         BuildExtraStep:
           - template: Steps/RustSetupSteps.yml@mu_devops
           - template: Steps/SetupToolChainTagPreReqs.yml@mu_devops
