@@ -18,3 +18,4 @@ xmlschema==3.3.2
 regex==2024.7.24
 pygount==1.8.0
 pywin32==306; sys_platform == 'win32'
+pefile==2023.2.7
