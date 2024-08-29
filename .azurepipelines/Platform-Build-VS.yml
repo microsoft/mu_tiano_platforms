@@ -134,7 +134,7 @@ jobs:
       QemuQ35_DEBUG_CLANGPDB:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-        BuildFlags: ""
+        BuildFlags: "-v"
         BuildTarget: "DEBUG"
         BuildExtraTag: ""
         BuildExtraStep:
