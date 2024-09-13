@@ -29,8 +29,12 @@
   # Defines for default states.  These can be changed on the command line.
   # -D FLAG=VALUE
   #
-!ifndef DEBUGGER_ENABLED
-  DEFINE DEBUGGER_ENABLED               = FALSE
+
+  #
+  # DXE_DBG_BRK will force the DXE debugger to break in as early as possible and wait indefinitely
+  #
+!ifndef DXE_DBG_BRK
+  DEFINE DXE_DBG_BRK = FALSE
 !endif
 !ifndef TPM_ENABLE
   DEFINE TPM_ENABLE                     = FALSE
@@ -604,11 +608,7 @@
   !endif
 
 [PcdsPatchableInModule]
-!if $(DEBUGGER_ENABLED) == TRUE
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
-!else
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2F
-!endif
 
 [PcdsFixedAtBuild]
   !include QemuPkg/AutoGen/SecurebootPcds.inc
@@ -732,6 +732,18 @@
   # CMOS region is 128 bytes
   gMsWheaPkgTokenSpaceGuid.PcdMsWheaReportEarlyStorageCapacity|0x80
 
+  ## Controls the debug configuration flags.
+  # Bit 0 - Controls whether the debugger will break in on initialization.
+  # Bit 1 - Controls whether the DXE debugger is enabled.
+  # Bit 2 - Controls whether the MM debugger is enabled.
+  # Bit 3 - Controls whether the debugger runs in minimal mode. If enabled, the
+  #         debugger will avoid using protocols and depend on static linked functionality.
+  DebuggerFeaturePkgTokenSpaceGuid.PcdDebugConfigFlags|0x2
+
+  # Set the debugger timeout to wait forever. This only takes effect if Bit 0 of PcdDebugConfigFlags is set
+  # to 1, which by default it is not. Using BLD_*_DXE_DBG_BRK=TRUE will set this to 1.
+  DebuggerFeaturePkgTokenSpaceGuid.PcdInitialBreakpointTimeoutMs|0
+
 [PcdsFixedAtBuild.IA32]
   #
   # The NumberOfPages values below are ad-hoc. They are updated sporadically at
@@ -835,10 +847,8 @@
     gEfiMdeModulePkgTokenSpaceGuid.PcdDeviceStateBitmask|0x20
   !endif
 
-  # Set to debug if debugger is enabled.
-  !if $(DEBUGGER_ENABLED) == TRUE
-    gEfiMdeModulePkgTokenSpaceGuid.PcdDeviceStateBitmask|0x08
-  !endif
+  # Set to debug as debugger is enabled.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDeviceStateBitmask|0x08
 
 [PcdsDynamicHii]
 !if $(TPM_ENABLE) == TRUE && $(TPM_CONFIG_ENABLE) == TRUE
@@ -1023,6 +1033,13 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
     <LibraryClasses>
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
       DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+    <PcdsFixedAtBuild>
+      ## Forcibly enables the debugger with a 30 second initial breakpoint. This can be set from the cmdline by passing
+      # BLD_*_DXE_DBG_BRK=TRUE. If this is false, the debugger will not have an initial break in, but will break in
+      # on exceptions
+      !if $(DXE_DBG_BRK) == TRUE
+        DebuggerFeaturePkgTokenSpaceGuid.PcdDebugConfigFlags|0x3
+      !endif
   }
 
   MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
