@@ -737,7 +737,13 @@
   # Bit 1 - Controls whether the DXE debugger is enabled.
   # Bit 2 - Controls whether the MM debugger is enabled.
   # Bit 3 - Disables the debuggers periodic polling for a requested break-in.
+  # if BLD_*_DXE_DBG_BRK=TRUE, the debugger will have an initial break in, but will break in, otherwise it only will
+  # on exceptions
+!if $(DXE_DBG_BRK) == TRUE
+  DebuggerFeaturePkgTokenSpaceGuid.PcdDebugConfigFlags|0x3
+!else
   DebuggerFeaturePkgTokenSpaceGuid.PcdDebugConfigFlags|0x2
+!endif
 
   # Set the debugger timeout to wait forever. This only takes effect if Bit 0 of PcdDebugConfigFlags is set
   # to 1, which by default it is not. Using BLD_*_DXE_DBG_BRK=TRUE will set this to 1.
@@ -1032,13 +1038,6 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
     <LibraryClasses>
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
       DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
-    <PcdsFixedAtBuild>
-      ## Forcibly enables the debugger with a 30 second initial breakpoint. This can be set from the cmdline by passing
-      # BLD_*_DXE_DBG_BRK=TRUE. If this is false, the debugger will not have an initial break in, but will break in
-      # on exceptions
-      !if $(DXE_DBG_BRK) == TRUE
-        DebuggerFeaturePkgTokenSpaceGuid.PcdDebugConfigFlags|0x3
-      !endif
   }
 
   MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf

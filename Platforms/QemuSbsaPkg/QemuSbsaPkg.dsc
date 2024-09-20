@@ -801,8 +801,13 @@
   # Bit 2 - Controls whether the MM debugger is enabled.
   # Bit 3 - Disables the debuggers periodic polling for a requested break-in.
   # For SBSA, we have to disable the periodic polling, because there is only one one serial port and the debug agent
-  # may eat console input if let poll on it
-  DebuggerFeaturePkgTokenSpaceGuid.PcdDebugConfigFlags|0x6
+  # may eat console input if let poll on it. If BLD_*_DXE_DBG_BRK is set to TRUE, then the debugger will break in on
+  # initialization. Otherwise, the debugger will not break in on initialization.
+  !if $(DXE_DBG_BRK) == TRUE
+    DebuggerFeaturePkgTokenSpaceGuid.PcdDebugConfigFlags|0xB
+  !else
+    DebuggerFeaturePkgTokenSpaceGuid.PcdDebugConfigFlags|0xA
+  !endif
 
   # Set the debugger timeout to wait forever. This only takes effect if Bit 0 of PcdDebugConfigFlags is set
   # to 1, which by default it is not. Using BLD_*_DXE_DBG_BRK=TRUE will set this to 1.
@@ -991,13 +996,6 @@
     <LibraryClasses>
       NULL|MdeModulePkg/Library/DxeCrc32GuidedSectionExtractLib/DxeCrc32GuidedSectionExtractLib.inf
       DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
-    <PcdsFixedAtBuild>
-      ## Forcibly enables the debugger with a 30 second initial breakpoint. This can be set from the cmdline by passing
-      # BLD_*_DXE_DBG_BRK=TRUE. If this is false, the debugger will not have an initial break in, but will break in
-      # on exceptions
-      !if $(DXE_DBG_BRK) == TRUE
-        DebuggerFeaturePkgTokenSpaceGuid.PcdDebugConfigFlags|0x7
-      !endif
   }
   MdeModulePkg/Universal/PCD/Dxe/Pcd.inf {
     <LibraryClasses>
