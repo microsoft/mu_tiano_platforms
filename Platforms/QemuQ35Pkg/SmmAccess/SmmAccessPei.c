@@ -2,10 +2,8 @@
 
   A PEIM with the following responsibilities:
 
-  - verify & configure the Q35 TSEG in the entry point,
-  - provide SMRAM access by producing PEI_SMM_ACCESS_PPI,
-  - set aside the SMM_S3_RESUME_STATE object at the bottom of TSEG, and expose
-    it via the gEfiAcpiVariableGuid GUID HOB.
+  - verify & configure the Q35 TSEG in the entry point
+  - provide SMRAM access by producing PEI_SMM_ACCESS_PPI
 
   This PEIM runs from RAM, so we can write to variables with static storage
   duration.
@@ -17,7 +15,6 @@
 
 **/
 
-#include <Guid/AcpiS3Context.h>
 #include <Guid/MmramMemoryReserve.h> // MU_CHANGE: Added support for Standalone MM mode
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -248,7 +245,6 @@ SmmAccessPeiEntryPoint (
   EFI_STATUS            Status;
   UINTN                 SmramMapSize;
   EFI_SMRAM_DESCRIPTOR  SmramMap[DescIdxCount];
-  VOID                  *GuidHob;
 
   //
   // This module should only be included if SMRAM support is required.
@@ -403,31 +399,12 @@ SmmAccessPeiEntryPoint (
   }
   DEBUG_CODE_END ();
 
-  GuidHob = BuildGuidHob (
-              &gEfiAcpiVariableGuid,
-              sizeof SmramMap[DescIdxSmmS3ResumeState]
-              );
-  if (GuidHob == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  CopyMem (
-    GuidHob,
-    &SmramMap[DescIdxSmmS3ResumeState],
-    sizeof SmramMap[DescIdxSmmS3ResumeState]
-    );
-
   //
   // SmramAccessLock() depends on "mQ35SmramAtDefaultSmbase"; init the latter
   // just before exposing the former via PEI_SMM_ACCESS_PPI.Lock().
   //
   InitQ35SmramAtDefaultSmbase ();
 
-  //
-  // We're done. The next step should succeed, but even if it fails, we can't
-  // roll back the above BuildGuidHob() allocation, because PEI doesn't support
-  // releasing memory.
-  //
   return PeiServicesInstallPpi (mPpiList);
 
 WrongConfig:

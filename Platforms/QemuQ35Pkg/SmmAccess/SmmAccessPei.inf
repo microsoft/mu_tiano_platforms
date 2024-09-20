@@ -1,10 +1,8 @@
 ## @file
 # A PEIM with the following responsibilities:
 #
-# - provide SMRAM access by producing PEI_SMM_ACCESS_PPI,
-# - verify & configure the Q35 TSEG in the entry point,
-# - set aside the SMM_S3_RESUME_STATE object at the bottom of TSEG, and expose
-#   it via the gEfiAcpiVariableGuid GUIDed HOB.
+# - provide SMRAM access by producing PEI_SMM_ACCESS_PPI
+# - verify & configure the Q35 TSEG in the entry point
 #
 # Copyright (C) 2013, 2015, Red Hat, Inc.
 #
