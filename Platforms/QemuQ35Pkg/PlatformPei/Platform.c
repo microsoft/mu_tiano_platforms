@@ -3,6 +3,7 @@
 
   Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2011, Andrei Warkentin <andreiw@motorola.com>
+  Copyright (c) Microsoft Corporation
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -27,7 +28,6 @@
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/QemuFwCfgLib.h>
-#include <Library/QemuFwCfgS3Lib.h>
 #include <Library/QemuFwCfgSimpleParserLib.h>
 #include <Library/ResourcePublicationLib.h>
 #include <Ppi/MasterBootMode.h>
@@ -54,8 +54,6 @@ EFI_PEI_PPI_DESCRIPTOR  mPpiBootMode[] = {
 UINT16  mHostBridgeDevId;
 
 EFI_BOOT_MODE  mBootMode = BOOT_WITH_FULL_CONFIGURATION;
-
-BOOLEAN  mS3Supported = FALSE;
 
 UINT32  mMaxCpuCount;
 
@@ -416,8 +414,7 @@ MiscInitialization (
 
   //
   // Build the CPU HOB with guest RAM size dependent address width and 16-bits
-  // of IO space. (Side note: unlike other HOBs, the CPU HOB is needed during
-  // S3 resume as well, so we build it unconditionally.)
+  // of IO space.
   //
   BuildCpuHob (mPhysMemAddressWidth, 16);
 
@@ -516,7 +513,9 @@ BootModeInitialization (
   EFI_STATUS  Status;
 
   if (CmosRead8 (0xF) == 0xFE) {
-    mBootMode = BOOT_ON_S3_RESUME;
+    // S3 is not supported. Do not modify the boot mode.
+    DEBUG ((DEBUG_ERROR, "[%a] S3 is enabled in CMOS, but not supported!\n", __func__));
+    ASSERT (FALSE);
   }
 
   CmosWrite8 (0xF, 0x00);
@@ -576,35 +575,6 @@ DebugDumpCmos (
       DEBUG ((DEBUG_INFO, "\n"));
     }
   }
-}
-
-VOID
-S3Verification (
-  VOID
-  )
-{
- #if defined (MDE_CPU_X64)
-  if (FeaturePcdGet (PcdSmmSmramRequire) && mS3Supported) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: S3Resume2Pei doesn't support X64 PEI + SMM yet.\n",
-      __FUNCTION__
-      ));
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: Please disable S3 on the QEMU command line (see the README),\n",
-      __FUNCTION__
-      ));
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: or build OVMF with \"QemuQ35PkgIa32X64.dsc\".\n",
-      __FUNCTION__
-      ));
-    ASSERT (FALSE);
-    CpuDeadLoop ();
-  }
-
- #endif
 }
 
 VOID
@@ -818,7 +788,6 @@ InitializePlatform (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_STATUS  Status;
   // MU_CHANGE START
   DXE_MEMORY_PROTECTION_SETTINGS  DxeSettings;
   MM_MEMORY_PROTECTION_SETTINGS   MmSettings;
@@ -852,14 +821,6 @@ InitializePlatform (
 
   DebugDumpCmos ();
 
-  if (QemuFwCfgS3Enabled ()) {
-    DEBUG ((DEBUG_INFO, "S3 support was detected on QEMU\n"));
-    mS3Supported = TRUE;
-    Status       = PcdSetBoolS (PcdAcpiS3Enable, TRUE);
-    ASSERT_EFI_ERROR (Status);
-  }
-
-  S3Verification ();
   BootModeInitialization ();
   AddressWidthInitialization ();
 
@@ -882,16 +843,14 @@ InitializePlatform (
 
   InitializeRamRegions ();
 
-  if (mBootMode != BOOT_ON_S3_RESUME) {
-    if (!FeaturePcdGet (PcdSmmSmramRequire)) {
-      ReserveEmuVariableNvStore ();
-    }
-
-    PeiFvInitialization ();
-    MemTypeInfoInitialization ();
-    MemMapInitialization ();
-    NoexecDxeInitialization ();
+  if (!FeaturePcdGet (PcdSmmSmramRequire)) {
+    ReserveEmuVariableNvStore ();
   }
+
+  PeiFvInitialization ();
+  MemTypeInfoInitialization ();
+  MemMapInitialization ();
+  NoexecDxeInitialization ();
 
   InstallClearCacheCallback ();
   AmdSevInitialize ();
