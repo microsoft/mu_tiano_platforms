@@ -153,9 +153,6 @@ NumBlocks     = 0xD0
 gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecPageTablesBase|gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfSecPageTablesSize
 
 0x006000|0x001000
-gQemuPkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase|gQemuPkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize
-
-0x007000|0x001000
 gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress|gUefiQemuQ35PkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
 
 0x010000|0x010000
