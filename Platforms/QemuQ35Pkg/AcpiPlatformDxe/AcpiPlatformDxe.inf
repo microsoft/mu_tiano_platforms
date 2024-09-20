@@ -23,7 +23,6 @@
 [Sources]
   AcpiPlatform.c
   AcpiPlatform.h
-  BootScript.c
   CloudHvAcpi.c
   EntryPoint.c
   PciDecoding.c
@@ -43,7 +42,6 @@
   OrderedCollectionLib
   PcdLib
   QemuFwCfgLib
-  QemuFwCfgS3Lib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
 
