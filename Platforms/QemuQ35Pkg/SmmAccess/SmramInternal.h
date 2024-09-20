@@ -3,6 +3,7 @@
   Functions and types shared by the SMM accessor PEI and DXE modules.
 
   Copyright (C) 2015, Red Hat, Inc.
+  Copyright (c) Microsoft Corporation
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -14,18 +15,11 @@
 #include <Pi/PiMultiPhase.h>
 
 //
-// We'll have two SMRAM ranges.
-//
-// The first is a tiny one that hosts an SMM_S3_RESUME_STATE object, to be
-// filled in by the CPU SMM driver during normal boot, for the PEI instance of
-// the LockBox library (which will rely on the object during S3 resume).
-//
-// The other SMRAM range is the main one, for the SMM core and the SMM drivers.
+// A single MMRAM range is used for both the MM core and MM drivers.
 //
 typedef enum {
-  DescIdxSmmS3ResumeState = 0,
-  DescIdxMain             = 1,
-  DescIdxCount            = 2
+  DescIdxMain  = 0,
+  DescIdxCount = 1
 } DESCRIPTOR_INDEX;
 
 //
