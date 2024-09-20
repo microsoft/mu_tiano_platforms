@@ -527,16 +527,6 @@ IsS3Resume (
   return (CmosRead8 (0xF) == 0xFE);
 }
 
-STATIC
-EFI_STATUS
-GetS3ResumePeiFv (
-  IN OUT EFI_FIRMWARE_VOLUME_HEADER  **PeiFv
-  )
-{
-  *PeiFv = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdOvmfPeiMemFvBase);
-  return EFI_SUCCESS;
-}
-
 /**
   Locates the PEI Core entry point address
 
@@ -559,28 +549,12 @@ FindPeiCoreImageBase (
   *PeiCoreImageBase = 0;
 
   S3Resume = IsS3Resume ();
-  if (S3Resume && !FeaturePcdGet (PcdSmmSmramRequire)) {
-    //
-    // A malicious runtime OS may have injected something into our previously
-    // decoded PEI FV, but we don't care about that unless SMM/SMRAM is required.
-    //
-    DEBUG ((DEBUG_VERBOSE, "SEC: S3 resume\n"));
-    GetS3ResumePeiFv (BootFv);
-  } else {
-    //
-    // We're either not resuming, or resuming "securely" -- we'll decompress
-    // both PEI FV and DXE FV from pristine flash.
-    //
-    DEBUG ((
-      DEBUG_VERBOSE,
-      "SEC: %a\n",
-      S3Resume ? "S3 resume (with PEI decompression)" : "Normal boot"
-      ));
-    FindMainFv (BootFv);
 
-    DecompressMemFvs (BootFv);
-  }
+  // S3 is not supported
+  ASSERT (!S3Resume);
 
+  FindMainFv (BootFv);
+  DecompressMemFvs (BootFv);
   FindPeiCoreImageBaseInFv (*BootFv, PeiCoreImageBase);
 }
 
