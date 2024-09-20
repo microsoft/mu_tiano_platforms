@@ -52,7 +52,6 @@
   PcdLib
   PciLib
   QemuFwCfgLib
-  QemuFwCfgS3Lib
   PeimEntryPoint
 
 [Ppis]

@@ -3,6 +3,7 @@
   accordingly.
 
   Copyright (C) 2016-2017, Red Hat, Inc.
+  Copyright (c) Microsoft Corporation
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -13,7 +14,6 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/QemuFwCfgLib.h>
-#include <Library/QemuFwCfgS3Lib.h>
 
 #include "SmiFeatures.h"
 
@@ -36,40 +36,26 @@
 #define ICH9_LPC_SMI_F_CPU_HOT_UNPLUG  BIT2
 
 //
-// Provides a scratch buffer (allocated in EfiReservedMemoryType type memory)
-// for the S3 boot script fragment to write to and read from.
-//
-#pragma pack (1)
-typedef union {
-  UINT64    Features;
-  UINT8     FeaturesOk;
-} SCRATCH_BUFFER;
-#pragma pack ()
-
-//
 // These carry the selector keys of the "etc/smi/requested-features" and
-// "etc/smi/features-ok" fw_cfg files from NegotiateSmiFeatures() to
-// AppendFwCfgBootScript().
+// "etc/smi/features-ok" fw_cfg files from NegotiateSmiFeatures().
 //
 STATIC FIRMWARE_CONFIG_ITEM  mRequestedFeaturesItem;
 STATIC FIRMWARE_CONFIG_ITEM  mFeaturesOkItem;
 
 //
-// Carries the negotiated SMI features from NegotiateSmiFeatures() to
-// AppendFwCfgBootScript().
+// Holds the negotiated SMI features from NegotiateSmiFeatures().
 //
 STATIC UINT64  mSmiFeatures;
 
 /**
   Negotiate SMI features with QEMU.
 
-  @retval FALSE  If SMI feature negotiation is not supported by QEMU. This is
-                 not an error, it just means that SaveSmiFeatures() should not
-                 be called.
+  @retval FALSE  It is not an error if SMI feature negotiation is not supported
+                 by QEMU. It just means the data cannot be used.
 
   @retval TRUE   SMI feature negotiation is supported, and it has completed
-                 successfully as well. (Failure to negotiate is a fatal error
-                 and the function never returns in that case.)
+                 successfully as well (failure to negotiate is a fatal error
+                 and the function never returns in that case).
 **/
 BOOLEAN
 NegotiateSmiFeatures (
@@ -236,97 +222,4 @@ FatalError:
   // Keep the compiler happy.
   //
   return FALSE;
-}
-
-/**
-  FW_CFG_BOOT_SCRIPT_CALLBACK_FUNCTION provided to QemuFwCfgS3Lib.
-**/
-STATIC
-VOID
-EFIAPI
-AppendFwCfgBootScript (
-  IN OUT VOID  *Context               OPTIONAL,
-  IN OUT VOID  *ExternalScratchBuffer
-  )
-{
-  SCRATCH_BUFFER  *ScratchBuffer;
-  RETURN_STATUS   Status;
-
-  ScratchBuffer = ExternalScratchBuffer;
-
-  //
-  // Write the negotiated feature bitmap into "etc/smi/requested-features".
-  //
-  ScratchBuffer->Features = mSmiFeatures;
-  Status                  = QemuFwCfgS3ScriptWriteBytes (
-                              mRequestedFeaturesItem,
-                              sizeof ScratchBuffer->Features
-                              );
-  if (RETURN_ERROR (Status)) {
-    goto FatalError;
-  }
-
-  //
-  // Read back "etc/smi/features-ok". This invokes the feature validation &
-  // lockdown. (The validation succeeded at first boot.)
-  //
-  Status = QemuFwCfgS3ScriptReadBytes (
-             mFeaturesOkItem,
-             sizeof ScratchBuffer->FeaturesOk
-             );
-  if (RETURN_ERROR (Status)) {
-    goto FatalError;
-  }
-
-  //
-  // If "etc/smi/features-ok" read as 1, we're good. Otherwise, hang the S3
-  // resume process.
-  //
-  Status = QemuFwCfgS3ScriptCheckValue (
-             &ScratchBuffer->FeaturesOk,
-             sizeof ScratchBuffer->FeaturesOk,
-             MAX_UINT8,
-             1
-             );
-  if (RETURN_ERROR (Status)) {
-    goto FatalError;
-  }
-
-  DEBUG ((
-    DEBUG_VERBOSE,
-    "%a: SMI feature negotiation boot script saved\n",
-    __FUNCTION__
-    ));
-  return;
-
-FatalError:
-  ASSERT (FALSE);
-  CpuDeadLoop ();
-}
-
-/**
-  Append a boot script fragment that will re-select the previously negotiated
-  SMI features during S3 resume.
-**/
-VOID
-SaveSmiFeatures (
-  VOID
-  )
-{
-  RETURN_STATUS  Status;
-
-  //
-  // We are already running at TPL_CALLBACK, on the stack of
-  // OnS3SaveStateInstalled(). But that's okay, we can easily queue more
-  // notification functions while executing a notification function.
-  //
-  Status = QemuFwCfgS3CallWhenBootScriptReady (
-             AppendFwCfgBootScript,
-             NULL,
-             sizeof (SCRATCH_BUFFER)
-             );
-  if (RETURN_ERROR (Status)) {
-    ASSERT (FALSE);
-    CpuDeadLoop ();
-  }
 }
