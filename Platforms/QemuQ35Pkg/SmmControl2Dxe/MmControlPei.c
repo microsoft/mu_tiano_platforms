@@ -29,16 +29,12 @@
 #include <Library/PciLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/QemuFwCfgLib.h>
-#include <Library/QemuFwCfgS3Lib.h>
 #include <Ppi/MmControl.h>
 
 #include "SmiFeatures.h"
 
 //
-// The absolute IO port address of the SMI Control and Enable Register. It is
-// only used to carry information from the entry point function to the
-// S3SaveState protocol installation callback, strictly before the runtime
-// phase.
+// The absolute IO port address of the SMI Control and Enable Register.
 //
 STATIC UINTN  mSmiEnable;
 

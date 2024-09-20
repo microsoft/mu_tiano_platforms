@@ -12,6 +12,7 @@
 # configuring it.
 #
 # Copyright (C) 2013, 2015, Red Hat, Inc.
+# Copyright (c) Microsoft Corporation
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -53,18 +54,15 @@
   PcdLib
   PciLib
   QemuFwCfgLib
-  QemuFwCfgS3Lib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
 
 [Protocols]
-  gEfiS3SaveStateProtocolGuid   ## SOMETIMES_CONSUMES
   gEfiSmmControl2ProtocolGuid   ## PRODUCES
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout ## SOMETIMES_PRODUCES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode      ## SOMETIMES_PRODUCES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable
 
 [FeaturePcd]
   gQemuPkgTokenSpaceGuid.PcdSmmSmramRequire

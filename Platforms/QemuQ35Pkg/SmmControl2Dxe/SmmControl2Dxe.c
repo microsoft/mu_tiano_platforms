@@ -14,6 +14,7 @@
 
   Copyright (C) 2013, 2015, Red Hat, Inc.<BR>
   Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -26,41 +27,19 @@
 #include <Library/PcdLib.h>
 #include <Library/PciLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Protocol/S3SaveState.h>
 #include <Protocol/SmmControl2.h>
 
 #include "SmiFeatures.h"
 
 //
-// Forward declaration.
-//
-STATIC
-VOID
-EFIAPI
-OnS3SaveStateInstalled (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
-  );
-
-//
-// The absolute IO port address of the SMI Control and Enable Register. It is
-// only used to carry information from the entry point function to the
-// S3SaveState protocol installation callback, strictly before the runtime
-// phase.
+// The absolute IO port address of the SMI Control and Enable Register.
 //
 STATIC UINTN  mSmiEnable;
 
 //
-// Captures whether SMI feature negotiation is supported. The variable is only
-// used to carry this information from the entry point function to the
-// S3SaveState protocol installation callback.
+// Captures whether SMI feature negotiation is supported.
 //
 STATIC BOOLEAN  mSmiFeatureNegotiation;
-
-//
-// Event signaled when an S3SaveState protocol interface is installed.
-//
-STATIC EFI_EVENT  mS3SaveStateInstalled;
 
 /**
   Invokes SMI activation from either the preboot or runtime environment.
@@ -249,53 +228,10 @@ SmmControl2DxeEntryPoint (
 
   //
   // QEMU can inject SMIs in different ways, negotiate our preferences.
+  // Note: Negotiated features are not actually used for anything right now. But, the function is called
+  //       to test negotiation in case it is need in the future.
   //
   mSmiFeatureNegotiation = NegotiateSmiFeatures ();
-
-  if (PcdGetBool (PcdAcpiS3Enable)) {
-    VOID  *Registration;
-
-    //
-    // On S3 resume the above register settings have to be repeated. Register a
-    // protocol notify callback that, when boot script saving becomes
-    // available, saves operations equivalent to the above to the boot script.
-    //
-    Status = gBS->CreateEvent (
-                    EVT_NOTIFY_SIGNAL,
-                    TPL_CALLBACK,
-                    OnS3SaveStateInstalled,
-                    NULL /* Context */,
-                    &mS3SaveStateInstalled
-                    );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: CreateEvent: %r\n", __FUNCTION__, Status));
-      goto FatalError;
-    }
-
-    Status = gBS->RegisterProtocolNotify (
-                    &gEfiS3SaveStateProtocolGuid,
-                    mS3SaveStateInstalled,
-                    &Registration
-                    );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "%a: RegisterProtocolNotify: %r\n",
-        __FUNCTION__,
-        Status
-        ));
-      goto ReleaseEvent;
-    }
-
-    //
-    // Kick the event right now -- maybe the boot script is already saveable.
-    //
-    Status = gBS->SignalEvent (mS3SaveStateInstalled);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: SignalEvent: %r\n", __FUNCTION__, Status));
-      goto ReleaseEvent;
-    }
-  }
 
   //
   // We have no pointers to convert to virtual addresses. The handle itself
@@ -314,15 +250,10 @@ SmmControl2DxeEntryPoint (
       __FUNCTION__,
       Status
       ));
-    goto ReleaseEvent;
+    goto FatalError;
   }
 
   return EFI_SUCCESS;
-
-ReleaseEvent:
-  if (mS3SaveStateInstalled != NULL) {
-    gBS->CloseEvent (mS3SaveStateInstalled);
-  }
 
 FatalError:
   //
@@ -331,99 +262,4 @@ FatalError:
   ASSERT (FALSE);
   CpuDeadLoop ();
   return EFI_UNSUPPORTED;
-}
-
-/**
-  Notification callback for S3SaveState installation.
-
-  @param[in] Event    Event whose notification function is being invoked.
-
-  @param[in] Context  The pointer to the notification function's context, which
-                      is implementation-dependent.
-**/
-STATIC
-VOID
-EFIAPI
-OnS3SaveStateInstalled (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
-  )
-{
-  EFI_STATUS                  Status;
-  EFI_S3_SAVE_STATE_PROTOCOL  *S3SaveState;
-  UINT32                      SmiEnOrMask, SmiEnAndMask;
-  UINT64                      GenPmCon1Address;
-  UINT16                      GenPmCon1OrMask, GenPmCon1AndMask;
-
-  ASSERT (Event == mS3SaveStateInstalled);
-
-  Status = gBS->LocateProtocol (
-                  &gEfiS3SaveStateProtocolGuid,
-                  NULL /* Registration */,
-                  (VOID **)&S3SaveState
-                  );
-  if (EFI_ERROR (Status)) {
-    return;
-  }
-
-  //
-  // These operations were originally done, verified and explained in the entry
-  // point function of the driver.
-  //
-  SmiEnOrMask  = ICH9_SMI_EN_APMC_EN | ICH9_SMI_EN_GBL_SMI_EN;
-  SmiEnAndMask = MAX_UINT32;
-  Status       = S3SaveState->Write (
-                                S3SaveState,
-                                EFI_BOOT_SCRIPT_IO_READ_WRITE_OPCODE,
-                                EfiBootScriptWidthUint32,
-                                (UINT64)mSmiEnable,
-                                &SmiEnOrMask,
-                                &SmiEnAndMask
-                                );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: EFI_BOOT_SCRIPT_IO_READ_WRITE_OPCODE: %r\n",
-      __FUNCTION__,
-      Status
-      ));
-    ASSERT (FALSE);
-    CpuDeadLoop ();
-  }
-
-  GenPmCon1Address = POWER_MGMT_REGISTER_Q35_EFI_PCI_ADDRESS (
-                       ICH9_GEN_PMCON_1
-                       );
-  GenPmCon1OrMask  = ICH9_GEN_PMCON_1_SMI_LOCK;
-  GenPmCon1AndMask = MAX_UINT16;
-  Status           = S3SaveState->Write (
-                                    S3SaveState,
-                                    EFI_BOOT_SCRIPT_PCI_CONFIG_READ_WRITE_OPCODE,
-                                    EfiBootScriptWidthUint16,
-                                    GenPmCon1Address,
-                                    &GenPmCon1OrMask,
-                                    &GenPmCon1AndMask
-                                    );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: EFI_BOOT_SCRIPT_PCI_CONFIG_READ_WRITE_OPCODE: %r\n",
-      __FUNCTION__,
-      Status
-      ));
-    ASSERT (FALSE);
-    CpuDeadLoop ();
-  }
-
-  DEBUG ((DEBUG_VERBOSE, "%a: chipset boot script saved\n", __FUNCTION__));
-
-  //
-  // Append a boot script fragment that re-selects the negotiated SMI features.
-  //
-  if (mSmiFeatureNegotiation) {
-    SaveSmiFeatures ();
-  }
-
-  gBS->CloseEvent (Event);
-  mS3SaveStateInstalled = NULL;
 }
