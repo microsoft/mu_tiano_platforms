@@ -114,8 +114,6 @@ SevInitializeRam (
   VOID
   );
 
-extern BOOLEAN  mS3Supported;
-
 extern UINT8  mPhysMemAddressWidth;
 
 extern UINT32  mMaxCpuCount;
