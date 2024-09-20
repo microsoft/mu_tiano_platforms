@@ -50,9 +50,14 @@
   # Defines for default states.  These can be changed on the command line.
   # -D FLAG=VALUE
   #
-  !ifndef DEBUGGER_ENABLED
-    DEFINE DEBUGGER_ENABLED               = FALSE
-  !endif
+
+  #
+  # DXE_DBG_BRK will force the DXE debugger to break in as early as possible and wait indefinitely
+  #
+!ifndef DXE_DBG_BRK
+  DEFINE DXE_DBG_BRK = FALSE
+!endif
+
   DEFINE TTY_TERMINAL            = FALSE
   DEFINE TPM2_ENABLE             = FALSE
   DEFINE TPM2_CONFIG_ENABLE      = FALSE
@@ -587,11 +592,7 @@
   # CLEAR_MEMORY_ENABLED       0x08
   # ASSERT_BREAKPOINT_ENABLED  0x10
   # ASSERT_DEADLOOP_ENABLED    0x20
-!if $(TARGET) == RELEASE
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x21
-!else
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0xff
-!endif
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
 
 [PcdsFixedAtBuild.common]
   !include QemuPkg/AutoGen/SecurebootPcds.inc
@@ -794,6 +795,19 @@
   # Set this to be gOemConfigPolicyGuid
   gSetupDataPkgTokenSpaceGuid.PcdConfigurationPolicyGuid|{GUID("ba320ade-e132-4c99-a3df-74d673ea6f76")}
 
+  ## Controls the debug configuration flags.
+  # Bit 0 - Controls whether the debugger will break in on initialization.
+  # Bit 1 - Controls whether the DXE debugger is enabled.
+  # Bit 2 - Controls whether the MM debugger is enabled.
+  # Bit 3 - Disables the debuggers periodic polling for a requested break-in.
+  # For SBSA, we have to disable the periodic polling, because there is only one one serial port and the debug agent
+  # may eat console input if let poll on it
+  DebuggerFeaturePkgTokenSpaceGuid.PcdDebugConfigFlags|0x6
+
+  # Set the debugger timeout to wait forever. This only takes effect if Bit 0 of PcdDebugConfigFlags is set
+  # to 1, which by default it is not. Using BLD_*_DXE_DBG_BRK=TRUE will set this to 1.
+  DebuggerFeaturePkgTokenSpaceGuid.PcdInitialBreakpointTimeoutMs|0
+
 [PcdsFixedAtBuild.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId|"Palindrome"
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId|0x756D6551754D #MuQemuArm
@@ -867,10 +881,8 @@
     gEfiMdeModulePkgTokenSpaceGuid.PcdDeviceStateBitmask|0x20
   !endif
 
-  # Set to debug if debugger is enabled.
-  !if $(DEBUGGER_ENABLED) == TRUE
-    gEfiMdeModulePkgTokenSpaceGuid.PcdDeviceStateBitmask|0x08
-  !endif
+  # Set to debug as debugger is enabled.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDeviceStateBitmask|0x08
 
   #
   # TPM2 support
@@ -979,6 +991,13 @@
     <LibraryClasses>
       NULL|MdeModulePkg/Library/DxeCrc32GuidedSectionExtractLib/DxeCrc32GuidedSectionExtractLib.inf
       DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+    <PcdsFixedAtBuild>
+      ## Forcibly enables the debugger with a 30 second initial breakpoint. This can be set from the cmdline by passing
+      # BLD_*_DXE_DBG_BRK=TRUE. If this is false, the debugger will not have an initial break in, but will break in
+      # on exceptions
+      !if $(DXE_DBG_BRK) == TRUE
+        DebuggerFeaturePkgTokenSpaceGuid.PcdDebugConfigFlags|0x7
+      !endif
   }
   MdeModulePkg/Universal/PCD/Dxe/Pcd.inf {
     <LibraryClasses>

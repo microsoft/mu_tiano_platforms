@@ -736,8 +736,7 @@
   # Bit 0 - Controls whether the debugger will break in on initialization.
   # Bit 1 - Controls whether the DXE debugger is enabled.
   # Bit 2 - Controls whether the MM debugger is enabled.
-  # Bit 3 - Controls whether the debugger runs in minimal mode. If enabled, the
-  #         debugger will avoid using protocols and depend on static linked functionality.
+  # Bit 3 - Disables the debuggers periodic polling for a requested break-in.
   DebuggerFeaturePkgTokenSpaceGuid.PcdDebugConfigFlags|0x2
 
   # Set the debugger timeout to wait forever. This only takes effect if Bit 0 of PcdDebugConfigFlags is set
