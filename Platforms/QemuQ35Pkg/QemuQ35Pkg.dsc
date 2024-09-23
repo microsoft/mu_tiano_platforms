@@ -220,7 +220,6 @@
   UnitTestResultReportLib |XmlSupportPkg/Library/UnitTestResultReportJUnitFormatLib/UnitTestResultReportLib.inf
 
   # Xen Libraries
-  XenHypercallLib |QemuQ35Pkg/Library/XenHypercallLib/XenHypercallLib.inf
   XenPlatformLib  |QemuPkg/Library/XenPlatformLib/XenPlatformLib.inf
 
   # Crypto Libraries
@@ -310,13 +309,16 @@
 
   AmdSvsmLib|UefiCpuPkg/Library/AmdSvsmLibNull/AmdSvsmLibNull.inf
 
-[LibraryClasses]
   # Platform Runtime Mechanism (PRM) libraries
   PrmContextBufferLib|PrmPkg/Library/DxePrmContextBufferLib/DxePrmContextBufferLib.inf
   PrmModuleDiscoveryLib|PrmPkg/Library/DxePrmModuleDiscoveryLib/DxePrmModuleDiscoveryLib.inf
   PrmPeCoffLib|PrmPkg/Library/DxePrmPeCoffLib/DxePrmPeCoffLib.inf
 
   StackCheckFailureHookLib|MdePkg/Library/StackCheckFailureHookLibNull/StackCheckFailureHookLibNull.inf
+
+[LibraryClasses.IA32, LibraryClasses.X64]
+  XenHypercallLib|QemuQ35Pkg/Library/XenHypercallLib/XenHypercallLib.inf
+
 [LibraryClasses.common.PEI_CORE]
   NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
 
