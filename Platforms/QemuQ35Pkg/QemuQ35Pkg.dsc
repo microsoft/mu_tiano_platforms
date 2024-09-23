@@ -1272,9 +1272,6 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   }
 
   QemuQ35Pkg/IoMmuDxe/IoMmuDxe.inf
-
-  QemuQ35Pkg/CpuS3DataDxe/CpuS3DataDxe.inf
-
   AdvLoggerPkg/AdvancedFileLogger/AdvancedFileLogger.inf
   MsCorePkg/Universal/StatusCodeHandler/Serial/Dxe/SerialStatusCodeHandlerDxe.inf
   MsCorePkg/MuCryptoDxe/MuCryptoDxe.inf
