@@ -155,7 +155,6 @@ SmmInitHandler (
 
 /**
   Relocate SmmBases for each processor.
-  Execute on first boot and all S3 resumes
 
   @param[in]   MpServices2         Pointer to this instance of the MpServices.
   @param[in]   SmmRelocationStart  The start address of Smm relocated memory in SMRAM.
