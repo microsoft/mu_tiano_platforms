@@ -66,9 +66,6 @@
   gQemuPkgTokenSpaceGuid.PcdVirtioScsiMaxTargetLimit|31|UINT16|0x2
   gQemuPkgTokenSpaceGuid.PcdVirtioScsiMaxLunLimit|7|UINT32|0x3
 
-  gQemuPkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase|0x0|UINT32|0x4
-  gQemuPkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize|0x0|UINT32|0x5
-
 [PcdsFixedAtBuild, PcdsDynamic, PcdsDynamicEx]
   gQemuPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0|UINT16|0x10
 
