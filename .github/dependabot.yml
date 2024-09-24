@@ -80,6 +80,7 @@ updates:
       - dependency-name: "Common/MU_TIANO"
       - dependency-name: "Common/MU"
       - dependency-name: "Features/CONFIG"
+      - dependency-name: "Features/DEBUGGER"
       - dependency-name: "Features/DFCI"
       - dependency-name: "Features/IPMI"
       - dependency-name: "Features/MM_SUPV"
