@@ -8,7 +8,6 @@
 
 **/
 
-#include <Guid/AcpiS3Context.h>
 #include <IndustryStandard/Q35MchIch9.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
@@ -197,18 +196,6 @@ SmramAccessGetCapabilities (
                       EFI_CACHEABLE;
 
   //
-  // The first region hosts an SMM_S3_RESUME_STATE object. It is located at the
-  // start of TSEG. We round up the size to whole pages, and we report it as
-  // EFI_ALLOCATED, so that the SMM_CORE stays away from it.
-  //
-  SmramMap[DescIdxSmmS3ResumeState].PhysicalStart = TsegMemoryBase;
-  SmramMap[DescIdxSmmS3ResumeState].CpuStart      = TsegMemoryBase;
-  SmramMap[DescIdxSmmS3ResumeState].PhysicalSize  =
-    EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (sizeof (SMM_S3_RESUME_STATE)));
-  SmramMap[DescIdxSmmS3ResumeState].RegionState =
-    CommonRegionState | EFI_ALLOCATED;
-
-  //
   // Get the TSEG size bits from the ESMRAMC register.
   //
   TsegSizeBits = PciRead8 (DRAMC_REGISTER_Q35 (MCH_ESMRAMC)) &
@@ -217,16 +204,13 @@ SmramAccessGetCapabilities (
   //
   // The second region is the main one, following the first.
   //
-  SmramMap[DescIdxMain].PhysicalStart =
-    SmramMap[DescIdxSmmS3ResumeState].PhysicalStart +
-    SmramMap[DescIdxSmmS3ResumeState].PhysicalSize;
-  SmramMap[DescIdxMain].CpuStart     = SmramMap[DescIdxMain].PhysicalStart;
-  SmramMap[DescIdxMain].PhysicalSize =
+  SmramMap[DescIdxMain].PhysicalStart = TsegMemoryBase;
+  SmramMap[DescIdxMain].CpuStart      = SmramMap[DescIdxMain].PhysicalStart;
+  SmramMap[DescIdxMain].PhysicalSize  =
     (TsegSizeBits == MCH_ESMRAMC_TSEG_8MB ? SIZE_8MB :
      TsegSizeBits == MCH_ESMRAMC_TSEG_2MB ? SIZE_2MB :
      TsegSizeBits == MCH_ESMRAMC_TSEG_1MB ? SIZE_1MB :
-     mQ35TsegMbytes * SIZE_1MB) -
-    SmramMap[DescIdxSmmS3ResumeState].PhysicalSize;
+     mQ35TsegMbytes * SIZE_1MB);
   SmramMap[DescIdxMain].RegionState = CommonRegionState;
 
   return EFI_SUCCESS;

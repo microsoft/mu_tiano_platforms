@@ -29,10 +29,6 @@
   #                  instances in ArmVirtPkg and OvmfPkg.
   PciHostBridgeUtilityLib|Include/Library/PciHostBridgeUtilityLib.h
 
-  ##  @libraryclass  S3 support for QEMU fw_cfg
-  #
-  QemuFwCfgS3Lib|Include/Library/QemuFwCfgS3Lib.h
-
   ##  @libraryclass  Parse the contents of named fw_cfg files as simple
   #                  (scalar) data types.
   QemuFwCfgSimpleParserLib|Include/Library/QemuFwCfgSimpleParserLib.h

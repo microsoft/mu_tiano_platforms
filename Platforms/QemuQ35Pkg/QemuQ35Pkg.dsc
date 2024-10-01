@@ -184,7 +184,7 @@
   # Security Libraries
   SecurityManagementLib |MdeModulePkg/Library/DxeSecurityManagementLib/DxeSecurityManagementLib.inf
   SecurityLockAuditLib  |MdeModulePkg/Library/SecurityLockAuditDebugMessageLib/SecurityLockAuditDebugMessageLib.inf ##MU_CHANGE
-  LockBoxLib            |QemuPkg/Library/LockBoxLib/LockBoxBaseLib.inf
+  LockBoxLib            |MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
   PlatformSecureLib     |SecurityPkg/Library/PlatformSecureLibNull/PlatformSecureLibNull.inf
   PasswordStoreLib      |MsCorePkg/Library/PasswordStoreLibNull/PasswordStoreLibNull.inf
   PasswordPolicyLib     |OemPkg/Library/PasswordPolicyLib/PasswordPolicyLib.inf
@@ -229,7 +229,6 @@
   # Power/Thermal/Power State Libraries
   MsNVBootReasonLib       |OemPkg/Library/MsNVBootReasonLib/MsNVBootReasonLib.inf # interface on Reboot Reason non volatile variables
   ResetUtilityLib         |MdeModulePkg/Library/ResetUtilityLib/ResetUtilityLib.inf
-  S3BootScriptLib         |MdeModulePkg/Library/PiDxeS3BootScriptLib/DxeS3BootScriptLib.inf
   PowerServicesLib        |PcBdsPkg/Library/PowerServicesLibNull/PowerServicesLibNull.inf
   ThermalServicesLib      |PcBdsPkg/Library/ThermalServicesLibNull/ThermalServicesLibNull.inf
   MsPlatformPowerCheckLib |PcBdsPkg/Library/MsPlatformPowerCheckLibNull/MsPlatformPowerCheckLibNull.inf
@@ -380,12 +379,10 @@
   PeimEntryPoint             |MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
   MsPlatformEarlyGraphicsLib |MsGraphicsPkg/Library/MsEarlyGraphicsLibNull/Pei/MsEarlyGraphicsLibNull.inf
   MsUiThemeLib               |MsGraphicsPkg/Library/MsUiThemeLib/Pei/MsUiThemeLib.inf
-  LockBoxLib                 |MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxPeiLib.inf
   ResourcePublicationLib     |MdePkg/Library/PeiResourcePublicationLib/PeiResourcePublicationLib.inf
   ExtractGuidedSectionLib    |MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
   CpuExceptionHandlerLib     |UefiCpuPkg/Library/CpuExceptionHandlerLib/PeiCpuExceptionHandlerLib.inf
   MpInitLib                  |UefiCpuPkg/Library/MpInitLib/PeiMpInitLib.inf
-  QemuFwCfgS3Lib             |QemuQ35Pkg/Library/QemuFwCfgS3Lib/PeiQemuFwCfgS3LibFwCfg.inf
   PcdLib                     |MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   QemuFwCfgLib               |QemuQ35Pkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
   PcdDatabaseLoaderLib       |MdeModulePkg/Library/PcdDatabaseLoaderLib/Pei/PcdDatabaseLoaderLibPei.inf
@@ -418,7 +415,6 @@
   MemoryAllocationLib           |MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   CpuExceptionHandlerLib        |UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
   ReportStatusCodeLib           |MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
-  QemuFwCfgS3Lib                |QemuQ35Pkg/Library/QemuFwCfgS3Lib/DxeQemuFwCfgS3LibFwCfg.inf
   MmUnblockMemoryLib            |MmSupervisorPkg/Library/MmSupervisorUnblockMemoryLib/MmSupervisorUnblockMemoryLibDxe.inf
 
 # Non DXE Core but everything else
@@ -455,7 +451,6 @@
 [LibraryClasses.common.DXE_DRIVER]
   PlatformBootManagerLib|MsCorePkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   PlatformBmPrintScLib|QemuPkg/Library/PlatformBmPrintScLib/PlatformBmPrintScLib.inf
-  LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxDxeLib.inf
   QemuLoadImageLib|QemuQ35Pkg/Library/GenericQemuLoadImageLib/GenericQemuLoadImageLib.inf
   MpInitLib|UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
   UpdateFacsHardwareSignatureLib|OemPkg/Library/UpdateFacsHardwareSignatureLib/UpdateFacsHardwareSignatureLib.inf
@@ -486,7 +481,6 @@
   SmmServicesTableLib|MdePkg/Library/SmmServicesTableLib/SmmServicesTableLib.inf
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/SmmCpuExceptionHandlerLib.inf
   RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
-  LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxSmmLib.inf
   AdvLoggerAccessLib|AdvLoggerPkg/Library/AdvLoggerSmmAccessLib/AdvLoggerSmmAccessLib.inf
 
 [LibraryClasses.common.SMM_CORE]
@@ -523,7 +517,6 @@
   MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
   HobLib|MmSupervisorPkg/Library/StandaloneMmHobLibSyscall/StandaloneMmHobLibSyscall.inf
   MemLib|MmSupervisorPkg/Library/MmSupervisorMemLib/MmSupervisorMemLibSyscall.inf
-  LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxStandaloneMmLib.inf
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/SmmCpuExceptionHandlerLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/SmmReportStatusCodeLib/StandaloneMmReportStatusCodeLib.inf
   HwResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
@@ -926,13 +919,6 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
     <LibraryClasses>
       NULL|StandaloneMmPkg/Library/PeiStandaloneMmHobProductionLib/PeiStandaloneMmHobProductionLib.inf
   }
-  UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf {
-    <LibraryClasses>
-
-      LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxPeiLib.inf
-
-  }
-
   MdeModulePkg/Universal/FaultTolerantWritePei/FaultTolerantWritePei.inf
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
   QemuQ35Pkg/SmmAccess/SmmAccessPei.inf
@@ -1176,8 +1162,6 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   #
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   QemuQ35Pkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
-  MdeModulePkg/Universal/Acpi/S3SaveStateDxe/S3SaveStateDxe.inf
-  MdeModulePkg/Universal/Acpi/BootScriptExecutorDxe/BootScriptExecutorDxe.inf
   MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
 
   #
@@ -1288,9 +1272,6 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   }
 
   QemuQ35Pkg/IoMmuDxe/IoMmuDxe.inf
-
-  QemuQ35Pkg/CpuS3DataDxe/CpuS3DataDxe.inf
-
   AdvLoggerPkg/AdvancedFileLogger/AdvancedFileLogger.inf
   MsCorePkg/Universal/StatusCodeHandler/Serial/Dxe/SerialStatusCodeHandlerDxe.inf
   MsCorePkg/MuCryptoDxe/MuCryptoDxe.inf
@@ -1419,11 +1400,6 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   # Privileged drivers (DXE_SMM_DRIVER modules)
   #
   UefiCpuPkg/CpuIo2Smm/CpuIo2StandaloneMm.inf
-  MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.inf {
-    <LibraryClasses>
-      LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxSmmLib.inf
-  }
-
   QemuQ35Pkg/SmmControl2Dxe/SmmControl2Dxe.inf
 
 

@@ -127,8 +127,6 @@
   QemuPkg/Library/ConfigSystemModeLibQemu/ConfigSystemModeLib.inf
   QemuPkg/Library/DfciDeviceIdSupportLib/DfciDeviceIdSupportLib.inf
   QemuPkg/Library/DfciUiSupportLib/DfciUiSupportLib.inf
-  QemuPkg/Library/LockBoxLib/LockBoxBaseLib.inf
-  QemuPkg/Library/LockBoxLib/LockBoxDxeLib.inf
   QemuPkg/Library/MsBootOptionsLibQemu/MsBootOptionsLib.inf
   QemuPkg/Library/PlatformBmPrintScLib/PlatformBmPrintScLib.inf
   QemuPkg/Library/PlatformSecureLib/PlatformSecureLib.inf

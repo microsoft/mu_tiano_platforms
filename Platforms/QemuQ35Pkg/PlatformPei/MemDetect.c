@@ -2,11 +2,9 @@
   Memory Detection for Virtual Machines.
 
   Copyright (c) 2006 - 2024, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
-
-Module Name:
-
-  MemDetect.c
 
 **/
 
@@ -43,9 +41,6 @@ Module Name:
 
 UINT8  mPhysMemAddressWidth;
 
-STATIC UINT32  mS3AcpiReservedMemoryBase;
-STATIC UINT32  mS3AcpiReservedMemorySize;
-
 STATIC UINT16  mQ35TsegMbytes;
 
 BOOLEAN  mQ35SmramAtDefaultSmbase;
@@ -70,7 +65,7 @@ Q35TsegMbytesInitialization (
   //
   // On a QEMU machine type that does not offer an extended TSEG, the initial
   // write overwrites whatever value a malicious guest OS may have placed in
-  // the (unimplemented) register, before entering S3 or rebooting.
+  // the (unimplemented) register before rebooting.
   // Subsequently, the read returns MCH_EXT_TSEG_MB_QUERY unchanged.
   //
   // On a QEMU machine type that offers an extended TSEG, the initial write
@@ -673,56 +668,31 @@ PublishPeiMemory (
     LowerMemorySize -= mQ35TsegMbytes * SIZE_1MB;
   }
 
-  //
-  // If S3 is supported, then the S3 permanent PEI memory is placed next,
-  // downwards. Its size is primarily dictated by CpuMpPei. The formula below
-  // is an approximation.
-  //
-  if (mS3Supported) {
-    mS3AcpiReservedMemorySize = SIZE_512KB +
-                                mMaxCpuCount *
-                                PcdGet32 (PcdCpuApStackSize);
-    mS3AcpiReservedMemoryBase = LowerMemorySize - mS3AcpiReservedMemorySize;
-    LowerMemorySize           = mS3AcpiReservedMemoryBase;
-  }
+  // S3 is not supported
+  ASSERT (mBootMode != BOOT_ON_S3_RESUME);
 
-  if (mBootMode == BOOT_ON_S3_RESUME) {
-    MemoryBase = mS3AcpiReservedMemoryBase;
-    MemorySize = mS3AcpiReservedMemorySize;
-  } else {
-    PeiMemoryCap = GetPeiMemoryCap ();
-    DEBUG ((
-      DEBUG_INFO,
-      "%a: mPhysMemAddressWidth=%d PeiMemoryCap=%u KB\n",
-      __FUNCTION__,
-      mPhysMemAddressWidth,
-      PeiMemoryCap >> 10
-      ));
+  PeiMemoryCap = GetPeiMemoryCap ();
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: mPhysMemAddressWidth=%d PeiMemoryCap=%u KB\n",
+    __func__,
+    mPhysMemAddressWidth,
+    PeiMemoryCap >> 10
+    ));
 
-    //
-    // Determine the range of memory to use during PEI
-    //
-    // Technically we could lay the permanent PEI RAM over SEC's temporary
-    // decompression and scratch buffer even if "secure S3" is needed, since
-    // their lifetimes don't overlap. However, PeiFvInitialization() will cover
-    // RAM up to PcdOvmfDecompressionScratchEnd with an EfiACPIMemoryNVS memory
-    // allocation HOB, and other allocations served from the permanent PEI RAM
-    // shouldn't overlap with that HOB.
-    //
-    MemoryBase = mS3Supported && FeaturePcdGet (PcdSmmSmramRequire) ?
-                 PcdGet32 (PcdOvmfDecompressionScratchEnd) :
-                 PcdGet32 (PcdOvmfDxeMemFvBase) + PcdGet32 (PcdOvmfDxeMemFvSize);
-    MemorySize = LowerMemorySize - MemoryBase;
-    if (MemorySize > PeiMemoryCap) {
-      MemoryBase = LowerMemorySize - PeiMemoryCap;
-      MemorySize = PeiMemoryCap;
-    }
+  //
+  // Determine the range of memory to use during PEI
+  //
+  MemoryBase = PcdGet32 (PcdOvmfDxeMemFvBase) + PcdGet32 (PcdOvmfDxeMemFvSize);
+  MemorySize = LowerMemorySize - MemoryBase;
+  if (MemorySize > PeiMemoryCap) {
+    MemoryBase = LowerMemorySize - PeiMemoryCap;
+    MemorySize = PeiMemoryCap;
   }
 
   //
   // MEMFD_BASE_ADDRESS separates the SMRAM at the default SMBASE from the
-  // normal boot permanent PEI RAM. Regarding the S3 boot path, the S3
-  // permanent PEI RAM is located even higher.
+  // normal boot permanent PEI RAM.
   //
   if (FeaturePcdGet (PcdSmmSmramRequire) && mQ35SmramAtDefaultSmbase) {
     ASSERT (SMM_DEFAULT_SMBASE + MCH_DEFAULT_SMBASE_SIZE <= MemoryBase);
@@ -758,7 +728,7 @@ CreateSmmSmramMemoryHob (
   EFI_PEI_HOB_POINTERS            Hob;
   EFI_SMRAM_HOB_DESCRIPTOR_BLOCK  *SmramHobDescriptorBlock;
 
-  SmramRanges = 2;
+  SmramRanges = 1;
   BufferSize  = sizeof (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK) + (SmramRanges - 1) * sizeof (EFI_SMRAM_DESCRIPTOR);
 
   Hob.Raw = BuildGuidHob (
@@ -771,21 +741,12 @@ CreateSmmSmramMemoryHob (
   SmramHobDescriptorBlock->NumberOfSmmReservedRegions = SmramRanges;
 
   //
-  // 1. Create first SMRAM descriptor, which contains data structures used in S3 resume.
-  // One page is enough for the data structure
+  // Create SMRAM descriptor, which is free and will be used by the SMM foundation.
   //
   SmramHobDescriptorBlock->Descriptor[0].PhysicalStart = StartAddress;
   SmramHobDescriptorBlock->Descriptor[0].CpuStart      = StartAddress;
-  SmramHobDescriptorBlock->Descriptor[0].PhysicalSize  = EFI_PAGE_SIZE;
-  SmramHobDescriptorBlock->Descriptor[0].RegionState   = EFI_SMRAM_CLOSED | EFI_CACHEABLE | EFI_ALLOCATED;
-
-  //
-  // 2. Create second SMRAM descriptor, which is free and will be used by SMM foundation.
-  //
-  SmramHobDescriptorBlock->Descriptor[1].PhysicalStart = SmramHobDescriptorBlock->Descriptor[0].PhysicalStart + EFI_PAGE_SIZE;
-  SmramHobDescriptorBlock->Descriptor[1].CpuStart      = SmramHobDescriptorBlock->Descriptor[0].CpuStart + EFI_PAGE_SIZE;
-  SmramHobDescriptorBlock->Descriptor[1].PhysicalSize  = Size - EFI_PAGE_SIZE;
-  SmramHobDescriptorBlock->Descriptor[1].RegionState   = EFI_SMRAM_CLOSED | EFI_CACHEABLE;
+  SmramHobDescriptorBlock->Descriptor[0].PhysicalSize  = Size;
+  SmramHobDescriptorBlock->Descriptor[0].RegionState   = EFI_SMRAM_CLOSED | EFI_CACHEABLE;
 }
 
 STATIC
@@ -824,10 +785,12 @@ QemuInitializeRam (
   VOID
   )
 {
-  UINT64         LowerMemorySize;
-  UINT64         UpperMemorySize;
-  MTRR_SETTINGS  MtrrSettings;
-  EFI_STATUS     Status;
+  UINT32                TsegSize;
+  UINT64                LowerMemorySize;
+  UINT64                UpperMemorySize;
+  EFI_PHYSICAL_ADDRESS  TsegBase;
+  MTRR_SETTINGS         MtrrSettings;
+  EFI_STATUS            Status;
 
   DEBUG ((DEBUG_INFO, "%a called\n", __FUNCTION__));
 
@@ -836,65 +799,38 @@ QemuInitializeRam (
   //
   LowerMemorySize = GetSystemMemorySizeBelow4gb ();
 
-  if (mBootMode == BOOT_ON_S3_RESUME) {
+  //
+  // Create memory HOBs
+  //
+  QemuInitializeRamBelow1gb ();
+
+  if (FeaturePcdGet (PcdSmmSmramRequire)) {
+    TsegSize = mQ35TsegMbytes * SIZE_1MB;
+    TsegBase = LowerMemorySize - TsegSize;
+    AddMemoryRangeHob (BASE_1MB, TsegBase);
+    AddReservedMemoryBaseSizeHob (
+      TsegBase,
+      TsegSize,
+      TRUE
+      );
     //
-    // Create the following memory HOB as an exception on the S3 boot path.
+    // Create gEfiSmmSmramMemoryGuid HOB
     //
-    // Normally we'd create memory HOBs only on the normal boot path. However,
-    // CpuMpPei specifically needs such a low-memory HOB on the S3 path as
-    // well, for "borrowing" a subset of it temporarily, for the AP startup
-    // vector.
-    //
-    // CpuMpPei saves the original contents of the borrowed area in permanent
-    // PEI RAM, in a backup buffer allocated with the normal PEI services.
-    // CpuMpPei restores the original contents ("returns" the borrowed area) at
-    // End-of-PEI. End-of-PEI in turn is emitted by S3Resume2Pei before
-    // transferring control to the OS's wakeup vector in the FACS.
-    //
-    // We expect any other PEIMs that "borrow" memory similarly to CpuMpPei to
-    // restore the original contents. Furthermore, we expect all such PEIMs
-    // (CpuMpPei included) to claim the borrowed areas by producing memory
-    // allocation HOBs, and to honor preexistent memory allocation HOBs when
-    // looking for an area to borrow.
-    //
-    QemuInitializeRamBelow1gb ();
+    CreateSmmSmramMemoryHob (TsegBase, TsegSize);
   } else {
-    //
-    // Create memory HOBs
-    //
-    QemuInitializeRamBelow1gb ();
+    AddMemoryRangeHob (BASE_1MB, LowerMemorySize);
+  }
 
-    if (FeaturePcdGet (PcdSmmSmramRequire)) {
-      UINT32                TsegSize;
-      EFI_PHYSICAL_ADDRESS  TsegBase;
-
-      TsegSize = mQ35TsegMbytes * SIZE_1MB;
-      TsegBase = LowerMemorySize - TsegSize;
-      AddMemoryRangeHob (BASE_1MB, TsegBase);
-      AddReservedMemoryBaseSizeHob (
-        TsegBase,
-        TsegSize,
-        TRUE
-        );
-      //
-      // Create gEfiSmmSmramMemoryGuid HOB
-      //
-      CreateSmmSmramMemoryHob (TsegBase, TsegSize);
-    } else {
-      AddMemoryRangeHob (BASE_1MB, LowerMemorySize);
-    }
-
-    //
-    // If QEMU presents an E820 map, then create memory HOBs for the >=4GB RAM
-    // entries. Otherwise, create a single memory HOB with the flat >=4GB
-    // memory size read from the CMOS.
-    //
-    Status = ScanOrAdd64BitE820Ram (TRUE, NULL, NULL);
-    if (EFI_ERROR (Status)) {
-      UpperMemorySize = GetSystemMemorySizeAbove4gb ();
-      if (UpperMemorySize != 0) {
-        AddMemoryBaseSizeHob (BASE_4GB, UpperMemorySize);
-      }
+  //
+  // If QEMU presents an E820 map, then create memory HOBs for the >=4GB RAM
+  // entries. Otherwise, create a single memory HOB with the flat >=4GB
+  // memory size read from the CMOS.
+  //
+  Status = ScanOrAdd64BitE820Ram (TRUE, NULL, NULL);
+  if (EFI_ERROR (Status)) {
+    UpperMemorySize = GetSystemMemorySizeAbove4gb ();
+    if (UpperMemorySize != 0) {
+      AddMemoryBaseSizeHob (BASE_4GB, UpperMemorySize);
     }
   }
 
@@ -959,151 +895,57 @@ InitializeRamRegions (
   VOID
   )
 {
-  QemuInitializeRam ();
+  UINT32  TsegSize;
 
+  QemuInitializeRam ();
   SevInitializeRam ();
 
-  if (mS3Supported && (mBootMode != BOOT_ON_S3_RESUME)) {
+  // S3 is not supported.
+  ASSERT (mBootMode != BOOT_ON_S3_RESUME);
+
+  if (FeaturePcdGet (PcdSmmSmramRequire)) {
     //
-    // This is the memory range that will be used for PEI on S3 resume
+    // Make sure the TSEG area that we reported as a reserved memory resource
+    // cannot be used for reserved memory allocations.
     //
+    TsegSize = mQ35TsegMbytes * SIZE_1MB;
     BuildMemoryAllocationHob (
-      mS3AcpiReservedMemoryBase,
-      mS3AcpiReservedMemorySize,
-      EfiACPIMemoryNVS
+      GetSystemMemorySizeBelow4gb () - TsegSize,
+      TsegSize,
+      EfiReservedMemoryType
       );
-
     //
-    // Cover the initial RAM area used as stack and temporary PEI heap.
+    // Similarly, allocate away the (already reserved) SMRAM at the default
+    // SMBASE, if it exists.
     //
-    // This is reserved as ACPI NVS so it can be used on S3 resume.
-    //
-    BuildMemoryAllocationHob (
-      PcdGet32 (PcdSecPeiTemporaryRamBase),
-      PcdGet32 (PcdSecPeiTemporaryRamSize),
-      EfiACPIMemoryNVS
-      );
-
-    //
-    // SEC stores its table of GUIDed section handlers here.
-    //
-    BuildMemoryAllocationHob (
-      PcdGet64 (PcdGuidedExtractHandlerTableAddress),
-      PcdGet32 (PcdGuidedExtractHandlerTableSize),
-      EfiACPIMemoryNVS
-      );
-
- #ifdef MDE_CPU_X64
-    //
-    // Reserve the initial page tables built by the reset vector code.
-    //
-    // Since this memory range will be used by the Reset Vector on S3
-    // resume, it must be reserved as ACPI NVS.
-    //
-    BuildMemoryAllocationHob (
-      (EFI_PHYSICAL_ADDRESS)(UINTN)PcdGet32 (PcdOvmfSecPageTablesBase),
-      (UINT64)(UINTN)PcdGet32 (PcdOvmfSecPageTablesSize),
-      EfiACPIMemoryNVS
-      );
-
-    if (MemEncryptSevEsIsEnabled ()) {
-      //
-      // If SEV-ES is enabled, reserve the GHCB-related memory area. This
-      // includes the extra page table used to break down the 2MB page
-      // mapping into 4KB page entries where the GHCB resides and the
-      // GHCB area itself.
-      //
-      // Since this memory range will be used by the Reset Vector on S3
-      // resume, it must be reserved as ACPI NVS.
-      //
+    if (mQ35SmramAtDefaultSmbase) {
       BuildMemoryAllocationHob (
-        (EFI_PHYSICAL_ADDRESS)(UINTN)PcdGet32 (PcdOvmfSecGhcbPageTableBase),
-        (UINT64)(UINTN)PcdGet32 (PcdOvmfSecGhcbPageTableSize),
-        EfiACPIMemoryNVS
-        );
-      BuildMemoryAllocationHob (
-        (EFI_PHYSICAL_ADDRESS)(UINTN)PcdGet32 (PcdOvmfSecGhcbBase),
-        (UINT64)(UINTN)PcdGet32 (PcdOvmfSecGhcbSize),
-        EfiACPIMemoryNVS
-        );
-      BuildMemoryAllocationHob (
-        (EFI_PHYSICAL_ADDRESS)(UINTN)PcdGet32 (PcdOvmfSecGhcbBackupBase),
-        (UINT64)(UINTN)PcdGet32 (PcdOvmfSecGhcbBackupSize),
-        EfiACPIMemoryNVS
-        );
-    }
-
- #endif
-  }
-
-  if (mBootMode != BOOT_ON_S3_RESUME) {
-    if (!FeaturePcdGet (PcdSmmSmramRequire)) {
-      //
-      // Reserve the lock box storage area
-      //
-      // Since this memory range will be used on S3 resume, it must be
-      // reserved as ACPI NVS.
-      //
-      // If S3 is unsupported, then various drivers might still write to the
-      // LockBox area. We ought to prevent DXE from serving allocation requests
-      // such that they would overlap the LockBox storage.
-      //
-      ZeroMem (
-        (VOID *)(UINTN)PcdGet32 (PcdOvmfLockBoxStorageBase),
-        (UINTN)PcdGet32 (PcdOvmfLockBoxStorageSize)
-        );
-      BuildMemoryAllocationHob (
-        (EFI_PHYSICAL_ADDRESS)(UINTN)PcdGet32 (PcdOvmfLockBoxStorageBase),
-        (UINT64)(UINTN)PcdGet32 (PcdOvmfLockBoxStorageSize),
-        mS3Supported ? EfiACPIMemoryNVS : EfiBootServicesData
-        );
-    }
-
-    if (FeaturePcdGet (PcdSmmSmramRequire)) {
-      UINT32  TsegSize;
-
-      //
-      // Make sure the TSEG area that we reported as a reserved memory resource
-      // cannot be used for reserved memory allocations.
-      //
-      TsegSize = mQ35TsegMbytes * SIZE_1MB;
-      BuildMemoryAllocationHob (
-        GetSystemMemorySizeBelow4gb () - TsegSize,
-        TsegSize,
+        SMM_DEFAULT_SMBASE,
+        MCH_DEFAULT_SMBASE_SIZE,
         EfiReservedMemoryType
         );
-      //
-      // Similarly, allocate away the (already reserved) SMRAM at the default
-      // SMBASE, if it exists.
-      //
-      if (mQ35SmramAtDefaultSmbase) {
-        BuildMemoryAllocationHob (
-          SMM_DEFAULT_SMBASE,
-          MCH_DEFAULT_SMBASE_SIZE,
-          EfiReservedMemoryType
-          );
-      }
     }
+  }
 
  #ifdef MDE_CPU_X64
-    if (FixedPcdGet32 (PcdOvmfWorkAreaSize) != 0) {
-      //
-      // Reserve the work area.
-      //
-      // Since this memory range will be used by the Reset Vector on S3
-      // resume, it must be reserved as ACPI NVS.
-      //
-      // If S3 is unsupported, then various drivers might still write to the
-      // work area. We ought to prevent DXE from serving allocation requests
-      // such that they would overlap the work area.
-      //
-      BuildMemoryAllocationHob (
-        (EFI_PHYSICAL_ADDRESS)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaBase),
-        (UINT64)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaSize),
-        mS3Supported ? EfiACPIMemoryNVS : EfiBootServicesData
-        );
-    }
+  if (FixedPcdGet32 (PcdOvmfWorkAreaSize) != 0) {
+    //
+    // Reserve the work area.
+    //
+    // This range was originally used by the Reset Vector on S3
+    // resume and in that case, it would be allocated as ACPI NVS.
+    //
+    // S3 is no longer supported. However, drivers might still write to the
+    // work area. We ought to prevent DXE from serving allocation requests
+    // such that they would overlap the work area. The area is also allocated
+    // as boot services data to prevent impact on OS mapped memory.
+    //
+    BuildMemoryAllocationHob (
+      (EFI_PHYSICAL_ADDRESS)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaBase),
+      (UINT64)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaSize),
+      EfiBootServicesData
+      );
+  }
 
  #endif
-  }
 }
