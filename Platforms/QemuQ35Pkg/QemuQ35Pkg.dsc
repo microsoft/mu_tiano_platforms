@@ -848,12 +848,13 @@
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0
 
   # Add DEVICE_STATE_UNIT_TEST_MODE to the device state bitmask if BUILD_UNIT_TESTS=TRUE (default)
+  # in addition to debugger enabled
   !if $(BUILD_UNIT_TESTS) == TRUE
-    gEfiMdeModulePkgTokenSpaceGuid.PcdDeviceStateBitmask|0x20
-  !endif
-
+    gEfiMdeModulePkgTokenSpaceGuid.PcdDeviceStateBitmask|0x28
+  !else
   # Set to debug as debugger is enabled.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDeviceStateBitmask|0x08
+    gEfiMdeModulePkgTokenSpaceGuid.PcdDeviceStateBitmask|0x08
+  !endif
 
 [PcdsDynamicHii]
 !if $(TPM_ENABLE) == TRUE && $(TPM_CONFIG_ENABLE) == TRUE

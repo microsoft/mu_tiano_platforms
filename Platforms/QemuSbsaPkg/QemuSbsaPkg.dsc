@@ -882,12 +882,13 @@
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv6PXESupport|0x01
 
   # Add DEVICE_STATE_UNIT_TEST_MODE to the device state bitmask if BUILD_UNIT_TESTS=TRUE (default)
+  # in addition to debugger enabled
   !if $(BUILD_UNIT_TESTS) == TRUE
-    gEfiMdeModulePkgTokenSpaceGuid.PcdDeviceStateBitmask|0x20
+    gEfiMdeModulePkgTokenSpaceGuid.PcdDeviceStateBitmask|0x28
+  !else
+    # Set to debug as debugger is enabled.
+    gEfiMdeModulePkgTokenSpaceGuid.PcdDeviceStateBitmask|0x08
   !endif
-
-  # Set to debug as debugger is enabled.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDeviceStateBitmask|0x08
 
   #
   # TPM2 support
