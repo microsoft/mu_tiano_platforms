@@ -132,7 +132,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             args += " -gdb tcp::" + gdb_port
 
         # write ConOut messages to telnet localhost port
-        serial_port = env.GetValue("SERIAL_PORT", "50001")
+        serial_port = env.GetValue("SERIAL_PORT")
         if serial_port != None:
             args += " -serial tcp:127.0.0.1:" + serial_port + ",server,nowait"
         else:
