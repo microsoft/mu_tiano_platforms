@@ -109,6 +109,11 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         args += " -drive if=pflash,format=raw,unit=1,file=" + \
                 code_fd + ",readonly=on"
 
+        tpm_dev = env.GetValue("TPM_DEV")
+        if tpm_dev is not None:
+            args += f" -chardev socket,id=chrtpm,path={tpm_dev}"
+            args += " -tpmdev emulator,id=tpm0,chardev=chrtpm"
+
         # Add XHCI USB controller and mouse
         args += " -device qemu-xhci,id=usb"
         args += " -device usb-tablet,id=input0,bus=usb.0,port=1"  # add a usb mouse
