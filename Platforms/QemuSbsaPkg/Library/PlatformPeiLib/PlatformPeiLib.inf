@@ -1,0 +1,47 @@
+#/** @file
+#
+#  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+#  Copyright (c), Microsoft Corporation.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = QemuSbsaPlatformPeiLib
+  FILE_GUID                      = 24AA3E9F-33E8-440F-BD49-EC23F14FDFC4
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformPeiLib
+
+[Sources]
+  PlatformPeiLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  SecurityPkg/SecurityPkg.dec
+  QemuPkg/QemuPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  HobLib
+  ArmPlatformLib
+
+[Ppis]
+  gQemuPkgTpmDiscoveredPpiGuid
+  gPeiTpmInitializationDonePpiGuid
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdFvBaseAddress
+  gArmTokenSpaceGuid.PcdFvSize
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress               ## CONSUMES # TODO: Consider removing later
+
+[depex]
+  TRUE
