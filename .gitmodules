@@ -20,7 +20,7 @@
 	branch = release/202405
 [submodule "Silicon/Arm/TFA"]
 	path = Silicon/Arm/TFA
-	url = https://github.com/ARM-software/arm-trusted-firmware.git
+	url = https://github.com/kuqin12/arm-trusted-firmware.git
 	branch = v2.10.0
 [submodule "Features/DFCI"]
 	path = Features/DFCI
