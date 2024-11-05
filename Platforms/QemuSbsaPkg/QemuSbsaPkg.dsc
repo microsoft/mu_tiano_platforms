@@ -1127,6 +1127,8 @@
   }
   PcBdsPkg/MsBootPolicy/MsBootPolicy.inf
 
+  QemuPkg/ClangpdbTestApp/ClangpdbTestApp.inf
+
   # Apply Variable Policy to Load Option UEFI Variables
   MsCorePkg/LoadOptionVariablePolicyDxe/LoadOptionVariablePolicyDxe.inf
 
