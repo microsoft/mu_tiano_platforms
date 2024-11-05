@@ -1,14 +1,14 @@
 /** @file
-LogDumper.c
+ClangpdbTestApp.c
 
-This application will dump the AdvancedLog to a file.
+This application just tests the clangpdb symbol output.
 
 Copyright (C) Microsoft Corporation. All rights reserved.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 #include <Library/UefiBootServicesTableLib.h>
-
+volatile BOOLEAN loop = TRUE;
 /**
   The user Entry Point for LogDumper Application.
   It starts with this function as the real entry point for the application.
@@ -29,6 +29,10 @@ EntryPoint (
 {
   if (gBS == NULL) {
     return EFI_UNSUPPORTED;
+  }
+
+  if (gBS->Stall) {
+    gBS->Stall (1000);
   }
 
   return EFI_SUCCESS;
