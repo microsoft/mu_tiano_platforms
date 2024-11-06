@@ -319,6 +319,8 @@
 
   StackCheckFailureHookLib|MdePkg/Library/StackCheckFailureHookLibNull/StackCheckFailureHookLibNull.inf
 
+  HobPrintLib|MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
+
 [LibraryClasses.IA32, LibraryClasses.X64]
   XenHypercallLib|QemuQ35Pkg/Library/XenHypercallLib/XenHypercallLib.inf
 
