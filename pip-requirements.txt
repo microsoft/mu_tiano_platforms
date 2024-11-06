@@ -17,4 +17,4 @@ edk2-pytool-extensions==0.27.12
 xmlschema==3.4.2
 regex==2024.9.11
 pygount==1.8.0
-pywin32==306; sys_platform == 'win32'
+pywin32==308; sys_platform == 'win32'
