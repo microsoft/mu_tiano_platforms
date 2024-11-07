@@ -376,6 +376,8 @@
   WatchdogTimerLib|DebuggerFeaturePkg/Library/WatchdogTimerLibNull/WatchdogTimerLibNull.inf
   TransportLogControlLib|DebuggerFeaturePkg/Library/TransportLogControlLibNull/TransportLogControlLibNull.inf
 
+  HobPrintLib|MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
+
 [LibraryClasses.common.SEC, LibraryClasses.common.PEI_CORE]
   NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
 
