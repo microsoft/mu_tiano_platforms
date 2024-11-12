@@ -1429,6 +1429,9 @@
       gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
   }
 
+  # FF-A test application to test the FF-A interface
+  QemuSbsaPkg/FfaPartitionTest/FfaPartitionTestApp.inf
+
   # Test secure partition
   QemuSbsaPkg/ExampleSecurePartition/ExampleSecurePartition.inf {
     <LibraryClasses>
