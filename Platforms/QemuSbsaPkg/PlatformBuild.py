@@ -388,6 +388,18 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                     },
                     "uuid": "eaba83d8-baaf-4eaf-8144-f7fdcbe544a7",
                     "owner": "Plat"
+                },
+                "example": {
+                    "image": {
+                        "file": os.path.join(self.env.GetValue('BUILD_OUTPUT_BASE'), 'FV', 'BL32_AP_MM_SP1.fd'),
+                        "offset": "0x10000"
+                    },
+                    "pm": {
+                        "file": os.path.join(os.path.dirname(__file__), "fdts/qemu_sbsa_example_config.dts"),
+                        "offset": "0x1000"
+                    },
+                    "uuid": "8064A10B-9A26-4DF8-9629-024B64058B4F",
+                    "owner": "Plat"
                 }
             }
             json.dump(data, f, indent=4)

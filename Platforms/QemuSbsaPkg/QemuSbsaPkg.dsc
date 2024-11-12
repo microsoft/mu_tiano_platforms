@@ -174,6 +174,10 @@
   PL011UartLib|ArmPlatformPkg/Library/PL011UartLib/PL011UartLib.inf
   SerialPortLib|ArmPlatformPkg/Library/PL011SerialPortLib/PL011SerialPortLib.inf
 
+  # Extended support for FF-A transactions
+  ArmFfaLibEx|ArmPkg/Library/ArmFfaLibEx/ArmFfaLibEx.inf
+  PlatformFfaInterruptLib|ArmPkg/Library/PlatformFfaInterruptLibNull/PlatformFfaInterruptLib.inf
+
   #
   # Uncomment (and comment out the next line) For RealView Debugger. The Standard IO window
   # in the debugger will show load and unload commands for symbols. You can cut and paste this
@@ -488,7 +492,7 @@
   StandaloneMmCoreEntryPoint|ArmPkg/Library/StandaloneMmCoreEntryPoint/StandaloneMmCoreEntryPoint.inf
   PeCoffExtraActionLib|StandaloneMmPkg/Library/StandaloneMmPeCoffExtraActionLib/StandaloneMmPeCoffExtraActionLib.inf
   MmServicesTableLib|StandaloneMmPkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLibCore.inf
-  # SerialPortLib|ArmPlatformPkg/Library/ArmFfaConsoleLib/ArmFfaConsoleLib.inf
+  ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaStandaloneMmCoreLib.inf
   CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLibNull/BaseCacheMaintenanceLibNull.inf
 
 [LibraryClasses.common.MM_STANDALONE]
@@ -1393,8 +1397,6 @@
       gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
     <PcdsPatchableInModule>
       gArmTokenSpaceGuid.PcdFfaLibConduitSmc|FALSE
-    <LibraryClasses>
-      ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaStandaloneMmCoreLib.inf
   }
 
   ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf {
@@ -1425,6 +1427,17 @@
     <PcdsFixedAtBuild>
       gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60040000
       gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
+  }
+
+  # Test secure partition
+  QemuSbsaPkg/ExampleSecurePartition/ExampleSecurePartition.inf {
+    <LibraryClasses>
+      MemoryAllocationLib|MdeModulePkg/Library/BaseMemoryAllocationLibNull/BaseMemoryAllocationLibNull.inf
+      StandaloneMmCoreEntryPoint|ArmPkg/Library/SecurePartitionEntryPoint/SecurePartitionEntryPoint.inf
+    <PcdsFixedAtBuild>
+      gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60030000
+    <PcdsPatchableInModule>
+      gArmTokenSpaceGuid.PcdFfaLibConduitSmc|FALSE
   }
 
 ###################################################################################################

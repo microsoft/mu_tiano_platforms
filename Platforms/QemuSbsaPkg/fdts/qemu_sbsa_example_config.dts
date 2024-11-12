@@ -1,0 +1,69 @@
+/*
+ * Copyright (c) 2020-21, ARM Limited and Contributors. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+/dts-v1/;
+
+/ {
+#define MODE_SEL0	(0x1)
+#define MODE_SEL1	(0x2)
+
+#define SECURE_RO 0x1
+#define SECURE_RW 0x3
+#define SECURE_EXECUTE_RO 0x5
+#define SECURE_EXECUTE_RW 0x7
+#define NON_SECURE_RO 0x9
+#define NON_SECURE_RW 0xB
+#define NON_SECURE_EXECUTE_RO 0xD
+#define NONSECURE_EXECUTE_RW 0xF
+	/*
+	 * FF-A compatible Secure Partition Manager parses the
+	 * config file and fetch the following booting arguments to
+	 * pass on to the StandAloneMM(StMM) Secure Partition.
+	 */
+	compatible = "arm,ffa-manifest-1.0";
+
+	description = "Example Services";
+	ffa-version = <0x00010002>; /* 31:16 - Major, 15:0 - Minor */
+	uuid = <0x7036A3DB 0xBA3B44E5 0xB359E25E 0x5D904387>, <0x5B9ECC17 0x44D0447C 0xB49568BB 0x6A970764>;
+	id = <0x8002>;
+	execution-ctx-count = <1>;
+	exception-level = <MODE_SEL0>; /* SEL0*/
+	execution-state = <0>; /* AArch64*/
+	load-address = <0x0 0x20400000>;
+	entrypoint-offset = <0x10000>;
+	image-size = <0x0 0x400000>;
+	xlat-granule = <0>; /* 4KiB */
+	boot-order = <1>;
+	messaging-method = <0x603>; /* Direct request/response supported. */
+	ns-interrupts-action = <2>; /* Non-secure interrupt is signaled */
+	notification-support; /* Support receipt of notifications. */
+	gp-register-num = <0>;
+
+	boot-info {
+		compatible = "arm,ffa-manifest-boot-info";
+		ffa_manifest;
+	};
+
+	device-regions {
+		compatible = "arm,ffa-manifest-device-regions";
+
+		mailbox {
+			description = "mailbox";
+			base-address = <0x00000100 0x1FFFE000>;
+			pages-count = <0x1>; /* 4KB (actual 256 bytes) */
+			attributes = <SECURE_RW>; /* s-read-write */
+		};
+
+		/*
+		 * Secure UART region.
+		 */
+		secure_uart {
+			base-address = <0x0 0x60030000>;
+			pages-count = <0x1>;
+			attributes = <SECURE_RW>;
+		};
+	};
+};
