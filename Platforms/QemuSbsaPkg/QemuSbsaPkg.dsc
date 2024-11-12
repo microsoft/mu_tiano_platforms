@@ -375,6 +375,7 @@
   DebugTransportLib|DebuggerFeaturePkg/Library/DebugTransportSerialLib/DebugTransportSerialLib.inf
   WatchdogTimerLib|DebuggerFeaturePkg/Library/WatchdogTimerLibNull/WatchdogTimerLibNull.inf
   TransportLogControlLib|DebuggerFeaturePkg/Library/TransportLogControlLibNull/TransportLogControlLibNull.inf
+  ArmTransferListLib|ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
 
 [LibraryClasses.common.SEC, LibraryClasses.common.PEI_CORE]
   NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
@@ -383,7 +384,8 @@
   NULL|MdePkg/Library/StackCheckLib/StackCheckLibDynamicInit.inf
 
 [LibraryClasses.common.DXE_CORE, LibraryClasses.common.DXE_RUNTIME_DRIVER, LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.UEFI_APPLICATION]
-  MsUiThemeLib                  |MsGraphicsPkg/Library/MsUiThemeLib/Dxe/MsUiThemeLib.inf
+  MsUiThemeLib|MsGraphicsPkg/Library/MsUiThemeLib/Dxe/MsUiThemeLib.inf
+  ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
 
 [LibraryClasses.common.UEFI_APPLICATION]
   CheckHwErrRecHeaderLib|MsWheaPkg/Library/CheckHwErrRecHeaderLib/CheckHwErrRecHeaderLib.inf
@@ -431,6 +433,7 @@
   PeiServicesTablePointerLib|ArmPkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
   ArmVirtMemInfoLib|QemuSbsaPkg/Library/QemuVirtMemInfoLib/QemuVirtMemInfoPeiLib.inf
   PcdDatabaseLoaderLib|MdeModulePkg/Library/PcdDatabaseLoaderLib/Pei/PcdDatabaseLoaderLibPei.inf
+  ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaPeiLib.inf
 
   MsPlatformEarlyGraphicsLib |MsGraphicsPkg/Library/MsEarlyGraphicsLibNull/Pei/MsEarlyGraphicsLibNull.inf
   MsUiThemeLib               |MsGraphicsPkg/Library/MsUiThemeLib/Pei/MsUiThemeLib.inf
@@ -474,7 +477,7 @@
 
 [LibraryClasses.common.MM_CORE_STANDALONE]
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
-  ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
+  ExtractGuidedSectionLib|StandaloneMmPkg/Library/StandaloneMmExtractGuidedSectionLib/StandaloneMmExtractGuidedSectionLib.inf
   FvLib|StandaloneMmPkg/Library/FvLib/FvLib.inf
   HobLib|StandaloneMmPkg/Library/StandaloneMmCoreHobLib/StandaloneMmCoreHobLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
@@ -485,6 +488,8 @@
   StandaloneMmCoreEntryPoint|ArmPkg/Library/StandaloneMmCoreEntryPoint/StandaloneMmCoreEntryPoint.inf
   PeCoffExtraActionLib|StandaloneMmPkg/Library/StandaloneMmPeCoffExtraActionLib/StandaloneMmPeCoffExtraActionLib.inf
   MmServicesTableLib|StandaloneMmPkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLibCore.inf
+  # SerialPortLib|ArmPlatformPkg/Library/ArmFfaConsoleLib/ArmFfaConsoleLib.inf
+  CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLibNull/BaseCacheMaintenanceLibNull.inf
 
 [LibraryClasses.common.MM_STANDALONE]
   StandaloneMmDriverEntryPoint|MdePkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
@@ -502,6 +507,8 @@
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
   MemoryTypeInfoSecVarCheckLib|MdeModulePkg/Library/MemoryTypeInfoSecVarCheckLib/MemoryTypeInfoSecVarCheckLib.inf
   FltUsedLib|MdePkg/Library/FltUsedLib/FltUsedLib.inf
+  # SerialPortLib|ArmPlatformPkg/Library/ArmFfaConsoleLib/ArmFfaConsoleLib.inf
+  ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaStandaloneMmLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER]
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
@@ -593,6 +600,7 @@
   # ASSERT_BREAKPOINT_ENABLED  0x10
   # ASSERT_DEADLOOP_ENABLED    0x20
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
+  gArmTokenSpaceGuid.PcdFfaLibConduitSmc|TRUE
 
 [PcdsFixedAtBuild.common]
   !include QemuPkg/AutoGen/SecurebootPcds.inc
@@ -1381,13 +1389,25 @@
   StandaloneMmPkg/Core/StandaloneMmCore.inf {
     <PcdsFixedAtBuild>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
+      gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60040000
+      gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
+    <PcdsPatchableInModule>
+      gArmTokenSpaceGuid.PcdFfaLibConduitSmc|FALSE
+    <LibraryClasses>
+      ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaStandaloneMmCoreLib.inf
   }
 
   ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf {
     <PcdsFixedAtBuild>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
+      gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60040000
+      gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
   }
-  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteStandaloneMm.inf
+  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteStandaloneMm.inf {
+    <PcdsFixedAtBuild>
+      gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60040000
+      gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
+  }
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStandaloneMm.inf {
     <LibraryClasses>
       AdvLoggerAccessLib|MdeModulePkg/Library/AdvLoggerAccessLibNull/AdvLoggerAccessLib.inf
@@ -1397,8 +1417,15 @@
       BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
       VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLib.inf
       VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
+    <PcdsFixedAtBuild>
+      gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60040000
+      gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
   }
-  QemuSbsaPkg/VirtNorFlashStandaloneMm/VirtNorFlashStandaloneMm.inf
+  QemuSbsaPkg/VirtNorFlashStandaloneMm/VirtNorFlashStandaloneMm.inf {
+    <PcdsFixedAtBuild>
+      gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60040000
+      gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
+  }
 
 ###################################################################################################
 #
@@ -1427,9 +1454,13 @@
 [BuildOptions.common.EDKII.SEC,BuildOptions.common.EDKII.MM_CORE_STANDALONE]
   GCC:*_CLANGPDB_*_DLINK_FLAGS = /ALIGN:0x1000 /FILEALIGN:0x1000
 
+[BuildOptions.common.EDKII.PEIM]
+  GCC:*_*_*_DLINK_XIPFLAGS = -z common-page-size=0x1000
+
 [BuildOptions.common.EDKII.DXE_CORE,BuildOptions.common.EDKII.DXE_DRIVER,BuildOptions.common.EDKII.UEFI_DRIVER,BuildOptions.common.EDKII.UEFI_APPLICATION,BuildOptions.common.EDKII.MM_CORE_STANDALONE,BuildOptions.common.EDKII.MM_STANDALONE]
   GCC:*_GCC5_*_DLINK_FLAGS = -z common-page-size=0x1000
   GCC:*_CLANGPDB_*_DLINK_FLAGS = /ALIGN:0x1000
+  GCC:*_*_*_DLINK_XIPFLAGS = -z common-page-size=0x1000
 
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_GCC5_AARCH64_DLINK_FLAGS = -z common-page-size=0x10000

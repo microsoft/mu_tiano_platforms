@@ -10,6 +10,7 @@ import os
 import uuid
 from io import StringIO
 from pathlib import Path
+import json
 
 from edk2toolext.environment import shell_environment
 from edk2toolext.environment.uefi_build import UefiBuilder
@@ -88,6 +89,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
             RequiredSubmodule("Common/MU_OEM_SAMPLE", True),
             RequiredSubmodule("Silicon/Arm/MU_TIANO", True),
             RequiredSubmodule("Silicon/Arm/TFA", True),
+            RequiredSubmodule("Silicon/Arm/HAF", True),
             RequiredSubmodule("Features/DEBUGGER", True),
             RequiredSubmodule("Features/DFCI", True),
             RequiredSubmodule("Features/CONFIG", True),
@@ -213,6 +215,11 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         args = "distclean"
         RunCmd(cmd, args, workingdir=self.env.GetValue("ARM_TFA_PATH"))
 
+        # Also for the hafnium, do not check for the return code as it is not a fatal error
+        cmd = "make"
+        args = "clean"
+        RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_HAF_PATH"))
+
         return super().CleanTree(RemoveConfTemplateFilesToo)
 
     def GetWorkspaceRoot(self):
@@ -285,6 +292,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         self.env.SetValue("BUILDREPORTING", "TRUE", "Enabling build report")
         self.env.SetValue("BUILDREPORT_TYPES", "PCD DEPEX FLASH BUILD_FLAGS LIBRARY FIXED_ADDRESS HASH", "Setting build report types")
         self.env.SetValue("ARM_TFA_PATH", os.path.join (self.GetWorkspaceRoot (), "Silicon/Arm/TFA"), "Platform hardcoded")
+        self.env.SetValue("ARM_HAF_PATH", os.path.join (self.GetWorkspaceRoot (), "Silicon/Arm/HAF"), "Platform hardcoded")
         self.env.SetValue("BLD_*_QEMU_CORE_NUM", "4", "Default")
         self.env.SetValue("BLD_*_MEMORY_PROTECTION", "TRUE", "Default")
         # Include the MFCI test cert by default, override on the commandline with "BLD_*_SHIP_MODE=TRUE" if you want the retail MFCI cert
@@ -331,6 +339,13 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         # Add a post build step to build BL31 and assemble the FD files
         op_fv = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
 
+        logging.info("Building Hafnium")
+        cmd = "make"
+        args = "PROJECT=mu PLATFORM=secure_qemu_aarch64"
+        ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_HAF_PATH"))
+        if ret != 0:
+            return ret
+
         logging.info("Building TF-A")
 
         shell_environment.CheckpointBuildVars()  # checkpoint our config before we mess with it
@@ -356,6 +371,27 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             else:
                 clang_exe = "clang"
 
+        # Specify the filename
+        filename = os.path.join(self.env.GetValue('BUILD_OUTPUT_BASE'), 'sp_layout.json')
+
+        # Writing JSON data
+        with open(filename, 'w') as f:
+            data = {
+                "stmm": {
+                    "image": {
+                        "file": os.path.join(self.env.GetValue('BUILD_OUTPUT_BASE'), 'FV', 'BL32_AP_MM.fd'),
+                        "offset": "0x2000"
+                    },
+                    "pm": {
+                        "file": os.path.join(os.path.dirname(__file__), "fdts/qemu_sbsa_stmm_config.dts"),
+                        "offset": "0x1000"
+                    },
+                    "uuid": "eaba83d8-baaf-4eaf-8144-f7fdcbe544a7",
+                    "owner": "Plat"
+                }
+            }
+            json.dump(data, f, indent=4)
+
         cmd = "make"
         if self.env.GetValue("TOOL_CHAIN_TAG") == "CLANGPDB":
             args = "CC="+clang_exe
@@ -368,10 +404,11 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         args += " PLAT=" + self.env.GetValue("QEMU_PLATFORM").lower()
         args += " ARCH=" + self.env.GetValue("TARGET_ARCH").lower()
         args += " DEBUG=" + str(1 if self.env.GetValue("TARGET").lower() == 'debug' else 0)
-        args += " SPM_MM=1 EL3_EXCEPTION_HANDLING=1 ENABLE_SME_FOR_NS=0 ENABLE_SVE_FOR_NS=0"
-        args += " ENABLE_FEAT_HCX=1" # Features used by hypervisor
+        args += " ENABLE_SME_FOR_SWD=1 ENABLE_SVE_FOR_SWD=1 ENABLE_SME_FOR_NS=1 ENABLE_SVE_FOR_NS=1" # SPM_MM=1
+        args += f" SPD=spmd SPMD_SPM_AT_SEL2=1 SP_LAYOUT_FILE={filename}"
+        args += " ENABLE_FEAT_HCX=1 PHIT_HOB=1 TRANSFER_LIST=1 LOG_LEVEL=40" # Features used by hypervisor
         # args += " FEATURE_DETECTION=1" # Enforces support for features enabled.
-        args += " BL32=" + os.path.join(op_fv, "BL32_AP_MM.fd")
+        args += f" BL32={os.path.join(self.env.GetValue('ARM_HAF_PATH'), 'out/mu/secure_qemu_aarch64_clang', 'hafnium.bin')}"
         args += " all fip"
         ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_TFA_PATH"))
         if ret != 0:

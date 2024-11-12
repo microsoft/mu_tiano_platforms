@@ -98,7 +98,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             args += " -m 2048"
 
         args += " -machine sbsa-ref" #,accel=(tcg|kvm)"
-        args += " -cpu max,sve=off,sme=off"
+        args += " -cpu max"
         if env.GetBuildValue ("QEMU_CORE_NUM") is not None:
           args += " -smp " + env.GetBuildValue ("QEMU_CORE_NUM")
         args += " -global driver=cfi.pflash01,property=secure,value=on"
@@ -138,6 +138,8 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         else:
             # write messages to stdio
             args += " -serial stdio"
+            args += " -serial file:secure.log"
+            args += " -serial file:secure_mm.log"
 
         # Connect the debug monitor to a telnet localhost port
         monitor_port = env.GetValue("MONITOR_PORT")
