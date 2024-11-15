@@ -29,10 +29,21 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
+#define FFA_NOTIFICATION_SERVICE_GUID \
+  { \
+    0xb510b3a3, 0x59f6, 0x4054, { 0xba, 0x7a, 0xff, 0x2e, 0xb1, 0xea, 0xc7, 0x65 } \
+  }
+
+#define FFA_TPM_SERVICE_GUID \
+  { \
+    0x17b862a4, 0x1806, 0x4faf, { 0x86, 0xb3, 0x08, 0x9a, 0x58, 0x35, 0x38, 0x61 } \
+  }
+
 #define FFA_TEST_SERVICE_GUID \
   { \
-    0x7036A3DB, 0xBA3B, 0x44E5, { 0xB3, 0x59, 0xE2, 0x5E, 0x5D, 0x90, 0x43, 0x87 } \
+    0xe0fad9b3, 0x7f5c, 0x42c5, { 0xb2, 0xee, 0xb7, 0xa8, 0x23, 0x13, 0xcd, 0xb2 } \
   }
+
 
 UINT16  FfaPartId;
 
@@ -91,15 +102,16 @@ FfaPartitionTestAppEntry (
   )
 {
   EFI_STATUS              Status;
-  ARM_SMC_ARGS            SmcArgs            = { 0 };
-  EFI_GUID                FfaTestServiceGuid = FFA_TEST_SERVICE_GUID;
+  ARM_SMC_ARGS            SmcArgs                    = { 0 };
+  EFI_GUID                FfaTestServiceGuid         = FFA_TEST_SERVICE_GUID;
+  EFI_GUID                FfaNotificationServiceGuid = FFA_NOTIFICATION_SERVICE_GUID;
+  EFI_GUID                FfaTpmServiceGuid          = FFA_TPM_SERVICE_GUID;
   EFI_FFA_PART_INFO_DESC  FfaTestPartInfo;
   UINT32                  Count;
   UINT32                  Size;
   UINTN                   SriIndex;
   UINTN                   Dummy;
   DIRECT_MSG_ARGS_EX      DirectMsgArgsEx;
-  DIRECT_MSG_ARGS         DirectMsgArgs;
   UINT16                  CurrentMajorVersion;
   UINT16                  CurrentMinorVersion;
 
@@ -162,7 +174,7 @@ FfaPartitionTestAppEntry (
     goto Done;
   }
 
-  // Retrieve the partition information from the retuend registers
+  // Retrieve the partition information from the returned registers
   CopyMem (&FfaTestPartInfo, (VOID *)PcdGet64 (PcdFfaRxBuffer), sizeof (EFI_FFA_PART_INFO_DESC));
 
   DEBUG ((DEBUG_INFO, "Discovered FF-A test SP.\n"));
@@ -209,42 +221,112 @@ FfaPartitionTestAppEntry (
   }
 
   // Then register this test app to receive notifications from the Ffa test SP
-  FfaNotificationBind (FfaTestPartInfo.PartitionId, FFA_NOTIFICATIONS_FLAG_PER_VCPU, 0x1);
+  FfaNotificationBind (FfaTestPartInfo.PartitionId, 0, 0x4);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Unable to bind notification with FF-A Ffa test SP (%r).\n", Status));
     goto Done;
   }
 
-  // Next, communicate to the Ffa test SP
-  ZeroMem (&DirectMsgArgs, sizeof (DirectMsgArgs));
-  Status = ArmFfaLibMsgDirectReq (FfaTestPartInfo.PartitionId, 0, &DirectMsgArgs);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Unable to communicate with FF-A Ffa test SP (%r).\n", Status));
-    goto Done;
-  }
-
-  DUMP_HEX (DEBUG_INFO, 0, &DirectMsgArgs, sizeof (DirectMsgArgs), "    ");
-
-  // Communicate to the Ffa test SP with direct message req 2, twice
-  // This will make the Ffa test SP send a notification to the UEFI through SRI
+  // Setup the Thermal Service Notification Bits
   ZeroMem (&DirectMsgArgsEx, sizeof (DirectMsgArgsEx));
-  Status = FfaMessageSendDirectReq2 (FfaTestPartInfo.PartitionId, NULL, &DirectMsgArgsEx);
+  DirectMsgArgsEx.Arg0 = 0x01; // Setup
+  DirectMsgArgsEx.Arg1 = 0xba7aff2eb1eac765;
+  DirectMsgArgsEx.Arg2 = 0xb610b3a359f64054;
+  DirectMsgArgsEx.Arg3 = 0x03;
+  DirectMsgArgsEx.Arg4 = ((6 << 16) | (0));
+  DirectMsgArgsEx.Arg5 = ((7 << 16) | (1));
+  DirectMsgArgsEx.Arg6 = ((8 << 16) | (2));
+  Status = FfaMessageSendDirectReq2 (FfaTestPartInfo.PartitionId, &FfaNotificationServiceGuid, &DirectMsgArgsEx);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Unable to communicate direct req 2 with FF-A Ffa test SP (%r).\n", Status));
     goto Done;
   }
 
-  DUMP_HEX (DEBUG_INFO, 0, &DirectMsgArgsEx, sizeof (DirectMsgArgsEx), "    ");
-
-  // Next, communicate to the Ffa test SP
-  // This will make the Ffa test SP send a notification to the UEFI through SRI
-  ZeroMem (&DirectMsgArgsEx, sizeof (DirectMsgArgsEx));
-  Status = FfaMessageSendDirectReq2 (FfaTestPartInfo.PartitionId, NULL, &DirectMsgArgsEx);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Unable to communicate direct req 2 again with FF-A Ffa test SP (%r).\n", Status));
+  if (DirectMsgArgsEx.Arg0 != 0) {
+    DEBUG ((DEBUG_ERROR, "Command Failed: %x\n", DirectMsgArgsEx.Arg0));
+    goto Done;
+  } else {
+    DEBUG ((DEBUG_INFO, "Thermal Service Setup Success\n"));
   }
 
-  DUMP_HEX (DEBUG_INFO, 0, &DirectMsgArgsEx, sizeof (DirectMsgArgsEx), "    ");
+  // Setup the Battery Service Notification Bits
+  ZeroMem (&DirectMsgArgsEx, sizeof (DirectMsgArgsEx));
+  DirectMsgArgsEx.Arg0 = 0x01; // Setup
+  DirectMsgArgsEx.Arg1 = 0xba7aff2eb1eac765;
+  DirectMsgArgsEx.Arg2 = 0xb710b3a359f64054;
+  DirectMsgArgsEx.Arg3 = 0x05;
+  DirectMsgArgsEx.Arg4 = ((1 << 16) | (0));
+  DirectMsgArgsEx.Arg5 = ((2 << 16) | (1));
+  DirectMsgArgsEx.Arg6 = ((3 << 16) | (2));
+  DirectMsgArgsEx.Arg7 = ((4 << 16) | (3));
+  DirectMsgArgsEx.Arg8 = ((5 << 16) | (4));
+  Status = FfaMessageSendDirectReq2 (FfaTestPartInfo.PartitionId, &FfaNotificationServiceGuid, &DirectMsgArgsEx);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Unable to communicate direct req 2 with FF-A Ffa test SP (%r).\n", Status));
+    goto Done;
+  }
+
+  if (DirectMsgArgsEx.Arg0 != 0) {
+    DEBUG ((DEBUG_ERROR, "Command Failed: %x\n", DirectMsgArgsEx.Arg0));
+    goto Done;
+  } else {
+    DEBUG ((DEBUG_INFO, "Battery Service Setup Success\n"));
+  }
+
+  // Destroy the Thermal Service Notification Bit 1
+  ZeroMem (&DirectMsgArgsEx, sizeof (DirectMsgArgsEx));
+  DirectMsgArgsEx.Arg0 = 0x02; // Destroy
+  DirectMsgArgsEx.Arg1 = 0xba7aff2eb1eac765;
+  DirectMsgArgsEx.Arg2 = 0xb610b3a359f64054;
+  DirectMsgArgsEx.Arg3 = 0x01;
+  DirectMsgArgsEx.Arg4 = ((7 << 16) | (1));
+  Status = FfaMessageSendDirectReq2 (FfaTestPartInfo.PartitionId, &FfaNotificationServiceGuid, &DirectMsgArgsEx);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Unable to communicate direct req 2 with FF-A Ffa test SP (%r).\n", Status));
+    goto Done;
+  }
+
+  if (DirectMsgArgsEx.Arg0 != 0) {
+    DEBUG ((DEBUG_ERROR, "Command Failed: %x\n", DirectMsgArgsEx.Arg0));
+    goto Done;
+  } else {
+    DEBUG ((DEBUG_INFO, "Thermal Service Destroy Success\n"));
+  }
+
+  // Call the TPM Service get_interface_version
+  ZeroMem (&DirectMsgArgsEx, sizeof (DirectMsgArgsEx));
+  DirectMsgArgsEx.Arg0 = 0x0F000001;
+  Status = FfaMessageSendDirectReq2 (FfaTestPartInfo.PartitionId, &FfaTpmServiceGuid, &DirectMsgArgsEx);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Unable to communicate direct req 2 with FF-A Ffa test SP (%r).\n", Status));
+    goto Done;
+  }
+
+  if (DirectMsgArgsEx.Arg0 != 0x05000002) {
+    DEBUG ((DEBUG_ERROR, "Command Failed: %x\n", DirectMsgArgsEx.Arg0));
+    goto Done;
+  } else {
+    DEBUG ((DEBUG_INFO, "TPM Service Interface Version: %d.%d\n", DirectMsgArgsEx.Arg1 >> 16, DirectMsgArgsEx.Arg1 & 0xFFFF));
+  }
+
+  // Call the TPM Service get_interface_version
+  ZeroMem (&DirectMsgArgsEx, sizeof (DirectMsgArgsEx));
+  DirectMsgArgsEx.Arg0 = 0xDEF1;
+  DirectMsgArgsEx.Arg1 = 0xba7aff2eb1eac765;
+  DirectMsgArgsEx.Arg2 = 0xb710b3a359f64054; // Battery Service
+  DirectMsgArgsEx.Arg3 = 0x01; // ID 1
+  Status = FfaMessageSendDirectReq2 (FfaTestPartInfo.PartitionId, &FfaTestServiceGuid, &DirectMsgArgsEx);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Unable to communicate direct req 2 with FF-A Ffa test SP (%r).\n", Status));
+    goto Done;
+  }
+
+  if (DirectMsgArgsEx.Arg0 != 0) {
+    DEBUG ((DEBUG_ERROR, "Command Failed: %x\n", DirectMsgArgsEx.Arg0));
+    goto Done;
+  } else {
+    DEBUG ((DEBUG_INFO, "Test Test Service Notification Test Success\n"));
+  }
 
   return EFI_SUCCESS;
 

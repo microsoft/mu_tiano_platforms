@@ -398,7 +398,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                         "file": os.path.join(os.path.dirname(__file__), "fdts/qemu_sbsa_example_config.dts"),
                         "offset": "0x1000"
                     },
-                    "uuid": "8064A10B-9A26-4DF8-9629-024B64058B4F",
+                    "uuid": "b8bcbd0c-8e8f-4ebe-99eb-3cbbdd0cd412",
                     "owner": "Plat"
                 }
             }
