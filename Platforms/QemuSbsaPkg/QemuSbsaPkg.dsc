@@ -636,7 +636,7 @@
   # but not used).
   #
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0x40
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS|0x14
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS|0x28
 !if $(TOOL_CHAIN_TAG) == GCC5     # This is really odd on why CLANGPDB has runtime memory consumption differences
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x505
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x258
@@ -921,10 +921,11 @@
   gArmTokenSpaceGuid.PcdMmBufferBase
 
 [PcdsDynamicHii]
-
+!if $(TPM2_ENABLE) == TRUE
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableRev|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x8|4|NV,BS
+!endif
 !if $(TPM2_CONFIG_ENABLE) == TRUE
   gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x0|"1.3"|NV,BS
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableRev|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x8|3|NV,BS
 !endif
 
 ################################################################################
@@ -1252,6 +1253,8 @@
 !if $(TPM2_CONFIG_ENABLE) == TRUE
   SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
 !endif
+
+  SecurityPkg/Tcg/Tcg2AcpiFfa/Tcg2AcpiFfa.inf
 !endif
 
   #
