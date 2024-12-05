@@ -836,6 +836,12 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId|0x554D5250 #PRMU
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision|1
 
+  #
+  # TPM2 support
+  #
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x10000010000
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmMaxAddress|0x10000014FFF
+
 [PcdsFixedAtBuild.AARCH64]
   # Clearing BIT0 in this PCD prevents installing a 32-bit SMBIOS entry point,
   # if the entry point version is >= 3.0. AARCH64 OSes cannot assume the
@@ -909,7 +915,6 @@
   #
   # TPM2 support
   #
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x10000010000
 !if $(TPM2_ENABLE) == TRUE
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0

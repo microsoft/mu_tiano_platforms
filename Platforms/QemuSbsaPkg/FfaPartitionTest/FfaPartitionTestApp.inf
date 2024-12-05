@@ -11,7 +11,7 @@
 [Defines]
   INF_VERSION                    = 0x00010006
   BASE_NAME                      = FfaPartitionTestApp
-  FILE_GUID                      = e3dd9528-cee0-4375-995d-abd4b6ca314c
+  FILE_GUID                      = c02b1056-0c82-4c58-9bbc-94a7d5726ff1
   MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = FfaPartitionTestAppEntry
