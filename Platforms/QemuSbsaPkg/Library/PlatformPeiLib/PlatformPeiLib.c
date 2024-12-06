@@ -38,13 +38,10 @@ PlatformPeim (
   UINT64      TpmBase;
   EFI_STATUS  Status;
 
-  TpmBase = PcdGet64(PcdTpmBaseAddress);
+  TpmBase = PcdGet64 (PcdTpmBaseAddress);
 
   if (TpmBase != 0) {
     DEBUG ((DEBUG_INFO, "%a: TPM @ 0x%lx\n", __func__, TpmBase));
-
-    Status = (EFI_STATUS)PcdSet64S (PcdTpmBaseAddress, TpmBase);
-    ASSERT_EFI_ERROR (Status);
 
     Status = PeiServicesInstallPpi (&mTpm2DiscoveredPpi);
   } else {

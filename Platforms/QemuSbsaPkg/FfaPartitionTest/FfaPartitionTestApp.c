@@ -44,7 +44,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     0xe0fad9b3, 0x7f5c, 0x42c5, { 0xb2, 0xee, 0xb7, 0xa8, 0x23, 0x13, 0xcd, 0xb2 } \
   }
 
-
 UINT16  FfaPartId;
 
 EFI_HARDWARE_INTERRUPT_PROTOCOL  *gInterrupt;
@@ -149,7 +148,7 @@ FfaPartitionTestAppEntry (
 
   DUMP_HEX (DEBUG_INFO, 0, &SmcArgs, sizeof (SmcArgs), "    ");
 
-  // Retrieve the partition information from the retuend registers
+  // Retrieve the partition information from the returned registers
   CopyMem (&FfaTestPartInfo, &SmcArgs.Arg3, sizeof (EFI_FFA_PART_INFO_DESC));
 
   DEBUG ((DEBUG_INFO, "Discovered first FF-A Ffa SP.\n"));
@@ -236,7 +235,7 @@ FfaPartitionTestAppEntry (
   DirectMsgArgsEx.Arg4 = ((6 << 16) | (0));
   DirectMsgArgsEx.Arg5 = ((7 << 16) | (1));
   DirectMsgArgsEx.Arg6 = ((8 << 16) | (2));
-  Status = FfaMessageSendDirectReq2 (FfaTestPartInfo.PartitionId, &FfaNotificationServiceGuid, &DirectMsgArgsEx);
+  Status               = FfaMessageSendDirectReq2 (FfaTestPartInfo.PartitionId, &FfaNotificationServiceGuid, &DirectMsgArgsEx);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Unable to communicate direct req 2 with FF-A Ffa test SP (%r).\n", Status));
     goto Done;
@@ -260,7 +259,7 @@ FfaPartitionTestAppEntry (
   DirectMsgArgsEx.Arg6 = ((3 << 16) | (2));
   DirectMsgArgsEx.Arg7 = ((4 << 16) | (3));
   DirectMsgArgsEx.Arg8 = ((5 << 16) | (4));
-  Status = FfaMessageSendDirectReq2 (FfaTestPartInfo.PartitionId, &FfaNotificationServiceGuid, &DirectMsgArgsEx);
+  Status               = FfaMessageSendDirectReq2 (FfaTestPartInfo.PartitionId, &FfaNotificationServiceGuid, &DirectMsgArgsEx);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Unable to communicate direct req 2 with FF-A Ffa test SP (%r).\n", Status));
     goto Done;
@@ -280,7 +279,7 @@ FfaPartitionTestAppEntry (
   DirectMsgArgsEx.Arg2 = 0xb610b3a359f64054;
   DirectMsgArgsEx.Arg3 = 0x01;
   DirectMsgArgsEx.Arg4 = ((7 << 16) | (1));
-  Status = FfaMessageSendDirectReq2 (FfaTestPartInfo.PartitionId, &FfaNotificationServiceGuid, &DirectMsgArgsEx);
+  Status               = FfaMessageSendDirectReq2 (FfaTestPartInfo.PartitionId, &FfaNotificationServiceGuid, &DirectMsgArgsEx);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Unable to communicate direct req 2 with FF-A Ffa test SP (%r).\n", Status));
     goto Done;
@@ -296,7 +295,7 @@ FfaPartitionTestAppEntry (
   // Call the TPM Service get_interface_version
   ZeroMem (&DirectMsgArgsEx, sizeof (DirectMsgArgsEx));
   DirectMsgArgsEx.Arg0 = 0x0F000001;
-  Status = FfaMessageSendDirectReq2 (FfaTestPartInfo.PartitionId, &FfaTpmServiceGuid, &DirectMsgArgsEx);
+  Status               = FfaMessageSendDirectReq2 (FfaTestPartInfo.PartitionId, &FfaTpmServiceGuid, &DirectMsgArgsEx);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Unable to communicate direct req 2 with FF-A Ffa test SP (%r).\n", Status));
     goto Done;
@@ -309,13 +308,13 @@ FfaPartitionTestAppEntry (
     DEBUG ((DEBUG_INFO, "TPM Service Interface Version: %d.%d\n", DirectMsgArgsEx.Arg1 >> 16, DirectMsgArgsEx.Arg1 & 0xFFFF));
   }
 
-  // Call the TPM Service get_interface_version
+  // Invoke the Test Service to trigger a notification event
   ZeroMem (&DirectMsgArgsEx, sizeof (DirectMsgArgsEx));
   DirectMsgArgsEx.Arg0 = 0xDEF1;
   DirectMsgArgsEx.Arg1 = 0xba7aff2eb1eac765;
   DirectMsgArgsEx.Arg2 = 0xb710b3a359f64054; // Battery Service
-  DirectMsgArgsEx.Arg3 = 0x01; // ID 1
-  Status = FfaMessageSendDirectReq2 (FfaTestPartInfo.PartitionId, &FfaTestServiceGuid, &DirectMsgArgsEx);
+  DirectMsgArgsEx.Arg3 = 0x01;               // ID 1
+  Status               = FfaMessageSendDirectReq2 (FfaTestPartInfo.PartitionId, &FfaTestServiceGuid, &DirectMsgArgsEx);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Unable to communicate direct req 2 with FF-A Ffa test SP (%r).\n", Status));
     goto Done;

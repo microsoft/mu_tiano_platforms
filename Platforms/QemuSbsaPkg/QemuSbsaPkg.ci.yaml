@@ -56,6 +56,7 @@
             "PolicyServicePkg/PolicyServicePkg.dec",
             "OemPkg/OemPkg.dec",
             "SetupDataPkg/SetupDataPkg.dec",
+            "StandaloneMmPkg/StandaloneMmPkg.dec",
             ""
         ],
         # For host based unit tests
