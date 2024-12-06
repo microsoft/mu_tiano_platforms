@@ -148,7 +148,7 @@ FfaPartitionTestAppEntry (
 
   DUMP_HEX (DEBUG_INFO, 0, &SmcArgs, sizeof (SmcArgs), "    ");
 
-  // Retrieve the partition information from the retuend registers
+  // Retrieve the partition information from the returned registers
   CopyMem (&FfaTestPartInfo, &SmcArgs.Arg3, sizeof (EFI_FFA_PART_INFO_DESC));
 
   DEBUG ((DEBUG_INFO, "Discovered first FF-A Ffa SP.\n"));
