@@ -9,6 +9,8 @@
 #include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/AcpiAml.h>
 #include <IndustryStandard/SbsaQemuAcpi.h>
+#include <IndustryStandard/ArmStdSmc.h>
+#include <Library/ArmMonitorLib.h>
 #include <Library/AcpiLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
@@ -16,10 +18,67 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PrintLib.h>
+#include <Library/ResetSystemLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiLib.h>
 #include <Protocol/AcpiTable.h>
+
+#define SIP_SVC_GET_CPU_COUNT  SMC_SIP_FUNCTION_ID(200)
+#define SIP_SVC_GET_CPU_NODE   SMC_SIP_FUNCTION_ID(201)
+#define SMC_SIP_CALL_SUCCESS   SMC_ARCH_CALL_SUCCESS
+
+/**
+  Get CPU count from information passed by TF-A.
+
+**/
+UINT32
+GetCpuCount (
+  VOID
+  )
+{
+  ARM_MONITOR_ARGS  SmcArgs;
+
+  SmcArgs.Arg0 = SIP_SVC_GET_CPU_COUNT;
+  ArmMonitorCall (&SmcArgs);
+
+  if (SmcArgs.Arg0 != SMC_SIP_CALL_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "%a: SIP_SVC_GET_CPU_COUNT call failed. We have no cpu information.\n", __func__));
+    ResetShutdown ();
+  }
+
+  DEBUG ((DEBUG_INFO, "%a: We have %d cpus.\n", __func__, SmcArgs.Arg1));
+
+  return SmcArgs.Arg1;
+}
+
+/**
+  Get MPIDR for a given cpu from TF-A.
+
+  @param [in]   CpuId    Index of cpu to retrieve MPIDR value for.
+
+  @retval                MPIDR value of CPU at index <CpuId>
+**/
+UINT64
+GetMpidr (
+  IN UINTN  CpuId
+  )
+{
+  ARM_MONITOR_ARGS  SmcArgs;
+
+  SmcArgs.Arg0 = SIP_SVC_GET_CPU_NODE;
+  SmcArgs.Arg1 = CpuId;
+  ArmMonitorCall (&SmcArgs);
+
+  if (SmcArgs.Arg0 != SMC_SIP_CALL_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "%a: SIP_SVC_GET_CPU_NODE call failed. We have no MPIDR for CPU%d.\n", __func__, CpuId));
+    ResetShutdown ();
+  }
+
+  DEBUG ((DEBUG_INFO, "%a: MPIDR for CPU%d: = %d\n", __func__, CpuId, SmcArgs.Arg2));
+
+  return SmcArgs.Arg2;
+}
 
 /*
  * A Function to Compute the ACPI Table Checksum
@@ -129,7 +188,7 @@ AddMadtTable (
     CopyMem (New, &Gicc, sizeof (EFI_ACPI_6_0_GIC_STRUCTURE));
     GiccPtr                   = (EFI_ACPI_6_0_GIC_STRUCTURE *)New;
     GiccPtr->AcpiProcessorUid = CoreIndex;
-    GiccPtr->MPIDR            = FdtHelperGetMpidr (CoreIndex);
+    GiccPtr->MPIDR            = GetMpidr (CoreIndex);
     New                      += sizeof (EFI_ACPI_6_0_GIC_STRUCTURE);
   }
 
@@ -431,7 +490,7 @@ InitializeSbsaQemuAcpiDxe (
   UINT32                   NumCores;
 
   // Parse the device tree and get the number of CPUs
-  NumCores = FdtHelperCountCpus ();
+  NumCores = GetCpuCount ();
   ASSERT (PcdGet32 (PcdCoreCount) == NumCores);
 
   // Check if ACPI Table Protocol has been installed
