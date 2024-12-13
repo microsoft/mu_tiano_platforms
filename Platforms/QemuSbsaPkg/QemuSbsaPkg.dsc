@@ -180,6 +180,11 @@
   ArmFfaLibEx|ArmPkg/Library/ArmFfaLibEx/ArmFfaLibEx.inf
   PlatformFfaInterruptLib|ArmPkg/Library/PlatformFfaInterruptLibNull/PlatformFfaInterruptLib.inf
 
+  # Secure Partition Services
+  NotificationServiceLib|ArmPkg/Library/NotificationServiceLib/NotificationServiceLib.inf
+  TestServiceLib|ArmPkg/Library/TestServiceLib/TestServiceLib.inf
+  TpmServiceLib|ArmPkg/Library/TpmServiceLib/TpmServiceLib.inf
+
   #
   # Uncomment (and comment out the next line) For RealView Debugger. The Standard IO window
   # in the debugger will show load and unload commands for symbols. You can cut and paste this
@@ -1444,14 +1449,16 @@
   QemuSbsaPkg/FfaPartitionTest/FfaPartitionTestApp.inf
 
   # Test secure partition
-  QemuSbsaPkg/ExampleSecurePartition/ExampleSecurePartition.inf {
+  QemuSbsaPkg/MsSecurePartition/MsSecurePartition.inf {
     <LibraryClasses>
       MemoryAllocationLib|MdeModulePkg/Library/BaseMemoryAllocationLibNull/BaseMemoryAllocationLibNull.inf
       StandaloneMmCoreEntryPoint|ArmPkg/Library/SecurePartitionEntryPoint/SecurePartitionEntryPoint.inf
+      Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
     <PcdsFixedAtBuild>
       gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60030000
     <PcdsPatchableInModule>
       gArmTokenSpaceGuid.PcdFfaLibConduitSmc|FALSE
+      gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x60120000
   }
 
 ###################################################################################################

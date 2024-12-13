@@ -567,7 +567,7 @@ READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
-  INF QemuSbsaPkg/ExampleSecurePartition/ExampleSecurePartition.inf
+  INF QemuSbsaPkg/MsSecurePartition/MsSecurePartition.inf
 
 ################################################################################
 #
