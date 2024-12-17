@@ -104,9 +104,7 @@ FfaPartitionTestAppEntry (
   ARM_SMC_ARGS            SmcArgs                    = { 0 };
   EFI_GUID                FfaTestServiceGuid         = FFA_TEST_SERVICE_GUID;
   EFI_GUID                FfaNotificationServiceGuid = FFA_NOTIFICATION_SERVICE_GUID;
-#if TPM2_ENABLE
   EFI_GUID                FfaTpmServiceGuid          = FFA_TPM_SERVICE_GUID;
-#endif
   EFI_FFA_PART_INFO_DESC  FfaTestPartInfo;
   UINT32                  Count;
   UINT32                  Size;
@@ -294,7 +292,6 @@ FfaPartitionTestAppEntry (
     DEBUG ((DEBUG_INFO, "Thermal Service Destroy Success\n"));
   }
 
-#if TPM2_ENABLE
   // Call the TPM Service get_interface_version
   ZeroMem (&DirectMsgArgsEx, sizeof (DirectMsgArgsEx));
   DirectMsgArgsEx.Arg0 = 0x0F000001;
@@ -310,7 +307,6 @@ FfaPartitionTestAppEntry (
   } else {
     DEBUG ((DEBUG_INFO, "TPM Service Interface Version: %d.%d\n", DirectMsgArgsEx.Arg1 >> 16, DirectMsgArgsEx.Arg1 & 0xFFFF));
   }
-#endif
 
   // Invoke the Test Service to trigger a notification event
   ZeroMem (&DirectMsgArgsEx, sizeof (DirectMsgArgsEx));
