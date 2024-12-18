@@ -22,10 +22,10 @@
 #include <Library/NotificationServiceLib.h>
 #include <Library/TestServiceLib.h>
 #include <Library/TpmServiceLib.h>
+#include <Guid/Tpm2ServiceFfa.h>
 
 // Service specific structures/variables
 EFI_GUID NotificationServiceGuid = NOTIFICATION_SERVICE_UUID;
-EFI_GUID TpmServiceGuid = TPM_SERVICE_UUID;
 EFI_GUID TestServiceGuid = TEST_SERVICE_UUID;
 volatile BOOLEAN Loop = TRUE;
 
@@ -50,7 +50,7 @@ MsSecurePartitionHandleMessage (
 
   if (!CompareMem(&Request->ServiceGuid, &NotificationServiceGuid, sizeof(EFI_GUID))) {
     NotificationServiceHandle (Request, Response);
-  } else if (!CompareMem(&Request->ServiceGuid, &TpmServiceGuid, sizeof(EFI_GUID))) {
+  } else if (!CompareMem(&Request->ServiceGuid, &gEfiTpm2ServiceFfaGuid, sizeof(EFI_GUID))) {
     TpmServiceHandle(Request, Response);
   } else if (!CompareMem(&Request->ServiceGuid, &TestServiceGuid, sizeof(EFI_GUID))) {
     TestServiceHandle(Request, Response);

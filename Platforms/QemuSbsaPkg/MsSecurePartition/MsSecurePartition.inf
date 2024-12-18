@@ -45,6 +45,7 @@
 
 [Guids]
   gMmCoreDataHobGuid
+  gEfiTpm2ServiceFfaGuid
 
 #
 # This configuration fails for CLANGPDB, which does not support PIE in the GCC
