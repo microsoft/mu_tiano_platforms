@@ -25,8 +25,8 @@
 #include <Guid/Tpm2ServiceFfa.h>
 
 // Service specific structures/variables
-EFI_GUID          NotificationServiceGuid = NOTIFICATION_SERVICE_UUID;
-EFI_GUID          TestServiceGuid         = TEST_SERVICE_UUID;
+EFI_GUID  NotificationServiceGuid = NOTIFICATION_SERVICE_UUID;
+EFI_GUID  TestServiceGuid         = TEST_SERVICE_UUID;
 
 /**
   Message Handler for the Microsoft Secure Partition
