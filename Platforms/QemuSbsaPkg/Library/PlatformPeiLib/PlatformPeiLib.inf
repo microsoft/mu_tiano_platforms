@@ -42,6 +42,7 @@
 
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress               ## CONSUMES # TODO: Consider removing later
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmMaxAddress                ## CONSUMES
 
 [depex]
   TRUE

@@ -180,6 +180,11 @@
   ArmFfaLibEx|ArmPkg/Library/ArmFfaLibEx/ArmFfaLibEx.inf
   PlatformFfaInterruptLib|ArmPkg/Library/PlatformFfaInterruptLibNull/PlatformFfaInterruptLib.inf
 
+  # Secure Partition Services
+  NotificationServiceLib|ArmPkg/Library/NotificationServiceLib/NotificationServiceLib.inf
+  TestServiceLib|ArmPkg/Library/TestServiceLib/TestServiceLib.inf
+  TpmServiceLib|ArmPkg/Library/TpmServiceLib/TpmServiceLib.inf
+
   #
   # Uncomment (and comment out the next line) For RealView Debugger. The Standard IO window
   # in the debugger will show load and unload commands for symbols. You can cut and paste this
@@ -840,8 +845,8 @@
   #
   # TPM2 support
   #
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x10000010000
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpmMaxAddress|0x10000014FFF
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x10000200000
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmMaxAddress|0x10000204FFF
 
 [PcdsFixedAtBuild.AARCH64]
   # Clearing BIT0 in this PCD prevents installing a 32-bit SMBIOS entry point,
@@ -917,8 +922,8 @@
   # TPM2 support
   #
 !if $(TPM2_ENABLE) == TRUE
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x5a, 0xf2, 0x6b, 0x28, 0xc3, 0xc2, 0x8c, 0x40, 0xb3, 0xb4, 0x25, 0xe6, 0x75, 0x8b, 0x73, 0x17}
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0x02
 !endif
 
   #
@@ -1444,12 +1449,18 @@
   QemuSbsaPkg/FfaPartitionTest/FfaPartitionTestApp.inf
 
   # Test secure partition
-  QemuSbsaPkg/ExampleSecurePartition/ExampleSecurePartition.inf {
+  QemuSbsaPkg/MsSecurePartition/MsSecurePartition.inf {
     <LibraryClasses>
       MemoryAllocationLib|MdeModulePkg/Library/BaseMemoryAllocationLibNull/BaseMemoryAllocationLibNull.inf
       StandaloneMmCoreEntryPoint|ArmPkg/Library/SecurePartitionEntryPoint/SecurePartitionEntryPoint.inf
+      Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpmStandaloneMm.inf
+      Tpm2DebugLib|SecurityPkg/Library/Tpm2DebugLib/Tpm2DebugLibVerbose.inf
+      TimerLib|ArmPkg/Library/ArmArchTimerLibEx/ArmArchTimerLibEx.inf
     <PcdsFixedAtBuild>
       gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60030000
+      gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x60120000
+      gEfiSecurityPkgTokenSpaceGuid.PcdTpmInternalBaseAddress|0x10000200000
+      gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
     <PcdsPatchableInModule>
       gArmTokenSpaceGuid.PcdFfaLibConduitSmc|FALSE
   }
