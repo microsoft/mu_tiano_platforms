@@ -9,17 +9,17 @@
 
 [Defines]
   INF_VERSION                    = 0x0001001A
-  BASE_NAME                      = ExampleSecurePartition
-  FILE_GUID                      = 68C17D7D-6E3E-4042-8E48-6F99CC343EE6
+  BASE_NAME                      = MsSecurePartition
+  FILE_GUID                      = df1df62b-cf53-4195-b1d9-fe44206bf338
   MODULE_TYPE                    = MM_CORE_STANDALONE
   VERSION_STRING                 = 1.0
   PI_SPECIFICATION_VERSION       = 0x00010032
-  ENTRY_POINT                    = ExampleSecurePartitionMain
+  ENTRY_POINT                    = MsSecurePartitionMain
 
 #  VALID_ARCHITECTURES           = AARCH64
 
 [Sources]
-  ExampleSecurePartition.c
+  MsSecurePartition.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -39,9 +39,13 @@
   FvLib
   MemoryAllocationLib
   IoLib
+  NotificationServiceLib
+  TestServiceLib
+  TpmServiceLib
 
 [Guids]
   gMmCoreDataHobGuid
+  gEfiTpm2ServiceFfaGuid
 
 #
 # This configuration fails for CLANGPDB, which does not support PIE in the GCC
