@@ -845,8 +845,8 @@
   #
   # TPM2 support
   #
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x10000010000
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpmMaxAddress|0x10000014FFF
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x10000200000
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmMaxAddress|0x10000204FFF
 
 [PcdsFixedAtBuild.AARCH64]
   # Clearing BIT0 in this PCD prevents installing a 32-bit SMBIOS entry point,
@@ -1459,6 +1459,7 @@
     <PcdsFixedAtBuild>
       gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60030000
       gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x60120000
+      gEfiSecurityPkgTokenSpaceGuid.PcdTpmInternalBaseAddress|0x10000200000
       gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
     <PcdsPatchableInModule>
       gArmTokenSpaceGuid.PcdFfaLibConduitSmc|FALSE

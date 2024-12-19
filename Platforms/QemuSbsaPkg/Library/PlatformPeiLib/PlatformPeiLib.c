@@ -36,14 +36,17 @@ PlatformPeim (
   )
 {
   UINT64      TpmBase;
+  UINT64      TpmMax;
   EFI_STATUS  Status;
 
   TpmBase = PcdGet64 (PcdTpmBaseAddress);
+  TpmMax  = PcdGet64 (PcdTpmMaxAddress);
 
   if (TpmBase != 0) {
     DEBUG ((DEBUG_INFO, "%a: TPM @ 0x%lx\n", __func__, TpmBase));
 
     Status = PeiServicesInstallPpi (&mTpm2DiscoveredPpi);
+    BuildMemoryAllocationHob (TpmBase, ((TpmMax + 1) - TpmBase), EfiACPIMemoryNVS);
   } else {
     Status = PeiServicesInstallPpi (&mTpm2InitializationDonePpi);
   }

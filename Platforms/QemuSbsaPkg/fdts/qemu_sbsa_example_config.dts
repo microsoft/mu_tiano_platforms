@@ -61,7 +61,7 @@
 
 		internal_tpm_crb {
 			description = "internal tpm crb";
-			base-address = <0x00000100 0x00010000>;
+			base-address = <0x00000100 0x00200000>;
 			pages-count = <0x10>;
 			attributes = <SECURE_RW>;
 		};
