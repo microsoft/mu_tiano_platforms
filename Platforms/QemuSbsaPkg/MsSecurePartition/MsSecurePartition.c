@@ -25,9 +25,8 @@
 #include <Guid/Tpm2ServiceFfa.h>
 
 // Service specific structures/variables
-EFI_GUID NotificationServiceGuid = NOTIFICATION_SERVICE_UUID;
-EFI_GUID TestServiceGuid = TEST_SERVICE_UUID;
-volatile BOOLEAN Loop = TRUE;
+EFI_GUID          NotificationServiceGuid = NOTIFICATION_SERVICE_UUID;
+EFI_GUID          TestServiceGuid         = TEST_SERVICE_UUID;
 
 /**
   Message Handler for the Microsoft Secure Partition
@@ -40,20 +39,20 @@ STATIC
 VOID
 EFIAPI
 MsSecurePartitionHandleMessage (
-  DIRECT_MSG_ARGS_EX *Request, 
-  DIRECT_MSG_ARGS_EX *Response
+  DIRECT_MSG_ARGS_EX  *Request,
+  DIRECT_MSG_ARGS_EX  *Response
   )
 {
   ZeroMem (Response, sizeof (DIRECT_MSG_ARGS_EX));
-  Response->SourceId = Request->DestinationId;
+  Response->SourceId      = Request->DestinationId;
   Response->DestinationId = Request->SourceId;
 
-  if (!CompareMem(&Request->ServiceGuid, &NotificationServiceGuid, sizeof(EFI_GUID))) {
+  if (!CompareMem (&Request->ServiceGuid, &NotificationServiceGuid, sizeof (EFI_GUID))) {
     NotificationServiceHandle (Request, Response);
-  } else if (!CompareMem(&Request->ServiceGuid, &gEfiTpm2ServiceFfaGuid, sizeof(EFI_GUID))) {
-    TpmServiceHandle(Request, Response);
-  } else if (!CompareMem(&Request->ServiceGuid, &TestServiceGuid, sizeof(EFI_GUID))) {
-    TestServiceHandle(Request, Response);
+  } else if (!CompareMem (&Request->ServiceGuid, &gEfiTpm2ServiceFfaGuid, sizeof (EFI_GUID))) {
+    TpmServiceHandle (Request, Response);
+  } else if (!CompareMem (&Request->ServiceGuid, &TestServiceGuid, sizeof (EFI_GUID))) {
+    TestServiceHandle (Request, Response);
   } else {
     DEBUG ((DEBUG_ERROR, "Invalid secure partition service UUID\n"));
     Response->Arg0 = EFI_NOT_FOUND;
@@ -78,9 +77,6 @@ MsSecurePartitionMain (
   DIRECT_MSG_ARGS_EX  Request;
   DIRECT_MSG_ARGS_EX  Response;
 
-  DEBUG ((DEBUG_INFO, "%a - 0x%x\n", __func__, HobStart));
-  DUMP_HEX (DEBUG_ERROR, 0, 0x000001001FFFE000, EFI_PAGE_SIZE, "");
-
   // Initialize the services running in this secure partition
   NotificationServiceInit ();
   TpmServiceInit ();
@@ -91,25 +87,23 @@ MsSecurePartitionMain (
   Status = FfaMessageWait (&Request);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Failed to wait for message %r\n", Status));
-    while (Loop) {
-    }
+    ASSERT (FALSE);
   }
 
   while (1) {
-    MsSecurePartitionHandleMessage(&Request, &Response);
+    MsSecurePartitionHandleMessage (&Request, &Response);
 
-    Status = FfaMessageSendDirectResp2(&Response, &Request);
+    Status = FfaMessageSendDirectResp2 (&Response, &Request);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "Failed to send direct response %r\n", Status));
-      Status = FfaMessageWait(&Request);
+      Status = FfaMessageWait (&Request);
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_ERROR, "Failed to wait for message %r\n", Status));
-        while (Loop) {
-        }
+        ASSERT (FALSE);
       }
     }
   }
 
-  DEBUG ((DEBUG_INFO, "%a - Done!\n", __func__));
+  DEBUG ((DEBUG_ERROR, "Reached the end of %a - Invalid!\n", __func__));
   return EFI_SUCCESS;
 }
