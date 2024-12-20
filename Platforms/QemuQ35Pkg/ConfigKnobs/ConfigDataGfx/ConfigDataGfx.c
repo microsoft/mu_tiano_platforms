@@ -68,8 +68,8 @@ ApplyGfxConfigToPolicy (
     DEBUG ((DEBUG_ERROR, "Failed to allocate Policy structure\n"));
     Status = EFI_OUT_OF_RESOURCES;
     goto Exit;
-  }  
- 
+  }
+
   // We only translate the GFX ports #0 exposed to platform from conf data
   GfxSiliconPolicy[0].Power_State_Port = GfxEnablePort0;
 
@@ -82,7 +82,7 @@ ApplyGfxConfigToPolicy (
 
 Exit:
   if (GfxSiliconPolicy != NULL) {
-    FreePool (GfxSiliconPolicy);   
+    FreePool (GfxSiliconPolicy);
   }
 
   return Status;
