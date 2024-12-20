@@ -339,23 +339,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         # Add a post build step to build BL31 and assemble the FD files
         op_fv = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
 
-        logging.info("Test to see if clang is installed")
-        cmd = "clang"
-        args = "--version"
-        ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_HAF_PATH"))
-        if ret != 0:
-            # If clang is not installed, we need to install it here.
-            # For consistency, we will install v16.
-            ret = RunCmd("apt", "install clang")
-            if ret != 0:
-                logging.error("Failed to install clang")
-                return ret
-
-            ret = RunCmd("apt", "install llvm")
-            if ret != 0:
-                logging.error("Failed to install llvm")
-                return ret
-
         logging.info("Building Hafnium")
         cmd = "make"
         args = "PROJECT=mu PLATFORM=secure_qemu_aarch64"
