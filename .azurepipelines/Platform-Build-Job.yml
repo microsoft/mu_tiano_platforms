@@ -173,14 +173,6 @@ jobs:
           itemPattern: '**/*.efi'
           targetPath: 'Build/${{ item.Value.BuildPackage }}/${{ item.Value.BuildTarget }}_$(tool_chain_tag)/X64/'
 
-      # Run
-      - task: CmdLine@2
-        displayName: Run to Shell
-        inputs:
-          script: stuart_build -c ${{ item.Value.BuildFile }} TOOL_CHAIN_TAG=$(tool_chain_tag) TARGET=${{ item.Value.BuildTarget }} ${{ item.Value.BuildFlags }} ${{ item.Value.RunFlags }} --FlashOnly
-        condition: and(gt(variables.pkg_count, 0), succeeded())
-        timeoutInMinutes: ${{ parameters.run_timeout }}
-
       # Copy build logs to the artifact staging directory
       - template: Steps/CommonLogCopyAndPublish.yml@mu_devops
         parameters:
