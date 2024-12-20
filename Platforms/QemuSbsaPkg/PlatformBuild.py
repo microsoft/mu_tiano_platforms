@@ -339,6 +339,13 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         # Add a post build step to build BL31 and assemble the FD files
         op_fv = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
 
+        logging.info("Test")
+        cmd = "clang"
+        args = "--version"
+        ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_HAF_PATH"))
+        if ret != 0:
+            return ret
+
         logging.info("Building Hafnium")
         cmd = "make"
         args = "PROJECT=mu PLATFORM=secure_qemu_aarch64"
