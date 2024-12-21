@@ -66,11 +66,6 @@ jobs:
 
       variables:
       - name: Run
-        ${{ if EndsWith(item.Key, 'CODE_COVERAGE') }}:
-          value: false
-        ${{ elseif or(eq(item.Value.Run, true), eq(parameters.os_type, 'Linux')) }}:
-          value: true
-        ${{ else }}:
           value: false
 
       ${{ if and(ne(parameters.container_image, ''), ne(item.Value.SelfHostAgent, true)) }}:
