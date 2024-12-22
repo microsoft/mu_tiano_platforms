@@ -64,16 +64,26 @@ ApplyGfxConfigToPolicy (
   GfxEnablePort0   = *(BOOLEAN *)ConfigBuffer;
   GfxSiliconPolicy = AllocateCopyPool (sizeof (DefaultQemuGfxPolicy), DefaultQemuGfxPolicy);
 
+  if (GfxSiliconPolicy == NULL) {
+    DEBUG ((DEBUG_ERROR, "Failed to allocate Policy structure\n"));
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
+
   // We only translate the GFX ports #0 exposed to platform from conf data
   GfxSiliconPolicy[0].Power_State_Port = GfxEnablePort0;
 
   Status = SetPolicy (&gPolicyDataGFXGuid, POLICY_ATTRIBUTE_FINALIZED, GfxSiliconPolicy, sizeof (DefaultQemuGfxPolicy));
+
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a Failed to update GFX policy per configuration data - %r!!!\n", __func__, Status));
-    ASSERT (FALSE);
-    goto Exit;
+    ASSERT_EFI_ERROR (Status);
   }
 
 Exit:
+  if (GfxSiliconPolicy != NULL) {
+    FreePool (GfxSiliconPolicy);
+  }
+
   return Status;
 }
