@@ -22,7 +22,7 @@ The following are the steps needed to create a secure partition:
 
    .dsc example:
 
-   ```c
+   ```bash
    QemuSbsaPkg/MsSecurePartition/MsSecurePartition.inf {
     <LibraryClasses>
       MemoryAllocationLib|MdeModulePkg/Library/BaseMemoryAllocationLibNull/BaseMemoryAllocationLibNull.inf
@@ -42,7 +42,7 @@ The following are the steps needed to create a secure partition:
 
    .fdf example:
 
-   ```c
+   ```bash
    [FV.FV_STANDALONE_MM_SECURE_PARTITION1]
    FvAlignment        = 16
    ERASE_POLARITY     = 1
@@ -69,7 +69,7 @@ The following are the steps needed to create a secure partition:
    Note that only S-EL0 partitions are supported at this time.
 6. Update the .dts in TFA to include your secure partition and its info. The file can be found at Silicon/Arm/TFA/plat/qemu/qemu_sbsa/fdts.
 
-   ```c
+   ```text
    secure-partitions {
     compatible = "arm,sp";
     stmm {
@@ -110,7 +110,7 @@ The following are steps needed to create a service for a secure partition:
 5. Create a global EFI_GUID extern which will hold the UUID/GUID of your service. Make sure it is initialized in the .dec
    file. This will give you an easy way to compare the UUID/GUID against other UUIDs/GUIDs received through FF-A.
 
-   ```c
+   ```bash
    ## TPM Service over FF-A
    # Include/Guid/Tpm2ServiceFfa.h
    gEfiTpm2ServiceFfaGuid = { 0x17b862a4, 0x1806, 0x4faf, { 0x86, 0xb3, 0x08, 0x9a, 0x58, 0x35, 0x38, 0x61 } }
@@ -120,7 +120,7 @@ The following are steps needed to create a service for a secure partition:
    directory. Note that a service should have an Init, Deinit, and Handler function. Make sure to update the .dec to include
    the path to this header.
 
-   ```c
+   ```bash
    ##  @libraryclass  Provides an implementation of the TPM Service
    #
    TpmServiceLib|Include/Library/TpmServiceLib.h
@@ -129,14 +129,14 @@ The following are steps needed to create a service for a secure partition:
 7. Add the UUID/GUID to the uuid variable in the secure partition .dts file. A secure partition can support multiple
    services, each service can be added as a list. (i.e. <\UUID_1>, <\UUID_2>, <\UUID_3>)
 
-   ```c
+   ```bash
    uuid = <0xb510b3a3 0x59f64054 0xba7aff2e 0xb1eac765>, <0x17b862a4 0x18064faf 0x86b3089a 0x58353861>, <0xe0fad9b3 0x7f5c42c5 0xb2eeb7a8 0x2313cdb2>;
    ```
 
 8. Link the service into your secure partition by adding the .inf to the [\LibraryClasses] section of the secure partition's
    .inf file.
 
-   ```c
+   ```bash
    [LibraryClasses]
     NotificationServiceLib
     TestServiceLib
