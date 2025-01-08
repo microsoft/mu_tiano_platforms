@@ -155,13 +155,13 @@ FV = FV_STANDALONE_MM_COMPACT
 
 [FD.BL32_AP_MM_SP1]
 BaseAddress   = 0x20410000|gArmTokenSpaceGuid.PcdFdBaseAddress  # UEFI in DRAM + 128MB.
-Size          = 0x00012000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the device (64MiB).
+Size          = 0x00013000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the device (64MiB).
 ErasePolarity = 1
 
 BlockSize     = 0x00001000
-NumBlocks     = 0x00012
+NumBlocks     = 0x00013
 
-0x00000000|0x00012000
+0x00000000|0x00013000
 FV = FV_STANDALONE_MM_SECURE_PARTITION1
 
 [FD.QEMU_EFI]
