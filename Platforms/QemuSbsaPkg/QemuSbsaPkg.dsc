@@ -1459,7 +1459,6 @@
     <PcdsFixedAtBuild>
       gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60030000
       gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x60120000
-      gEfiSecurityPkgTokenSpaceGuid.PcdTpmInternalBaseAddress|0x10000200000
       gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
     <PcdsPatchableInModule>
       gArmTokenSpaceGuid.PcdFfaLibConduitSmc|FALSE
