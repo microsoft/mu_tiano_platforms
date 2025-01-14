@@ -73,16 +73,18 @@
   DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS  = TRUE
   DEFINE NETWORK_ISCSI_ENABLE            = FALSE
 
-  PEI_CRYPTO_SERVICES           = TINY_SHA
-  DXE_CRYPTO_SERVICES           = STANDARD
-  RUNTIMEDXE_CRYPTO_SERVICES    = NONE
-  STANDALONEMM_CRYPTO_SERVICES  = STANDARD
-  SMM_CRYPTO_SERVICES           = NONE
-  PEI_CRYPTO_ARCH               = AARCH64
-  DXE_CRYPTO_ARCH               = AARCH64
-  RUNTIMEDXE_CRYPTO_ARCH        = NONE
-  STANDALONEMM_CRYPTO_ARCH      = AARCH64
-  SMM_CRYPTO_ARCH               = NONE
+  PEI_CRYPTO_SERVICES                 = TINY_SHA
+  DXE_CRYPTO_SERVICES                 = STANDARD
+  RUNTIMEDXE_CRYPTO_SERVICES          = NONE
+  STANDALONEMM_CRYPTO_SERVICES        = None
+  STANDALONEMM_MMSUPV_CRYPTO_SERVICES = STANDARD
+  SMM_CRYPTO_SERVICES                 = NONE
+  PEI_CRYPTO_ARCH                     = AARCH64
+  DXE_CRYPTO_ARCH                     = AARCH64
+  RUNTIMEDXE_CRYPTO_ARCH              = NONE
+  STANDALONEMM_CRYPTO_ARCH            = NONE 
+  STANDALONEMM_MMSUPV_CRYPTO_ARCH     = AARCH64
+  SMM_CRYPTO_ARCH                     = NONE
 
 !if $(NETWORK_SNP_ENABLE) == TRUE
   !error "NETWORK_SNP_ENABLE is IA32/X64/EBC only"
@@ -377,6 +379,8 @@
   TransportLogControlLib|DebuggerFeaturePkg/Library/TransportLogControlLibNull/TransportLogControlLibNull.inf
 
   HobPrintLib|MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
+
+  MemoryBinOverrideLib|MdeModulePkg/Library/MemoryBinOverrideLibNull/MemoryBinOverrideLibNull.inf
 
 [LibraryClasses.common.SEC, LibraryClasses.common.PEI_CORE]
   NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf

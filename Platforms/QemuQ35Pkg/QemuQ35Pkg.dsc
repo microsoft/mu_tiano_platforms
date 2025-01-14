@@ -54,12 +54,14 @@
   DXE_CRYPTO_SERVICES = STANDARD
   RUNTIMEDXE_CRYPTO_SERVICES = STANDARD
   SMM_CRYPTO_SERVICES = NONE
-  STANDALONEMM_CRYPTO_SERVICES = STANDARD
+  STANDALONEMM_CRYPTO_SERVICES = NONE
+  STANDALONEMM_MMSUPV_CRYPTO_SERVICES = STANDARD
   PEI_CRYPTO_ARCH = IA32
   DXE_CRYPTO_ARCH = X64
   RUNTIMEDXE_CRYPTO_ARCH = X64
   SMM_CRYPTO_ARCH = NONE
-  STANDALONEMM_CRYPTO_ARCH = X64
+  STANDALONEMM_CRYPTO_ARCH = NONE
+  STANDALONEMM_MMSUPV_CRYPTO_ARCH = X64
 
 ################################################################################
 #
@@ -320,6 +322,8 @@
   StackCheckFailureHookLib|MdePkg/Library/StackCheckFailureHookLibNull/StackCheckFailureHookLibNull.inf
 
   HobPrintLib|MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
+
+  MemoryBinOverrideLib|MdeModulePkg/Library/MemoryBinOverrideLibNull/MemoryBinOverrideLibNull.inf
 
 [LibraryClasses.IA32, LibraryClasses.X64]
   XenHypercallLib|QemuQ35Pkg/Library/XenHypercallLib/XenHypercallLib.inf
