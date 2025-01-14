@@ -14,7 +14,7 @@ HiiKeyboardLayout = {path = "Common/MU/HidPkg/Crates/HiiKeyboardLayout"}
 RustAdvancedLoggerDxe = {path = "Common/MU/AdvLoggerPkg/Crates/RustAdvancedLoggerDxe"}
 RustBootServicesAllocatorDxe = {path = "Common/MU/MsCorePkg/Crates/RustBootServicesAllocatorDxe"}
 
-hidparser = {git = "https://github.com/microsoft/mu_rust_hid.git", branch = "main"}
+hidparser = {version = "1.0"}
 memoffset = "0.9.1"
 num-traits = { version = "0.2", default-features = false}
 num-derive = { version = "0.4", default-features = false}
