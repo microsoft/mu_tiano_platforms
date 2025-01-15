@@ -50,7 +50,11 @@ MsSecurePartitionHandleMessage (
   if (!CompareMem (&Request->ServiceGuid, &NotificationServiceGuid, sizeof (EFI_GUID))) {
     NotificationServiceHandle (Request, Response);
   } else if (!CompareMem (&Request->ServiceGuid, &gEfiTpm2ServiceFfaGuid, sizeof (EFI_GUID))) {
+#ifdef TPM2_ENABLE
     TpmServiceHandle (Request, Response);
+#else
+    Response->Arg0 = EFI_UNSUPPORTED;
+#endif
   } else if (!CompareMem (&Request->ServiceGuid, &TestServiceGuid, sizeof (EFI_GUID))) {
     TestServiceHandle (Request, Response);
   } else {
@@ -79,7 +83,10 @@ MsSecurePartitionMain (
 
   // Initialize the services running in this secure partition
   NotificationServiceInit ();
+#ifdef TPM2_ENABLE
   TpmServiceInit ();
+  #error "TPM2_ENABLE is defined"
+#endif
   TestServiceInit ();
 
   DEBUG ((DEBUG_INFO, "MS-Services secure partition initialized and running!\n"));
