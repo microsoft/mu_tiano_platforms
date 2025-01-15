@@ -343,6 +343,7 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
   INF QemuSbsaPkg/SbsaQemuAcpiDxe/SbsaQemuAcpiDxe.inf
   INF RuleOverride = ACPITABLE QemuSbsaPkg/AcpiTables/AcpiTables.inf
+  INF ArmPkg/Drivers/SmmuDxe/SmmuDxe.inf
 
   #
   # EBC support
