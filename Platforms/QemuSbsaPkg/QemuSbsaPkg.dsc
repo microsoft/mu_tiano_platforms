@@ -76,14 +76,14 @@
   PEI_CRYPTO_SERVICES                 = TINY_SHA
   DXE_CRYPTO_SERVICES                 = STANDARD
   RUNTIMEDXE_CRYPTO_SERVICES          = NONE
-  STANDALONEMM_CRYPTO_SERVICES        = None
-  STANDALONEMM_MMSUPV_CRYPTO_SERVICES = STANDARD
+  STANDALONEMM_CRYPTO_SERVICES        = STANDARD
+  STANDALONEMM_MMSUPV_CRYPTO_SERVICES = NONE
   SMM_CRYPTO_SERVICES                 = NONE
   PEI_CRYPTO_ARCH                     = AARCH64
   DXE_CRYPTO_ARCH                     = AARCH64
   RUNTIMEDXE_CRYPTO_ARCH              = NONE
-  STANDALONEMM_CRYPTO_ARCH            = NONE 
-  STANDALONEMM_MMSUPV_CRYPTO_ARCH     = AARCH64
+  STANDALONEMM_CRYPTO_ARCH            = AARCH64
+  STANDALONEMM_MMSUPV_CRYPTO_ARCH     = NONE
   SMM_CRYPTO_ARCH                     = NONE
 
 !if $(NETWORK_SNP_ENABLE) == TRUE
@@ -508,6 +508,7 @@
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
   MemoryTypeInfoSecVarCheckLib|MdeModulePkg/Library/MemoryTypeInfoSecVarCheckLib/MemoryTypeInfoSecVarCheckLib.inf
   FltUsedLib|MdePkg/Library/FltUsedLib/FltUsedLib.inf
+
 
 [LibraryClasses.common.UEFI_DRIVER]
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
