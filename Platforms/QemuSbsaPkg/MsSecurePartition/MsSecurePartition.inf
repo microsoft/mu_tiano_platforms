@@ -41,7 +41,6 @@
   IoLib
   NotificationServiceLib
   TestServiceLib
-  TpmServiceLib
 
 [Guids]
   gMmCoreDataHobGuid

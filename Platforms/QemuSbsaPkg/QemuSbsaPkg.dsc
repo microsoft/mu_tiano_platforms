@@ -183,7 +183,6 @@
   # Secure Partition Services
   NotificationServiceLib|ArmPkg/Library/NotificationServiceLib/NotificationServiceLib.inf
   TestServiceLib|ArmPkg/Library/TestServiceLib/TestServiceLib.inf
-  TpmServiceLib|ArmPkg/Library/TpmServiceLib/TpmServiceLib.inf
 
   #
   # Uncomment (and comment out the next line) For RealView Debugger. The Standard IO window
@@ -1456,6 +1455,9 @@
       Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpmStandaloneMm.inf
       Tpm2DebugLib|SecurityPkg/Library/Tpm2DebugLib/Tpm2DebugLibVerbose.inf
       TimerLib|ArmPkg/Library/ArmArchTimerLibEx/ArmArchTimerLibEx.inf
+!if $(TPM2_ENABLE) == TRUE
+      TpmServiceLib|ArmPkg/Library/TpmServiceLib/TpmServiceLib.inf
+!endif
     <PcdsFixedAtBuild>
       gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60030000
       gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x60120000
@@ -1487,6 +1489,13 @@
   #
   RVCT:*_*_*_CC_FLAGS = -DDISABLE_NEW_DEPRECATED_INTERFACES
   GCC:*_*_*_CC_FLAGS = -DDISABLE_NEW_DEPRECATED_INTERFACES
+
+!if $(TPM2_ENABLE) == TRUE
+  #
+  # Enable TPM2 support
+  #
+  GCC:*_*_*_CC_FLAGS = -DTPM2_ENABLE
+!endif
 
 [BuildOptions.common.EDKII.SEC,BuildOptions.common.EDKII.MM_CORE_STANDALONE]
   GCC:*_CLANGPDB_*_DLINK_FLAGS = /ALIGN:0x1000 /FILEALIGN:0x1000
