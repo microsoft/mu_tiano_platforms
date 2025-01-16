@@ -92,10 +92,9 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         else:
             logging.critical("Virtual Drive Path Invalid")
 
-        if path_to_os is not None:
-            args += " -m 8192"
-        else:
-            args += " -m 2048"
+        # TODO: Set the memory size to be 2GB regardless. Not sure why 8GB does
+        # not work.
+        args += " -m 2048"
 
         args += " -machine sbsa-ref" #,accel=(tcg|kvm)"
         args += " -cpu max"
