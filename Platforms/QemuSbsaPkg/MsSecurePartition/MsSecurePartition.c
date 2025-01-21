@@ -83,7 +83,6 @@ MsSecurePartitionMain (
   NotificationServiceInit ();
  #ifdef TPM2_ENABLE
   TpmServiceInit ();
-  #error "TPM2_ENABLE is defined"
  #endif
   TestServiceInit ();
 
