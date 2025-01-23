@@ -1456,7 +1456,7 @@
       Tpm2DebugLib|SecurityPkg/Library/Tpm2DebugLib/Tpm2DebugLibVerbose.inf
       TimerLib|ArmPkg/Library/ArmArchTimerLibEx/ArmArchTimerLibEx.inf
 !if $(TPM2_ENABLE) == TRUE
-      TpmServiceLib|ArmPkg/Library/TpmServiceLib/TpmServiceLib.inf
+      NULL|ArmPkg/Library/TpmServiceLib/TpmServiceLib.inf
       TpmServiceStateTranslationLib|ArmPkg/Library/TpmServiceStateTranslationLib/TpmServiceStateTranslationLib.inf
 !endif
     <PcdsFixedAtBuild>
