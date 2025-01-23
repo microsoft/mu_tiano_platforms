@@ -60,7 +60,7 @@
 
   DEFINE TTY_TERMINAL            = FALSE
 !ifndef TPM2_ENABLE
-  DEFINE TPM2_ENABLE                     = FALSE
+  DEFINE TPM2_ENABLE             = FALSE
 !endif
   DEFINE TPM2_CONFIG_ENABLE      = FALSE
   DEFINE BUILD_UNIT_TESTS        = TRUE
@@ -1457,6 +1457,7 @@
       TimerLib|ArmPkg/Library/ArmArchTimerLibEx/ArmArchTimerLibEx.inf
 !if $(TPM2_ENABLE) == TRUE
       TpmServiceLib|ArmPkg/Library/TpmServiceLib/TpmServiceLib.inf
+      TpmServiceStateTranslationLib|ArmPkg/Library/TpmServiceStateTranslationLib/TpmServiceStateTranslationLib.inf
 !endif
     <PcdsFixedAtBuild>
       gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60030000
