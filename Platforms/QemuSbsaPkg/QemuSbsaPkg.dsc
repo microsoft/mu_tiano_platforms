@@ -375,6 +375,7 @@
 
   # Common Standalone MM libraries
   MemLib|StandaloneMmPkg/Library/StandaloneMmMemLib/StandaloneMmMemLib.inf
+  MemoryBinOverrideLib|MdeModulePkg/Library/MemoryBinOverrideLibNull/MemoryBinOverrideLibNull.inf
 
   AdvancedLoggerAccessLib |AdvLoggerPkg/Library/AdvancedLoggerAccessLib/AdvancedLoggerAccessLib.inf
   FmpDependencyLib|FmpDevicePkg/Library/FmpDependencyLib/FmpDependencyLib.inf
@@ -497,7 +498,7 @@
   HobPrintLib|MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
 
   ArmMmuLib|ArmPkg/Library/StandaloneMmMmuLib/ArmMmuStandaloneMmLib.inf
-  StandaloneMmCoreEntryPoint|ArmPkg/Library/StandaloneMmCoreEntryPoint/StandaloneMmCoreEntryPoint.inf
+  StandaloneMmCoreEntryPoint|ArmPkg/Library/ArmStandaloneMmCoreEntryPoint/ArmStandaloneMmCoreEntryPoint.inf
   SecurePartitionServicesTableLib|ArmPkg/Library/SecurePartitionServicesTableLib/SecurePartitionServicesTableLib.inf
   PeCoffExtraActionLib|StandaloneMmPkg/Library/StandaloneMmPeCoffExtraActionLib/StandaloneMmPeCoffExtraActionLib.inf
   MmServicesTableLib|StandaloneMmPkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLibCore.inf
@@ -967,7 +968,7 @@
   ArmPlatformPkg/MemoryInitPei/MemoryInitPeim.inf
   ArmPkg/Drivers/CpuPei/CpuPei.inf
   ArmPkg/Drivers/MmCommunicationPei/MmCommunicationPei.inf
-  ArmPkg/Drivers/SmmVariablePei/SmmVariablePei.inf
+  MdeModulePkg/Universal/Variable/MmVariablePei/MmVariablePei.inf
 
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
 
