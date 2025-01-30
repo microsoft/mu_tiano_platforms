@@ -1,0 +1,18 @@
+##
+# Downloads the exact version of cargo-tarpaulin. This version should be the same version as that found in the
+# rust-toolchain.toml file.
+#
+# Copyright (c) 2019, Microsoft Corporation
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "global-win",
+  "type": "web",
+  "name": "cargo-tarpaulin",
+  "source": "https://github.com/xd009642/tarpaulin/releases/download/0.31.5/cargo-tarpaulin-x86_64-pc-windows-msvc.zip",
+  "version": "v0.31.5",
+  "sha256": "96d93282bcd9c8e52fbe1dab2dff023512f198b5f0cff375c2fbce12fd978c5e",
+  "internal_path": "/",
+  "compression_type": "zip",
+  "flags": ["set_path"],
+}

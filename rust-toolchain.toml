@@ -1,6 +1,10 @@
 [toolchain]
 channel = "1.80.0"
 
+# For Windows, these tools are external dependencies found at QemuPkg/Binaries. If updating the version here, the
+# version in QemuPkg/Binaries/README.md should also be updated.
+
+# For Linux, these tools, come from the devcontainer found at .devcontainer/devcontainer.json.
 [tools]
 cargo-make = "0.37.9"
 cargo-tarpaulin = "0.31.2"

@@ -1,0 +1,18 @@
+##
+# Downloads the exact version of cargo-make. This version should be the same version as that found in the
+# rust-toolchain.toml file.
+#
+# Copyright (c) 2019, Microsoft Corporation
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "global-win",
+  "type": "web",
+  "name": "cargo-make",
+  "source": "https://github.com/sagiegurari/cargo-make/releases/download/0.37.9/cargo-make-v0.37.9-x86_64-pc-windows-msvc.zip",
+  "version": "v0.37.9",
+  "sha256": "4d4c45546402e6edf387348f9e83281cc1415b0990c69a31a4462a81b43b8835",
+  "internal_path": "/",
+  "compression_type": "zip",
+  "flags": ["set_path"],
+}
