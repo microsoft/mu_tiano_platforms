@@ -201,7 +201,7 @@ MemMapInitialization (
   ASSERT_RETURN_ERROR (PcdStatus);
 
   AddIoMemoryBaseSizeHob (0xFEC00000, SIZE_4KB);
-  AddIoMemoryBaseSizeHob (0xFED00000, SIZE_1KB);
+  AddIoMemoryBaseSizeHob (0xFED00000, SIZE_4KB);
   if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
     AddIoMemoryBaseSizeHob (ICH9_ROOT_COMPLEX_BASE, SIZE_16KB);
     //

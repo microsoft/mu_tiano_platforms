@@ -55,6 +55,7 @@
   LocalApicLib
   MemEncryptSevLib
   CpuExceptionHandlerLib
+  StackCheckLib
 
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid                # PPI ALWAYS_PRODUCED
