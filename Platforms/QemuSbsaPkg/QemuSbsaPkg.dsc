@@ -496,6 +496,7 @@
   MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmCoreMemoryAllocationLib/StandaloneMmCoreMemoryAllocationLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   HobPrintLib|MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
+  ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerPhyCounterLib/ArmGenericTimerPhyCounterLib.inf
 
   ArmMmuLib|ArmPkg/Library/StandaloneMmMmuLib/ArmMmuStandaloneMmLib.inf
   StandaloneMmCoreEntryPoint|ArmPkg/Library/ArmStandaloneMmCoreEntryPoint/ArmStandaloneMmCoreEntryPoint.inf
@@ -516,6 +517,7 @@
   VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+  ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerPhyCounterLib/ArmGenericTimerPhyCounterLib.inf
 
   VirtNorFlashPlatformLib|QemuSbsaPkg/Library/SbsaQemuNorFlashLib/SbsaQemuNorFlashLib.inf
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
@@ -1455,7 +1457,6 @@
       StandaloneMmCoreEntryPoint|ArmPkg/Library/SecurePartitionEntryPoint/SecurePartitionEntryPoint.inf
       Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpmStandaloneMm.inf
       Tpm2DebugLib|SecurityPkg/Library/Tpm2DebugLib/Tpm2DebugLibVerbose.inf
-      TimerLib|ArmPkg/Library/ArmArchTimerLibEx/ArmArchTimerLibEx.inf
 !if $(TPM2_ENABLE) == TRUE
       NULL|ArmPkg/Library/TpmServiceLib/TpmServiceLib.inf
       TpmServiceStateTranslationLib|ArmPkg/Library/TpmServiceStateTranslationLib/TpmServiceStateTranslationLib.inf

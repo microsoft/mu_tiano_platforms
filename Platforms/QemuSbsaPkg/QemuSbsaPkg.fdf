@@ -142,7 +142,7 @@ SET gQemuSbsaPkgTokenSpaceGuid.PcdFlashNvStorageBase = $(SECURE_FLASH_NVSTORAGE_
 SET gQemuSbsaPkgTokenSpaceGuid.PcdFlashNvStorageSize = $(SECURE_FLASH_NVSTORAGE_SIZE)
 
 [FD.BL32_AP_MM]
-BaseAddress   = 0x20004000|gArmTokenSpaceGuid.PcdFdBaseAddress  # UEFI in DRAM + 128MB.
+BaseAddress   = 0x20005000|gArmTokenSpaceGuid.PcdFdBaseAddress  # UEFI in DRAM + 128MB.
 Size          = 0x00e00000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the device (64MiB).
 ErasePolarity = 1
 
