@@ -386,8 +386,10 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                         "file": os.path.join(os.path.dirname(__file__), "fdts/qemu_sbsa_stmm_config.dts"),
                         "offset": "0x1000"
                     },
+                    "package": "tl_pkg",
                     "uuid": "eaba83d8-baaf-4eaf-8144-f7fdcbe544a7",
-                    "owner": "Plat"
+                    "owner": "Plat",
+                    "size": "0x300000"
                 },
                 "mssp": {
                     "image": {
@@ -418,7 +420,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         args += " DEBUG=" + str(1 if self.env.GetValue("TARGET").lower() == 'debug' else 0)
         args += " ENABLE_SME_FOR_SWD=1 ENABLE_SVE_FOR_SWD=1 ENABLE_SME_FOR_NS=1 ENABLE_SVE_FOR_NS=1" # SPM_MM=1
         args += f" SPD=spmd SPMD_SPM_AT_SEL2=1 SP_LAYOUT_FILE={filename}"
-        args += " ENABLE_FEAT_HCX=1 PHIT_HOB=1 TRANSFER_LIST=1 LOG_LEVEL=40" # Features used by hypervisor
+        args += " ENABLE_FEAT_HCX=1 HOB_LIST=1 TRANSFER_LIST=1 LOG_LEVEL=40" # Features used by hypervisor
         # args += " FEATURE_DETECTION=1" # Enforces support for features enabled.
         args += f" BL32={os.path.join(self.env.GetValue('ARM_HAF_PATH'), 'out/mu/secure_qemu_aarch64_clang', 'hafnium.bin')}"
         args += " all fip"
