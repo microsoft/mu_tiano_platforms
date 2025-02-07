@@ -7,6 +7,7 @@
 import datetime
 import logging
 import os
+import sys
 import uuid
 from io import StringIO
 from pathlib import Path
@@ -23,6 +24,8 @@ from edk2toolext.invocables.edk2_parse import ParseSettingsManager
 from edk2toollib.utility_functions import RunCmd
 from edk2toollib.windows.locate_tools import QueryVcVariables
 from edk2toollib.utility_functions import GetHostInfo
+
+cached_enivron = os.environ.copy()
 
 # Declare test whose failure will not return a non-zero exit code
 FAILURE_EXEMPT_TESTS = {
@@ -406,6 +409,29 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             }
             json.dump(data, f, indent=4)
 
+        # This is an unorthodox build, as TF-A uses poetry to manage dependencies and build the firmware.
+        # First, we need to know what the name of the virtual environment is.
+        # This is stored in the poetry.lock file in the root of the TF-A directory.
+        virtual_env = ""
+        if sys.base_prefix != sys.prefix:
+            # If we are in a virtual environment, we need to activate it before we can build the firmware.
+            virtual_env = os.path.join(sys.prefix, "bin", "activate")
+            if not os.path.exists(virtual_env):
+                logging.error("Virtual environment not found")
+                return -1
+
+        outstream = StringIO()
+        # If we are not in a virtual environment, we can build the firmware directly.
+        ret = RunCmd("poetry", "env list --full-path", workingdir=self.env.GetValue("ARM_TFA_PATH"), outstream=outstream, environ=cached_enivron)
+        if ret != 0:
+            return ret
+
+        # Grab the last line, which is the virtual environment path.
+        logging.info(f"Virtual environment path: {outstream.getvalue().strip().split('\n')}")
+        virt_path = outstream.getvalue().strip().split('\n')[-1]
+        virt_cmd = "source " + virt_path + "/bin/activate"
+
+        # Second, put together the command to build the firmware.
         cmd = "make"
         if self.env.GetValue("TOOL_CHAIN_TAG") == "CLANGPDB":
             args = "CC="+clang_exe
@@ -424,9 +450,26 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         # args += " FEATURE_DETECTION=1" # Enforces support for features enabled.
         args += f" BL32={os.path.join(self.env.GetValue('ARM_HAF_PATH'), 'out/mu/secure_qemu_aarch64_clang', 'hafnium.bin')}"
         args += " all fip"
-        ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_TFA_PATH"))
+
+        # Third, write a temp bash file to activate the virtual environment and build the firmware.
+        temp_bash = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "temp.sh")
+        with open(temp_bash, "w") as f:
+            f.write("#!/bin/bash\n")
+            f.write(f"{virt_cmd}\n")
+            f.write(f"{cmd} {args}\n")
+            if virtual_env != "":
+                # If we were in a virtual environment, we need to reactivate it after the build.
+                f.write(f"source {virtual_env}\n")
+            else:
+                f.write("deactivate\n")
+
+        # Fifth, run the temp bash file to build the firmware.
+        ret = RunCmd("bash", temp_bash, workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
         if ret != 0:
             return ret
+
+        # Fourth, remove the temp bash file, if succeeded.
+        os.remove(temp_bash)
 
         # Revert the build vars to the original state
         shell_environment.RevertBuildVars()
