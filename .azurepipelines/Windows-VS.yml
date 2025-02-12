@@ -27,7 +27,6 @@ extends:
     do_non_ci_setup: true
     do_pr_eval: true
     os_type: Windows_NT
-    rust_build: true
     extra_cargo_steps:
       - script: pip install -r pip-requirements.txt --upgrade
         displayName: Install and Upgrade pip Modules
