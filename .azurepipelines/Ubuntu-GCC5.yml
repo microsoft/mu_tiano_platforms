@@ -28,7 +28,6 @@ extends:
     do_pr_eval: true
     container_build: true
     os_type: Linux
-    rust_build: true
     extra_cargo_steps:
       - script: pip install -r pip-requirements.txt --upgrade
         displayName: Install and Upgrade pip Modules
