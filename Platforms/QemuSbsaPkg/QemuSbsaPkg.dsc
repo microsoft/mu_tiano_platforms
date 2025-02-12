@@ -164,6 +164,7 @@
   ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
   ArmHvcLib|ArmPkg/Library/ArmHvcLib/ArmHvcLib.inf
   ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerVirtCounterLib/ArmGenericTimerVirtCounterLib.inf
+  ArmTransferListLib|ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
 
   PlatformPeiLib|ArmPlatformPkg/PlatformPei/PlatformPeiLib.inf
   MemoryInitPeiLib|ArmPlatformPkg/MemoryInitPei/MemoryInitPeiLib.inf
@@ -391,6 +392,9 @@
 [LibraryClasses.common.DXE_CORE, LibraryClasses.common.DXE_RUNTIME_DRIVER, LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.UEFI_APPLICATION]
   MsUiThemeLib                  |MsGraphicsPkg/Library/MsUiThemeLib/Dxe/MsUiThemeLib.inf
 
+[LibraryClasses.common.DXE_RUNTIME_DRIVER, LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.UEFI_APPLICATION]
+  ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
+
 [LibraryClasses.common.UEFI_APPLICATION]
   CheckHwErrRecHeaderLib|MsWheaPkg/Library/CheckHwErrRecHeaderLib/CheckHwErrRecHeaderLib.inf
   FlatPageTableLib|UefiTestingPkg/Library/FlatPageTableLib/FlatPageTableLib.inf
@@ -437,6 +441,7 @@
   PeiServicesTablePointerLib|ArmPkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
   ArmVirtMemInfoLib|QemuSbsaPkg/Library/QemuVirtMemInfoLib/QemuVirtMemInfoPeiLib.inf
   PcdDatabaseLoaderLib|MdeModulePkg/Library/PcdDatabaseLoaderLib/Pei/PcdDatabaseLoaderLibPei.inf
+  ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaPeiLib.inf
 
   MsPlatformEarlyGraphicsLib |MsGraphicsPkg/Library/MsEarlyGraphicsLibNull/Pei/MsEarlyGraphicsLibNull.inf
   MsUiThemeLib               |MsGraphicsPkg/Library/MsUiThemeLib/Pei/MsUiThemeLib.inf
@@ -482,13 +487,14 @@
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
   FvLib|StandaloneMmPkg/Library/FvLib/FvLib.inf
-  HobLib|StandaloneMmPkg/Library/StandaloneMmCoreHobLib/StandaloneMmCoreHobLib.inf
+  HobLib|QemuSbsaPkg/Override/StandaloneMmPkg/Library/StandaloneMmCoreHobLib/StandaloneMmCoreHobLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmCoreMemoryAllocationLib/StandaloneMmCoreMemoryAllocationLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
 
   ArmMmuLib|ArmPkg/Library/StandaloneMmMmuLib/ArmMmuStandaloneMmLib.inf
-  StandaloneMmCoreEntryPoint|ArmPkg/Library/StandaloneMmCoreEntryPoint/StandaloneMmCoreEntryPoint.inf
+  ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaStandaloneMmCoreLib.inf
+  StandaloneMmCoreEntryPoint|QemuSbsaPkg/Override/ArmPkg/Library/StandaloneMmCoreEntryPoint/StandaloneMmCoreEntryPoint.inf
   PeCoffExtraActionLib|StandaloneMmPkg/Library/StandaloneMmPeCoffExtraActionLib/StandaloneMmPeCoffExtraActionLib.inf
   MmServicesTableLib|StandaloneMmPkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLibCore.inf
 
@@ -508,7 +514,7 @@
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
   MemoryTypeInfoSecVarCheckLib|MdeModulePkg/Library/MemoryTypeInfoSecVarCheckLib/MemoryTypeInfoSecVarCheckLib.inf
   FltUsedLib|MdePkg/Library/FltUsedLib/FltUsedLib.inf
-
+  ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaStandaloneMmLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER]
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
@@ -600,6 +606,9 @@
   # ASSERT_BREAKPOINT_ENABLED  0x10
   # ASSERT_DEADLOOP_ENABLED    0x20
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
+
+  # Set to TRUE to enable the use of the Arm FFA Conduit SMC for non-MM modules
+  gArmTokenSpaceGuid.PcdFfaLibConduitSmc|TRUE
 
 [PcdsFixedAtBuild.common]
   !include QemuPkg/AutoGen/SecurebootPcds.inc
@@ -947,7 +956,7 @@
   ArmPlatformPkg/MemoryInitPei/MemoryInitPeim.inf
   ArmPkg/Drivers/CpuPei/CpuPei.inf
   ArmPkg/Drivers/MmCommunicationPei/MmCommunicationPei.inf
-  ArmPkg/Drivers/SmmVariablePei/SmmVariablePei.inf
+  MdeModulePkg/Universal/Variable/MmVariablePei/MmVariablePei.inf
 
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
 
@@ -1110,8 +1119,9 @@
   MsWheaPkg/MsWheaReport/Dxe/MsWheaReportDxe.inf
   MsCorePkg/MuVarPolicyFoundationDxe/MuVarPolicyFoundationDxe.inf
   MsCorePkg/AcpiRGRT/AcpiRgrt.inf
+!if $(BUILD_RUST_CODE) == TRUE
   MsCorePkg/HelloWorldRustDxe/HelloWorldRustDxe.inf
-
+!endif
   MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
   SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
   AdvLoggerPkg/Application/AdvancedLogDumper/AdvancedLogDumper.inf
@@ -1211,7 +1221,9 @@
   #
   # HID Support
   #
+!if $(BUILD_RUST_CODE) == TRUE
   HidPkg/UefiHidDxe/UefiHidDxe.inf
+!endif
 
   #
   # USB Support
@@ -1222,10 +1234,15 @@
   MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+
+!if $(BUILD_RUST_CODE) == TRUE
   HidPkg/UsbHidDxe/UsbHidDxe.inf {
     <LibraryClasses>
       UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
   }
+!else
+  MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.inf
+!endif
 
   #
   # TPM2 support
@@ -1388,6 +1405,8 @@
   StandaloneMmPkg/Core/StandaloneMmCore.inf {
     <PcdsFixedAtBuild>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
+    <PcdsPatchableInModule>
+      gArmTokenSpaceGuid.PcdFfaLibConduitSmc|FALSE
   }
 
   ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf {

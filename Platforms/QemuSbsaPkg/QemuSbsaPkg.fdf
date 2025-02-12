@@ -399,12 +399,16 @@ READ_LOCK_STATUS   = TRUE
   INF  MsWheaPkg/MsWheaReport/Dxe/MsWheaReportDxe.inf
   INF  MsCorePkg/MuVarPolicyFoundationDxe/MuVarPolicyFoundationDxe.inf
   INF  MsCorePkg/LoadOptionVariablePolicyDxe/LoadOptionVariablePolicyDxe.inf
+!if $(BUILD_RUST_CODE) == TRUE
+  INF  MsCorePkg/HelloWorldRustDxe/HelloWorldRustDxe.inf
   INF  HidPkg/UsbHidDxe/UsbHidDxe.inf
   INF  HidPkg/UefiHidDxe/UefiHidDxe.inf
+!else
+  INF  MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.inf
+!endif
   INF  MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
   INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
   INF  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
-  INF  MsCorePkg/HelloWorldRustDxe/HelloWorldRustDxe.inf
   INF  AdvLoggerPkg/Application/AdvancedLogDumper/AdvancedLogDumper.inf
 
   #
@@ -480,7 +484,7 @@ READ_LOCK_STATUS   = TRUE
   INF ArmPlatformPkg/MemoryInitPei/MemoryInitPeim.inf
   INF ArmPkg/Drivers/CpuPei/CpuPei.inf
   INF ArmPkg/Drivers/MmCommunicationPei/MmCommunicationPei.inf
-  INF ArmPkg/Drivers/SmmVariablePei/SmmVariablePei.inf
+  INF MdeModulePkg/Universal/Variable/MmVariablePei/MmVariablePei.inf
   INF MdeModulePkg/Universal/PCD/Pei/Pcd.inf
   INF MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
   INF MsGraphicsPkg/MsUiTheme/Pei/MsUiThemePpi.inf

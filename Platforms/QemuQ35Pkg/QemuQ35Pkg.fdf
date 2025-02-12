@@ -504,12 +504,16 @@ INF  MmSupervisorPkg/Drivers/StandaloneMmUnblockMem/StandaloneMmUnblockMem.inf
 # COMMENTED OUT DUE TO LACK OF TPM
 # INF  SecurityPkg/Tcg/MemoryOverwriteControl/TcgMor.inf
 INF  MdeModulePkg/Universal/EsrtFmpDxe/EsrtFmpDxe.inf
+!if $(BUILD_RUST_CODE) == TRUE
+INF  MsCorePkg/HelloWorldRustDxe/HelloWorldRustDxe.inf
 INF  HidPkg/UsbHidDxe/UsbHidDxe.inf
 INF  HidPkg/UefiHidDxe/UefiHidDxe.inf
+!else
+INF  MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.inf
+!endif
 INF  DfciPkg/Application/DfciMenu/DfciMenu.inf
 INF  MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
 INF  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
-INF  MsCorePkg/HelloWorldRustDxe/HelloWorldRustDxe.inf
 INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
 
 !if $(SMM_ENABLED) == TRUE
