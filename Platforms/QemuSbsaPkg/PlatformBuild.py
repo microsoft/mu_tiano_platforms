@@ -41,7 +41,7 @@ class CommonPlatform():
     PackagesSupported = ("QemuSbsaPkg",)
     ArchSupported = ("AARCH64",)
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
-    Scopes = ('qemu', 'qemusbsa', 'edk2-build', 'cibuild', 'configdata', 'rust-ci')
+    Scopes = ('qemu', 'qemusbsa', 'edk2-build', 'cibuild', 'configdata')
     WorkspaceRoot = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     PackagesPath = (
         "Platforms",

@@ -46,7 +46,7 @@ class CommonPlatform():
     PackagesSupported = ("QemuQ35Pkg",)
     ArchSupported = ("IA32", "X64")
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
-    Scopes = ('qemu', 'qemuq35', 'edk2-build', 'cibuild', 'configdata', 'rust-ci')
+    Scopes = ('qemu', 'qemuq35', 'edk2-build', 'cibuild', 'configdata')
     PackagesPath = (
         "Platforms",
         "MU_BASECORE",
