@@ -7,8 +7,8 @@
 /dts-v1/;
 
 / {
-#define MODE_SEL0	(0x1)
-#define MODE_SEL1	(0x2)
+#define MODE_SEL0	(1)
+#define MODE_SEL1	(2)
 
 #define SECURE_RO 0x1
 #define SECURE_RW 0x3
@@ -30,7 +30,7 @@
 	uuid = <0xb510b3a3 0x59f64054 0xba7aff2e 0xb1eac765>, <0x17b862a4 0x18064faf 0x86b3089a 0x58353861>, <0xe0fad9b3 0x7f5c42c5 0xb2eeb7a8 0x2313cdb2>;
 	id = <0x8002>;
 	execution-ctx-count = <1>;
-	exception-level = <MODE_SEL0>; /* SEL0*/
+	exception-level = <1>; /* SEL0*/
 	execution-state = <0>; /* AArch64*/
 	load-address = <0x0 0x20400000>;
 	entrypoint-offset = <0x10000>;
@@ -38,7 +38,7 @@
 	xlat-granule = <0>; /* 4KiB */
 	boot-order = <1>;
 	messaging-method = <0x603>; /* Direct request/response supported. */
-	ns-interrupts-action = <2>; /* Non-secure interrupt is signaled */
+	ns-interrupts-action = <0>; /* Non-secure interrupt is queued */
 	notification-support; /* Support receipt of notifications. */
 	gp-register-num = <0>;
 
@@ -56,21 +56,21 @@
 		secure_uart {
 			base-address = <0x0 0x60030000>;
 			pages-count = <0x1>;
-			attributes = <SECURE_RW>;
+			attributes = <0x3>;
 		};
 
 		internal_tpm_crb {
 			description = "internal tpm crb";
 			base-address = <0x00000100 0x00200000>;
 			pages-count = <0x10>;
-			attributes = <SECURE_RW>;
+			attributes = <0x3>;
 		};
 
 		external_tpm_crb {
 			description = "external tpm crb";
 			base-address = <0x00000000 0x60120000>;
 			pages-count = <0x10>;
-			attributes = <SECURE_RW>;
+			attributes = <0x3>;
 		};
 	};
 };

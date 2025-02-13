@@ -115,7 +115,7 @@ FfaPartitionTestAppEntry (
   UINT16                  CurrentMinorVersion;
 
   // Query FF-A version to make sure FF-A is supported
-  Status = ArmFfaLibVersion (
+  Status = ArmFfaLibGetVersion (
              ARM_FFA_MAJOR_VERSION,
              ARM_FFA_MINOR_VERSION,
              &CurrentMajorVersion,
@@ -201,7 +201,7 @@ FfaPartitionTestAppEntry (
   }
 
   // Followed by querying which notification ID is supported by the Ffa test SP
-  Status = ArmFfaLibFeatures (ARM_FFA_FEATURE_ID_SCHEDULE_RECEIVER_INTERRUPT, 0, &SriIndex, &Dummy);
+  Status = ArmFfaLibGetFeatures (ARM_FFA_FEATURE_ID_SCHEDULE_RECEIVER_INTERRUPT, 0, &SriIndex, &Dummy);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Unable to query feature SRI number with FF-A Ffa test SP (%r).\n", Status));
     goto Done;

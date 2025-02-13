@@ -7,8 +7,8 @@
 /dts-v1/;
 
 / {
-#define MODE_SEL0	(0x1)
-#define MODE_SEL1	(0x2)
+#define MODE_SEL0	(1)
+#define MODE_SEL1	(2)
 
 #define SECURE_RO 0x1
 #define SECURE_RW 0x3
@@ -30,10 +30,10 @@
 	uuid = <0x378daedc 0xf06b4446 0x831440ab 0x933c87a3>;
 	id = <0x8001>;
 	execution-ctx-count = <1>;
-	exception-level = <MODE_SEL0>; /* SEL0*/
+	exception-level = <1>; /* SEL0*/
 	execution-state = <0>; /* AArch64*/
 	load-address = <0x0 0x20002000>;
-	entrypoint-offset = <0x2000>;
+	entrypoint-offset = <0x3000>;
 	image-size = <0x0 0x300000>;
 	xlat-granule = <0>; /* 4KiB */
 	boot-order = <0>;
@@ -43,7 +43,7 @@
 
 	boot-info {
 		compatible = "arm,ffa-manifest-boot-info";
-		ffa_manifest;
+		hob_list;
 	};
 
 	device-regions {
@@ -93,7 +93,7 @@
 		secure_uart {
 			base-address = <0x0 0x60040000>;
 			pages-count = <0x1>;
-			attributes = <SECURE_RW>;
+			attributes = <0x3>;
 		};
 
 		/*
@@ -102,7 +102,7 @@
 		variable_flash {
 			base-address = <0x0 0x01000000>;
 			pages-count = <0xC0>;
-			attributes = <SECURE_RW>;
+			attributes = <0x3>;
 		};
 	};
 
@@ -121,7 +121,7 @@
 			description = "hob-buffer";
 			base-address = <0x0 0x21fff000>;
 			pages-count = <0x1>;
-			attributes = <SECURE_RO>;
+			attributes = <0x1>;
 		};
 
 		/*
@@ -132,7 +132,7 @@
 			description = "shared-buff";
 			base-address = <0x0 0x22000000>;
 			pages-count = <0x100>;
-			attributes = <SECURE_RW>;
+			attributes = <0x3>;
 		};
 
 		/*
@@ -146,7 +146,7 @@
 			description = "heap";
 			base-address = <0x0 0x21000000>;
 			pages-count = <0xfff>;
-			attributes = <SECURE_RW>;
+			attributes = <0x3>;
 		};
 
 		/*
@@ -161,7 +161,7 @@
 			description = "ns-comm";
 			base-address = <0x00000100 0x7fe00000>;
 			pages-count = <0x30>;
-			attributes = <NON_SECURE_RW>;
+			attributes = <0xB>;
 		};
 	};
 };
