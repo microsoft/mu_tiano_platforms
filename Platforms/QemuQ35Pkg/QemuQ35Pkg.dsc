@@ -380,6 +380,9 @@
   MemEncryptSevLib           |QemuQ35Pkg/Library/BaseMemEncryptSevLib/PeiMemEncryptSevLib.inf
   FrameBufferMemDrawLib      |MsGraphicsPkg/Library/FrameBufferMemDrawLib/FrameBufferMemDrawLibPei.inf
   MmUnblockMemoryLib         |MmSupervisorPkg/Library/MmSupervisorUnblockMemoryLib/MmSupervisorUnblockMemoryLibPei.inf
+!if $(PERF_TRACE_ENABLE) == TRUE
+  PerformanceLib             |MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
+!endif
 
 [LibraryClasses.common.PEI_CORE]
   PeiCoreEntryPoint |MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
@@ -428,6 +431,9 @@
   CpuExceptionHandlerLib        |UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
   ReportStatusCodeLib           |MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   MmUnblockMemoryLib            |MmSupervisorPkg/Library/MmSupervisorUnblockMemoryLib/MmSupervisorUnblockMemoryLibDxe.inf
+!if $(PERF_TRACE_ENABLE) == TRUE
+  PerformanceLib                |MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
+!endif
 
 # Non DXE Core but everything else
 [LibraryClasses.common.DXE_RUNTIME_DRIVER, LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.UEFI_APPLICATION]
@@ -443,7 +449,9 @@
   ExtractGuidedSectionLib |MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
   DebugAgentLib           |DebuggerFeaturePkg/Library/DebugAgent/DebugAgentDxe.inf
   RngLib                  |MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
-
+!if $(PERF_TRACE_ENABLE) == TRUE
+  PerformanceLib          |MdeModulePkg/Library/DxeCorePerformanceLib/DxeCorePerformanceLib.inf
+!endif
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   ReportStatusCodeLib|MdeModulePkg/Library/RuntimeDxeReportStatusCodeLib/RuntimeDxeReportStatusCodeLib.inf
@@ -543,6 +551,10 @@
   SysCallLib|MmSupervisorPkg/Library/SysCallLib/SysCallLib.inf
   CpuLib|MmSupervisorPkg/Library/BaseCpuLibSysCall/BaseCpuLib.inf
 
+!if $(PERF_TRACE_ENABLE) == TRUE
+  PerformanceLib|MdeModulePkg/Library/SmmPerformanceLib/StandaloneMmPerformanceLib.inf
+!endif
+
 #########################################
 # Advanced Logger Libraries
 #########################################
@@ -639,6 +651,27 @@
 !if $(NETWORK_TLS_ENABLE) == TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x80000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVolatileVariableSize|0x40000
+!endif
+
+!if $(PERF_TRACE_ENABLE) == TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdExtFpdtBootRecordPadSize          |0x100000   # 1MB padding for records after Ready to Boot.
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask          |0x9        # Enable perf measurements.
+                                                                                  # Disable binding support logging.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEdkiiFpdtStringRecordEnableOnly   |FALSE
+
+  # This value directly affects HOB space consumption regardless of the actual
+  # number of performance records. Keep this close to the actual number needed
+  # to avoid unnecessary consumption of Temporary RAM.
+  #
+  # The current number of PEI records last checked was approximately 80.
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries       |140
+
+  !if $(TARGET) == DEBUG
+    gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType        |0xF0E
+  !else
+    gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType        |0x510
+  !endif
 !endif
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0
@@ -1080,7 +1113,16 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
 !endif
   }
 
-  MmSupervisorPkg/Drivers/MmSupervisorRing3Broker/MmSupervisorRing3Broker.inf
+  MmSupervisorPkg/Drivers/MmSupervisorRing3Broker/MmSupervisorRing3Broker.inf {
+    <LibraryClasses>
+      PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
+  }
+!if $(PERF_TRACE_ENABLE) == TRUE
+  MmSupervisorPkg/Drivers/MmSupervisorRing3Performance/MmSupervisorRing3Performance.inf {
+    <LibraryClasses>
+      PerformanceLib|MdeModulePkg/Library/SmmCorePerformanceLib/StandaloneMmCorePerformanceLib.inf
+  }
+!endif
   MmSupervisorPkg/Drivers/StandaloneMmUnblockMem/StandaloneMmUnblockMem.inf
 
   QemuQ35Pkg/8259InterruptControllerDxe/8259.inf
