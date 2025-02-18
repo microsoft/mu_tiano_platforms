@@ -28,10 +28,11 @@ class Settings(CiSetupSettingsManager, CiBuildSettingsManager, UpdateSettingsMan
     # ####################################################################################### #
 
     def AddCommandLineOptions(self, parserObj):
-        pass
+        parserObj.add_argument("-r", "--rust", dest="rust_ci", action="store_true", help="Runs CI with Rust CI checks enabled")
+
 
     def RetrieveCommandLineOptions(self, args):
-        pass
+        self.rust_ci = args.rust_ci
 
     # ####################################################################################### #
     #                        Default Support for this Ci Build                                #
@@ -109,6 +110,9 @@ class Settings(CiSetupSettingsManager, CiBuildSettingsManager, UpdateSettingsMan
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
         scopes = ("cibuild", "edk2-build", "host-based-test")
+
+        if self.rust_ci:
+            scopes += ("rust-ci",)
 
         self.ActualToolChainTag = shell_environment.GetBuildVars().GetValue("TOOL_CHAIN_TAG", "")
 
