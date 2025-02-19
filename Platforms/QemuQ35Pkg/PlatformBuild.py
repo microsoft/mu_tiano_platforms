@@ -63,6 +63,13 @@ class CommonPlatform():
     def add_common_command_line_options(parserObj) -> None:
         """Adds command line options common to settings managers."""
         codeql_helpers.add_command_line_option(parserObj)
+        parserObj.add_argument("-r", "--rust", dest="build_rust", action="store_true", help="Builds this platform with additional Rust components (And some C components removed).")
+
+    @staticmethod
+    def get_common_command_line_options(settings, args) -> None:
+        """Retrieves command line options common to settings managers."""
+        settings.build_rust = args.build_rust
+        settings.codeql = CommonPlatform.is_codeql_enabled(args)
 
     @staticmethod
     def is_codeql_enabled(args) -> bool:
@@ -70,10 +77,12 @@ class CommonPlatform():
         return codeql_helpers.is_codeql_enabled_on_command_line(args)
 
     @staticmethod
-    def get_active_scopes(codeql_enabled: bool) -> Tuple[str]:
+    def get_active_scopes(codeql_enabled: bool, build_rust: bool) -> Tuple[str]:
         """Returns the active scopes for the platform."""
         active_scopes = CommonPlatform.Scopes
         active_scopes += codeql_helpers.get_scopes(codeql_enabled)
+        if build_rust:
+            active_scopes += ("rust-ci",)
 
         if codeql_enabled:
             codeql_filter_files = [str(n) for n in glob.glob(
@@ -97,7 +106,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
     def RetrieveCommandLineOptions(self, args):
         """Retrieve command line options from the argparser"""
-        self.codeql = CommonPlatform.is_codeql_enabled(args)
+        CommonPlatform.get_common_command_line_options(self, args)
 
     def GetPackagesSupported(self):
         ''' return iterable of edk2 packages supported by this build.
@@ -150,7 +159,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
-        return CommonPlatform.get_active_scopes(self.codeql)
+        return CommonPlatform.get_active_scopes(self.codeql, self.build_rust)
 
     def FilterPackagesToTest(self, changedFilesList: list, potentialPackagesList: list) -> list:
         ''' Filter other cases that this package should be built
@@ -200,7 +209,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
     def RetrieveCommandLineOptions(self, args):
         '''  Retrieve command line options from the argparser '''
-        self.codeql = CommonPlatform.is_codeql_enabled(args)
+        CommonPlatform.get_common_command_line_options(self, args)
 
     def GetWorkspaceRoot(self):
         ''' get WorkspacePath '''
@@ -218,7 +227,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
-        return CommonPlatform.get_active_scopes(self.codeql)
+        return CommonPlatform.get_active_scopes(self.codeql, self.build_rust)
 
     def GetName(self):
         ''' Get the name of the repo, platform, or product being build '''
@@ -255,6 +264,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         self.env.SetValue("PRODUCT_NAME", "QemuQ35", "Platform Hardcoded")
         self.env.SetValue("ACTIVE_PLATFORM", "QemuQ35Pkg/QemuQ35Pkg.dsc", "Platform Hardcoded")
         self.env.SetValue("TARGET_ARCH", "IA32 X64", "Platform Hardcoded")
+        self.env.SetValue("BLD_*_BUILD_RUST_CODE", str(self.build_rust).upper(), "Set via `--rust` command line option")
         self.env.SetValue("EMPTY_DRIVE", "FALSE", "Default to false")
         self.env.SetValue("RUN_TESTS", "FALSE", "Default to false")
         self.env.SetValue("QEMU_HEADLESS", "FALSE", "Default to false")
