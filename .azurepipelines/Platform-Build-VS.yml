@@ -32,7 +32,7 @@ jobs:
         BuildTarget: "DEBUG"
         BuildExtraTag: ""
         BuildExtraStep:
-          - template: Steps/RustSetupSteps.yml@mu_devops
+          - script: echo No extra steps provided
         Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
         BuildArtifactsBinary: |
@@ -46,7 +46,7 @@ jobs:
         BuildTarget: "RELEASE"
         BuildExtraTag: ""
         BuildExtraStep:
-          - template: Steps/RustSetupSteps.yml@mu_devops
+          - script: echo No extra steps provided
         Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
         BuildArtifactsBinary: |
@@ -92,7 +92,7 @@ jobs:
         BuildTarget: "RELEASE"
         BuildExtraTag: "NO_SMM"
         BuildExtraStep:
-          - template: Steps/RustSetupSteps.yml@mu_devops
+          - script: echo No extra steps provided
         Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE"
         BuildArtifactsBinary: |
@@ -138,7 +138,7 @@ jobs:
         BuildTarget: "DEBUG"
         BuildExtraTag: ""
         BuildExtraStep:
-          - template: Steps/RustSetupSteps.yml@mu_devops
+          - script: echo No extra steps provided
         Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
         BuildArtifactsBinary: |
@@ -152,7 +152,7 @@ jobs:
         BuildTarget: "RELEASE"
         BuildExtraTag: ""
         BuildExtraStep:
-          - template: Steps/RustSetupSteps.yml@mu_devops
+          - script: echo No extra steps provided
         Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
         BuildArtifactsBinary: |
@@ -165,7 +165,6 @@ jobs:
         BuildTarget: "DEBUG"
         BuildExtraTag: ""
         BuildExtraStep:
-          - template: Steps/RustSetupSteps.yml@mu_devops
           - template: Steps/SetupToolChainTagPreReqs.yml@mu_devops
         Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
@@ -181,7 +180,6 @@ jobs:
         BuildTarget: "RELEASE"
         BuildExtraTag: ""
         BuildExtraStep:
-          - template: Steps/RustSetupSteps.yml@mu_devops
           - template: Steps/SetupToolChainTagPreReqs.yml@mu_devops
         Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"

@@ -35,7 +35,7 @@ jobs:
         BuildTarget: "DEBUG"
         BuildExtraTag: ""
         BuildExtraStep:
-          - template: Steps/RustSetupSteps.yml@mu_devops
+          - script: echo No extra steps provided
         Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
         BuildArtifactsBinary: |
@@ -49,7 +49,7 @@ jobs:
         BuildTarget: "RELEASE"
         BuildExtraTag: ""
         BuildExtraStep:
-          - template: Steps/RustSetupSteps.yml@mu_devops
+          - script: echo No extra steps provided
         Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
         BuildArtifactsBinary: |
@@ -95,7 +95,7 @@ jobs:
         BuildTarget: "RELEASE"
         BuildExtraTag: "NO_SMM"
         BuildExtraStep:
-          - template: Steps/RustSetupSteps.yml@mu_devops
+          - script: echo No extra steps provided
         Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE"
         BuildArtifactsBinary: |
@@ -111,7 +111,6 @@ jobs:
         BuildExtraStep:
           - script: sudo apt-get install -y libssl-dev
             displayName: Install openssl
-          - template: Steps/RustSetupSteps.yml@mu_devops
         Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
         BuildArtifactsBinary: |
@@ -128,7 +127,6 @@ jobs:
         BuildExtraStep:
           - script: sudo apt-get install -y libssl-dev
             displayName: Install openssl
-          - template: Steps/RustSetupSteps.yml@mu_devops
         Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
         BuildArtifactsBinary: |
@@ -163,6 +161,37 @@ jobs:
         Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
         SelfHostAgent: true
+        BuildArtifactsBinary: |
+          **/QEMU_EFI.fd
+          **/SECURE_FLASH0.fd
+        BuildArtifactsOther: "**/unit_test_results/*"
+
+      QemuQ35_Rust_DEBUG:
+        BuildPackage: QemuQ35Pkg
+        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+        BuildFlags: "--rust"
+        BuildTarget: "DEBUG"
+        BuildExtraTag: ""
+        BuildExtraStep:
+          - template: Steps/RustSetupSteps.yml@mu_devops
+        Run: true
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2"
+        BuildArtifactsBinary: |
+          **/QEMUQ35_*.fd
+        BuildArtifactsOther: "**/unit_test_results/*"
+
+      QemuSbsa_Rust_DEBUG:
+        BuildPackage: QemuSbsaPkg
+        BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+        BuildFlags: "--rust"
+        BuildTarget: "DEBUG"
+        BuildExtraTag: ""
+        BuildExtraStep:
+          - template: Steps/RustSetupSteps.yml@mu_devops
+          - script: sudo apt-get install -y libssl-dev
+            displayName: Install openssl
+        Run: true
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE"
         BuildArtifactsBinary: |
           **/QEMU_EFI.fd
           **/SECURE_FLASH0.fd
