@@ -38,3 +38,6 @@
 [submodule "Silicon/Arm/HAF"]
 	path = Silicon/Arm/HAF
 	url = https://github.com/kuqin12/hafnium.git
+[submodule "Features/FFA"]
+	path = Features/FFA
+	url = https://github.com/microsoft/mu_feature_ffa.git

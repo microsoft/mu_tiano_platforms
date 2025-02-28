@@ -177,12 +177,12 @@
   SerialPortLib|ArmPlatformPkg/Library/PL011SerialPortLib/PL011SerialPortLib.inf
 
   # Extended support for FF-A transactions
-  ArmFfaLibEx|ArmPkg/Library/ArmFfaLibEx/ArmFfaLibEx.inf
-  PlatformFfaInterruptLib|ArmPkg/Library/PlatformFfaInterruptLibNull/PlatformFfaInterruptLib.inf
+  ArmFfaLibEx|FfaFeaturePkg/Library/ArmFfaLibEx/ArmFfaLibEx.inf
+  PlatformFfaInterruptLib|FfaFeaturePkg/Library/PlatformFfaInterruptLibNull/PlatformFfaInterruptLib.inf
 
   # Secure Partition Services
-  NotificationServiceLib|ArmPkg/Library/NotificationServiceLib/NotificationServiceLib.inf
-  TestServiceLib|ArmPkg/Library/TestServiceLib/TestServiceLib.inf
+  NotificationServiceLib|FfaFeaturePkg/Library/NotificationServiceLib/NotificationServiceLib.inf
+  TestServiceLib|FfaFeaturePkg/Library/TestServiceLib/TestServiceLib.inf
 
   #
   # Uncomment (and comment out the next line) For RealView Debugger. The Standard IO window
@@ -500,7 +500,7 @@
 
   ArmMmuLib|ArmPkg/Library/StandaloneMmMmuLib/ArmMmuStandaloneMmLib.inf
   StandaloneMmCoreEntryPoint|ArmPkg/Library/ArmStandaloneMmCoreEntryPoint/ArmStandaloneMmCoreEntryPoint.inf
-  SecurePartitionServicesTableLib|ArmPkg/Library/SecurePartitionServicesTableLib/SecurePartitionServicesTableLib.inf
+  SecurePartitionServicesTableLib|FfaFeaturePkg/Library/SecurePartitionServicesTableLib/SecurePartitionServicesTableLib.inf
   PeCoffExtraActionLib|StandaloneMmPkg/Library/StandaloneMmPeCoffExtraActionLib/StandaloneMmPeCoffExtraActionLib.inf
   MmServicesTableLib|StandaloneMmPkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLibCore.inf
   ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaStandaloneMmCoreLib.inf
@@ -525,6 +525,10 @@
   FltUsedLib|MdePkg/Library/FltUsedLib/FltUsedLib.inf
   # SerialPortLib|ArmPlatformPkg/Library/ArmFfaConsoleLib/ArmFfaConsoleLib.inf
   ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaStandaloneMmLib.inf
+
+!if $(TPM2_ENABLE) == TRUE
+  Tcg2PhysicalPresenceLib|SecurityPkg/Library/SmmTcg2PhysicalPresenceLib/StandaloneMmTcg2PhysicalPresenceLib.inf
+!endif
 
 [LibraryClasses.common.UEFI_DRIVER]
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
@@ -1448,18 +1452,18 @@
   }
 
   # FF-A test application to test the FF-A interface
-  QemuSbsaPkg/FfaPartitionTest/FfaPartitionTestApp.inf
+  FfaFeaturePkg/Applications/FfaPartitionTest/FfaPartitionTestApp.inf
 
   # Test secure partition
-  QemuSbsaPkg/MsSecurePartition/MsSecurePartition.inf {
+  FfaFeaturePkg/SecurePartitions/MsSecurePartition/MsSecurePartition.inf {
     <LibraryClasses>
       MemoryAllocationLib|MdeModulePkg/Library/BaseMemoryAllocationLibNull/BaseMemoryAllocationLibNull.inf
-      StandaloneMmCoreEntryPoint|ArmPkg/Library/SecurePartitionEntryPoint/SecurePartitionEntryPoint.inf
+      StandaloneMmCoreEntryPoint|FfaFeaturePkg/Library/SecurePartitionEntryPoint/SecurePartitionEntryPoint.inf
       Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpmStandaloneMm.inf
       Tpm2DebugLib|SecurityPkg/Library/Tpm2DebugLib/Tpm2DebugLibVerbose.inf
 !if $(TPM2_ENABLE) == TRUE
-      NULL|ArmPkg/Library/TpmServiceLib/TpmServiceLib.inf
-      TpmServiceStateTranslationLib|ArmPkg/Library/TpmServiceStateTranslationLib/TpmServiceStateTranslationLib.inf
+      NULL|FfaFeaturePkg/Library/TpmServiceLib/TpmServiceLib.inf
+      TpmServiceStateTranslationLib|FfaFeaturePkg/Library/TpmServiceStateTranslationLib/TpmServiceStateTranslationLib.inf
 !endif
     <PcdsFixedAtBuild>
       gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60030000
