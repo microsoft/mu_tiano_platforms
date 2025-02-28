@@ -57,7 +57,8 @@ class CommonPlatform():
         "Silicon/Arm/TFA",
         "Features/DEBUGGER",
         "Features/DFCI",
-        "Features/CONFIG"
+        "Features/CONFIG",
+        "Features/FFA",
     )
 
 
