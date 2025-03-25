@@ -39,7 +39,7 @@ jobs:
           - script: sudo apt-get install -y libssl-dev clang llvm lld device-tree-compiler
             displayName: Install openssl
           - template: Steps/RustSetupSteps.yml@mu_devops
-        Run: false
+        Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
         BuildArtifactsBinary: |
           **/QEMU_EFI.fd
@@ -56,7 +56,7 @@ jobs:
           - script: sudo apt-get install -y libssl-dev clang llvm lld device-tree-compiler
             displayName: Install openssl
           - template: Steps/RustSetupSteps.yml@mu_devops
-        Run: false
+        Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
         BuildArtifactsBinary: |
           **/QEMU_EFI.fd
