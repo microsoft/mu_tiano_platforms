@@ -334,8 +334,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             # it is not setup
             need_setup = True
 
-        need_setup = True
-
         if need_setup:
             # okay, need to install it
             ret = RunCmd("poetry", "--verbose install", workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
