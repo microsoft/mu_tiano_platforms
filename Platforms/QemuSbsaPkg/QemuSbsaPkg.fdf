@@ -391,7 +391,7 @@ READ_LOCK_STATUS   = TRUE
   #
 !if $(TPM2_ENABLE) == TRUE
   INF SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
-  INF SecurityPkg/Tcg/Tcg2AcpiFfa/Tcg2AcpiFfa.inf
+  INF RuleOverride = DRIVER_ACPITABLE SecurityPkg/Tcg/Tcg2AcpiFfa/Tcg2AcpiFfa.inf
 !if $(TPM2_CONFIG_ENABLE) == TRUE
   INF SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
 !endif
@@ -514,7 +514,7 @@ READ_LOCK_STATUS   = TRUE
 
 !if $(TPM2_ENABLE) == TRUE
   INF MdeModulePkg/Universal/ResetSystemPei/ResetSystemPei.inf
-  INF QemuPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
+  # INF QemuPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
   INF SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
 !endif
 
@@ -548,6 +548,7 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStandaloneMm.inf
   INF QemuSbsaPkg/VirtNorFlashStandaloneMm/VirtNorFlashStandaloneMm.inf
   INF ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
+  INF SecurityPkg/Tcg/Tcg2StandaloneMmArm/Tcg2StandaloneMmArm.inf
 
 [FV.FV_STANDALONE_MM_SECURE_PARTITION1]
 FvAlignment        = 16
@@ -675,6 +676,16 @@ READ_LOCK_STATUS   = TRUE
     RAW       ACPI                    |.acpi
     RAW       ASL                     |.aml
     UI        STRING="$(MODULE_NAME)" Optional
+  }
+
+[Rule.Common.DXE_DRIVER.DRIVER_ACPITABLE]
+  FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX DXE_DEPEX Optional       $(INF_OUTPUT)/$(MODULE_NAME).depex
+    PE32      PE32                     $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI        STRING="$(MODULE_NAME)" Optional
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+    RAW ACPI  Optional                |.acpi
+    RAW ASL   Optional                |.aml
   }
 
 [Rule.Common.MM_CORE_STANDALONE]

@@ -177,6 +177,7 @@
   SerialPortLib|ArmPlatformPkg/Library/PL011SerialPortLib/PL011SerialPortLib.inf
 
   # Extended support for FF-A transactions
+  ArmFfaMemMgmtLib|ArmPkg/Library/ArmFfaMemMgmtLib/ArmFfaMemMgmtLib.inf
   ArmFfaLibEx|FfaFeaturePkg/Library/ArmFfaLibEx/ArmFfaLibEx.inf
   PlatformFfaInterruptLib|FfaFeaturePkg/Library/PlatformFfaInterruptLibNull/PlatformFfaInterruptLib.inf
 
@@ -631,6 +632,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320
   gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedLoggerPreMemPages|3
   gEfiNetworkPkgTokenSpaceGuid.PcdEnforceSecureRngAlgorithms|FALSE
+  gArmTokenSpaceGuid.PcdSxcUse18Registers|TRUE
 
 !if $(TARGET) != RELEASE
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|$(DEBUG_PRINT_ERROR_LEVEL)
@@ -648,7 +650,7 @@
   # but not used).
   #
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0x40
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS|0x28
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS|0x40
 !if $(TOOL_CHAIN_TAG) == GCC5     # This is really odd on why CLANGPDB has runtime memory consumption differences
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x505
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x258
@@ -854,6 +856,10 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x10000200000
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmMaxAddress|0x10000204FFF
 
+!if $(TPM2_ENABLE) == TRUE
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x5a, 0xf2, 0x6b, 0x28, 0xc3, 0xc2, 0x8c, 0x40, 0xb3, 0xb4, 0x25, 0xe6, 0x75, 0x8b, 0x73, 0x17}
+!endif
+
 [PcdsFixedAtBuild.AARCH64]
   # Clearing BIT0 in this PCD prevents installing a 32-bit SMBIOS entry point,
   # if the entry point version is >= 3.0. AARCH64 OSes cannot assume the
@@ -928,7 +934,6 @@
   # TPM2 support
   #
 !if $(TPM2_ENABLE) == TRUE
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x5a, 0xf2, 0x6b, 0x28, 0xc3, 0xc2, 0x8c, 0x40, 0xb3, 0xb4, 0x25, 0xe6, 0x75, 0x8b, 0x73, 0x17}
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0x02
 !endif
 
@@ -980,7 +985,7 @@
 
 !if $(TPM2_ENABLE) == TRUE
   MdeModulePkg/Universal/ResetSystemPei/ResetSystemPei.inf
-  QemuPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
+  # QemuPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
   SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf {
     <LibraryClasses>
       HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCryptoRouterPei.inf
@@ -1267,6 +1272,15 @@
       NULL|SecurityPkg/Library/HashInstanceLibSha512/HashInstanceLibSha512.inf
       NULL|SecurityPkg/Library/HashInstanceLibSm3/HashInstanceLibSm3.inf
   }
+  SecurityPkg/Tcg/Tcg2StandaloneMmArm/Tcg2StandaloneMmArm.inf {
+    <PcdsPatchableInModule>
+      gArmTokenSpaceGuid.PcdFfaLibConduitSmc|FALSE
+    <PcdsFixedAtBuild>
+      # gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
+      gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60040000
+      gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
+  }
+
 !if $(TPM2_CONFIG_ENABLE) == TRUE
   SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
 !endif
@@ -1414,7 +1428,7 @@
   #
   StandaloneMmPkg/Core/StandaloneMmCore.inf {
     <PcdsFixedAtBuild>
-      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
+      # gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
       gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60040000
       gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
     <PcdsPatchableInModule>
@@ -1423,7 +1437,7 @@
 
   ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf {
     <PcdsFixedAtBuild>
-      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
+      # gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
       gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60040000
       gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
   }
