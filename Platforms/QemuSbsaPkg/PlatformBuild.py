@@ -321,6 +321,39 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         return 0
 
     def PlatformPreBuild(self):
+
+        need_setup = False
+        # Check to see if the poetry for TFA is setup, if not, do it.
+        outstream = StringIO()
+        # If we are not in a virtual environment, we can build the firmware directly.
+        ret = RunCmd("poetry", "env list --full-path", workingdir=self.env.GetValue("ARM_TFA_PATH"), outstream=outstream, environ=cached_enivron)
+        if ret != 0:
+            # it is not setup
+            need_setup = True
+        elif outstream.getvalue() == "":
+            # it is not setup
+            need_setup = True
+
+        if need_setup:
+            shell_environment.CheckpointBuildVars()  # checkpoint our config before we mess with it
+            # Third, write a temp bash file to activate the virtual environment and build the firmware.
+            temp_bash = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "temp2.sh")
+            with open(temp_bash, "w") as f:
+                f.write("#!/bin/bash\n")
+                f.write("deactivate\n")
+                f.write("poetry install\n")
+
+            # Next, run the temp bash file to build the firmware.
+            ret = RunCmd("bash", temp_bash, workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
+            if ret != 0:
+                return ret
+
+            # Fourth, remove the temp bash file, if succeeded.
+            os.remove(temp_bash)
+
+            # Revert the build vars to the original state
+            shell_environment.RevertBuildVars()
+
         return 0
 
     #
