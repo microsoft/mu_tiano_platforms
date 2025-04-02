@@ -12,6 +12,7 @@ import uuid
 from io import StringIO
 from pathlib import Path
 import json
+import shutil
 
 from edk2toolext.environment import shell_environment
 from edk2toolext.environment.uefi_build import UefiBuilder
@@ -340,6 +341,17 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         return 0
 
     def PlatformPostBuild(self):
+        src_dir = os.path.join(self.GetWorkspaceRoot (), "Platforms/QemuSbsaPkg/mu")
+        dest_dir = os.path.join(self.GetWorkspaceRoot (), "Silicon/Arm/HAF/project/mu")
+
+        # Remove the directory if it exists
+        if os.path.exists(dest_dir):
+            shutil.rmtree(dest_dir)
+
+        # Copy the mu directory and its contents
+        logging.info("Copying mu directory to Silicon/Arm/HAF/project")
+        shutil.copytree(src_dir, dest_dir)
+
         # Add a post build step to build BL31 and assemble the FD files
         op_fv = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
 
