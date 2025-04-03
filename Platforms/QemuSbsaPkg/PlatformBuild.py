@@ -97,6 +97,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
             RequiredSubmodule("Features/DEBUGGER", True),
             RequiredSubmodule("Features/DFCI", True),
             RequiredSubmodule("Features/CONFIG", True),
+            RequiredSubmodule("Features/FFA", True),
         ]
 
     def SetArchitectures(self, list_of_requested_architectures):
