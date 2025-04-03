@@ -1,0 +1,61 @@
+# Copyright 2018 The Hafnium Authors.
+# Copyright (c) Microsoft Corporation.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/BSD-3-Clause.
+
+import("//build/toolchain/embedded.gni")
+import("//build/toolchain/host.gni")
+
+group("secure_qemu_aarch64") {
+  deps = [ "//src:hafnium(:secure_qemu_aarch64_clang)" ]
+}
+
+group("root") {
+  deps = [
+    ":secure_qemu_aarch64",
+  ]
+}
+
+group("test_root") {
+  testonly = true
+
+  deps = [
+    "//src:unit_tests(:host_fake_clang)",
+  ]
+}
+
+# Describe each of the platforms used in this project.
+
+host_toolchain("host_fake") {
+  use_platform = true
+  heap_pages = 60
+  max_cpus = 4
+  max_vms = 6
+}
+
+aarch64_toolchains("secure_qemu_aarch64") {
+  cpu = "cortex-a57"
+  origin_address = "0x30000000"
+  memory_protect = "//src/memory_protect:absent"
+  boot_flow = "//src/boot_flow:spmc"
+  console = "//src/arch/aarch64/pl011"
+  iommu = "//src/iommu:absent"
+  gic_version = 3
+  gicd_base_address = "0x40060000"
+  gicr_base_address = "0x40080000"
+  gicr_frames = 8
+  heap_pages = 180
+  max_cpus = 8
+  max_vms = 16
+  toolchain_args = {
+    ffa_role = "//src/ffa:spmc"
+    plat_psci = "//src/arch/aarch64/plat/psci:spmc"
+    plat_interrupts = "//src/arch/aarch64/plat/interrupts:gicv3"
+    secure_world = "1"
+    pl011_base_address = "0x60000000"
+    plat_log_level = "LOG_LEVEL_VERBOSE"
+    plat_num_virtual_interrupts_ids = 1024
+  }
+}
