@@ -27,7 +27,7 @@
 
 	description = "SBSA StMM";
 	ffa-version = <0x00010002>; /* 31:16 - Major, 15:0 - Minor */
-	uuid = <0x378daedc 0xf06b4446 0x831440ab 0x933c87a3>, <0x3DDDFAA6 0x361B4eb4 0xA4248D10 0x089D1653>;
+	uuid = <0xdcae8d37 0x46446bf0 0xab401483 0xa3873c93>, <0xA6FADD3D 0xB44E1B36 0x108D24A4 0x53169D08>;
 	id = <0x8001>;
 	execution-ctx-count = <1>;
 	exception-level = <1>; /* SEL0*/
