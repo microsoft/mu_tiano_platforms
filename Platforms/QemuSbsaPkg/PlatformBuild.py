@@ -7,6 +7,7 @@
 import datetime
 import logging
 import os
+from typing import Tuple
 import sys
 import uuid
 from io import StringIO
@@ -63,10 +64,39 @@ class CommonPlatform():
     )
 
 
+    @staticmethod
+    def add_common_command_line_options(parserObj) -> None:
+        """Add common command line options to the parser object."""
+        parserObj.add_argument("-r", "--rust", dest="build_rust", action="store_true", help="Builds this platform with additional Rust components (And some C components removed).")
+
+    @staticmethod
+    def get_common_command_line_options(settings, args) -> None:
+        """Retrieves command line options common to settings managers."""
+        settings.build_rust = args.build_rust
+    
+    @staticmethod
+    def get_active_scopes(build_rust: bool) -> Tuple[str]:
+        scopes = CommonPlatform.Scopes
+
+        if build_rust:
+            scopes += ("rust",)
+
+        actual_tool_chain_tag = shell_environment.GetBuildVars().GetValue(
+                "TOOL_CHAIN_TAG", ""
+            )
+        if actual_tool_chain_tag.upper().startswith("GCC"):
+            scopes += ("gcc_aarch64_linux",)
+        return scopes
+
     # ####################################################################################### #
     #                         Configuration for Update & Setup                                #
     # ####################################################################################### #
 class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSettingsManager, ParseSettingsManager):
+    def AddCommandLineOptions(self, parserObj):
+        CommonPlatform.add_common_command_line_options(parserObj)
+
+    def RetrieveCommandLineOptions(self, args):
+        CommonPlatform.get_common_command_line_options(self, args)
 
     def GetPackagesSupported(self):
         ''' return iterable of edk2 packages supported by this build.
@@ -122,13 +152,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
-        scopes = CommonPlatform.Scopes
-        actual_tool_chain_tag = shell_environment.GetBuildVars().GetValue(
-                "TOOL_CHAIN_TAG", ""
-            )
-        if actual_tool_chain_tag.upper().startswith("GCC"):
-            scopes += ("gcc_aarch64_linux",)
-        return scopes
+        return CommonPlatform.get_active_scopes(self.build_rust)
 
     def FilterPackagesToTest(self, changedFilesList: list, potentialPackagesList: list) -> list:
         ''' Filter other cases that this package should be built
@@ -171,6 +195,12 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 class PlatformBuilder(UefiBuilder, BuildSettingsManager):
     def __init__(self):
         UefiBuilder.__init__(self)
+
+    def AddCommandLineOptions(self, parserObj):
+        CommonPlatform.add_common_command_line_options(parserObj)
+
+    def RetrieveCommandLineOptions(self, args):
+        CommonPlatform.get_common_command_line_options(self, args)
 
     # Helper function to query the VC variables of interest and inject them into the environment
     def InjectVcVarsOfInterests(self, vcvars: list):
@@ -243,13 +273,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
-        scopes = CommonPlatform.Scopes
-        actual_tool_chain_tag = shell_environment.GetBuildVars().GetValue(
-                "TOOL_CHAIN_TAG", ""
-            )
-        if actual_tool_chain_tag.upper().startswith("GCC"):
-            scopes += ("gcc_aarch64_linux",)
-        return scopes
+        return CommonPlatform.get_active_scopes(self.build_rust)
 
     def GetName(self):
         ''' Get the name of the repo, platform, or product being build '''
@@ -287,6 +311,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         self.env.SetValue("ACTIVE_PLATFORM", "QemuSbsaPkg/QemuSbsaPkg.dsc", "Platform Hardcoded")
         self.env.SetValue("TARGET_ARCH", "AARCH64", "Platform Hardcoded")
         self.env.SetValue("TOOL_CHAIN_TAG", "GCC5", "set default to gcc5")
+        self.env.SetValue("BLD_*_BUILD_RUST_CODE", str(self.build_rust).upper(), "Set via `--rust` command line option")
         self.env.SetValue("EMPTY_DRIVE", "FALSE", "Default to false")
         self.env.SetValue("RUN_TESTS", "FALSE", "Default to false")
         self.env.SetValue("QEMU_HEADLESS", "FALSE", "Default to false")
