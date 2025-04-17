@@ -85,6 +85,7 @@ jobs:
     linux_container_image: ghcr.io/microsoft/mu_devops/ubuntu-22-build:4bebc96
     ${{ if eq(parameters.rust_build, true) }}:
       linux_container_options: --security-opt seccomp=unconfined
+      extra_build_args: --rust CODE_COVERAGE=TRUE CC_FLATTEN=TRUE CC_FULL=TRUE
     do_ci_build: ${{ parameters.do_ci_build }}
     do_ci_setup: ${{ parameters.do_ci_setup }}
     do_pr_eval: ${{ parameters.do_pr_eval }}
