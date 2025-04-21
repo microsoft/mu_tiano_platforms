@@ -482,7 +482,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                 f.write("deactivate\n")
 
         # Fifth, run the temp bash file to build the firmware.
-        ret = RunCmd("bash", temp_bash, workingdir=self.env.GetValue("ARM_TFA_PATH"))
+        ret = RunCmd("bash", temp_bash, workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
         if ret != 0:
             return ret
 
