@@ -462,7 +462,12 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         # Grab the last line, which is the virtual environment path.
         logging.info(f"Virtual environment path: {outstream.getvalue().strip().split('\n')}")
         virt_path = outstream.getvalue().strip().split('\n')[-1]
-        virt_cmd = "source " + virt_path + "/bin/activate"
+        # if it is activated, contains (Activated), do nothing
+        # otherwise, we need to activate it.
+        if "(Activated)" not in virt_path:
+            virt_cmd = "source " + virt_path + "/bin/activate"
+        else:
+            virt_cmd = ""
 
         # Second, put together the command to build the firmware.
         cmd = "make"
