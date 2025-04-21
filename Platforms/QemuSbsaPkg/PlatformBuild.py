@@ -431,22 +431,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                 logging.error("Virtual environment not found")
                 return -1
 
-        outstream = StringIO()
-        # If we are not in a virtual environment, we can build the firmware directly.
-        ret = RunCmd("poetry", "env list --full-path", workingdir=self.env.GetValue("ARM_TFA_PATH"), outstream=outstream, environ=cached_enivron)
-        if ret != 0:
-            return ret
-
-        # Grab the last line, which is the virtual environment path.
-        logging.info(f"Virtual environment path: {outstream.getvalue().strip().split('\n')}")
-        virt_path = outstream.getvalue().strip().split('\n')[-1]
-        # if it is activated, contains (Activated), do nothing
-        # otherwise, we need to activate it.
-        if "(Activated)" not in virt_path:
-            virt_cmd = "source " + virt_path + "/bin/activate"
-        else:
-            virt_cmd = ""
-
         # Second, put together the command to build the firmware.
         cmd = "make"
         if self.env.GetValue("TOOL_CHAIN_TAG") == "CLANGPDB":
@@ -471,15 +455,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         temp_bash = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "temp.sh")
         with open(temp_bash, "w") as f:
             f.write("#!/bin/bash\n")
-            f.write(f"{virt_cmd}\n")
-            f.write("poetry --verbose install")
+            f.write("poetry --verbose install\n")
             f.write(f"{cmd} {args}\n")
-            if virtual_env != "":
-                # If we were in a virtual environment, we need to reactivate it after the build.
-                f.write(f"source {virtual_env}\n")
-            elif virt_cmd != "":
-                # If we activated the virtual environment, we need to deactivate it after the build.
-                f.write("deactivate\n")
 
         # Fifth, run the temp bash file to build the firmware.
         ret = RunCmd("bash", temp_bash, workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
