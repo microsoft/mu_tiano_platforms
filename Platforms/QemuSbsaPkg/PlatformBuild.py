@@ -322,28 +322,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         return 0
 
-    def PlatformPreBuild(self):
-        need_setup = False
-        # Check to see if the poetry for TFA is setup, if not, do it.
-        outstream = StringIO()
-
-        # If we are not in a virtual environment, we can build the firmware directly.
-        ret = RunCmd("poetry", "env list --full-path", workingdir=self.env.GetValue("ARM_TFA_PATH"), outstream=outstream, environ=cached_enivron)
-        if ret != 0:
-            # it is not setup
-            need_setup = True
-        elif outstream.getvalue() == "":
-            # it is not setup
-            need_setup = True
-
-        if need_setup:
-            # okay, need to install it
-            ret = RunCmd("poetry", "--verbose install", workingdir=self.env.GetValue("ARM_TFA_PATH"))
-            if ret != 0:
-                return ret
-
-        return 0
-
     #
     # Copy a file into the designated region of target FD.
     #
@@ -494,6 +472,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         with open(temp_bash, "w") as f:
             f.write("#!/bin/bash\n")
             f.write(f"{virt_cmd}\n")
+            f.write("poetry --verbose install")
             f.write(f"{cmd} {args}\n")
             if virtual_env != "":
                 # If we were in a virtual environment, we need to reactivate it after the build.
