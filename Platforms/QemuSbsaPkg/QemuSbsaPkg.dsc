@@ -1241,7 +1241,7 @@
   #
   # HID Support
   #
-  HidPkg/UefiHidDxe/UefiHidDxe.inf
+  # HidPkg/UefiHidDxe/UefiHidDxe.inf
 
   #
   # USB Support
@@ -1252,10 +1252,10 @@
   MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
-  HidPkg/UsbHidDxe/UsbHidDxe.inf {
-    <LibraryClasses>
-      UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
-  }
+  # HidPkg/UsbHidDxe/UsbHidDxe.inf {
+  #   <LibraryClasses>
+  #     UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
+  # }
 
   #
   # TPM2 support
