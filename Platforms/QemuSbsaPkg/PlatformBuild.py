@@ -455,6 +455,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         temp_bash = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "temp.sh")
         with open(temp_bash, "w") as f:
             f.write("#!/bin/bash\n")
+            f.write("poetry env activate\n")
             f.write("poetry --verbose install\n")
             f.write(f"{cmd} {args}\n")
 
