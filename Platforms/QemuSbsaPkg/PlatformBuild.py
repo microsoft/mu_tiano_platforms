@@ -498,7 +498,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             if virtual_env != "":
                 # If we were in a virtual environment, we need to reactivate it after the build.
                 f.write(f"source {virtual_env}\n")
-            else:
+            elif virt_cmd != "":
+                # If we activated the virtual environment, we need to deactivate it after the build.
                 f.write("deactivate\n")
 
         # Fifth, run the temp bash file to build the firmware.
