@@ -457,7 +457,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             f.write("#!/bin/bash\n")
             f.write("poetry --verbose install\n")
             f.write("poetry env activate\n")
-            f.write("poetry env list --full-path\n")
+            f.write("poetry show\n")
+            f.write("pip3 install fdt\n") # why is this still needed?
             f.write(f"{cmd} {args}\n")
 
         # Fifth, run the temp bash file to build the firmware.
