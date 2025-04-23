@@ -515,7 +515,7 @@
   RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
   VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
-  TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
+  TimerLib|FfaFeaturePkg/Library/ArmArchTimerLibEx/ArmArchTimerLibEx.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerPhyCounterLib/ArmGenericTimerPhyCounterLib.inf
 
