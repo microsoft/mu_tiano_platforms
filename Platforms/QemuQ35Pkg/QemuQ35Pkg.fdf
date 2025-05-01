@@ -276,7 +276,6 @@ INF  DebuggerFeaturePkg/DebugConfigPei/DebugConfigPei.inf
 !include $(SHARED_CRYPTO_PATH)/Driver/Bin/CryptoDriver.PEI.inc.fdf
 
 ################################################################################
-
 [FV.DXEFV]
 FvForceRebase      = FALSE
 FvNameGuid         = 7CB8BDC9-F8EB-4F34-AAEA-3EE4AF6516A1
@@ -480,6 +479,9 @@ INF  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
 INF  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
 !endif
 !endif
+
+INF CryptoPkg/Binaries/edk2-sharedcrypto-driver-bin/bin/driver/SharedCryptoDxe.inf
+INF CryptoPkg/Binaries/edk2-sharedcrypto-driver-bin/bin/shared/SharedCryptoBin.inf
 
 #
 # MU Modules

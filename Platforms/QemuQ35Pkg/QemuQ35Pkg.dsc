@@ -1075,7 +1075,9 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   # Produces FORM DISPLAY ENGINE protocol. Handles input, displays strings.
   MsGraphicsPkg/DisplayEngineDxe/DisplayEngineDxe.inf
 
-
+  CryptoPkg/Binaries/edk2-sharedcrypto-driver-bin/bin/driver/SharedCryptoDxe.inf
+  CryptoPkg/Binaries/edk2-sharedcrypto-driver-bin/bin/shared/SharedCryptoBin.inf
+  
   MdeModulePkg/Core/Dxe/DxeMain.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
