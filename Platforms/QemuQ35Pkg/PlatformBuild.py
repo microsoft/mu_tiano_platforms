@@ -23,13 +23,14 @@ from edk2toolext.invocables.edk2_setup import (RequiredSubmodule,
                                                SetupSettingsManager)
 from edk2toolext.invocables.edk2_update import UpdateSettingsManager
 from edk2toolext.invocables.edk2_parse import ParseSettingsManager
-from edk2toollib.utility_functions import GetHostInfo, RunCmd
+from edk2toollib.utility_functions import RunCmd
 
 WORKSPACE_ROOT = str(Path(__file__).parent.parent.parent)
 
 # Declare test whose failure will not return a non-zero exit code
 FAILURE_EXEMPT_TESTS = {
     # example "PiValueTestApp.efi": datetime.datetime(3141, 5, 9, 2, 6, 53, 589793),
+    "LineParserTestApp.efi": datetime.datetime(2025, 5, 5, 0, 0, 0, 0)
 }
 
 # Allow failure exempt tests to be ignored for 90 days

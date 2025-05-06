@@ -1,6 +1,13 @@
 # This workflow automatically creates a pull request for any submodule in the repo
 # that has a new GitHub release available. The release must follow semantic versioning.
 #
+# The GitHub App ID and private key should be stored in the repository as a variable named `MU_ACCESS_APP_ID` and a
+# secret named `MU_ACCESS_APP_PRIVATE_KEY` respectively.
+#
+# The GitHub App must grant the following permissions:
+# - Read and write access to repository contents
+# - Read and write access to pull requests
+#
 # NOTE: This file is automatically synchronized from Mu DevOps. Update the original file there
 #       instead of the file in this repo.
 #
@@ -28,10 +35,17 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Update Submodules to Latest Release
-        uses: microsoft/mu_devops/.github/actions/submodule-release-updater@v13.0.0
+      - name: Generate Token
+        id: app-token
+        uses: actions/create-github-app-token@v2
         with:
-          GH_PAT: ${{ secrets.SUBMODULE_UPDATER_TOKEN }}
+          app-id: $
+          private-key: $
+
+      - name: Update Submodules to Latest Release
+        uses: microsoft/mu_devops/.github/actions/submodule-release-updater@v14.0.1
+        with:
+          GH_PAT: ${{ steps.app-token.outputs.token }}
           GH_USER: "ProjectMuBot"
           GIT_EMAIL: "mubot@microsoft.com"
           GIT_NAME: "Project Mu Bot"
