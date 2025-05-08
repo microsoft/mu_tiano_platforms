@@ -498,6 +498,7 @@
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   HobPrintLib|MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
   ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerPhyCounterLib/ArmGenericTimerPhyCounterLib.inf
+  TimerLib|FfaFeaturePkg/Library/ArmArchTimerLibEx/ArmArchTimerLibEx.inf
 
   ArmMmuLib|ArmPkg/Library/StandaloneMmMmuLib/ArmMmuStandaloneMmLib.inf
   StandaloneMmCoreEntryPoint|ArmPkg/Library/ArmStandaloneMmCoreEntryPoint/ArmStandaloneMmCoreEntryPoint.inf
@@ -516,7 +517,7 @@
   RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
   VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
-  TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
+  TimerLib|FfaFeaturePkg/Library/ArmArchTimerLibEx/ArmArchTimerLibEx.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerPhyCounterLib/ArmGenericTimerPhyCounterLib.inf
 
@@ -1145,7 +1146,7 @@
   MsWheaPkg/MsWheaReport/Dxe/MsWheaReportDxe.inf
   MsCorePkg/MuVarPolicyFoundationDxe/MuVarPolicyFoundationDxe.inf
   MsCorePkg/AcpiRGRT/AcpiRgrt.inf
-  MsCorePkg/HelloWorldRustDxe/HelloWorldRustDxe.inf
+  # MsCorePkg/HelloWorldRustDxe/HelloWorldRustDxe.inf
 
   MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
   SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
@@ -1246,7 +1247,7 @@
   #
   # HID Support
   #
-  HidPkg/UefiHidDxe/UefiHidDxe.inf
+  # HidPkg/UefiHidDxe/UefiHidDxe.inf
 
   #
   # USB Support
@@ -1257,10 +1258,10 @@
   MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
-  HidPkg/UsbHidDxe/UsbHidDxe.inf {
-    <LibraryClasses>
-      UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
-  }
+  # HidPkg/UsbHidDxe/UsbHidDxe.inf {
+  #   <LibraryClasses>
+  #     UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
+  # }
 
   #
   # TPM2 support

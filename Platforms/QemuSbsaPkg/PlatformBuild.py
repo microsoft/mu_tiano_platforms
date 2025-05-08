@@ -46,7 +46,7 @@ class CommonPlatform():
     PackagesSupported = ("QemuSbsaPkg",)
     ArchSupported = ("AARCH64",)
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
-    Scopes = ('qemu', 'qemusbsa', 'edk2-build', 'cibuild', 'configdata', 'rust-ci')
+    Scopes = ('qemu', 'qemusbsa', 'edk2-build', 'cibuild', 'configdata')
     WorkspaceRoot = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     PackagesPath = (
         "Platforms",
@@ -98,6 +98,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
             RequiredSubmodule("Features/DEBUGGER", True),
             RequiredSubmodule("Features/DFCI", True),
             RequiredSubmodule("Features/CONFIG", True),
+            RequiredSubmodule("Features/FFA", True),
         ]
 
     def SetArchitectures(self, list_of_requested_architectures):
@@ -321,42 +322,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         return 0
 
-    def PlatformPreBuild(self):
-
-        need_setup = False
-        # Check to see if the poetry for TFA is setup, if not, do it.
-        outstream = StringIO()
-        # If we are not in a virtual environment, we can build the firmware directly.
-        ret = RunCmd("poetry", "env list --full-path", workingdir=self.env.GetValue("ARM_TFA_PATH"), outstream=outstream, environ=cached_enivron)
-        if ret != 0:
-            # it is not setup
-            need_setup = True
-        elif outstream.getvalue() == "":
-            # it is not setup
-            need_setup = True
-
-        if need_setup:
-            shell_environment.CheckpointBuildVars()  # checkpoint our config before we mess with it
-            # Third, write a temp bash file to activate the virtual environment and build the firmware.
-            temp_bash = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "temp2.sh")
-            with open(temp_bash, "w") as f:
-                f.write("#!/bin/bash\n")
-                f.write("deactivate\n")
-                f.write("poetry install\n")
-
-            # Next, run the temp bash file to build the firmware.
-            ret = RunCmd("bash", temp_bash, workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
-            if ret != 0:
-                return ret
-
-            # Fourth, remove the temp bash file, if succeeded.
-            os.remove(temp_bash)
-
-            # Revert the build vars to the original state
-            shell_environment.RevertBuildVars()
-
-        return 0
-
     #
     # Copy a file into the designated region of target FD.
     #
@@ -466,17 +431,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                 logging.error("Virtual environment not found")
                 return -1
 
-        outstream = StringIO()
-        # If we are not in a virtual environment, we can build the firmware directly.
-        ret = RunCmd("poetry", "env list --full-path", workingdir=self.env.GetValue("ARM_TFA_PATH"), outstream=outstream, environ=cached_enivron)
-        if ret != 0:
-            return ret
-
-        # Grab the last line, which is the virtual environment path.
-        logging.info(f"Virtual environment path: {outstream.getvalue().strip().split('\n')}")
-        virt_path = outstream.getvalue().strip().split('\n')[-1]
-        virt_cmd = "source " + virt_path + "/bin/activate"
-
         # Second, put together the command to build the firmware.
         cmd = "make"
         if self.env.GetValue("TOOL_CHAIN_TAG") == "CLANGPDB":
@@ -501,13 +455,11 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         temp_bash = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "temp.sh")
         with open(temp_bash, "w") as f:
             f.write("#!/bin/bash\n")
-            f.write(f"{virt_cmd}\n")
+            f.write("poetry --verbose install\n")
+            f.write("poetry env activate\n")
+            f.write("poetry show\n")
+            f.write("pip3 install fdt\n") # why is this still needed?
             f.write(f"{cmd} {args}\n")
-            if virtual_env != "":
-                # If we were in a virtual environment, we need to reactivate it after the build.
-                f.write(f"source {virtual_env}\n")
-            else:
-                f.write("deactivate\n")
 
         # Fifth, run the temp bash file to build the firmware.
         ret = RunCmd("bash", temp_bash, workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
