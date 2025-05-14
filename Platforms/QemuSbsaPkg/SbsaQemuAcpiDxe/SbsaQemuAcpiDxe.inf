@@ -29,6 +29,7 @@
 
 [LibraryClasses]
   ArmLib
+  ArmMonitorLib
   BaseMemoryLib
   BaseLib
   DebugLib
@@ -36,6 +37,7 @@
   FdtHelperLib
   PcdLib
   PrintLib
+  ResetSystemLib
   UefiDriverEntryPoint
   UefiLib
   UefiRuntimeServicesTableLib
