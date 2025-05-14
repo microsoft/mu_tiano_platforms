@@ -1,0 +1,293 @@
+From c9537c20b8cda91c8214be04b842695321199d68 Mon Sep 17 00:00:00 2001
+From: Kun Qin <kuqin@microsoft.com>
+Date: Thu, 31 Oct 2024 00:41:05 -0700
+Subject: [PATCH 1/2] Changes needed to hack through QEMU SBSA usage
+
+Also added an example partition.
+
+Co-authored-by: Chris Fernald <chfernal@microsoft.com>
+Co-authored-by: rdiaz <raymonddiaz@microsoft.com>
+(cherry picked from commit 584847543e91dff3eef4732fcf456bcc675ba37f)
+
+Updated DTS files to include the correct UUID for the Notification SP and added the device regions for the TPM CRBs
+---
+ .../fdts/qemu_sbsa_spmc_sp_manifest.dts       | 118 ++++++++++++++++++
+ .../qemu_sbsa/fdts/qemu_sbsa_tb_fw_config.dts |  42 +++++++
+ plat/qemu/qemu_sbsa/include/platform_def.h    |  35 ++++--
+ plat/qemu/qemu_sbsa/platform.mk               |  21 ++++
+ 4 files changed, 209 insertions(+), 7 deletions(-)
+ create mode 100644 plat/qemu/qemu_sbsa/fdts/qemu_sbsa_spmc_sp_manifest.dts
+ create mode 100644 plat/qemu/qemu_sbsa/fdts/qemu_sbsa_tb_fw_config.dts
+
+diff --git a/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_spmc_sp_manifest.dts b/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_spmc_sp_manifest.dts
+new file mode 100644
+index 000000000..3c0187cfa
+--- /dev/null
++++ b/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_spmc_sp_manifest.dts
+@@ -0,0 +1,118 @@
++/*
++ * Copyright (c) 2022, Arm Limited. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++ /dts-v1/;
++
++ #define	AFF	00
++
++//  #include "rdfremont-defs.dtsi"
++//  #undef POST
++ #define	POST \
++   };
++
++ / {
++   compatible = "arm,ffa-core-manifest-1.0";
++   #address-cells = <2>;
++   #size-cells = <2>;
++
++   attribute {
++     spmc_id = <0x8000>;
++     maj_ver = <0x1>;
++     min_ver = <0x1>;
++     exec_state = <0x0>;
++     load_address = <0x0 0x30000000>;
++     entrypoint = <0x0 0x30000000>;
++     binary_size = <0x80000>;
++   };
++
++   hypervisor {
++     compatible = "hafnium,hafnium";
++     vm1 {
++       is_ffa_partition;
++       debug_name = "stmm";
++       load_address = <0x0 0x20002000>;
++       vcpu_count = <1>;
++       mem_size = <0x0 0x300000>;
++     };
++     /* Example Service */
++     vm2 {
++       is_ffa_partition;
++       load_address = <0x0 0x20400000>;
++       debug_name = "therm";
++       vcpu_count = <1>;
++       mem_size = <0x400000>;
++     };
++   };
++
++   cpus {
++     #address-cells = <0x2>;
++     #size-cells = <0x0>;
++
++    cpu@0 {
++      device_type = "cpu";
++      reg = <0x0 0x0>;
++    };
++
++    cpu@3 {
++      device_type = "cpu";
++      reg = <0x0 0x3>;
++    };
++
++		cpu@2 {
++			device_type = "cpu";
++			reg = <0x0 0x2>;
++		};
++
++		cpu@1 {
++			device_type = "cpu";
++			reg = <0x0 0x1>;
++		};
++   };
++
++  memory@0 {
++    device_type = "memory"; /* Trusted DRAM */
++    reg = <0x0 0x20000000 0x0 0x20000000>;
++  };
++
++  memory@1 {
++		device_type = "device-memory"; /* UART */
++		reg = <0x0 0x60000000 0x0 0x00001000>;
++	};
++
++  memory@3 {
++		device_type = "device-memory"; /* UART */
++		reg = <0x0 0x60040000 0x0 0x00001000>;
++	};
++
++  memory@4 {
++		device_type = "device-memory"; /* FLASH */
++		reg = <0x0 0x01000000 0x0 0x000C0000>;
++	};
++
++  memory@5 {
++		device_type = "device-memory"; /* UART */
++		reg = <0x0 0x60030000 0x0 0x00001000>;
++	};
++
++  memory@6 {
++		device_type = "device-memory"; /* SP1 Test Carve-out */
++		reg = <0x00000100 0x1FFFE000 0x0 0x00001000>;
++	};
++
++  memory@2 {
++    device_type = "ns-memory";
++    reg = <0x00000100 0x00000000 0x0 0x80000000>;
++  };
++
++  memory@8 {
++    device_type = "device-memory"; /* Internal CRB */
++    reg = <0x00000100 0x00200000 0x0 0x00010000>;
++  };
++
++  memory@9 {
++    device_type = "device-memory"; /* External CRB */
++    reg = <0x00000000 0x60120000 0x0 0x00010000>;
++  };
++};
+diff --git a/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_tb_fw_config.dts b/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_tb_fw_config.dts
+new file mode 100644
+index 000000000..1e9284248
+--- /dev/null
++++ b/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_tb_fw_config.dts
+@@ -0,0 +1,42 @@
++/*
++ * Copyright (c) 2022, ARM Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++ /dts-v1/;
++
++ / {
++   tb_fw-config {
++     compatible = "arm,tb_fw";
++
++     /* Disable authentication for development */
++     disable_auth = <0x0>;
++
++     /*
++      * The following two entries are placeholders for Mbed TLS
++      * heap information. The default values don't matter since
++      * they will be overwritten by BL1.
++      * In case of having shared Mbed TLS heap between BL1 and BL2,
++      * BL1 will populate these two properties with the respective
++      * info about the shared heap. This info will be available for
++      * BL2 in order to locate and re-use the heap.
++      */
++     mbedtls_heap_addr = <0x0 0x0>;
++     mbedtls_heap_size = <0x0>;
++   };
++
++   secure-partitions {
++     compatible = "arm,sp";
++     stmm {
++      uuid = "eaba83d8-baaf-4eaf-8144-f7fdcbe544a7";
++      load-address = <0x20002000>;
++      owner = "Plat";
++    };
++    example {
++      uuid = "b8bcbd0c-8e8f-4ebe-99eb-3cbbdd0cd412";
++      load-address = <0x20400000>;
++      owner = "Plat";
++    };
++   };
++ };
+diff --git a/plat/qemu/qemu_sbsa/include/platform_def.h b/plat/qemu/qemu_sbsa/include/platform_def.h
+index 9979fe11e..d9b210bdf 100644
+--- a/plat/qemu/qemu_sbsa/include/platform_def.h
++++ b/plat/qemu/qemu_sbsa/include/platform_def.h
+@@ -148,11 +148,33 @@
+  * Put BL3-1 at the top of the Trusted SRAM. BL31_BASE is calculated using the
+  * current BL3-1 debug size plus a little space for growth.
+  */
+-#define BL31_SIZE			0x400000
++#define BL31_SIZE			0x440000
+ #define BL31_BASE			(BL31_LIMIT - BL31_SIZE)
+ #define BL31_LIMIT			(BL1_RW_BASE - FW_HANDOFF_SIZE)
+ #define BL31_PROGBITS_LIMIT		BL1_RW_BASE
+ 
++/*
++ * Configuration defines.
++ *
++ * Put the configurtion data before Bl2.
++ *
++*/
++
++#define FW_CONFIG_LIMIT				BL2_BASE
++#define FW_CONFIG_BASE 				(FW_CONFIG_LIMIT - 0x4000)
++#define TB_FW_CONFIG_BASE			FW_CONFIG_BASE
++#define TB_FW_CONFIG_LIMIT		(TB_FW_CONFIG_BASE + PAGE_SIZE)
++#define TOS_FW_CONFIG_BASE		TB_FW_CONFIG_LIMIT
++#define TOS_FW_CONFIG_LIMIT		(TOS_FW_CONFIG_BASE + PAGE_SIZE)
++
++/*
++ * SPMD specific defines
++ *
++*/
++
++#define SPMD_BASE				0x30000000
++#define SPMD_LIMIT 			FW_CONFIG_BASE
++
+ #if TRANSFER_LIST
+ #define FW_HANDOFF_BASE			BL31_LIMIT
+ #define FW_HANDOFF_LIMIT		(FW_HANDOFF_BASE + FW_HANDOFF_SIZE)
+@@ -170,13 +192,12 @@
+  * BL3-2 can execute from Secure SRAM, or Secure DRAM.
+  */
+ #define BL32_SRAM_BASE			BL_RAM_BASE
+-#define BL32_SRAM_LIMIT			BL2_BASE
++#define BL32_SRAM_LIMIT			SPMD_BASE
+ 
+-#define BL32_MEM_BASE			BL_RAM_BASE
+-#define BL32_MEM_SIZE			(BL_RAM_SIZE - RME_GPT_DRAM_SIZE - \
+-					BL1_SIZE - BL2_SIZE - BL31_SIZE)
+-#define BL32_BASE			BL32_SRAM_BASE
+-#define BL32_LIMIT			BL32_SRAM_LIMIT
++#define BL32_MEM_BASE			SPMD_BASE
++#define BL32_MEM_SIZE			(SPMD_LIMIT - SPMD_BASE)
++#define BL32_BASE					SPMD_BASE
++#define BL32_LIMIT			  SPMD_LIMIT
+ 
+ #define NS_IMAGE_OFFSET			(NS_DRAM0_BASE + 0x20000000)
+ #define NS_IMAGE_MAX_SIZE		(NS_DRAM0_SIZE - 0x20000000)
+diff --git a/plat/qemu/qemu_sbsa/platform.mk b/plat/qemu/qemu_sbsa/platform.mk
+index 8ec3a8249..d3ef3dda7 100644
+--- a/plat/qemu/qemu_sbsa/platform.mk
++++ b/plat/qemu/qemu_sbsa/platform.mk
+@@ -29,6 +29,13 @@ ifeq ($(NEED_BL32),yes)
+ $(eval $(call add_define,QEMU_LOAD_BL32))
+ endif
+ 
++ifeq (${SPMD_SPM_AT_SEL2}, 1)
++FDT_SOURCES		+=  ${PLAT_QEMU_PATH}/fdts/${PLAT}_tb_fw_config.dts
++BL32_CONFIG_DTS		:=	${PLAT_QEMU_PATH}/fdts/${PLAT}_spmc_sp_manifest.dts
++FDT_SOURCES		+=	${BL32_CONFIG_DTS}
++QEMU_SBSA_TOS_FW_CONFIG		:=	${BUILD_PLAT}/fdts/$(notdir $(basename ${BL32_CONFIG_DTS})).dtb
++endif
++
+ # Include GICv3 driver files
+ include drivers/arm/gic/v3/gicv3.mk
+ 
+@@ -47,6 +54,20 @@ ifeq (${SPM_MM},1)
+ 	BL31_SOURCES		+=	${PLAT_QEMU_COMMON_PATH}/qemu_spm.c
+ endif
+ 
++ifeq (${SPMD_SPM_AT_SEL2}, 1)
++BL1_SOURCES += plat/common/plat_spmd_manifest.c
++
++BL2_SOURCES += ${PLAT_QEMU_COMMON_PATH}/qemu_io_storage.c \
++				common/uuid.c
++
++BL31_SOURCES += plat/common/plat_spmd_manifest.c
++
++TOS_FW_CONFIG		:=	${BUILD_PLAT}/fdts/qemu_sbsa_spmc_sp_manifest.dtb
++$(eval $(call TOOL_ADD_PAYLOAD,${TOS_FW_CONFIG},--tos-fw-config,${TOS_FW_CONFIG}))
++TB_FW_CONFIG		:=	${BUILD_PLAT}/fdts/qemu_sbsa_tb_fw_config.dtb
++$(eval $(call TOOL_ADD_PAYLOAD,${TB_FW_CONFIG},--tb-fw-config,${TB_FW_CONFIG}))
++endif
++
+ # Use known base for UEFI if not given from command line
+ # By default BL33 is at FLASH1 base
+ PRELOADED_BL33_BASE	?= 0x10000000
+-- 
+2.34.1
+

@@ -461,8 +461,31 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             f.write("pip3 install fdt\n") # why is this still needed?
             f.write(f"{cmd} {args}\n")
 
+        # Grab the current head to restore from patches later.
+        patch_tfa = (self.env.GetValue("PATCH_TFA", "TRUE").upper() == "TRUE")
+        if patch_tfa:
+            outstream = StringIO()
+            ret = RunCmd("git", "rev-parse HEAD", outstream=outstream, workingdir=self.env.GetValue("ARM_TFA_PATH"))
+            if ret != 0:
+                logging.error("Failed to get git HEAD for TFA")
+                return ret
+            arm_tfa_git_head = outstream.getvalue().strip()
+            logging.info(f"TFA HEAD: {arm_tfa_git_head}")
+
+            patches = os.path.join(self.GetWorkspaceRoot(), "Platforms/QemuSbsaPkg/tfa_patches/*.patch")
+            # Log the patch files for debugging
+            ret = RunCmd("git", f"am {patches}", workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
+            if ret != 0:
+                return ret
+
         # Fifth, run the temp bash file to build the firmware.
         ret = RunCmd("bash", temp_bash, workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
+        if patch_tfa:
+            # Always revert before returning
+            revert_ret = RunCmd(f"git", f"checkout {arm_tfa_git_head}", workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
+            if revert_ret != 0:
+                return revert_ret
+
         if ret != 0:
             return ret
 
