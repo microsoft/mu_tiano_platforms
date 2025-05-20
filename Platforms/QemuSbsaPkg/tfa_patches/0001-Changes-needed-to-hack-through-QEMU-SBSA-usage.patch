@@ -204,7 +204,7 @@ index 9979fe11e..d9b210bdf 100644
  #define BL31_BASE			(BL31_LIMIT - BL31_SIZE)
  #define BL31_LIMIT			(BL1_RW_BASE - FW_HANDOFF_SIZE)
  #define BL31_PROGBITS_LIMIT		BL1_RW_BASE
- 
+
 +/*
 + * Configuration defines.
 + *
@@ -236,7 +236,7 @@ index 9979fe11e..d9b210bdf 100644
  #define BL32_SRAM_BASE			BL_RAM_BASE
 -#define BL32_SRAM_LIMIT			BL2_BASE
 +#define BL32_SRAM_LIMIT			SPMD_BASE
- 
+
 -#define BL32_MEM_BASE			BL_RAM_BASE
 -#define BL32_MEM_SIZE			(BL_RAM_SIZE - RME_GPT_DRAM_SIZE - \
 -					BL1_SIZE - BL2_SIZE - BL31_SIZE)
@@ -246,7 +246,7 @@ index 9979fe11e..d9b210bdf 100644
 +#define BL32_MEM_SIZE			(SPMD_LIMIT - SPMD_BASE)
 +#define BL32_BASE					SPMD_BASE
 +#define BL32_LIMIT			  SPMD_LIMIT
- 
+
  #define NS_IMAGE_OFFSET			(NS_DRAM0_BASE + 0x20000000)
  #define NS_IMAGE_MAX_SIZE		(NS_DRAM0_SIZE - 0x20000000)
 diff --git a/plat/qemu/qemu_sbsa/platform.mk b/plat/qemu/qemu_sbsa/platform.mk
@@ -256,7 +256,7 @@ index 8ec3a8249..d3ef3dda7 100644
 @@ -29,6 +29,13 @@ ifeq ($(NEED_BL32),yes)
  $(eval $(call add_define,QEMU_LOAD_BL32))
  endif
- 
+
 +ifeq (${SPMD_SPM_AT_SEL2}, 1)
 +FDT_SOURCES		+=  ${PLAT_QEMU_PATH}/fdts/${PLAT}_tb_fw_config.dts
 +BL32_CONFIG_DTS		:=	${PLAT_QEMU_PATH}/fdts/${PLAT}_spmc_sp_manifest.dts
@@ -266,11 +266,11 @@ index 8ec3a8249..d3ef3dda7 100644
 +
  # Include GICv3 driver files
  include drivers/arm/gic/v3/gicv3.mk
- 
+
 @@ -47,6 +54,20 @@ ifeq (${SPM_MM},1)
  	BL31_SOURCES		+=	${PLAT_QEMU_COMMON_PATH}/qemu_spm.c
  endif
- 
+
 +ifeq (${SPMD_SPM_AT_SEL2}, 1)
 +BL1_SOURCES += plat/common/plat_spmd_manifest.c
 +
@@ -288,6 +288,6 @@ index 8ec3a8249..d3ef3dda7 100644
  # Use known base for UEFI if not given from command line
  # By default BL33 is at FLASH1 base
  PRELOADED_BL33_BASE	?= 0x10000000
--- 
+--
 2.34.1
 
