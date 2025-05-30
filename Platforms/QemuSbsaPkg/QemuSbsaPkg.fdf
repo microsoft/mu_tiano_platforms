@@ -142,7 +142,7 @@ SET gQemuSbsaPkgTokenSpaceGuid.PcdFlashNvStorageBase = $(SECURE_FLASH_NVSTORAGE_
 SET gQemuSbsaPkgTokenSpaceGuid.PcdFlashNvStorageSize = $(SECURE_FLASH_NVSTORAGE_SIZE)
 
 [FD.BL32_AP_MM]
-BaseAddress   = 0x20002000|gArmTokenSpaceGuid.PcdFdBaseAddress  # UEFI in DRAM + 128MB.
+BaseAddress   = 0x20005000|gArmTokenSpaceGuid.PcdFdBaseAddress  # UEFI in DRAM + 128MB.
 Size          = 0x00e00000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the device (64MiB).
 ErasePolarity = 1
 
@@ -152,6 +152,17 @@ NumBlocks     = 0x0e00
 0x00000000|0x00280000
 gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = FV_STANDALONE_MM_COMPACT
+
+[FD.BL32_AP_MM_SP1]
+BaseAddress   = 0x20410000|gArmTokenSpaceGuid.PcdFdBaseAddress  # UEFI in DRAM + 128MB.
+Size          = 0x00014000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the device (64MiB).
+ErasePolarity = 1
+
+BlockSize     = 0x00001000
+NumBlocks     = 0x00014
+
+0x00000000|0x00014000
+FV = FV_STANDALONE_MM_SECURE_PARTITION1
 
 [FD.QEMU_EFI]
 BaseAddress   = 0x10000000|gArmTokenSpaceGuid.PcdFdBaseAddress
@@ -380,6 +391,7 @@ READ_LOCK_STATUS   = TRUE
   #
 !if $(TPM2_ENABLE) == TRUE
   INF SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
+  INF SecurityPkg/Tcg/Tcg2AcpiFfa/Tcg2AcpiFfa.inf
 !if $(TPM2_CONFIG_ENABLE) == TRUE
   INF SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
 !endif
@@ -540,6 +552,26 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStandaloneMm.inf
   INF QemuSbsaPkg/VirtNorFlashStandaloneMm/VirtNorFlashStandaloneMm.inf
   INF ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
+
+[FV.FV_STANDALONE_MM_SECURE_PARTITION1]
+FvAlignment        = 16
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+  INF FfaFeaturePkg/SecurePartitions/MsSecurePartition/MsSecurePartition.inf
 
 ################################################################################
 #

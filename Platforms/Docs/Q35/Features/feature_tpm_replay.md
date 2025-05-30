@@ -27,7 +27,7 @@ Or, as a `stuart_build` argument:
 
 Note that the TPM driver stack is also disabled by default in QEMU firmware. It requires a TPM emulator and currently
 has only been enabled/tested on Linux. The command above also shows how to enable TPM. For more information about
-enabling TPM, refer to the [TPM feature readme document](feature_tpm.md).
+enabling TPM, refer to the [TPM feature readme document](../../Common/Features/feature_tpm.md).
 
 > The `# yaml-language-server: $schema=<schemapath>` modeline at the top of the file points to the schema
 > for the TPM Replay event log. Eventually, the schema is planned to be submitted to the

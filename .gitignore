@@ -13,6 +13,8 @@ UefiDbgExt/x64/
 /Conf/
 /**/Include/Generated/**
 /**/AutoGen/**
+*secure.log
+*secure_mm.log
 
 # Ignore Rust build output
 /target

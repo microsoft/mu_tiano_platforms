@@ -124,7 +124,7 @@ Specific TPM Interface Specification (TIS) in addition to a TPM CRB interface th
 TPM Profile (PTP) Specification. `QemuQ35Pkg` has support to include TPM drivers and connect to the software TPM
 socket interface. Usage is covered in the detailed feature readme.
 
-[Details](Features/feature_tpm.md)
+[Details](../Common/Features/feature_tpm.md)
 
 ### Trusted Platform Module (TPM) Replay
 

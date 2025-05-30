@@ -1,0 +1,168 @@
+/*
+ * Copyright (c) 2020-21, ARM Limited and Contributors. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+/dts-v1/;
+
+/ {
+#define MODE_SEL0	(1)
+#define MODE_SEL1	(2)
+
+#define SECURE_RO 0x1
+#define SECURE_RW 0x3
+#define SECURE_EXECUTE_RO 0x5
+#define SECURE_EXECUTE_RW 0x7
+#define NON_SECURE_RO 0x9
+#define NON_SECURE_RW 0xB
+#define NON_SECURE_EXECUTE_RO 0xD
+#define NONSECURE_EXECUTE_RW 0xF
+	/*
+	 * FF-A compatible Secure Partition Manager parses the
+	 * config file and fetch the following booting arguments to
+	 * pass on to the StandAloneMM(StMM) Secure Partition.
+	 */
+	compatible = "arm,ffa-manifest-1.0";
+
+	description = "SBSA StMM";
+	ffa-version = <0x00010002>; /* 31:16 - Major, 15:0 - Minor */
+	uuid = <0xdcae8d37 0x46446bf0 0xab401483 0xa3873c93>, <0xA6FADD3D 0xB44E1B36 0x108D24A4 0x53169D08>;
+	id = <0x8001>;
+	execution-ctx-count = <1>;
+	exception-level = <1>; /* SEL0*/
+	execution-state = <0>; /* AArch64*/
+	load-address = <0x0 0x20002000>;
+	entrypoint-offset = <0x3000>;
+	image-size = <0x0 0x300000>;
+	xlat-granule = <0>; /* 4KiB */
+	boot-order = <0>;
+	messaging-method = <0x603>; /* Direct request/response supported. */
+	power-management-messages = <0x0>;
+	gp-register-num = <0>;
+	ns-interrupts-action = <0>; /* Non-secure interrupt is queued */
+
+	boot-info {
+		compatible = "arm,ffa-manifest-boot-info";
+		hob_list;
+	};
+
+	device-regions {
+		compatible = "arm,ffa-manifest-device-regions";
+
+		/*
+		 * System registers region for access from S-EL0.
+		 * Similar to PLAT_ARM_SECURE_MAP_SYSTEMREG.
+		 */
+		// sys-regs {
+		// 	base-address = <0x0 0x0C010000>;
+		// 	pages-count = <0x10>;
+		// 	attributes = <SECURE_RW>;
+		// };
+
+		/*
+		 * RTC region.
+		 */
+		// rtc {
+		// 	base-address = <0x0 0x60010000>;
+		// 	pages-count = <0x1>;
+		// 	attributes = <SECURE_RW>;
+		// };
+
+		/*
+		 * ARM CSS SoC Peripherals and PCIe expansion area.
+		 * Similar to SOC_CSS_MAP_DEVICE.
+		 */
+		// soc_components {
+		// 	base-address = <0x0 0x0E000000>;
+		// 	pages-count = <0x2000>;
+		// 	attributes = <SECURE_RW>;
+		// };
+
+		/*
+		 * RTC region.
+		 */
+		// cluster_utility {
+		// 	base-address = <0x0 0x20000000>;
+		// 	pages-count = <0x20000>;
+		// 	attributes = <SECURE_RW>;
+		// };
+
+		/*
+		 * Secure UART region.
+		 */
+		secure_uart {
+			base-address = <0x0 0x60040000>;
+			pages-count = <0x1>;
+			attributes = <0x3>;
+		};
+
+		/*
+		 * Variable Flash.
+		 */
+		variable_flash {
+			base-address = <0x0 0x01000000>;
+			pages-count = <0xC0>;
+			attributes = <0x3>;
+		};
+	};
+
+	memory-regions {
+		compatible = "arm,ffa-manifest-memory-regions";
+
+		/*
+		 * Memory shared between Normal world and S-EL0.
+		 * Similar to ARM_SP_IMAGE_NS_BUF_MMAP.
+		 */
+		hob_buffer {
+			/*
+			 * Description is needed for StMM to identify
+			 * ns-communication buffer.
+			 */
+			description = "hob-buffer";
+			base-address = <0x0 0x21fff000>;
+			pages-count = <0x1>;
+			attributes = <0x1>;
+		};
+
+		/*
+		 * Memory shared between EL3 and S-EL0.
+		 * Similar to ARM_SPM_BUF_EL0_MMAP.
+		 */
+		rx-tx-buffers {
+			description = "shared-buff";
+			base-address = <0x0 0x22000000>;
+			pages-count = <0x100>;
+			attributes = <0x3>;
+		};
+
+		/*
+		 * Heap used by SP to allocate memory for DMA.
+		 */
+		heap {
+			/*
+			 * Description is needed for StMM to identify
+			 * heap buffer.
+			 */
+			description = "heap";
+			base-address = <0x0 0x21000000>;
+			pages-count = <0xfff>;
+			attributes = <0x3>;
+		};
+
+		/*
+		 * Memory shared between Normal world and S-EL0.
+		 * Similar to ARM_SP_IMAGE_NS_BUF_MMAP.
+		 */
+		ns_comm_buffer {
+			/*
+			 * Description is needed for StMM to identify
+			 * ns-communication buffer.
+			 */
+			description = "ns-comm";
+			base-address = <0x00000100 0x7fe00000>;
+			pages-count = <0x30>;
+			attributes = <0xB>;
+		};
+	};
+};
