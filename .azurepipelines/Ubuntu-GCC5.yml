@@ -28,6 +28,7 @@ extends:
     do_pr_eval: true
     container_build: true
     os_type: Linux
+    rust_build: true
     extra_cargo_steps:
       - script: pip install -r pip-requirements.txt --upgrade
         displayName: Install and Upgrade pip Modules
@@ -42,7 +43,26 @@ extends:
         Pkgs: 'QemuPkg'
         Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
         ArchList: IA32,X64,AARCH64
+      TARGET_Q35:
+        Pkgs: 'QemuQ35Pkg'
+        Targets: 'NO-TARGET'
+        ArchList: IA32,X64
       TARGET_SBSA:
         Pkgs: 'QemuSbsaPkg'
         Targets: 'NO-TARGET'
         ArchList: AARCH64
+      TARGET_QEMU_ARM:
+        Pkgs: 'QemuPkg'
+        Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        ArchList: IA32,X64,AARCH64
+        SelfHostAgent: true
+      TARGET_Q35_ARM:
+        Pkgs: 'QemuQ35Pkg'
+        Targets: 'NO-TARGET'
+        ArchList: IA32,X64
+        SelfHostAgent: true
+      TARGET_SBSA_ARM:
+        Pkgs: 'QemuSbsaPkg'
+        Targets: 'NO-TARGET'
+        ArchList: AARCH64
+        SelfHostAgent: true

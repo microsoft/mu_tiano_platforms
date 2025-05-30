@@ -27,6 +27,7 @@ extends:
     do_non_ci_setup: true
     do_pr_eval: true
     os_type: Windows_NT
+    rust_build: true
     extra_cargo_steps:
       - script: pip install -r pip-requirements.txt --upgrade
         displayName: Install and Upgrade pip Modules
@@ -41,3 +42,17 @@ extends:
         Pkgs: 'QemuPkg'
         Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
         ArchList: IA32,X64,AARCH64
+      TARGET_Q35:
+        Pkgs: 'QemuQ35Pkg'
+        Targets: 'NO-TARGET'
+        ArchList: IA32,X64
+      TARGET_QEMU_ARM:
+        Pkgs: 'QemuPkg'
+        Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        ArchList: IA32,X64,AARCH64
+        SelfHostAgent: true
+      TARGET_Q35_ARM:
+        Pkgs: 'QemuQ35Pkg'
+        Targets: 'NO-TARGET'
+        ArchList: IA32,X64
+        SelfHostAgent: true
