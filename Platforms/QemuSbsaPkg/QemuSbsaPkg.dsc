@@ -75,16 +75,18 @@
   DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS  = TRUE
   DEFINE NETWORK_ISCSI_ENABLE            = FALSE
 
-  PEI_CRYPTO_SERVICES           = TINY_SHA
-  DXE_CRYPTO_SERVICES           = STANDARD
-  RUNTIMEDXE_CRYPTO_SERVICES    = NONE
-  STANDALONEMM_CRYPTO_SERVICES  = STANDARD
-  SMM_CRYPTO_SERVICES           = NONE
-  PEI_CRYPTO_ARCH               = AARCH64
-  DXE_CRYPTO_ARCH               = AARCH64
-  RUNTIMEDXE_CRYPTO_ARCH        = NONE
-  STANDALONEMM_CRYPTO_ARCH      = AARCH64
-  SMM_CRYPTO_ARCH               = NONE
+  PEI_CRYPTO_SERVICES                 = TINY_SHA
+  DXE_CRYPTO_SERVICES                 = STANDARD
+  RUNTIMEDXE_CRYPTO_SERVICES          = NONE
+  STANDALONEMM_CRYPTO_SERVICES        = STANDARD
+  STANDALONEMM_MMSUPV_CRYPTO_SERVICES = NONE
+  SMM_CRYPTO_SERVICES                 = NONE
+  PEI_CRYPTO_ARCH                     = AARCH64
+  DXE_CRYPTO_ARCH                     = AARCH64
+  RUNTIMEDXE_CRYPTO_ARCH              = NONE
+  STANDALONEMM_CRYPTO_ARCH            = AARCH64
+  STANDALONEMM_MMSUPV_CRYPTO_ARCH     = NONE
+  SMM_CRYPTO_ARCH                     = NONE
 
 !if $(NETWORK_SNP_ENABLE) == TRUE
   !error "NETWORK_SNP_ENABLE is IA32/X64/EBC only"
@@ -164,6 +166,7 @@
   ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
   ArmHvcLib|ArmPkg/Library/ArmHvcLib/ArmHvcLib.inf
   ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerVirtCounterLib/ArmGenericTimerVirtCounterLib.inf
+  ArmTransferListLib|ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
 
   PlatformPeiLib|QemuSbsaPkg/Library/PlatformPeiLib/PlatformPeiLib.inf
   MemoryInitPeiLib|ArmPlatformPkg/MemoryInitPei/MemoryInitPeiLib.inf
@@ -389,6 +392,10 @@
   TransportLogControlLib|DebuggerFeaturePkg/Library/TransportLogControlLibNull/TransportLogControlLibNull.inf
   ArmTransferListLib|ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
 
+  HobPrintLib|MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
+
+  MemoryBinOverrideLib|MdeModulePkg/Library/MemoryBinOverrideLibNull/MemoryBinOverrideLibNull.inf
+
 [LibraryClasses.common.SEC, LibraryClasses.common.PEI_CORE]
   NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
 
@@ -397,6 +404,9 @@
 
 [LibraryClasses.common.DXE_CORE, LibraryClasses.common.DXE_RUNTIME_DRIVER, LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.UEFI_APPLICATION]
   MsUiThemeLib|MsGraphicsPkg/Library/MsUiThemeLib/Dxe/MsUiThemeLib.inf
+  ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
+
+[LibraryClasses.common.DXE_RUNTIME_DRIVER, LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.UEFI_APPLICATION]
   ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
 
 [LibraryClasses.common.UEFI_APPLICATION]
@@ -491,7 +501,7 @@
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   ExtractGuidedSectionLib|StandaloneMmPkg/Library/StandaloneMmExtractGuidedSectionLib/StandaloneMmExtractGuidedSectionLib.inf
   FvLib|StandaloneMmPkg/Library/FvLib/FvLib.inf
-  HobLib|StandaloneMmPkg/Library/StandaloneMmCoreHobLib/StandaloneMmCoreHobLib.inf
+  HobLib|QemuSbsaPkg/Override/StandaloneMmPkg/Library/StandaloneMmCoreHobLib/StandaloneMmCoreHobLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmCoreMemoryAllocationLib/StandaloneMmCoreMemoryAllocationLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
@@ -524,7 +534,6 @@
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
   MemoryTypeInfoSecVarCheckLib|MdeModulePkg/Library/MemoryTypeInfoSecVarCheckLib/MemoryTypeInfoSecVarCheckLib.inf
   FltUsedLib|MdePkg/Library/FltUsedLib/FltUsedLib.inf
-  # SerialPortLib|ArmPlatformPkg/Library/ArmFfaConsoleLib/ArmFfaConsoleLib.inf
   ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaStandaloneMmLib.inf
 
 !if $(TPM2_ENABLE) == TRUE
@@ -621,6 +630,9 @@
   # ASSERT_BREAKPOINT_ENABLED  0x10
   # ASSERT_DEADLOOP_ENABLED    0x20
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
+  gArmTokenSpaceGuid.PcdFfaLibConduitSmc|TRUE
+
+  # Set to TRUE to enable the use of the Arm FFA Conduit SMC for non-MM modules
   gArmTokenSpaceGuid.PcdFfaLibConduitSmc|TRUE
 
 [PcdsFixedAtBuild.common]
@@ -1141,8 +1153,9 @@
   MsWheaPkg/MsWheaReport/Dxe/MsWheaReportDxe.inf
   MsCorePkg/MuVarPolicyFoundationDxe/MuVarPolicyFoundationDxe.inf
   MsCorePkg/AcpiRGRT/AcpiRgrt.inf
-  # MsCorePkg/HelloWorldRustDxe/HelloWorldRustDxe.inf
-
+!if $(BUILD_RUST_CODE) == TRUE
+  MsCorePkg/HelloWorldRustDxe/HelloWorldRustDxe.inf
+!endif
   MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
   SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
   AdvLoggerPkg/Application/AdvancedLogDumper/AdvancedLogDumper.inf
@@ -1242,7 +1255,9 @@
   #
   # HID Support
   #
-  # HidPkg/UefiHidDxe/UefiHidDxe.inf
+!if $(BUILD_RUST_CODE) == TRUE
+  HidPkg/UefiHidDxe/UefiHidDxe.inf
+!endif
 
   #
   # USB Support
@@ -1253,10 +1268,15 @@
   MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
-  # HidPkg/UsbHidDxe/UsbHidDxe.inf {
-  #   <LibraryClasses>
-  #     UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
-  # }
+
+!if $(BUILD_RUST_CODE) == TRUE
+  HidPkg/UsbHidDxe/UsbHidDxe.inf {
+    <LibraryClasses>
+      UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
+  }
+!else
+  MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.inf
+!endif
 
   #
   # TPM2 support

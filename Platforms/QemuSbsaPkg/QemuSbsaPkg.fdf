@@ -411,12 +411,16 @@ READ_LOCK_STATUS   = TRUE
   INF  MsWheaPkg/MsWheaReport/Dxe/MsWheaReportDxe.inf
   INF  MsCorePkg/MuVarPolicyFoundationDxe/MuVarPolicyFoundationDxe.inf
   INF  MsCorePkg/LoadOptionVariablePolicyDxe/LoadOptionVariablePolicyDxe.inf
-  # INF  HidPkg/UsbHidDxe/UsbHidDxe.inf
-  # INF  HidPkg/UefiHidDxe/UefiHidDxe.inf
+!if $(BUILD_RUST_CODE) == TRUE
+  INF  MsCorePkg/HelloWorldRustDxe/HelloWorldRustDxe.inf
+  INF  HidPkg/UsbHidDxe/UsbHidDxe.inf
+  INF  HidPkg/UefiHidDxe/UefiHidDxe.inf
+!else
+  INF  MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.inf
+!endif
   INF  MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
   INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
   INF  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
-  # INF  MsCorePkg/HelloWorldRustDxe/HelloWorldRustDxe.inf
   INF  AdvLoggerPkg/Application/AdvancedLogDumper/AdvancedLogDumper.inf
 
   #
