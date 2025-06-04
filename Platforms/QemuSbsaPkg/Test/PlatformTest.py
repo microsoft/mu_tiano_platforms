@@ -139,6 +139,7 @@ class TestManager(BuildSettingsManager, UefiBuilder):
                     .query(Inf.path, Source.path)
                     .join(Inf.sources)
                     .filter(Inf.module_type == "HOST_APPLICATION")
+                    .filter(Inf.library_class is None)
                     .all()
             )
             source_query = (
