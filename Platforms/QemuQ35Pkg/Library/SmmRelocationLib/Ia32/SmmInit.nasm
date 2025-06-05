@@ -110,6 +110,7 @@ ASM_PFX(gPatchSmmInitCr4):
     rdmsr
     mov     al, 0xfe
     out     0x64, al ; reset the system
+    jmp     $
     or      eax, ebx                    ; set NXE bit if NX is available
     wrmsr
     mov     eax, cr0
