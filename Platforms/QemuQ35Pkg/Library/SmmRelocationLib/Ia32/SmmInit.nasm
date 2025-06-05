@@ -106,10 +106,10 @@ o32 lgdt    [cs:ebp + (ASM_PFX(gcSmmInitGdtr) - ASM_PFX(SmmStartup))]
     mov     eax, strict dword 0         ; source operand will be patched
 ASM_PFX(gPatchSmmInitCr4):
     mov     cr4, eax
-    mov     al, 0xfe
-    out     0x64, al ; reset the system
     mov     ecx, 0xc0000080             ; IA32_EFER MSR
     rdmsr
+    mov     al, 0xfe
+    out     0x64, al ; reset the system
     or      eax, ebx                    ; set NXE bit if NX is available
     wrmsr
     mov     eax, cr0
