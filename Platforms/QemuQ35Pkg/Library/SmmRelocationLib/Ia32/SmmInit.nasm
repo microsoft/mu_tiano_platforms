@@ -119,6 +119,8 @@ ASM_PFX(gPatchSmmInitCr4):
 
 BITS 32
 @32bit:
+    mov     al, 0xfe
+    out     0x64, al ; reset the system
     mov     ds, edi
     mov     es, edi
     mov     fs, edi
