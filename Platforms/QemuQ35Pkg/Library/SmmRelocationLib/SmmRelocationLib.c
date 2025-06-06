@@ -11,7 +11,12 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+#include <PiPei.h>
+#include <IndustryStandard/PageTable.h>
 #include "InternalSmmRelocationLib.h"
+#include <Library/BaseLib.h>
+#include <Library/CpuPageTableLib.h>
+#include <Library/MpInitLib.h>
 
 UINTN  mMaxNumberOfCpus = 1;
 UINTN  mNumberOfCpus    = 1;
@@ -154,6 +159,91 @@ SmmInitHandler (
 }
 
 /**
+  Remove Nx protection for the range specific by BaseAddress and Length.
+
+  @param[in] BaseAddress  BaseAddress of the range.
+  @param[in] Length       Length of the range.
+**/
+VOID
+RemoveNxProtection (
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN                 Length
+  )
+{
+  EFI_STATUS                  Status;
+  UINTN                       PageTable;
+  EFI_PHYSICAL_ADDRESS        Buffer;
+  UINTN                       BufferSize;
+  IA32_MAP_ATTRIBUTE          MapAttribute;
+  IA32_MAP_ATTRIBUTE          MapMask;
+  PAGING_MODE                 PagingMode;
+  IA32_CR4                    Cr4;
+  BOOLEAN                     Page5LevelSupport;
+  UINT32                      RegEax;
+  BOOLEAN                     Page1GSupport;
+  CPUID_EXTENDED_CPU_SIG_EDX  RegEdx;
+
+  if (sizeof (UINTN) == sizeof (UINT64)) {
+    //
+    // Check Page5Level Support or not.
+    //
+    Cr4.UintN         = AsmReadCr4 ();
+    Page5LevelSupport = (Cr4.Bits.LA57 ? TRUE : FALSE);
+
+    //
+    // Check Page1G Support or not.
+    //
+    Page1GSupport = FALSE;
+    AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);
+    if (RegEax >= CPUID_EXTENDED_CPU_SIG) {
+      AsmCpuid (CPUID_EXTENDED_CPU_SIG, NULL, NULL, NULL, &RegEdx.Uint32);
+      if (RegEdx.Bits.Page1GB != 0) {
+        Page1GSupport = TRUE;
+      }
+    }
+
+    //
+    // Decide Paging Mode according Page5LevelSupport & Page1GSupport.
+    //
+    if (Page5LevelSupport) {
+      PagingMode = Page1GSupport ? Paging5Level1GB : Paging5Level;
+    } else {
+      PagingMode = Page1GSupport ? Paging4Level1GB : Paging4Level;
+    }
+  } else {
+    PagingMode = PagingPae;
+  }
+
+  MapAttribute.Uint64 = 0;
+  MapMask.Uint64      = 0;
+  MapMask.Bits.Nx     = 1;
+  PageTable           = AsmReadCr3 () & PAGING_4K_ADDRESS_MASK_64;
+  BufferSize          = 0;
+
+  //
+  // Get required buffer size for changing the pagetable.
+  //
+  Status = PageTableMap (&PageTable, PagingMode, 0, &BufferSize, BaseAddress, Length, &MapAttribute, &MapMask, NULL);
+  DEBUG ((DEBUG_INFO, "PageTableMap - Status: %r, BufferSize: 0x%x\n", Status, BufferSize));
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    //
+    // Allocate required Buffer.
+    //
+    Status = PeiServicesAllocatePages (
+               EfiBootServicesData,
+               EFI_SIZE_TO_PAGES (BufferSize),
+               &Buffer
+               );
+    ASSERT_EFI_ERROR (Status);
+    Status = PageTableMap (&PageTable, PagingMode, (VOID *)(UINTN)Buffer, &BufferSize, BaseAddress, Length, &MapAttribute, &MapMask, NULL);
+    DEBUG ((DEBUG_INFO, "PageTableMap - Status: %r, BufferSize: 0x%x\n", Status, BufferSize));
+  }
+
+  ASSERT_EFI_ERROR (Status);
+  AsmWriteCr3 (PageTable);
+}
+extern VOID *SmmStartup;
+/**
   Relocate SmmBases for each processor.
 
   @param[in]   MpServices2         Pointer to this instance of the MpServices.
@@ -204,6 +294,8 @@ SmmRelocateBases (
   // Load image for relocation
   //
   CopyMem (U8Ptr, gcSmmInitTemplate, gcSmmInitSize);
+
+  RemoveNxProtection ((EFI_PHYSICAL_ADDRESS)((UINTN)SmmStartup & ~(EFI_PAGE_SIZE - 1)), EFI_PAGE_SIZE * 2);
 
   //
   // Retrieve the local APIC ID of current processor

@@ -37,6 +37,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
+  QemuQ35Pkg/QemuQ35Pkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -48,6 +49,7 @@
   MemoryAllocationLib
   PcdLib
   PeiServicesLib
+  CpuPageTableLib
 
 [Guids]
   gSmmBaseHobGuid                               ## HOB ALWAYS_PRODUCED
