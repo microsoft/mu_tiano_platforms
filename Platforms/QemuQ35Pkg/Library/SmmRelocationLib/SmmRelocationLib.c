@@ -206,6 +206,8 @@ SmmRelocateBases (
   //
   CopyMem (U8Ptr, gcSmmInitTemplate, gcSmmInitSize);
 
+  // RemoveNxProtection ((EFI_PHYSICAL_ADDRESS)((UINTN)SmmStartup & ~(EFI_PAGE_SIZE - 1)), EFI_PAGE_SIZE * 2);
+
   //
   // Retrieve the local APIC ID of current processor
   //
