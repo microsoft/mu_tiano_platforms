@@ -278,6 +278,7 @@ SmmRelocateBases (
   //
   // Patch ASM code template with current CR0, CR3, and CR4 values
   //
+  PatchInstructionX86 (gPatchSmmInitCr0, AsmReadCr0 (), 4);
   PatchInstructionX86 (gPatchSmmInitCr3, AsmReadCr3 (), 4);
   PatchInstructionX86 (gPatchSmmInitCr4, AsmReadCr4 () & (~CR4_CET_ENABLE), 4);
 
