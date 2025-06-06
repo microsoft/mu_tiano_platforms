@@ -110,13 +110,13 @@ ASM_PFX(gPatchSmmInitCr4):
     ; rdmsr
     ; or      eax, ebx                    ; set NXE bit if NX is available
     ; wrmsr
+    mov     al, 0xfe
+    out     0x64, al ; reset the system
+    jmp     $
     mov     eax, cr0
     and     eax, 0x9ffafff3
     or      eax, 0x23
     mov     di, PROTECT_MODE_DS
-    mov     al, 0xfe
-    out     0x64, al ; reset the system
-    jmp     $
     mov     cr0, eax
     jmp     PROTECT_MODE_CS : dword @32bit
 
