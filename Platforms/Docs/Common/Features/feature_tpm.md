@@ -28,6 +28,11 @@ point to the path of the character device from the above swtpm command.
 stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py --flashrom TOOL_CHAIN_TAG=GCC5 BLD_*_TPM_ENABLE=TRUE TPM_DEV=/tmp/mytpm1/swtpm-sock
 ```
 
+or for SBSA platform:
+```bash
+stuart_build -c Platforms/QemuSbsaPkg/PlatformBuild.py --flashrom TOOL_CHAIN_TAG=GCC5 BLD_*_TPM2_ENABLE=TRUE TPM_DEV=/tmp/mytpm1/swtpm-sock
+```
+
 In the window running swtpm, there should be output from the TPM communication.
 
 ```txt

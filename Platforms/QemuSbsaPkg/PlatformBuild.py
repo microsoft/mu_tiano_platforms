@@ -7,10 +7,13 @@
 import datetime
 import logging
 import os
+import sys
 from typing import Tuple
 import uuid
 from io import StringIO
 from pathlib import Path
+import json
+import shutil
 
 from edk2toolext.environment import shell_environment
 from edk2toolext.environment.uefi_build import UefiBuilder
@@ -23,6 +26,8 @@ from edk2toolext.invocables.edk2_parse import ParseSettingsManager
 from edk2toollib.utility_functions import RunCmd
 from edk2toollib.windows.locate_tools import QueryVcVariables
 from edk2toollib.utility_functions import GetHostInfo
+
+cached_enivron = os.environ.copy()
 
 # Declare test whose failure will not return a non-zero exit code
 FAILURE_EXEMPT_TESTS = {
@@ -55,7 +60,8 @@ class CommonPlatform():
         "Silicon/Arm/TFA",
         "Features/DEBUGGER",
         "Features/DFCI",
-        "Features/CONFIG"
+        "Features/CONFIG",
+        "Features/FFA",
     )
 
     @staticmethod
@@ -118,9 +124,11 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
             RequiredSubmodule("Common/MU_OEM_SAMPLE", True),
             RequiredSubmodule("Silicon/Arm/MU_TIANO", True),
             RequiredSubmodule("Silicon/Arm/TFA", True),
+            RequiredSubmodule("Silicon/Arm/HAF", True),
             RequiredSubmodule("Features/DEBUGGER", True),
             RequiredSubmodule("Features/DFCI", True),
             RequiredSubmodule("Features/CONFIG", True),
+            RequiredSubmodule("Features/FFA", True),
         ]
 
     def SetArchitectures(self, list_of_requested_architectures):
@@ -243,6 +251,11 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         args = "distclean"
         RunCmd(cmd, args, workingdir=self.env.GetValue("ARM_TFA_PATH"))
 
+        # Also for the hafnium, do not check for the return code as it is not a fatal error
+        cmd = "make"
+        args = "clean"
+        RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_HAF_PATH"))
+
         return super().CleanTree(RemoveConfTemplateFilesToo)
 
     def GetWorkspaceRoot(self):
@@ -310,6 +323,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         self.env.SetValue("BUILDREPORTING", "TRUE", "Enabling build report")
         self.env.SetValue("BUILDREPORT_TYPES", "PCD DEPEX FLASH BUILD_FLAGS LIBRARY FIXED_ADDRESS HASH", "Setting build report types")
         self.env.SetValue("ARM_TFA_PATH", os.path.join (self.GetWorkspaceRoot (), "Silicon/Arm/TFA"), "Platform hardcoded")
+        self.env.SetValue("ARM_HAF_PATH", os.path.join (self.GetWorkspaceRoot (), "Silicon/Arm/HAF"), "Platform hardcoded")
         self.env.SetValue("BLD_*_QEMU_CORE_NUM", "4", "Default")
         self.env.SetValue("BLD_*_MEMORY_PROTECTION", "TRUE", "Default")
         # Include the MFCI test cert by default, override on the commandline with "BLD_*_SHIP_MODE=TRUE" if you want the retail MFCI cert
@@ -333,9 +347,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         return 0
 
-    def PlatformPreBuild(self):
-        return 0
-
     #
     # Copy a file into the designated region of target FD.
     #
@@ -353,8 +364,26 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         return 0
 
     def PlatformPostBuild(self):
+        src_dir = os.path.join(self.GetWorkspaceRoot (), "Platforms/QemuSbsaPkg/mu")
+        dest_dir = os.path.join(self.GetWorkspaceRoot (), "Silicon/Arm/HAF/project/mu")
+
+        # Remove the directory if it exists
+        if os.path.exists(dest_dir):
+            shutil.rmtree(dest_dir)
+
+        # Copy the mu directory and its contents
+        logging.info("Copying mu directory to Silicon/Arm/HAF/project")
+        shutil.copytree(src_dir, dest_dir)
+
         # Add a post build step to build BL31 and assemble the FD files
         op_fv = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
+
+        logging.info("Building Hafnium")
+        cmd = "make"
+        args = "PROJECT=mu PLATFORM=secure_qemu_aarch64"
+        ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_HAF_PATH"))
+        if ret != 0:
+            return ret
 
         logging.info("Building TF-A")
 
@@ -381,6 +410,53 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             else:
                 clang_exe = "clang"
 
+        # Specify the filename
+        filename = os.path.join(self.env.GetValue('BUILD_OUTPUT_BASE'), 'sp_layout.json')
+
+        # Writing JSON data
+        with open(filename, 'w') as f:
+            data = {
+                "stmm": {
+                    "image": {
+                        "file": os.path.join(self.env.GetValue('BUILD_OUTPUT_BASE'), 'FV', 'BL32_AP_MM.fd'),
+                        "offset": "0x2000"
+                    },
+                    "pm": {
+                        "file": os.path.join(os.path.dirname(__file__), "fdts/qemu_sbsa_stmm_config.dts"),
+                        "offset": "0x1000"
+                    },
+                    "package": "tl_pkg",
+                    "uuid": "eaba83d8-baaf-4eaf-8144-f7fdcbe544a7",
+                    "owner": "Plat",
+                    "size": "0x300000"
+                },
+                "mssp": {
+                    "image": {
+                        "file": os.path.join(self.env.GetValue('BUILD_OUTPUT_BASE'), 'FV', 'BL32_AP_MM_SP1.fd'),
+                        "offset": "0x10000"
+                    },
+                    "pm": {
+                        "file": os.path.join(os.path.dirname(__file__), "fdts/qemu_sbsa_mssp_config.dts"),
+                        "offset": "0x1000"
+                    },
+                    "uuid": "b8bcbd0c-8e8f-4ebe-99eb-3cbbdd0cd412",
+                    "owner": "Plat"
+                }
+            }
+            json.dump(data, f, indent=4)
+
+        # This is an unorthodox build, as TF-A uses poetry to manage dependencies and build the firmware.
+        # First, we need to know what the name of the virtual environment is.
+        # This is stored in the poetry.lock file in the root of the TF-A directory.
+        virtual_env = ""
+        if sys.base_prefix != sys.prefix:
+            # If we are in a virtual environment, we need to activate it before we can build the firmware.
+            virtual_env = os.path.join(sys.prefix, "bin", "activate")
+            if not os.path.exists(virtual_env):
+                logging.error("Virtual environment not found")
+                return -1
+
+        # Second, put together the command to build the firmware.
         cmd = "make"
         if self.env.GetValue("TOOL_CHAIN_TAG") == "CLANGPDB":
             args = "CC="+clang_exe
@@ -393,14 +469,53 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         args += " PLAT=" + self.env.GetValue("QEMU_PLATFORM").lower()
         args += " ARCH=" + self.env.GetValue("TARGET_ARCH").lower()
         args += " DEBUG=" + str(1 if self.env.GetValue("TARGET").lower() == 'debug' else 0)
-        args += " SPM_MM=1 EL3_EXCEPTION_HANDLING=1 ENABLE_SME_FOR_NS=0 ENABLE_SVE_FOR_NS=0"
+        args += " ENABLE_SME_FOR_SWD=1 ENABLE_SVE_FOR_SWD=1 ENABLE_SME_FOR_NS=1 ENABLE_SVE_FOR_NS=1"
+        args += f" SPD=spmd SPMD_SPM_AT_SEL2=1 SP_LAYOUT_FILE={filename}"
         args += " ENABLE_FEAT_HCX=1 HOB_LIST=1 TRANSFER_LIST=1 LOG_LEVEL=40" # Features used by hypervisor
         # args += " FEATURE_DETECTION=1" # Enforces support for features enabled.
-        args += " BL32=" + os.path.join(op_fv, "BL32_AP_MM.fd")
+        args += f" BL32={os.path.join(self.env.GetValue('ARM_HAF_PATH'), 'out/mu/secure_qemu_aarch64_clang', 'hafnium.bin')}"
         args += " all fip"
-        ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_TFA_PATH"))
+
+        # Third, write a temp bash file to activate the virtual environment and build the firmware.
+        temp_bash = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "temp.sh")
+        with open(temp_bash, "w") as f:
+            f.write("#!/bin/bash\n")
+            f.write("poetry --verbose install\n")
+            f.write("poetry env activate\n")
+            f.write("poetry show\n")
+            f.write("pip3 install fdt\n") # why is this still needed?
+            f.write(f"{cmd} {args}\n")
+
+        # Grab the current head to restore from patches later.
+        patch_tfa = (self.env.GetValue("PATCH_TFA", "TRUE").upper() == "TRUE")
+        if patch_tfa:
+            outstream = StringIO()
+            ret = RunCmd("git", "rev-parse HEAD", outstream=outstream, workingdir=self.env.GetValue("ARM_TFA_PATH"))
+            if ret != 0:
+                logging.error("Failed to get git HEAD for TFA")
+                return ret
+            arm_tfa_git_head = outstream.getvalue().strip()
+            logging.info(f"TFA HEAD: {arm_tfa_git_head}")
+
+            patches = os.path.join(self.GetWorkspaceRoot(), "Platforms/QemuSbsaPkg/tfa_patches/*.patch")
+            # Log the patch files for debugging
+            ret = RunCmd("git", f"am {patches}", workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
+            if ret != 0:
+                return ret
+
+        # Fifth, run the temp bash file to build the firmware.
+        ret = RunCmd("bash", temp_bash, workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
+        if patch_tfa:
+            # Always revert before returning
+            revert_ret = RunCmd(f"git", f"checkout {arm_tfa_git_head}", workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
+            if revert_ret != 0:
+                return revert_ret
+
         if ret != 0:
             return ret
+
+        # Fourth, remove the temp bash file, if succeeded.
+        os.remove(temp_bash)
 
         # Revert the build vars to the original state
         shell_environment.RevertBuildVars()

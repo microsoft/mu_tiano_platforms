@@ -21,7 +21,7 @@
 [submodule "Silicon/Arm/TFA"]
 	path = Silicon/Arm/TFA
 	url = https://github.com/ARM-software/arm-trusted-firmware.git
-	branch = v2.13.0-rc
+	branch = v2.13-rc0
 [submodule "Features/DFCI"]
 	path = Features/DFCI
 	url = https://github.com/microsoft/mu_feature_dfci
@@ -35,3 +35,9 @@
 [submodule "Features/DEBUGGER"]
 	path = Features/DEBUGGER
 	url = https://github.com/microsoft/mu_feature_debugger.git
+[submodule "Silicon/Arm/HAF"]
+	path = Silicon/Arm/HAF
+	url = https://github.com/TF-Hafnium/hafnium.git
+[submodule "Features/FFA"]
+	path = Features/FFA
+	url = https://github.com/microsoft/mu_feature_ffa.git

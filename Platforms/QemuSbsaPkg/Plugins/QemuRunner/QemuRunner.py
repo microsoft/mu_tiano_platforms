@@ -11,6 +11,7 @@ import io
 import os
 import re
 import datetime
+import threading
 from pathlib import Path
 from edk2toolext.environment.plugintypes import uefi_helper_plugin
 from edk2toollib import utility_functions
@@ -41,6 +42,24 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         ver_str = re.search(r'version\s*([\d.]+)', res).group(1)
 
         return ver_str.split('.')
+
+
+    @staticmethod
+    def RunThread(env):
+        ''' Runs TPM in a separate thread '''
+        tpm_path = env.GetValue("TPM_DEV")
+        if tpm_path is None:
+            logging.critical("TPM Path Invalid")
+            return
+
+        tpm_cmd = "swtpm"
+        tpm_args = f"socket --tpmstate dir={"/".join(tpm_path.rsplit("/", 1)[:-1])} --ctrl type=unixio,path={tpm_path} --tpm2 --log level=20"
+
+        # Start the TPM emulator in a separate thread
+        ret = utility_functions.RunCmd(tpm_cmd, tpm_args)
+        if ret != 0:
+            logging.critical("Failed to start TPM emulator.")
+            return
 
 
     @staticmethod
@@ -92,13 +111,12 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         else:
             logging.critical("Virtual Drive Path Invalid")
 
-        if path_to_os is not None:
-            args += " -m 8192"
-        else:
-            args += " -m 2048"
+        # TODO: Set the memory size to be 2GB regardless. Not sure why 8GB does
+        # not work.
+        args += " -m 2048"
 
         args += " -machine sbsa-ref" #,accel=(tcg|kvm)"
-        args += " -cpu max,sve=off,sme=off"
+        args += " -cpu max"
         if env.GetBuildValue ("QEMU_CORE_NUM") is not None:
           args += " -smp " + env.GetBuildValue ("QEMU_CORE_NUM")
         args += " -global driver=cfi.pflash01,property=secure,value=on"
@@ -108,6 +126,17 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         code_fd = os.path.join(OutputPath_FV, "QEMU_EFI.fd")
         args += " -drive if=pflash,format=raw,unit=1,file=" + \
                 code_fd + ",readonly=on"
+
+        tpm_dev = env.GetValue("TPM_DEV")
+        thread = None
+        if tpm_dev is not None:
+            args += f" -chardev socket,id=chrtpm,path={tpm_dev}"
+            args += " -tpmdev emulator,id=tpm0,chardev=chrtpm"
+
+            # also spawn the TPM emulator on a different thread
+            logging.critical("Starting TPM emulator in a different thread.")
+            thread = threading.Thread(target=QemuRunner.RunThread, args=(env,))
+            thread.start()
 
         # Add XHCI USB controller and mouse
         args += " -device qemu-xhci,id=usb"
@@ -138,6 +167,8 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         else:
             # write messages to stdio
             args += " -serial stdio"
+            args += " -serial file:secure.log"
+            args += " -serial file:secure_mm.log"
 
         # Connect the debug monitor to a telnet localhost port
         monitor_port = env.GetValue("MONITOR_PORT")
@@ -172,5 +203,9 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         elif os.name != 'nt':
             # Linux version of QEMU will mess with the print if its run failed, let's just restore it anyway
             utility_functions.RunCmd('stty', 'sane', capture=False)
+
+        if thread is not None:
+            logging.critical("Terminate TPM emulator by using Crtl + C now!")
+            thread.join()
 
         return ret
