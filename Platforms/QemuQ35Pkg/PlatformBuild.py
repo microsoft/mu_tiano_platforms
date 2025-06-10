@@ -129,14 +129,14 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
             If no RequiredSubmodules return an empty iterable
         """
         return [
-            RequiredSubmodule("MU_BASECORE", True),
-            RequiredSubmodule("Common/MU", True),
-            RequiredSubmodule("Common/MU_TIANO", True),
-            RequiredSubmodule("Common/MU_OEM_SAMPLE", True),
-            RequiredSubmodule("Features/DEBUGGER", True),
-            RequiredSubmodule("Features/DFCI", True),
-            RequiredSubmodule("Features/CONFIG", True),
-            RequiredSubmodule("Features/MM_SUPV", True),
+            RequiredSubmodule("MU_BASECORE", False, ".pytool/CISettings.py"),
+            RequiredSubmodule("Common/MU", False, ".pytool/CISettings.py"),
+            RequiredSubmodule("Common/MU_TIANO", False, ".pytool/CISettings.py"),
+            RequiredSubmodule("Common/MU_OEM_SAMPLE", False, ".pytool/CISettings.py"),
+            RequiredSubmodule("Features/DEBUGGER", False, ".pytool/CISettings.py"),
+            RequiredSubmodule("Features/DFCI", False, ".pytool/CISettings.py"),
+            RequiredSubmodule("Features/CONFIG", False, ".pytool/CISettings.py"),
+            RequiredSubmodule("Features/MM_SUPV", False, ".pytool/CISettings.py"),
         ]
 
     def SetArchitectures(self, list_of_requested_architectures):
