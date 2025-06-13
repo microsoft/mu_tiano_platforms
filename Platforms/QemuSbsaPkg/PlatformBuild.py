@@ -483,7 +483,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             f.write("poetry --verbose install\n")
             f.write("poetry env activate\n")
             f.write("poetry show\n")
-            f.write("pip3 install fdt\n") # why is this still needed?
             f.write(f"{cmd} {args}\n")
 
         # Grab the current head to restore from patches later.
