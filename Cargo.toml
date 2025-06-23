@@ -19,7 +19,7 @@ hidparser = {version = "1.0"}
 memoffset = "0.9.1"
 num-traits = { version = "0.2", default-features = false}
 num-derive = { version = "0.4", default-features = false}
-r-efi = "5.2.0"
+r-efi = "5.3.0"
 scroll = { version = "0.11", default-features = false, features = ["derive"]}
 rustversion = "1.0.21"
 spin = "0.5.2"
