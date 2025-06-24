@@ -52,6 +52,11 @@ On most Linux distros this requires an extra step for mono and nuget support.
     - `TOOL_CHAIN_TAG` being the toolchain you want to build with, currently `VS2019`, `VS2022`, and `GCC5` are
       supported values. Q35 can be built with `GCC5`, `VS2019`, and `VS2022` toolchains. SBSA can be built with
       `GCC5`.
+    - NOTE: Building with GCC5 targeting AARCH64 requires the setup to export `GCC5_AARCH64_PREFIX`.
+      `GCC5_AARCH64_PREFIX` should contain the path and the prefix to the gcc/objcopy tools, and needs to
+      match the tool chain that is being used by the platform. The below example is for the gcc-aarch64-linux-gnu
+      tool chain, but other tool chains can be used.
+      As an example, `export GCC5_AARCH64_PREFIX=/usr/bin/aarch64-linux-gnu-`
 
 5. Initialize & Update Dependencies - only as needed when ext_deps change
 
@@ -97,6 +102,7 @@ On most Linux distros this requires an extra step for mono and nuget support.
     - Under the hood, it just does the invocation of Stuart for you.
 
 ### Notes
+
 1. QEMU is provided on windows via an external dependency located at QemuPkg/Binaries; Qemu must be manually downloaded
    on linux.
 2. QEMU for linux requires at least **version 9.0.2** when booting an operating system; if you are only booting to
