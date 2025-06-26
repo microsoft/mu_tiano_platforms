@@ -722,9 +722,6 @@
   #
   gArmTokenSpaceGuid.PcdMmBufferSize|0x200000
 
-  # FFA 18 Register Support
-  gArmTokenSpaceGuid.PcdSxcUse18Registers|TRUE
-
   #
   # PLDA PCI Root Complex
   #
