@@ -518,7 +518,6 @@ READ_LOCK_STATUS   = TRUE
 
 !if $(TPM2_ENABLE) == TRUE
   INF MdeModulePkg/Universal/ResetSystemPei/ResetSystemPei.inf
-  INF QemuPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
   INF SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
 !endif
 
@@ -552,6 +551,9 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStandaloneMm.inf
   INF QemuSbsaPkg/VirtNorFlashStandaloneMm/VirtNorFlashStandaloneMm.inf
   INF ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
+!if $(TPM2_ENABLE) == TRUE
+  INF SecurityPkg/Tcg/Tcg2StandaloneMmArm/Tcg2StandaloneMmArm.inf
+!endif
 
 [FV.FV_STANDALONE_MM_SECURE_PARTITION1]
 FvAlignment        = 16
