@@ -1442,11 +1442,13 @@
       gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60040000
       gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
   }
+!if $(TPM2_ENABLE) == TRUE
   SecurityPkg/Tcg/Tcg2StandaloneMmArm/Tcg2StandaloneMmArm.inf {
     <PcdsFixedAtBuild>
       gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60040000
       gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
   }
+!endif
   QemuSbsaPkg/VirtNorFlashStandaloneMm/VirtNorFlashStandaloneMm.inf {
     <PcdsFixedAtBuild>
       gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60040000
