@@ -8,7 +8,7 @@
 	branch = dev/202502
 [submodule "Common/MU"]
 	path = Common/MU
-	url = https://github.com/microsoft/mu_plus.git
+	url = https://github.com/os-d/mu_plus.git
 	branch = dev/202502
 [submodule "Common/MU_OEM_SAMPLE"]
 	path = Common/MU_OEM_SAMPLE
