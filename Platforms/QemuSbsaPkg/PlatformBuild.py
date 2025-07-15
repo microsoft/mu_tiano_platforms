@@ -432,8 +432,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                 },
                 "mssp": {
                     "image": {
-                        "file": os.path.join(self.env.GetValue('BUILD_OUTPUT_BASE'), 'FV', 'BL32_AP_MM_SP1.fd'),
-                        "offset": "0x10000"
+                        "file": os.path.join(self.GetWorkspaceRoot(), 'target/aarch64-unknown-none/debug/msft-sp.bin'),
+                        "offset": "0x2000"
                     },
                     "pm": {
                         "file": os.path.join(os.path.dirname(__file__), "fdts/qemu_sbsa_mssp_config.dts"),

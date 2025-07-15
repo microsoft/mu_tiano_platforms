@@ -31,9 +31,9 @@ DEFINE FVMAIN_COMPACT_SIZE  = 0x2ff000
   DEFINE SECURE_FLASH_REGION_BL1_SIZE                                 = 0x00012000
 #===================================================================================
   DEFINE SECURE_FLASH_REGION_FIP_OFFSET                               = 0x00012000
-  DEFINE SECURE_FLASH_REGION_FIP_SIZE                                 = 0x00300000
+  DEFINE SECURE_FLASH_REGION_FIP_SIZE                                 = 0x003EE000
 #===================================================================================
-  # Unused bytes offset                                                 0x00312000
+  # Unused bytes offset                                                 0x00400000
   # Unused bytes size                                                   0x00CEE000
 #===================================================================================
   DEFINE SECURE_FLASH_NVSTORAGE_OFFSET                                = 0x01000000
@@ -154,15 +154,15 @@ gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = FV_STANDALONE_MM_COMPACT
 
 [FD.BL32_AP_MM_SP1]
-BaseAddress   = 0x20410000|gArmTokenSpaceGuid.PcdFdBaseAddress  # UEFI in DRAM + 128MB.
-Size          = 0x00014000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the device (64MiB).
+BaseAddress   = 0x20400000|gArmTokenSpaceGuid.PcdFdBaseAddress  # UEFI in DRAM + 128MB.
+Size          = 0x00060000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the device (64MiB).
 ErasePolarity = 1
 
 BlockSize     = 0x00001000
-NumBlocks     = 0x00014
+NumBlocks     = 0x00060
 
-0x00000000|0x00014000
-FV = FV_STANDALONE_MM_SECURE_PARTITION1
+0x00000000|0x00060000
+# Placeholder only
 
 [FD.QEMU_EFI]
 BaseAddress   = 0x10000000|gArmTokenSpaceGuid.PcdFdBaseAddress
@@ -553,25 +553,26 @@ READ_LOCK_STATUS   = TRUE
   INF QemuSbsaPkg/VirtNorFlashStandaloneMm/VirtNorFlashStandaloneMm.inf
   INF ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
 
-[FV.FV_STANDALONE_MM_SECURE_PARTITION1]
-FvAlignment        = 16
-ERASE_POLARITY     = 1
-MEMORY_MAPPED      = TRUE
-STICKY_WRITE       = TRUE
-LOCK_CAP           = TRUE
-LOCK_STATUS        = TRUE
-WRITE_DISABLED_CAP = TRUE
-WRITE_ENABLED_CAP  = TRUE
-WRITE_STATUS       = TRUE
-WRITE_LOCK_CAP     = TRUE
-WRITE_LOCK_STATUS  = TRUE
-READ_DISABLED_CAP  = TRUE
-READ_ENABLED_CAP   = TRUE
-READ_STATUS        = TRUE
-READ_LOCK_CAP      = TRUE
-READ_LOCK_STATUS   = TRUE
+# [FV.FV_STANDALONE_MM_SECURE_PARTITION1]
+# FvAlignment        = 16
+# ERASE_POLARITY     = 1
+# MEMORY_MAPPED      = TRUE
+# STICKY_WRITE       = TRUE
+# LOCK_CAP           = TRUE
+# LOCK_STATUS        = TRUE
+# WRITE_DISABLED_CAP = TRUE
+# WRITE_ENABLED_CAP  = TRUE
+# WRITE_STATUS       = TRUE
+# WRITE_LOCK_CAP     = TRUE
+# WRITE_LOCK_STATUS  = TRUE
+# READ_DISABLED_CAP  = TRUE
+# READ_ENABLED_CAP   = TRUE
+# READ_STATUS        = TRUE
+# READ_LOCK_CAP      = TRUE
+# READ_LOCK_STATUS   = TRUE
 
-  INF FfaFeaturePkg/SecurePartitions/MsSecurePartition/MsSecurePartition.inf
+#   INF FfaFeaturePkg/SecurePartitions/MsSecurePartition/MsSecurePartition.inf
+#   INF FfaFeaturePkg/SecurePartitions/MsSecurePartitionRust/MsSecurePartitionRust.inf
 
 ################################################################################
 #

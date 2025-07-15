@@ -1454,6 +1454,7 @@
   FfaFeaturePkg/Applications/FfaPartitionTest/FfaPartitionTestApp.inf
 
   # Test secure partition
+  # FfaFeaturePkg/SecurePartitions/MsSecurePartitionRust/MsSecurePartitionRust.inf
   FfaFeaturePkg/SecurePartitions/MsSecurePartition/MsSecurePartition.inf {
     <LibraryClasses>
       NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
