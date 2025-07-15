@@ -142,6 +142,16 @@ index 000000000..3c0187cfa
 +    device_type = "device-memory"; /* External CRB */
 +    reg = <0x00000000 0x60120000 0x0 0x00010000>;
 +  };
++
++  memory@10 {
++    device_type = "memory"; /* External CRB */
++    reg = <0x00000100 0x60000000 0x0 0x00002000>;
++  };
++
++  memory@11 {
++    device_type = "memory"; /* External CRB */
++    reg = <0x00000100 0x600A0000 0x0 0x00002000>;
++  };
 +};
 diff --git a/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_tb_fw_config.dts b/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_tb_fw_config.dts
 new file mode 100644
