@@ -3,8 +3,7 @@ resolver = "2"
 
 # Add packages that generate binaries here
 members = [
-  "Common/MU/HidPkg/UefiHidDxe",
-  "Common/MU/MsCorePkg/HelloWorldRustDxe"
+  "Features/FFA/FfaFeaturePkg/SecurePartitions/MsSecurePartitionRust",
 ]
 
 # Add packages that generate libraries here
@@ -23,6 +22,37 @@ r-efi = "5.2.0"
 scroll = { version = "0.11", default-features = false, features = ["derive"]}
 rustversion = "1.0.21"
 spin = "0.5.2"
+
+aarch64-cpu = "10.0.0"
+aarch64-paging = { version = "0.8.1", default-features = false }
+aarch64-rt = { version = "0.1.0", default-features = false, features = [
+    "el1",
+    "exceptions",
+] }
+bit-register = { git = "https://github.com/OpenDevicePartnership/odp-utilities", rev = "2f79d238" }
+critical-section = { version = "1.1.0", default-features = false }
+debug-non-default = { git = "https://github.com/OpenDevicePartnership/odp-utilities", rev = "2f79d238" }
+ec-service-lib = { git = "https://github.com/OpenDevicePartnership/haf-ec-service" }
+embassy-aarch64-haf = { git = "https://github.com/OpenDevicePartnership/haf-ec-service" }
+embassy-executor = { git = "https://github.com/embassy-rs/embassy" }
+embassy-futures = { git = "https://github.com/embassy-rs/embassy" }
+embassy-hal-internal = { git = "https://github.com/embassy-rs/embassy" }
+embassy-sync = { git = "https://github.com/embassy-rs/embassy" }
+embassy-time = { git = "https://github.com/embassy-rs/embassy" }
+embassy-time-driver = { git = "https://github.com/embassy-rs/embassy" }
+embassy-time-queue-utils = { git = "https://github.com/embassy-rs/embassy" }
+embedded-hal = { git = "https://github.com/rust-embedded/embedded-hal" }
+odp-ffa = { git = "https://github.com/OpenDevicePartnership/haf-ec-service" }
+hafnium = { git = "https://github.com/OpenDevicePartnership/haf-ec-service" }
+test-service-lib = { path = "Features/FFA/FfaFeaturePkg/Library/TestServiceLib" }
+user-sp-entry-lib = { path = "Features/FFA/FfaFeaturePkg/Library/SecurePartitionEntryPoint" }
+heapless = "0.8.0"
+log = { version = "0.4", default-features = false }
+mockall = "0.13.1"
+num_enum = { version = "0.7.3", default-features = false }
+subenum = { version = "1.1.2", default-features = false }
+uuid = { version = "1.0", default-features = false, features = ["v1"] }
+rstest = "0.25.0"
 
 # By default, the dev profile is used. The default build settings for the dev profile are documented here:
 # https://doc.rust-lang.org/cargo/reference/profiles.html#dev
@@ -45,3 +75,9 @@ spin = "0.5.2"
 # that needs to be debugged.
 [profile.dev.package."*"]
 opt-level = 3
+
+[patch."https://github.com/OpenDevicePartnership/haf-ec-service"]
+ec-service-lib = { path = "/mnt/d/Repos/haf-ec-service/ec-service-lib" }
+embassy-aarch64-haf = { path = "/mnt/d/Repos/haf-ec-service/embassy-aarch64-haf" }
+odp-ffa = { path = "/mnt/d/Repos/haf-ec-service/odp-ffa" }
+hafnium = { path = "/mnt/d/Repos/haf-ec-service/hafnium" }
