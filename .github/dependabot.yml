@@ -87,6 +87,8 @@ updates:
       - dependency-name: "MU_BASECORE"
       - dependency-name: "Silicon/Arm/MU_TIANO"
       - dependency-name: "Silicon/Intel/MU_TIANO"
+      - dependency-name: "Silicon/Arm/HAF"
+      - dependency-name: "Silicon/Arm/TFA"
 
   - package-ecosystem: "pip"
     directory: "/"
