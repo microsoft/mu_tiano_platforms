@@ -140,7 +140,7 @@
   gEfiPeiMasterBootModePpiGuid
   gEfiPeiMpServicesPpiGuid
   gEfiPeiReadOnlyVariable2PpiGuid
-  gEdkiiPeiMpServices2PpiGuid
+  gEfiPeiMpServices2PpiGuid
 
 [Depex]
   TRUE
