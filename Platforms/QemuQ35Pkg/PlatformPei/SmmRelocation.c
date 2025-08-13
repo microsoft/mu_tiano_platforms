@@ -57,8 +57,8 @@ OnMpServices2Available (
 STATIC CONST EFI_PEI_NOTIFY_DESCRIPTOR  mMpServices2Notify = {
   EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK |   // Flags
   EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
-  &gEdkiiPeiMpServices2PpiGuid,              // Guid
-  OnMpServices2Available                     // Notify
+  &gEfiPeiMpServices2PpiGuid,              // Guid
+  OnMpServices2Available                   // Notify
 };
 
 VOID
@@ -70,7 +70,7 @@ RelocateSmBase (
   EDKII_PEI_MP_SERVICES2_PPI  *PeiMpServicesPpi = NULL;
 
   Status = PeiServicesLocatePpi (
-             &gEdkiiPeiMpServices2PpiGuid,
+             &gEfiPeiMpServices2PpiGuid,
              0,
              NULL,
              (VOID **)&PeiMpServicesPpi
