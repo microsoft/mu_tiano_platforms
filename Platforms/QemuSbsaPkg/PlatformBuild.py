@@ -514,7 +514,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         # Grab the current head to restore from patches later.
         patch_tfa = (self.env.GetValue("PATCH_TFA", "TRUE").upper() == "TRUE")
-        patch_tfa = False
         if patch_tfa:
             outstream = StringIO()
             ret = RunCmd("git", "rev-parse HEAD", outstream=outstream, workingdir=self.env.GetValue("ARM_TFA_PATH"))
