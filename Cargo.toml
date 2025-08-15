@@ -3,7 +3,8 @@ resolver = "2"
 
 # Add packages that generate binaries here
 members = [
-  "Features/FFA/FfaFeaturePkg/SecurePartitions/MsSecurePartitionRust",
+  "Common/MU/HidPkg/UefiHidDxe",
+  "Common/MU/MsCorePkg/HelloWorldRustDxe"
 ]
 
 # Add packages that generate libraries here
