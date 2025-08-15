@@ -394,8 +394,10 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             return ret
 
         logging.info("Building Hafnium")
+        haf_out = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "HAF")
         cmd = "make"
         args = "PROJECT=mu PLATFORM=secure_qemu_aarch64"
+        args += " OUT=" + haf_out
         ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_HAF_PATH"))
         if ret != 0:
             return ret
@@ -500,7 +502,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         args += f" SPD=spmd SPMD_SPM_AT_SEL2=1 SP_LAYOUT_FILE={filename}"
         args += " ENABLE_FEAT_HCX=1 HOB_LIST=1 TRANSFER_LIST=1 LOG_LEVEL=40" # Features used by hypervisor
         # args += " FEATURE_DETECTION=1" # Enforces support for features enabled.
-        args += f" BL32={os.path.join(self.env.GetValue('ARM_HAF_PATH'), 'out/mu/secure_qemu_aarch64_clang', 'hafnium.bin')}"
+        args += f" BL32={os.path.join(haf_out, 'secure_qemu_aarch64_clang', 'hafnium.bin')}"
         args += " all fip"
 
         # Third, write a temp bash file to activate the virtual environment and build the firmware.
