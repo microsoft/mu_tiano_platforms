@@ -466,6 +466,7 @@
   PcdDatabaseLoaderLib|MdeModulePkg/Library/PcdDatabaseLoaderLib/Dxe/PcdDatabaseLoaderLibDxe.inf
   UpdateFacsHardwareSignatureLib|OemPkg/Library/UpdateFacsHardwareSignatureLib/UpdateFacsHardwareSignatureLib.inf
   PolicyLib|PolicyServicePkg/Library/DxePolicyLib/DxePolicyLib.inf
+  MuArmGicExLib|MsCorePkg/Library/MuArmGicExLib/MuArmGicExLib.inf
 
 !if $(TPM2_ENABLE) == TRUE
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibFfa/Tpm2DeviceLibFfa.inf
@@ -820,11 +821,7 @@
   # For SBSA, we have to disable the periodic polling, because there is only one one serial port and the debug agent
   # may eat console input if let poll on it. If BLD_*_DXE_DBG_BRK is set to TRUE, then the debugger will break in on
   # initialization. Otherwise, the debugger will not break in on initialization.
-  !if $(DXE_DBG_BRK) == TRUE
-    DebuggerFeaturePkgTokenSpaceGuid.PcdDebugConfigFlags|0xB
-  !else
-    DebuggerFeaturePkgTokenSpaceGuid.PcdDebugConfigFlags|0xA
-  !endif
+  DebuggerFeaturePkgTokenSpaceGuid.PcdDebugConfigFlags|0
 
   # Set the debugger timeout to wait forever. This only takes effect if Bit 0 of PcdDebugConfigFlags is set
   # to 1, which by default it is not. Using BLD_*_DXE_DBG_BRK=TRUE will set this to 1.
@@ -1117,6 +1114,10 @@
   # Produces FORM DISPLAY ENGINE protocol. Handles input, displays strings.
   MsGraphicsPkg/DisplayEngineDxe/DisplayEngineDxe.inf
   QemuSbsaPkg/QemuVideoDxe/QemuVideoDxe.inf
+  MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
+  ArmPkg/Drivers/ArmPsciMpServicesDxe/ArmPsciMpServicesDxe.inf
+  UefiTestingPkg/FunctionalSystemTests/MpManagement/Driver/MpManagement.inf
+  UefiTestingPkg/FunctionalSystemTests/MpManagement/App/MpManagementTestApp.inf
 
   MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
   MsCorePkg/MuCryptoDxe/MuCryptoDxe.inf
@@ -1125,7 +1126,7 @@
   MsCorePkg/MuVarPolicyFoundationDxe/MuVarPolicyFoundationDxe.inf
   MsCorePkg/AcpiRGRT/AcpiRgrt.inf
 !if $(BUILD_RUST_CODE) == TRUE
-  MsCorePkg/HelloWorldRustDxe/HelloWorldRustDxe.inf
+  # MsCorePkg/HelloWorldRustDxe/HelloWorldRustDxe.inf
 !endif
   MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
   SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
