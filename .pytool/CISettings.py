@@ -5,14 +5,14 @@
 ##
 import os
 import logging
-import io
 from edk2toolext.environment import shell_environment
 from edk2toolext.invocables.edk2_ci_build import CiBuildSettingsManager
 from edk2toolext.invocables.edk2_ci_setup import CiSetupSettingsManager
 from edk2toolext.invocables.edk2_setup import SetupSettingsManager, RequiredSubmodule
 from edk2toolext.invocables.edk2_update import UpdateSettingsManager
 from edk2toolext.invocables.edk2_pr_eval import PrEvalSettingsManager
-from edk2toollib.utility_functions import GetHostInfo,RunCmd
+from edk2toollib.utility_functions import GetHostInfo
+import git
 
 
 class Settings(CiSetupSettingsManager, CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManager, PrEvalSettingsManager):
@@ -136,19 +136,13 @@ class Settings(CiSetupSettingsManager, CiBuildSettingsManager, UpdateSettingsMan
         # lets just parse the .gitmodules and add each if not already in list.
         # The GetRequiredSubmodules is designed to allow a build to optimize
         # the desired submodules but it isn't necessary for this repository.
-        result = io.StringIO()
-        ret = RunCmd("git", "config --file .gitmodules --get-regexp path",
-                     workingdir=self.GetWorkspaceRoot(), outstream=result)
-        # Cmd output is expected to look like:
-        # submodule.CryptoPkg/Library/OpensslLib/openssl.path CryptoPkg/Library/OpensslLib/openssl
-        # submodule.SoftFloat.path ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3
-        if ret == 0:
-            for line in result.getvalue().splitlines():
-                _, _, path = line.partition(" ")
-                if path is not None:
-                    if path not in [x.path for x in rs]:
-                        # add it with recursive since we don't know
-                        rs.append(RequiredSubmodule(path, True))
+
+        gitrepo = git.Repo(self.GetWorkspaceRoot())
+        for submodule in gitrepo.submodules:
+            if "mu_" in submodule.url:
+                rs.append(RequiredSubmodule(submodule.path, False, ".pytool/CISettings.py"))
+            else:
+                rs.append(RequiredSubmodule(submodule.path, True))
         return rs
 
     def GetName(self):

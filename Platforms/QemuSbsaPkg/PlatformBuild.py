@@ -118,11 +118,11 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
             If no RequiredSubmodules return an empty iterable
         """
         return [
-            RequiredSubmodule("MU_BASECORE", True),
-            RequiredSubmodule("Common/MU", True),
-            RequiredSubmodule("Common/MU_TIANO", True),
-            RequiredSubmodule("Common/MU_OEM_SAMPLE", True),
-            RequiredSubmodule("Silicon/Arm/MU_TIANO", True),
+            RequiredSubmodule("MU_BASECORE", False, ".pytool/CISettings.py"),
+            RequiredSubmodule("Common/MU", False, ".pytool/CISettings.py"),
+            RequiredSubmodule("Common/MU_TIANO", False, ".pytool/CISettings.py"),
+            RequiredSubmodule("Common/MU_OEM_SAMPLE", False, ".pytool/CISettings.py"),
+            RequiredSubmodule("Silicon/Arm/MU_TIANO", False, ".pytool/CISettings.py"),
             RequiredSubmodule("Silicon/Arm/TFA", True),
             RequiredSubmodule("Silicon/Arm/HAF", True),
             RequiredSubmodule("Features/DEBUGGER", True),
