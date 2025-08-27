@@ -172,10 +172,6 @@
   ArmFfaLibEx|FfaFeaturePkg/Library/ArmFfaLibEx/ArmFfaLibEx.inf
   PlatformFfaInterruptLib|FfaFeaturePkg/Library/PlatformFfaInterruptLibNull/PlatformFfaInterruptLib.inf
 
-  # Secure Partition Services
-  NotificationServiceLib|FfaFeaturePkg/Library/NotificationServiceLib/NotificationServiceLib.inf
-  TestServiceLib|FfaFeaturePkg/Library/TestServiceLib/TestServiceLib.inf
-
   #
   # Uncomment (and comment out the next line) For RealView Debugger. The Standard IO window
   # in the debugger will show load and unload commands for symbols. You can cut and paste this
