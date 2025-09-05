@@ -173,7 +173,7 @@ jobs:
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
         BuildFlags: "--rust"
         BuildTarget: "DEBUG"
-        BuildExtraTag: ""
+        BuildExtraTag: "RUST"
         BuildExtraStep:
           - template: Steps/RustSetupSteps.yml@mu_devops
         Run: true
@@ -187,7 +187,7 @@ jobs:
         BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
         BuildFlags: "--rust"
         BuildTarget: "DEBUG"
-        BuildExtraTag: ""
+        BuildExtraTag: "RUST"
         BuildExtraStep:
           - template: Steps/RustSetupSteps.yml@mu_devops
           - script:  |
