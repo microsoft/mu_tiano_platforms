@@ -167,35 +167,3 @@ jobs:
           **/QEMU_EFI.fd
           **/SECURE_FLASH0.fd
         BuildArtifactsOther: "**/unit_test_results/*"
-
-      QemuQ35_Rust_DEBUG:
-        BuildPackage: QemuQ35Pkg
-        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-        BuildFlags: "--rust"
-        BuildTarget: "DEBUG"
-        BuildExtraTag: "RUST"
-        BuildExtraStep:
-          - template: Steps/RustSetupSteps.yml@mu_devops
-        Run: true
-        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2"
-        BuildArtifactsBinary: |
-          **/QEMUQ35_*.fd
-        BuildArtifactsOther: "**/unit_test_results/*"
-
-      QemuSbsa_Rust_DEBUG:
-        BuildPackage: QemuSbsaPkg
-        BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
-        BuildFlags: "--rust"
-        BuildTarget: "DEBUG"
-        BuildExtraTag: "RUST"
-        BuildExtraStep:
-          - template: Steps/RustSetupSteps.yml@mu_devops
-          - script:  |
-              git config --global user.name "ado pipline"
-              git config --global user.email "placeholderinfo@example.com"
-        Run: true
-        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE"
-        BuildArtifactsBinary: |
-          **/QEMU_EFI.fd
-          **/SECURE_FLASH0.fd
-        BuildArtifactsOther: "**/unit_test_results/*"
