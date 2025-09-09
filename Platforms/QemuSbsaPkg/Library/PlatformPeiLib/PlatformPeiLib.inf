@@ -26,11 +26,13 @@
   ArmPlatformPkg/ArmPlatformPkg.dec
   SecurityPkg/SecurityPkg.dec
   QemuPkg/QemuPkg.dec
+  QemuSbsaPkg/QemuSbsaPkg.dec
 
 [LibraryClasses]
   DebugLib
   HobLib
   ArmPlatformLib
+  PanicLib
 
 [Ppis]
   gQemuPkgTpmDiscoveredPpiGuid
@@ -40,9 +42,22 @@
   gArmTokenSpaceGuid.PcdFvBaseAddress
   gArmTokenSpaceGuid.PcdFvSize
 
+[Guids]
+  gMmMemoryProtectionSettingsGuid
+  gDxeMemoryProtectionSettingsGuid
+
+[FeaturePcd]
+  gQemuPkgTokenSpaceGuid.PcdEnableMemoryProtection
+
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress               ## CONSUMES # TODO: Consider removing later
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmCrbRegionSize             ## CONSUMES
+  gQemuSbsaPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
+  gQemuSbsaPkgTokenSpaceGuid.PcdDeviceTreeAllocationPadding
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+  gArmTokenSpaceGuid.PcdMmBufferSize
+  gArmTokenSpaceGuid.PcdMmBufferBase
 
 [depex]
   TRUE
