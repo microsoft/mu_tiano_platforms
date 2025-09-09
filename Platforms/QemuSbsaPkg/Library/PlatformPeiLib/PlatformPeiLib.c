@@ -34,8 +34,16 @@ STATIC CONST EFI_PEI_PPI_DESCRIPTOR  mTpm2InitializationDonePpi = {
   NULL
 };
 
+/**
+  Initialize the memory configuration for the platform based on the device tree blob.
+
+  This function will parse the device tree blob to find the memory nodes and create
+  the necessary HOBs to describe the system memory layout for the PEI phase.
+
+  @return  VOID
+**/
 VOID
-InitializeMemory (
+InitializeMemoryConfiguration (
   VOID
 )
 {
@@ -175,6 +183,14 @@ InitializeMemory (
   }
 }
 
+/**
+  Entrypoint of platform PEIM driver.
+
+  This function provides the platform logic to initialize the memory configuration
+  and TPM discovery for the PEI phase.
+
+  @return  Whether the platform PEIM driver executed successfully
+**/
 EFI_STATUS
 EFIAPI
 PlatformPeim (
@@ -203,7 +219,7 @@ PlatformPeim (
 
   BuildFvHob (PcdGet64 (PcdFvBaseAddress), PcdGet32 (PcdFvSize));
 
-  InitializeMemory ();
+  InitializeMemoryConfiguration ();
 
   return EFI_SUCCESS;
 }
