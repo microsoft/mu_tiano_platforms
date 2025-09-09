@@ -324,7 +324,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         self.env.SetValue("BUILDREPORT_TYPES", "PCD DEPEX FLASH BUILD_FLAGS LIBRARY FIXED_ADDRESS HASH", "Setting build report types")
         self.env.SetValue("ARM_TFA_PATH", os.path.join (self.GetWorkspaceRoot (), "Silicon/Arm/TFA"), "Platform hardcoded")
         self.env.SetValue("ARM_HAF_PATH", os.path.join (self.GetWorkspaceRoot (), "Silicon/Arm/HAF"), "Platform hardcoded")
-        self.env.SetValue("BLD_*_QEMU_CORE_NUM", "2", "Default")
+        self.env.SetValue("BLD_*_QEMU_CORE_NUM", "4", "Default")
         self.env.SetValue("BLD_*_MEMORY_PROTECTION", "TRUE", "Default")
         # Include the MFCI test cert by default, override on the commandline with "BLD_*_SHIP_MODE=TRUE" if you want the retail MFCI cert
         self.env.SetValue("BLD_*_SHIP_MODE", "FALSE", "Default")
@@ -473,7 +473,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         args += " DEBUG=" + str(1 if self.env.GetValue("TARGET").lower() == 'debug' else 0)
         args += " ENABLE_SME_FOR_SWD=1 ENABLE_SVE_FOR_SWD=1 ENABLE_SME_FOR_NS=1 ENABLE_SVE_FOR_NS=1"
         args += f" SPD=spmd SPMD_SPM_AT_SEL2=1 SP_LAYOUT_FILE={filename}"
-        args += " PROGRAMMABLE_RESET_ADDRESS=1 ENABLE_FEAT_HCX=1 HOB_LIST=1 TRANSFER_LIST=1 LOG_LEVEL=40" # Features used by hypervisor
+        args += " ENABLE_FEAT_HCX=1 HOB_LIST=1 TRANSFER_LIST=1 LOG_LEVEL=40" # Features used by hypervisor
         # args += " FEATURE_DETECTION=1" # Enforces support for features enabled.
         args += f" BL32={os.path.join(haf_out, 'secure_qemu_aarch64_clang', 'hafnium.bin')}"
         args += " all fip"
@@ -488,35 +488,35 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             f.write(f"{cmd} {args}\n")
 
         # Grab the current head to restore from patches later.
-        # patch_tfa = (self.env.GetValue("PATCH_TFA", "TRUE").upper() == "TRUE")
-        # if patch_tfa:
-        #     outstream = StringIO()
-        #     ret = RunCmd("git", "rev-parse HEAD", outstream=outstream, workingdir=self.env.GetValue("ARM_TFA_PATH"))
-        #     if ret != 0:
-        #         logging.error("Failed to get git HEAD for TFA")
-        #         return ret
-        #     arm_tfa_git_head = outstream.getvalue().strip()
-        #     logging.info(f"TFA HEAD: {arm_tfa_git_head}")
+        patch_tfa = (self.env.GetValue("PATCH_TFA", "TRUE").upper() == "TRUE")
+        if patch_tfa:
+            outstream = StringIO()
+            ret = RunCmd("git", "rev-parse HEAD", outstream=outstream, workingdir=self.env.GetValue("ARM_TFA_PATH"))
+            if ret != 0:
+                logging.error("Failed to get git HEAD for TFA")
+                return ret
+            arm_tfa_git_head = outstream.getvalue().strip()
+            logging.info(f"TFA HEAD: {arm_tfa_git_head}")
 
-        #     patches = os.path.join(self.GetWorkspaceRoot(), "Platforms/QemuSbsaPkg/tfa_patches/*.patch")
-        #     # Log the patch files for debugging
-        #     ret = RunCmd("git", f"am {patches}", workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
-        #     if ret != 0:
-        #         return ret
+            patches = os.path.join(self.GetWorkspaceRoot(), "Platforms/QemuSbsaPkg/tfa_patches/*.patch")
+            # Log the patch files for debugging
+            ret = RunCmd("git", f"am {patches}", workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
+            if ret != 0:
+                return ret
 
         # Fifth, run the temp bash file to build the firmware.
         ret = RunCmd("bash", temp_bash, workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
-        # if patch_tfa:
-        #     # Always revert before returning
-        #     revert_ret = RunCmd(f"git", f"checkout {arm_tfa_git_head}", workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
-        #     if revert_ret != 0:
-        #         return revert_ret
+        if patch_tfa:
+            # Always revert before returning
+            revert_ret = RunCmd(f"git", f"checkout {arm_tfa_git_head}", workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
+            if revert_ret != 0:
+                return revert_ret
 
         if ret != 0:
             return ret
 
-        # # Fourth, remove the temp bash file, if succeeded.
-        # os.remove(temp_bash)
+        # Fourth, remove the temp bash file, if succeeded.
+        os.remove(temp_bash)
 
         # Revert the build vars to the original state
         shell_environment.RevertBuildVars()

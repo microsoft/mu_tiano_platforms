@@ -7,7 +7,6 @@
 **/
 
 #include <Library/ArmLib.h>
-#include <Library/DebugLib.h>
 #include <Library/ArmPlatformLib.h>
 
 #include <Ppi/ArmMpCoreInfo.h>
