@@ -466,7 +466,6 @@
   PcdDatabaseLoaderLib|MdeModulePkg/Library/PcdDatabaseLoaderLib/Dxe/PcdDatabaseLoaderLibDxe.inf
   UpdateFacsHardwareSignatureLib|OemPkg/Library/UpdateFacsHardwareSignatureLib/UpdateFacsHardwareSignatureLib.inf
   PolicyLib|PolicyServicePkg/Library/DxePolicyLib/DxePolicyLib.inf
-  MuArmGicExLib|MsCorePkg/Library/MuArmGicExLib/MuArmGicExLib.inf
 
 !if $(TPM2_ENABLE) == TRUE
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibFfa/Tpm2DeviceLibFfa.inf
@@ -1113,10 +1112,6 @@
   # Produces FORM DISPLAY ENGINE protocol. Handles input, displays strings.
   MsGraphicsPkg/DisplayEngineDxe/DisplayEngineDxe.inf
   QemuSbsaPkg/QemuVideoDxe/QemuVideoDxe.inf
-  MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
-  ArmPkg/Drivers/ArmPsciMpServicesDxe/ArmPsciMpServicesDxe.inf
-  UefiTestingPkg/FunctionalSystemTests/MpManagement/Driver/MpManagement.inf
-  UefiTestingPkg/FunctionalSystemTests/MpManagement/App/MpManagementTestApp.inf
 
   MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
   MsCorePkg/MuCryptoDxe/MuCryptoDxe.inf
@@ -1125,7 +1120,7 @@
   MsCorePkg/MuVarPolicyFoundationDxe/MuVarPolicyFoundationDxe.inf
   MsCorePkg/AcpiRGRT/AcpiRgrt.inf
 !if $(BUILD_RUST_CODE) == TRUE
-  # MsCorePkg/HelloWorldRustDxe/HelloWorldRustDxe.inf
+  MsCorePkg/HelloWorldRustDxe/HelloWorldRustDxe.inf
 !endif
   MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
   SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
