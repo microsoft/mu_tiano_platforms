@@ -248,7 +248,7 @@
   # Virtio Support
   VirtioLib|QemuPkg/Library/VirtioLib/VirtioLib.inf
 
-  ArmPlatformLib|ArmPlatformPkg/Library/ArmPlatformLibNull/ArmPlatformLibNull.inf
+  ArmPlatformLib|QemuSbsaPkg/Library/SbsaQemuLib/SbsaQemuLib.inf
 
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
 
@@ -436,7 +436,6 @@
 
   MsPlatformEarlyGraphicsLib |MsGraphicsPkg/Library/MsEarlyGraphicsLibNull/Pei/MsEarlyGraphicsLibNull.inf
   MsUiThemeLib               |MsGraphicsPkg/Library/MsUiThemeLib/Pei/MsUiThemeLib.inf
-  ArmPlatformLib             |QemuSbsaPkg/Library/SbsaQemuLib/SbsaQemuLib.inf
   OemMfciLib                 |OemPkg/Library/OemMfciLib/OemMfciLibPei.inf
   ConfigKnobShimLib          |SetupDataPkg/Library/ConfigKnobShimLib/ConfigKnobShimPeiLib/ConfigKnobShimPeiLib.inf
   PolicyLib                  |PolicyServicePkg/Library/PeiPolicyLib/PeiPolicyLib.inf
@@ -816,11 +815,7 @@
   # For SBSA, we have to disable the periodic polling, because there is only one one serial port and the debug agent
   # may eat console input if let poll on it. If BLD_*_DXE_DBG_BRK is set to TRUE, then the debugger will break in on
   # initialization. Otherwise, the debugger will not break in on initialization.
-  !if $(DXE_DBG_BRK) == TRUE
-    DebuggerFeaturePkgTokenSpaceGuid.PcdDebugConfigFlags|0xB
-  !else
-    DebuggerFeaturePkgTokenSpaceGuid.PcdDebugConfigFlags|0xA
-  !endif
+  DebuggerFeaturePkgTokenSpaceGuid.PcdDebugConfigFlags|0
 
   # Set the debugger timeout to wait forever. This only takes effect if Bit 0 of PcdDebugConfigFlags is set
   # to 1, which by default it is not. Using BLD_*_DXE_DBG_BRK=TRUE will set this to 1.
