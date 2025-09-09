@@ -5,12 +5,20 @@ default_to_workspace = false
 CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true
 RUSTC_BOOTSTRAP = 1
 ARCH = "X64"
-TARGET_TRIPLE = { source = "${ARCH}", mapping = { "X64" = "x86_64-unknown-uefi", "IA32" = "i686-unknown-uefi", "AARCH64" = "aarch64-unknown-uefi", "LOCAL" = "${CARGO_MAKE_RUST_TARGET_TRIPLE}" }, condition = { env_not_set = [ "TARGET_TRIPLE" ] } }
+TARGET_TRIPLE = { source = "${ARCH}", mapping = { "X64" = "x86_64-unknown-uefi", "IA32" = "i686-unknown-uefi", "AARCH64" = "aarch64-unknown-uefi", "LOCAL" = "${CARGO_MAKE_RUST_TARGET_TRIPLE}" }, condition = { env_not_set = [
+  "TARGET_TRIPLE",
+] } }
 
-CARGO_FEATURES_FLAG = {value = "--features ${FEATURES}", condition = {env_set = ["FEATURES"], env_true = ["FEATURES"]}}
+CARGO_FEATURES_FLAG = { value = "--features ${FEATURES}", condition = { env_set = [
+  "FEATURES",
+], env_true = [
+  "FEATURES",
+] } }
 BUILD_FLAGS = "--profile ${RUSTC_PROFILE} --target ${TARGET_TRIPLE} -Zbuild-std=core,compiler_builtins,alloc -Zbuild-std-features=compiler-builtins-mem -Zunstable-options --timings=html"
 TEST_FLAGS = { value = "", condition = { env_not_set = ["TEST_FLAGS"] } }
-COV_FLAGS = { value = "--out html --exclude-files **/tests/*", condition = { env_not_set = ["COV_FLAGS"] } }
+COV_FLAGS = { value = "--out html --exclude-files **/tests/*", condition = { env_not_set = [
+  "COV_FLAGS",
+] } }
 
 [env.development]
 RUSTC_PROFILE = "dev"
@@ -58,35 +66,59 @@ Example:
 """
 clear = true
 command = "cargo"
-args = ["build", "@@split(INDIVIDUAL_PACKAGE_TARGETS, )", "@@split(BUILD_FLAGS, )", "@@split(CARGO_FEATURES_FLAG, ,remove-empty)"]
+args = [
+  "build",
+  "@@split(INDIVIDUAL_PACKAGE_TARGETS, )",
+  "@@split(BUILD_FLAGS, )",
+  "@@split(CARGO_FEATURES_FLAG, ,remove-empty)",
+]
 dependencies = ["individual-package-targets"]
 
 [tasks.check]
 description = "Checks rust code for errors. Example `cargo make check`"
 clear = true
 command = "cargo"
-args = ["check", "@@split(INDIVIDUAL_PACKAGE_TARGETS, )", "@@split(BUILD_FLAGS, )"]
+args = [
+  "check",
+  "@@split(INDIVIDUAL_PACKAGE_TARGETS, )",
+  "@@split(BUILD_FLAGS, )",
+]
 dependencies = ["individual-package-targets"]
 
 [tasks.check_json]
 description = "Checks rust code for errors with results in JSON. Example `cargo make check_json`"
 clear = true
 command = "cargo"
-args = ["check", "@@split(INDIVIDUAL_PACKAGE_TARGETS, )", "@@split(BUILD_FLAGS, )", "--message-format=json"]
+args = [
+  "check",
+  "@@split(INDIVIDUAL_PACKAGE_TARGETS, )",
+  "@@split(BUILD_FLAGS, )",
+  "--message-format=json",
+]
 dependencies = ["individual-package-targets"]
 
 [tasks.test]
 description = "Builds all rust tests in the workspace. Example `cargo make test`"
 clear = true
 command = "cargo"
-args = ["test", "@@split(INDIVIDUAL_PACKAGE_TARGETS, )", "@@split(TEST_FLAGS, )"]
+args = [
+  "test",
+  "@@split(INDIVIDUAL_PACKAGE_TARGETS, )",
+  "@@split(TEST_FLAGS, )",
+]
 dependencies = ["individual-package-targets"]
 
 [tasks.coverage]
 description = "Build and run all tests and calculate coverage."
 clear = true
 command = "cargo"
-args = ["tarpaulin", "@@split(INDIVIDUAL_PACKAGE_TARGETS, )", "@@split(COV_FLAGS, )", "--output-dir", "${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/target"]
+args = [
+  "tarpaulin",
+  "@@split(INDIVIDUAL_PACKAGE_TARGETS, )",
+  "@@split(COV_FLAGS, )",
+  "--output-dir",
+  "${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/target",
+]
 dependencies = ["individual-package-targets"]
 
 [tasks.clippy]
@@ -94,3 +126,7 @@ description = "Run cargo clippy."
 clear = true
 command = "cargo"
 args = ["clippy", "--all-targets", "--", "-D", "warnings"]
+
+[tasks.all]
+description = "Run all tasks for PR readiness."
+dependencies = []
