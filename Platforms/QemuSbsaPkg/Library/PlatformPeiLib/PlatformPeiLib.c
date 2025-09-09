@@ -104,7 +104,7 @@ InitializeMemoryConfiguration (
 
   // Make sure we have a valid device tree blob
   if (fdt_check_header (DeviceTreeBase) != 0) {
-    PANIC ("Device Tree Blob at 0x%p is not valid. Cannot continue without a valid Device Tree Blob.\n", DeviceTreeBase);
+    PANIC ("Device Tree Blob header is not valid. Cannot continue without a valid Device Tree Blob.\n");
   }
 
   // Look for the lowest memory node
@@ -157,29 +157,17 @@ InitializeMemoryConfiguration (
 
   // Make sure the start of DRAM matches our expectation
   if (FixedPcdGet64 (PcdSystemMemoryBase) != NewBase) {
-    PANIC (
-      "System Memory Base Mismatch. Expected 0x%lx, but found 0x%lx.\n",
-      FixedPcdGet64 (PcdSystemMemoryBase),
-      NewBase
-      );
+    PANIC ("System Memory Base Mismatch.\n");
   }
 
   PcdStatus = PcdSet64S (PcdSystemMemorySize, NewSize - PcdGet64 (PcdMmBufferSize));
   if (EFI_ERROR (PcdStatus)) {
-    PANIC (
-      "Failed to set PcdSystemMemorySize to 0x%lx. Status = %r\n",
-      NewSize - PcdGet64 (PcdMmBufferSize),
-      PcdStatus
-      );
+    PANIC ("Failed to set PcdSystemMemorySize.\n");
   }
 
   PcdStatus = PcdSet64S (PcdMmBufferBase, CurBase + NewSize - PcdGet64 (PcdMmBufferSize));
   if (EFI_ERROR (PcdStatus)) {
-    PANIC (
-      "Failed to set PcdMmBufferBase to 0x%lx. Status = %r\n",
-      CurBase + NewSize - PcdGet64 (PcdMmBufferSize),
-      PcdStatus
-      );
+    PANIC ("Failed to set PcdMmBufferBase.\n");
   }
 }
 
@@ -214,7 +202,7 @@ PlatformPeim (
   }
 
   if (EFI_ERROR (Status)) {
-    PANIC ("%a: Failed to install TPM PPI. Status = %r\n", __func__, Status);
+    PANIC ("Failed to install TPM PPI.\n");
   }
 
   BuildFvHob (PcdGet64 (PcdFvBaseAddress), PcdGet32 (PcdFvSize));
