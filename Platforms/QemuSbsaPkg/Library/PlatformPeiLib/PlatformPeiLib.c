@@ -14,6 +14,7 @@
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PeiServicesLib.h>
+#include <Library/PanicLib.h>
 #include <libfdt.h>
 #include <Library/HobLib.h>
 #include <Guid/DxeMemoryProtectionSettings.h>
@@ -89,10 +90,14 @@ InitializeMemory (
   NewSize = 0;
 
   DeviceTreeBase = (VOID *)(UINTN)PcdGet64 (PcdDeviceTreeInitialBaseAddress);
-  ASSERT (DeviceTreeBase != NULL);
+  if (DeviceTreeBase == NULL) {
+    PANIC ("Device Tree Base Address is not set. Cannot continue without a valid Device Tree Blob.\n");
+  }
 
   // Make sure we have a valid device tree blob
-  ASSERT (fdt_check_header (DeviceTreeBase) == 0);
+  if (fdt_check_header (DeviceTreeBase) != 0) {
+    PANIC ("Device Tree Blob at 0x%p is not valid. Cannot continue without a valid Device Tree Blob.\n", DeviceTreeBase);
+  }
 
   // Look for the lowest memory node
   for (Prev = 0; ; Prev = Node) {
@@ -143,12 +148,30 @@ InitializeMemory (
     );
 
   // Make sure the start of DRAM matches our expectation
-  ASSERT (FixedPcdGet64 (PcdSystemMemoryBase) == NewBase);
+  if (FixedPcdGet64 (PcdSystemMemoryBase) != NewBase) {
+    PANIC (
+      "System Memory Base Mismatch. Expected 0x%lx, but found 0x%lx.\n",
+      FixedPcdGet64 (PcdSystemMemoryBase),
+      NewBase
+      );
+  }
   // TODO: This is carved out by the BL31 during DT build up.
   PcdStatus = PcdSet64S (PcdSystemMemorySize, NewSize - PcdGet64 (PcdMmBufferSize));
-  ASSERT_RETURN_ERROR (PcdStatus);
+  if (EFI_ERROR (PcdStatus)) {
+    PANIC (
+      "Failed to set PcdSystemMemorySize to 0x%lx. Status = %r\n",
+      NewSize - PcdGet64 (PcdMmBufferSize),
+      PcdStatus
+      );
+  }
   PcdStatus = PcdSet64S (PcdMmBufferBase, CurBase + NewSize - PcdGet64 (PcdMmBufferSize));
-  ASSERT_RETURN_ERROR (PcdStatus);
+  if (EFI_ERROR (PcdStatus)) {
+    PANIC (
+      "Failed to set PcdMmBufferBase to 0x%lx. Status = %r\n",
+      CurBase + NewSize - PcdGet64 (PcdMmBufferSize),
+      PcdStatus
+      );
+  }
 }
 
 EFI_STATUS
@@ -173,7 +196,9 @@ PlatformPeim (
     Status = PeiServicesInstallPpi (&mTpm2InitializationDonePpi);
   }
 
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    PANIC ("%a: Failed to install TPM PPI. Status = %r\n", __func__, Status);
+  }
 
   BuildFvHob (PcdGet64 (PcdFvBaseAddress), PcdGet32 (PcdFvSize));
 
