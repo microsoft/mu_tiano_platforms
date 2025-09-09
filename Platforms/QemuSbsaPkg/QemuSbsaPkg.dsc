@@ -252,7 +252,7 @@
   # Virtio Support
   VirtioLib|QemuPkg/Library/VirtioLib/VirtioLib.inf
 
-  ArmPlatformLib|ArmPlatformPkg/Library/ArmPlatformLibNull/ArmPlatformLibNull.inf
+  ArmPlatformLib|QemuSbsaPkg/Library/SbsaQemuLib/SbsaQemuLib.inf
 
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
 
@@ -440,7 +440,6 @@
 
   MsPlatformEarlyGraphicsLib |MsGraphicsPkg/Library/MsEarlyGraphicsLibNull/Pei/MsEarlyGraphicsLibNull.inf
   MsUiThemeLib               |MsGraphicsPkg/Library/MsUiThemeLib/Pei/MsUiThemeLib.inf
-  ArmPlatformLib             |QemuSbsaPkg/Library/SbsaQemuLib/SbsaQemuLib.inf
   OemMfciLib                 |OemPkg/Library/OemMfciLib/OemMfciLibPei.inf
   ConfigKnobShimLib          |SetupDataPkg/Library/ConfigKnobShimLib/ConfigKnobShimPeiLib/ConfigKnobShimPeiLib.inf
   PolicyLib                  |PolicyServicePkg/Library/PeiPolicyLib/PeiPolicyLib.inf

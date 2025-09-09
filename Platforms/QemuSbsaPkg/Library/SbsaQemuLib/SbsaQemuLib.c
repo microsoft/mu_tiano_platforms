@@ -7,6 +7,7 @@
 **/
 
 #include <Library/ArmLib.h>
+#include <Library/DebugLib.h>
 #include <Library/ArmPlatformLib.h>
 
 #include <Ppi/ArmMpCoreInfo.h>
@@ -25,6 +26,26 @@ ARM_CORE_INFO  mArmPlatformNullMpCoreInfoTable[] = {
   {
     // Cluster 0, Core 1
     0x001,
+
+    // MP Core MailBox Set/Get/Clear Addresses and Clear Value
+    (EFI_PHYSICAL_ADDRESS)0,
+    (EFI_PHYSICAL_ADDRESS)0,
+    (EFI_PHYSICAL_ADDRESS)0,
+    (UINT64)0xFFFFFFFF
+  },
+  {
+    // Cluster 0, Core 2
+    0x002,
+
+    // MP Core MailBox Set/Get/Clear Addresses and Clear Value
+    (EFI_PHYSICAL_ADDRESS)0,
+    (EFI_PHYSICAL_ADDRESS)0,
+    (EFI_PHYSICAL_ADDRESS)0,
+    (UINT64)0xFFFFFFFF
+  },
+  {
+    // Cluster 0, Core 3
+    0x003,
 
     // MP Core MailBox Set/Get/Clear Addresses and Clear Value
     (EFI_PHYSICAL_ADDRESS)0,
