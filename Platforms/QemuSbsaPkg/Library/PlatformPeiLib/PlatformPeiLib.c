@@ -155,7 +155,7 @@ InitializeMemory (
       NewBase
       );
   }
-  // TODO: This is carved out by the BL31 during DT build up.
+
   PcdStatus = PcdSet64S (PcdSystemMemorySize, NewSize - PcdGet64 (PcdMmBufferSize));
   if (EFI_ERROR (PcdStatus)) {
     PANIC (
@@ -164,6 +164,7 @@ InitializeMemory (
       PcdStatus
       );
   }
+
   PcdStatus = PcdSet64S (PcdMmBufferBase, CurBase + NewSize - PcdGet64 (PcdMmBufferSize));
   if (EFI_ERROR (PcdStatus)) {
     PANIC (
