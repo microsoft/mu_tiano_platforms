@@ -45,7 +45,7 @@ STATIC CONST EFI_PEI_PPI_DESCRIPTOR  mTpm2InitializationDonePpi = {
 VOID
 InitializeMemoryConfiguration (
   VOID
-)
+  )
 {
   VOID                            *DeviceTreeBase;
   INT32                           Node, Prev;
