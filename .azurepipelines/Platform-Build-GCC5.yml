@@ -11,7 +11,7 @@ resources:
       type: github
       endpoint: microsoft
       name: microsoft/mu_devops
-      ref: fix_cargo_b
+      ref: main
   containers:
     - container: linux-gcc
       image: ghcr.io/microsoft/mu_devops/ubuntu-24-test:latest
