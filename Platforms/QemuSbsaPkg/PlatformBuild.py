@@ -379,9 +379,27 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         op_fv = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
 
         logging.info("Building Rust Secure Partition")
+        # For this build, we need to set the CARGO_HOME environment variable to a location local to the current user
+        # so that the build can access these dependencies without permission issues.
+        # This is especially important for CI builds that run in a containerized environment.
         shell_environment.GetEnvironment().set_shell_var("CARGO_HOME", "$HOME/.cargo")
-        cargo_home = shell_environment.GetEnvironment().get_shell_var("CARGO_HOME")
-        logging.error("Building Rust Secure Partition from " + cargo_home)
+
+        # Test to see if we need to add the Rust target for the build, if it is not already present.
+        cmd = "rustup"
+        args = "target list --installed"
+        outstream = StringIO()
+        ret = RunCmd(cmd, args, outstream=outstream, workingdir=os.path.join (self.GetWorkspaceRoot (), "Features/FFA"))
+        if ret != 0:
+            logging.error("Failed to list Rust targets")
+            return ret
+
+        if "aarch64-unknown-none" not in outstream.getvalue():
+            args = "target add aarch64-unknown-none"
+            ret = RunCmd(cmd, args, workingdir=os.path.join (self.GetWorkspaceRoot (), "Features/FFA"))
+            if ret != 0:
+                logging.error("Failed to add Rust target")
+                return ret
+
         cmd = "cargo"
         args = "build --target=aarch64-unknown-none"
         ret = RunCmd(cmd, args, workingdir=os.path.join (self.GetWorkspaceRoot (), "Features/FFA"))
