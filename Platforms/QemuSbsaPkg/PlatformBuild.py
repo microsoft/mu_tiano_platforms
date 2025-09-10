@@ -384,22 +384,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         # This is especially important for CI builds that run in a containerized environment.
         shell_environment.GetEnvironment().set_shell_var("CARGO_HOME", "$HOME/.cargo")
 
-        # Test to see if we need to add the Rust target for the build, if it is not already present.
-        cmd = "rustup"
-        args = "target list --installed"
-        outstream = StringIO()
-        ret = RunCmd(cmd, args, outstream=outstream, workingdir=os.path.join (self.GetWorkspaceRoot (), "Features/FFA"))
-        if ret != 0:
-            logging.error("Failed to list Rust targets")
-            return ret
-
-        if "aarch64-unknown-none" not in outstream.getvalue():
-            args = "target add aarch64-unknown-none"
-            ret = RunCmd(cmd, args, workingdir=os.path.join (self.GetWorkspaceRoot (), "Features/FFA"))
-            if ret != 0:
-                logging.error("Failed to add Rust target")
-                return ret
-
         cmd = "cargo"
         args = "build --target=aarch64-unknown-none"
         ret = RunCmd(cmd, args, workingdir=os.path.join (self.GetWorkspaceRoot (), "Features/FFA"))

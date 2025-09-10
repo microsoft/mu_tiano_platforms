@@ -112,6 +112,8 @@ jobs:
           - script:  |
               git config --global user.name "ado pipline"
               git config --global user.email "placeholderinfo@example.com"
+              rustup target add aarch64-unknown-none
+              rustup component add llvm-tools-preview
         Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
         BuildArtifactsBinary: |
@@ -129,6 +131,8 @@ jobs:
           - script:  |
               git config --global user.name "ado pipline"
               git config --global user.email "placeholderinfo@example.com"
+              rustup target add aarch64-unknown-none
+              rustup component add llvm-tools-preview
         Run: true
         RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
         BuildArtifactsBinary: |
