@@ -379,6 +379,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         op_fv = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
 
         logging.info("Building Rust Secure Partition")
+        shell_environment.GetEnvironment().set_shell_var("CARGO_HOME", "$HOME/.cargo")
         cargo_home = shell_environment.GetEnvironment().get_shell_var("CARGO_HOME")
         logging.error("Building Rust Secure Partition from " + cargo_home)
         cmd = "cargo"
