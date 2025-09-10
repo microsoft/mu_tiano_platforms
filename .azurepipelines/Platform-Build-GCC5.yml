@@ -112,6 +112,9 @@ jobs:
           - script:  |
               git config --global user.name "ado pipline"
               git config --global user.email "placeholderinfo@example.com"
+              rustup self update
+              rustup update
+              rustup clean
               rustup target add aarch64-unknown-none
               rustup component add llvm-tools-preview
         Run: true
@@ -131,6 +134,9 @@ jobs:
           - script:  |
               git config --global user.name "ado pipline"
               git config --global user.email "placeholderinfo@example.com"
+              rustup self update
+              rustup update
+              rustup clean
               rustup target add aarch64-unknown-none
               rustup component add llvm-tools-preview
         Run: true
