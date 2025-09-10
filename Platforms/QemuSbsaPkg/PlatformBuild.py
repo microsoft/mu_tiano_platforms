@@ -378,6 +378,26 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         # Add a post build step to build BL31 and assemble the FD files
         op_fv = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
 
+        logging.info("Building Rust Secure Partition")
+        # For this build, we need to set the CARGO_HOME environment variable to a location local to the current user
+        # so that the build can access these dependencies without permission issues.
+        # This is especially important for CI builds that run in a containerized environment.
+        shell_environment.GetEnvironment().set_shell_var("CARGO_HOME", "$HOME/.cargo")
+
+        cmd = "cargo"
+        args = "build --target=aarch64-unknown-none"
+        ret = RunCmd(cmd, args, workingdir=os.path.join (self.GetWorkspaceRoot (), "Features/FFA"))
+        if ret != 0:
+            logging.error("Failed to build Rust Secure Partition")
+            return ret
+
+        cmd = "cargo"
+        args = "objcopy --target=aarch64-unknown-none -- -O binary " + os.path.join(op_fv, "msft-sp.bin")
+        ret = RunCmd(cmd, args, workingdir=os.path.join (self.GetWorkspaceRoot (), "Features/FFA"))
+        if ret != 0:
+            logging.error("Failed to objcopy Rust Secure Partition")
+            return ret
+
         logging.info("Building Hafnium")
         haf_out = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "HAF")
         cmd = "make"
@@ -420,7 +440,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             data = {
                 "stmm": {
                     "image": {
-                        "file": os.path.join(self.env.GetValue('BUILD_OUTPUT_BASE'), 'FV', 'BL32_AP_MM.fd'),
+                        "file": os.path.join(op_fv, 'BL32_AP_MM.fd'),
                         "offset": "0x2000"
                     },
                     "pm": {
@@ -434,7 +454,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                 },
                 "mssp": {
                     "image": {
-                        "file": os.path.join(self.env.GetValue('BUILD_OUTPUT_BASE'), 'FV', 'BL32_AP_MM_SP1.fd'),
+                        "file": os.path.join(op_fv, 'BL32_AP_MS_SP.fd'),
                         "offset": "0x10000"
                     },
                     "pm": {
@@ -442,6 +462,18 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                         "offset": "0x1000"
                     },
                     "uuid": "b8bcbd0c-8e8f-4ebe-99eb-3cbbdd0cd412",
+                    "owner": "Plat"
+                },
+                "mssp-rust": {
+                    "image": {
+                        "file": os.path.join(op_fv, "msft-sp.bin"),
+                        "offset": "0x2000"
+                    },
+                    "pm": {
+                        "file": os.path.join(os.path.dirname(__file__), "fdts/qemu_sbsa_mssp_rust_config.dts"),
+                        "offset": "0x1000"
+                    },
+                    "uuid": "AFF0C73B-47E7-4A5B-AFFC-0052305A6520",
                     "owner": "Plat"
                 }
             }

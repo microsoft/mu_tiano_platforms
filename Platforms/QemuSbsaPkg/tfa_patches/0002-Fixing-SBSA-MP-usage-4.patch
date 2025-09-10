@@ -1,4 +1,4 @@
-From fc07528c7fb7a4b54f304a02cc8a3ea884ee319f Mon Sep 17 00:00:00 2001
+From 6f00302e3f2f18ebfbad5664bc7de1758b31ec18 Mon Sep 17 00:00:00 2001
 From: kuqin12 <42554914+kuqin12@users.noreply.github.com>
 Date: Mon, 13 Jan 2025 12:05:21 -0800
 Subject: [PATCH 2/2] Fixing SBSA MP usage (#4)
@@ -170,10 +170,10 @@ index 000000000..99fc9b2ee
 +endfunc plat_crash_console_flush
 +
 diff --git a/plat/qemu/common/common.mk b/plat/qemu/common/common.mk
-index 2dc89bccb..c539046d5 100644
+index 751511cf8..e3fa216fb 100644
 --- a/plat/qemu/common/common.mk
 +++ b/plat/qemu/common/common.mk
-@@ -50,7 +50,7 @@ BL1_SOURCES		+=	drivers/io/io_semihosting.c		\
+@@ -49,7 +49,7 @@ BL1_SOURCES		+=	drivers/io/io_semihosting.c		\
  				lib/semihosting/semihosting.c		\
  				lib/semihosting/${ARCH}/semihosting_call.S	\
  				${PLAT_QEMU_COMMON_PATH}/qemu_io_storage.c	\
@@ -181,23 +181,23 @@ index 2dc89bccb..c539046d5 100644
 +				${PLAT_QEMU_COMMON_PATH}/${ARCH}/plat_helpers_bl1.S	\
  				${PLAT_QEMU_COMMON_PATH}/qemu_bl1_setup.c	\
  				${QEMU_CPU_LIBS}
-
+ 
 diff --git a/plat/qemu/common/qemu_bl31_setup.c b/plat/qemu/common/qemu_bl31_setup.c
-index 81ce1023a..b5162b597 100644
+index 1c5e0eaf7..0f2b7193b 100644
 --- a/plat/qemu/common/qemu_bl31_setup.c
 +++ b/plat/qemu/common/qemu_bl31_setup.c
-@@ -56,6 +56,7 @@ static entry_point_info_t bl33_image_ep_info;
+@@ -80,6 +80,7 @@ static entry_point_info_t bl33_image_ep_info;
  static entry_point_info_t rmm_image_ep_info;
  #endif
  static struct transfer_list_header *bl31_tl;
 +void __dead2 plat_secondary_cold_boot_setup(void);
-
+ 
  /*******************************************************************************
   * Perform any BL3-1 early platform setup.  Here is an opportunity to copy
-@@ -90,6 +91,11 @@ void bl31_early_platform_setup2(u_register_t arg0, u_register_t arg1,
-
+@@ -114,6 +115,11 @@ void bl31_early_platform_setup2(u_register_t arg0, u_register_t arg1,
+ 
  	bl_params_node_t *bl_params = params_from_bl2->head;
-
+ 
 +	// We hacked the bl1 function to wait for any signal like this...
 +	// Should not be used in production
 +	uintptr_t *mailbox = (uintptr_t *)PLAT_QEMU_TRUSTED_MAILBOX_BASE;
@@ -207,7 +207,7 @@ index 81ce1023a..b5162b597 100644
  	 * Copy BL33, BL32 and RMM (if present), entry point information.
  	 * They are stored in Secure RAM, in BL2's address space.
 diff --git a/plat/qemu/qemu_sbsa/sbsa_pm.c b/plat/qemu/qemu_sbsa/sbsa_pm.c
-index 8d1e1d48c..fb1bb4330 100644
+index 7ce7beba9..a75c0a63a 100644
 --- a/plat/qemu/qemu_sbsa/sbsa_pm.c
 +++ b/plat/qemu/qemu_sbsa/sbsa_pm.c
 @@ -170,7 +170,7 @@ qemu_pwr_domain_pwr_down_wfi(const psci_power_state_t *target_state)
@@ -217,7 +217,7 @@ index 8d1e1d48c..fb1bb4330 100644
 -	assert(false);
 +	// assert(false);
  }
-
+ 
  /*******************************************************************************
 @@ -193,7 +193,7 @@ void qemu_pwr_domain_on_finish(const psci_power_state_t *target_state)
   ******************************************************************************/
@@ -226,7 +226,7 @@ index 8d1e1d48c..fb1bb4330 100644
 -	assert(false);
 +	// assert(false);
  }
-
+ 
  /*******************************************************************************
 @@ -208,6 +208,11 @@ static void __dead2 qemu_system_off(void)
  static void __dead2 qemu_system_reset(void)
@@ -239,7 +239,7 @@ index 8d1e1d48c..fb1bb4330 100644
 +
  	panic();
  }
-
---
-2.34.1
+ 
+-- 
+2.43.0
 
