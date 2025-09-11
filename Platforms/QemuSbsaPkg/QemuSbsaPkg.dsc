@@ -1126,7 +1126,7 @@
   MsCorePkg/MuVarPolicyFoundationDxe/MuVarPolicyFoundationDxe.inf
   MsCorePkg/AcpiRGRT/AcpiRgrt.inf
 !if $(BUILD_RUST_CODE) == TRUE
-  # MsCorePkg/HelloWorldRustDxe/HelloWorldRustDxe.inf
+  MsCorePkg/HelloWorldRustDxe/HelloWorldRustDxe.inf
 !endif
   MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
   SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
