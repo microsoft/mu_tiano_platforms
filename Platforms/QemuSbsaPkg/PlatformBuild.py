@@ -506,7 +506,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         ret = RunCmd("bash", temp_bash, workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
         if patch_tfa:
             # Always revert before returning
-            revert_ret = RunCmd(f"git", f"checkout {arm_tfa_git_head}", workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
+            revert_ret = RunCmd("git", f"checkout {arm_tfa_git_head}", workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
             if revert_ret != 0:
                 return revert_ret
 
