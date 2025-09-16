@@ -1,4 +1,4 @@
-From d22b19ac387866109e9e9b9821c453bf2a8eac13 Mon Sep 17 00:00:00 2001
+From bfafebc19c8ebbc6a73108753708767d5ee8f503 Mon Sep 17 00:00:00 2001
 From: Kun Qin <kuqin@microsoft.com>
 Date: Thu, 31 Oct 2024 00:41:05 -0700
 Subject: [PATCH 1/2] Changes needed to hack through QEMU SBSA usage

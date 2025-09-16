@@ -1,4 +1,4 @@
-From 0aa857bcfbc74395b0ab6b71bb1597f06fb2a43e Mon Sep 17 00:00:00 2001
+From 9fe61d752c88007a7bbf9a654234e044b11e542b Mon Sep 17 00:00:00 2001
 From: Kun Qin <kuqin@microsoft.com>
 Date: Thu, 21 Aug 2025 16:54:57 -0700
 Subject: [PATCH 2/2] Fixing SBSA MP usage (#4)
@@ -9,26 +9,18 @@ This change will need to pair with PROGRAMMABLE_RESET_ADDRESS=1 build option to 
 
 Note that the holding pen logic is also updated to specifically handle the case of context losing suspend, where a wfi is used which makes the core not to wake up more until an explicit interrupt is issued.
 ---
- plat/qemu/common/aarch64/plat_helpers.S    | 28 +++++++++++++++++++++-
+ plat/qemu/common/aarch64/plat_helpers.S    | 27 +++++++++++++++++++++-
  plat/qemu/common/qemu_bl31_setup.c         |  6 +++++
  plat/qemu/qemu/include/platform_def.h      |  5 ++--
  plat/qemu/qemu_sbsa/include/platform_def.h |  5 ++--
  plat/qemu/qemu_sbsa/sbsa_pm.c              | 16 +++++++++++--
- 5 files changed, 53 insertions(+), 7 deletions(-)
+ 5 files changed, 52 insertions(+), 7 deletions(-)
 
 diff --git a/plat/qemu/common/aarch64/plat_helpers.S b/plat/qemu/common/aarch64/plat_helpers.S
-index 08b281735..7e4594201 100644
+index 08b281735..3cb72393c 100644
 --- a/plat/qemu/common/aarch64/plat_helpers.S
 +++ b/plat/qemu/common/aarch64/plat_helpers.S
-@@ -17,6 +17,7 @@
- 	.globl	plat_crash_console_putc
- 	.globl	plat_crash_console_flush
- 	.globl  plat_secondary_cold_boot_setup
-+	.globl  plat_secondary_cold_boot_setup_wfi
- 	.globl  plat_get_my_entrypoint
- 	.globl  plat_is_my_cpu_primary
- 
-@@ -67,6 +68,12 @@ func plat_secondary_cold_boot_setup
+@@ -67,6 +67,12 @@ func plat_secondary_cold_boot_setup
  	lsl	x0, x0, #PLAT_QEMU_HOLD_ENTRY_SHIFT
  	mov_imm	x2, PLAT_QEMU_HOLD_BASE
  
@@ -41,7 +33,7 @@ index 08b281735..7e4594201 100644
  	/* Wait until we have a go */
  poll_mailbox:
  	ldr	x1, [x2, x0]
-@@ -83,11 +90,30 @@ poll_mailbox:
+@@ -83,11 +89,30 @@ poll_mailbox:
  1:
  	wfe
  	b	poll_mailbox
