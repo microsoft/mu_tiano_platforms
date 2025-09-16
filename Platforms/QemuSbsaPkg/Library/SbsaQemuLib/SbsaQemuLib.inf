@@ -38,15 +38,9 @@
   PcdLib
   HobLib
 
-[Guids]
-  gMmMemoryProtectionSettingsGuid
-  gDxeMemoryProtectionSettingsGuid
-
 [Pcd]
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdSystemMemorySize
-  gQemuSbsaPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
-  gQemuSbsaPkgTokenSpaceGuid.PcdDeviceTreeAllocationPadding
   gArmTokenSpaceGuid.PcdMmBufferBase
 
 [FixedPcd]
@@ -55,9 +49,6 @@
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
   gArmTokenSpaceGuid.PcdArmPrimaryCore
   gArmTokenSpaceGuid.PcdMmBufferSize
-
-[FeaturePcd]
-  gQemuPkgTokenSpaceGuid.PcdEnableMemoryProtection
 
 [Ppis]
   gArmMpCoreInfoPpiGuid

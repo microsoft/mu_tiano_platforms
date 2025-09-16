@@ -67,19 +67,14 @@ class CommonPlatform():
     @staticmethod
     def add_common_command_line_options(parserObj) -> None:
         """Add common command line options to the parser object."""
-        parserObj.add_argument("-r", "--rust", dest="build_rust", action="store_true", help="Builds this platform with additional Rust components (And some C components removed).")
 
     @staticmethod
     def get_common_command_line_options(settings, args) -> None:
         """Retrieves command line options common to settings managers."""
-        settings.build_rust = args.build_rust
-    
-    @staticmethod
-    def get_active_scopes(build_rust: bool) -> Tuple[str]:
-        scopes = CommonPlatform.Scopes
 
-        if build_rust:
-            scopes += ("rust",)
+    @staticmethod
+    def get_active_scopes() -> Tuple[str]:
+        scopes = CommonPlatform.Scopes
 
         actual_tool_chain_tag = shell_environment.GetBuildVars().GetValue(
                 "TOOL_CHAIN_TAG", ""
@@ -152,7 +147,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
-        return CommonPlatform.get_active_scopes(self.build_rust)
+        return CommonPlatform.get_active_scopes()
 
     def FilterPackagesToTest(self, changedFilesList: list, potentialPackagesList: list) -> list:
         ''' Filter other cases that this package should be built
@@ -273,7 +268,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
-        return CommonPlatform.get_active_scopes(self.build_rust)
+        return CommonPlatform.get_active_scopes()
 
     def GetName(self):
         ''' Get the name of the repo, platform, or product being build '''
@@ -311,7 +306,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         self.env.SetValue("ACTIVE_PLATFORM", "QemuSbsaPkg/QemuSbsaPkg.dsc", "Platform Hardcoded")
         self.env.SetValue("TARGET_ARCH", "AARCH64", "Platform Hardcoded")
         self.env.SetValue("TOOL_CHAIN_TAG", "GCC5", "set default to gcc5")
-        self.env.SetValue("BLD_*_BUILD_RUST_CODE", str(self.build_rust).upper(), "Set via `--rust` command line option")
         self.env.SetValue("EMPTY_DRIVE", "FALSE", "Default to false")
         self.env.SetValue("RUN_TESTS", "FALSE", "Default to false")
         self.env.SetValue("QEMU_HEADLESS", "FALSE", "Default to false")
@@ -379,8 +373,10 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         op_fv = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
 
         logging.info("Building Hafnium")
+        haf_out = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "HAF")
         cmd = "make"
         args = "PROJECT=mu PLATFORM=secure_qemu_aarch64"
+        args += " OUT=" + haf_out
         ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_HAF_PATH"))
         if ret != 0:
             return ret
@@ -473,7 +469,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         args += f" SPD=spmd SPMD_SPM_AT_SEL2=1 SP_LAYOUT_FILE={filename}"
         args += " ENABLE_FEAT_HCX=1 HOB_LIST=1 TRANSFER_LIST=1 LOG_LEVEL=40" # Features used by hypervisor
         # args += " FEATURE_DETECTION=1" # Enforces support for features enabled.
-        args += f" BL32={os.path.join(self.env.GetValue('ARM_HAF_PATH'), 'out/mu/secure_qemu_aarch64_clang', 'hafnium.bin')}"
+        args += f" BL32={os.path.join(haf_out, 'secure_qemu_aarch64_clang', 'hafnium.bin')}"
         args += " all fip"
 
         # Third, write a temp bash file to activate the virtual environment and build the firmware.

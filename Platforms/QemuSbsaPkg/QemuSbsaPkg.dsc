@@ -252,7 +252,7 @@
   # Virtio Support
   VirtioLib|QemuPkg/Library/VirtioLib/VirtioLib.inf
 
-  ArmPlatformLib|ArmPlatformPkg/Library/ArmPlatformLibNull/ArmPlatformLibNull.inf
+  ArmPlatformLib|QemuSbsaPkg/Library/SbsaQemuLib/SbsaQemuLib.inf
 
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
 
@@ -360,6 +360,7 @@
   Tcg2PpVendorLib         |SecurityPkg/Library/Tcg2PpVendorLibNull/Tcg2PpVendorLibNull.inf
   TpmMeasurementLib       |MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
   Tcg2PhysicalPresenceLib |QemuPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2PhysicalPresenceLib.inf
+  Tpm2HelpLib             |SecurityPkg/Library/Tpm2HelpLib/Tpm2HelpLib.inf
 !if $(TPM2_ENABLE) == TRUE
   Tcg2PhysicalPresenceLib |SecurityPkg/Library/DxeTcg2PhysicalPresenceMinimumLib/DxeTcg2PhysicalPresenceMinimumLib.inf
   TpmMeasurementLib       |SecurityPkg/Library/DxeTpmMeasurementLib/DxeTpmMeasurementLib.inf
@@ -440,7 +441,6 @@
 
   MsPlatformEarlyGraphicsLib |MsGraphicsPkg/Library/MsEarlyGraphicsLibNull/Pei/MsEarlyGraphicsLibNull.inf
   MsUiThemeLib               |MsGraphicsPkg/Library/MsUiThemeLib/Pei/MsUiThemeLib.inf
-  ArmPlatformLib             |QemuSbsaPkg/Library/SbsaQemuLib/SbsaQemuLib.inf
   OemMfciLib                 |OemPkg/Library/OemMfciLib/OemMfciLibPei.inf
   ConfigKnobShimLib          |SetupDataPkg/Library/ConfigKnobShimLib/ConfigKnobShimPeiLib/ConfigKnobShimPeiLib.inf
   PolicyLib                  |PolicyServicePkg/Library/PeiPolicyLib/PeiPolicyLib.inf
@@ -1125,9 +1125,6 @@
   MsWheaPkg/MsWheaReport/Dxe/MsWheaReportDxe.inf
   MsCorePkg/MuVarPolicyFoundationDxe/MuVarPolicyFoundationDxe.inf
   MsCorePkg/AcpiRGRT/AcpiRgrt.inf
-!if $(BUILD_RUST_CODE) == TRUE
-  MsCorePkg/HelloWorldRustDxe/HelloWorldRustDxe.inf
-!endif
   MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
   SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
   AdvLoggerPkg/Application/AdvancedLogDumper/AdvancedLogDumper.inf
@@ -1225,13 +1222,6 @@
   QemuPkg/Virtio10Dxe/Virtio10.inf
 
   #
-  # HID Support
-  #
-!if $(BUILD_RUST_CODE) == TRUE
-  HidPkg/UefiHidDxe/UefiHidDxe.inf
-!endif
-
-  #
   # USB Support
   #
   MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
@@ -1240,15 +1230,7 @@
   MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
-
-!if $(BUILD_RUST_CODE) == TRUE
-  HidPkg/UsbHidDxe/UsbHidDxe.inf {
-    <LibraryClasses>
-      UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
-  }
-!else
   MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.inf
-!endif
 
   #
   # TPM2 support
@@ -1466,6 +1448,7 @@
       MemoryAllocationLib|MdeModulePkg/Library/BaseMemoryAllocationLibNull/BaseMemoryAllocationLibNull.inf
       StandaloneMmCoreEntryPoint|FfaFeaturePkg/Library/SecurePartitionEntryPoint/SecurePartitionEntryPoint.inf
       Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpmStandaloneMm.inf
+      ArmFfaLib|MdeModulePkg/Library/ArmFfaLib/ArmFfaLibBase.inf
 !if $(TPM2_ENABLE) == TRUE
       NULL|FfaFeaturePkg/Library/TpmServiceLib/TpmServiceLib.inf
       TpmServiceStateTranslationLib|FfaFeaturePkg/Library/TpmServiceStateTranslationLib/TpmServiceStateTranslationLib.inf
@@ -1512,8 +1495,9 @@
 [BuildOptions.common.EDKII.SEC,BuildOptions.common.EDKII.MM_CORE_STANDALONE]
   GCC:*_CLANGPDB_*_DLINK_FLAGS = /ALIGN:0x1000 /FILEALIGN:0x1000
 
-[BuildOptions.common.EDKII.PEIM]
+[BuildOptions.common.EDKII.PEIM,BuildOptions.common.EDKII.PEI_CORE]
   GCC:*_*_*_DLINK_XIPFLAGS = -z common-page-size=0x1000
+  GCC:*_CLANGPDB_*_DLINK_FLAGS = /ALIGN:0x1000 /FILEALIGN:0x1000
 
 [BuildOptions.common.EDKII.DXE_CORE,BuildOptions.common.EDKII.DXE_DRIVER,BuildOptions.common.EDKII.UEFI_DRIVER,BuildOptions.common.EDKII.UEFI_APPLICATION,BuildOptions.common.EDKII.MM_CORE_STANDALONE,BuildOptions.common.EDKII.MM_STANDALONE]
   GCC:*_GCC5_*_DLINK_FLAGS = -z common-page-size=0x1000
