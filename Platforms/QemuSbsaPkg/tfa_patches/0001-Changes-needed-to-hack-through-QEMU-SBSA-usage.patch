@@ -11,20 +11,20 @@ Co-authored-by: rdiaz <raymonddiaz@microsoft.com>
 
 Updated DTS files to include the correct UUID for the Notification SP and added the device regions for the TPM CRBs
 ---
- .../fdts/qemu_sbsa_spmc_sp_manifest.dts       | 118 ++++++++++++++++++
- .../qemu_sbsa/fdts/qemu_sbsa_tb_fw_config.dts |  42 +++++++
- plat/qemu/qemu_sbsa/include/platform_def.h    |  35 ++++--
- plat/qemu/qemu_sbsa/platform.mk               |  21 ++++
- 4 files changed, 209 insertions(+), 7 deletions(-)
+ .../fdts/qemu_sbsa_spmc_sp_manifest.dts       | 136 ++++++++++++++++++
+ .../qemu_sbsa/fdts/qemu_sbsa_tb_fw_config.dts |  47 ++++++
+ plat/qemu/qemu_sbsa/include/platform_def.h    |  35 ++++-
+ plat/qemu/qemu_sbsa/platform.mk               |  21 +++
+ 4 files changed, 232 insertions(+), 7 deletions(-)
  create mode 100644 plat/qemu/qemu_sbsa/fdts/qemu_sbsa_spmc_sp_manifest.dts
  create mode 100644 plat/qemu/qemu_sbsa/fdts/qemu_sbsa_tb_fw_config.dts
 
 diff --git a/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_spmc_sp_manifest.dts b/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_spmc_sp_manifest.dts
 new file mode 100644
-index 000000000..3c0187cfa
+index 000000000..69b24a68f
 --- /dev/null
 +++ b/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_spmc_sp_manifest.dts
-@@ -0,0 +1,118 @@
+@@ -0,0 +1,136 @@
 +/*
 + * Copyright (c) 2022, Arm Limited. All rights reserved.
 + *
@@ -67,7 +67,15 @@ index 000000000..3c0187cfa
 +     vm2 {
 +       is_ffa_partition;
 +       load_address = <0x0 0x20400000>;
-+       debug_name = "therm";
++       debug_name = "mssp";
++       vcpu_count = <1>;
++       mem_size = <0x400000>;
++     };
++     /* Example Rust Service */
++     vm3 {
++       is_ffa_partition;
++       load_address = <0x0 0x20800000>;
++       debug_name = "mssp-rust";
 +       vcpu_count = <1>;
 +       mem_size = <0x400000>;
 +     };
@@ -142,13 +150,23 @@ index 000000000..3c0187cfa
 +    device_type = "device-memory"; /* External CRB */
 +    reg = <0x00000000 0x60120000 0x0 0x00010000>;
 +  };
++
++  memory@10 {
++    device_type = "memory"; /* External CRB */
++    reg = <0x00000100 0x60000000 0x0 0x00002000>;
++  };
++
++  memory@11 {
++    device_type = "memory"; /* External CRB */
++    reg = <0x00000100 0x600A0000 0x0 0x00002000>;
++  };
 +};
 diff --git a/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_tb_fw_config.dts b/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_tb_fw_config.dts
 new file mode 100644
-index 000000000..1e9284248
+index 000000000..5b655c37a
 --- /dev/null
 +++ b/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_tb_fw_config.dts
-@@ -0,0 +1,42 @@
+@@ -0,0 +1,47 @@
 +/*
 + * Copyright (c) 2022, ARM Limited and Contributors. All rights reserved.
 + *
@@ -187,6 +205,11 @@ index 000000000..1e9284248
 +    example {
 +      uuid = "b8bcbd0c-8e8f-4ebe-99eb-3cbbdd0cd412";
 +      load-address = <0x20400000>;
++      owner = "Plat";
++    };
++    example_rust {
++      uuid = "AFF0C73B-47E7-4A5B-AFFC-0052305A6520";
++      load-address = <0x20800000>;
 +      owner = "Plat";
 +    };
 +   };

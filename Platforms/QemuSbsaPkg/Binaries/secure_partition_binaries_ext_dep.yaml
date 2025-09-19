@@ -1,0 +1,18 @@
+## @file
+# Download the secure partition binary blobs for the default Db, 3PDb, Dbx, KEK, and Pk
+#
+# Copyright (c) Microsoft Corporation
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "qemusbsa",
+  "type": "web",
+  "name": "secure_partition_binaries",
+  "source": "https://github.com/microsoft/mu_feature_ffa/releases/download/v0.1.0/rust-secure-partitions-v0.1.0.tar.gz",
+  "version": "v0.1.0",
+  "sha256": "0e7a66cc570a1d8b35f27f6472978b881186722db554c5326b97f565f2821b4b",
+  "internal_path": "/artifacts/rust-secure-partitions",
+  "compression_type": "tar",
+  "flags": ["set_build_var"],
+  "var_name": "SECURE_PARTITION_BINARIES"
+}
