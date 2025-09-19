@@ -1,186 +1,69 @@
-From 6f00302e3f2f18ebfbad5664bc7de1758b31ec18 Mon Sep 17 00:00:00 2001
-From: kuqin12 <42554914+kuqin12@users.noreply.github.com>
-Date: Mon, 13 Jan 2025 12:05:21 -0800
+From 9fe61d752c88007a7bbf9a654234e044b11e542b Mon Sep 17 00:00:00 2001
+From: Kun Qin <kuqin@microsoft.com>
+Date: Thu, 21 Aug 2025 16:54:57 -0700
 Subject: [PATCH 2/2] Fixing SBSA MP usage (#4)
 
 The existing TFA will fault the secondary cores when placing the TFA image in secure flash. This was because when the stmm image is trying to communicate with the secure flash for UEFI variable support, the flash will change mode to write. In the meantime, the secondary cores looping at `wfe` will be woken up which at this point the flash cannot be read.
 
-This change will bring the secondary cores to loop at BL31 instead of BL1 which will remove the execute on flash dependency to avoid such issue.
+This change will need to pair with PROGRAMMABLE_RESET_ADDRESS=1 build option to hold the secondary cores to loop at BL31 instead of BL1 which will remove the execute on flash dependency to avoid such issue.
 
-Known drawback: The context losing sleep will be broken because the core cannot fall back to the context losing state once this is brought up BL31 context.
-
-(cherry picked from commit c994d713506e7d1ab38ed399e6c8473a9b4bf8c0)
+Note that the holding pen logic is also updated to specifically handle the case of context losing suspend, where a wfi is used which makes the core not to wake up more until an explicit interrupt is issued.
 ---
- include/plat/arm/common/aarch64/arm_macros.S |   2 +
- plat/qemu/common/aarch64/plat_helpers_bl1.S  | 131 +++++++++++++++++++
- plat/qemu/common/common.mk                   |   2 +-
- plat/qemu/common/qemu_bl31_setup.c           |   6 +
- plat/qemu/qemu_sbsa/sbsa_pm.c                |   9 +-
- 5 files changed, 147 insertions(+), 3 deletions(-)
- create mode 100644 plat/qemu/common/aarch64/plat_helpers_bl1.S
+ plat/qemu/common/aarch64/plat_helpers.S    | 27 +++++++++++++++++++++-
+ plat/qemu/common/qemu_bl31_setup.c         |  6 +++++
+ plat/qemu/qemu/include/platform_def.h      |  5 ++--
+ plat/qemu/qemu_sbsa/include/platform_def.h |  5 ++--
+ plat/qemu/qemu_sbsa/sbsa_pm.c              | 16 +++++++++++--
+ 5 files changed, 52 insertions(+), 7 deletions(-)
 
-diff --git a/include/plat/arm/common/aarch64/arm_macros.S b/include/plat/arm/common/aarch64/arm_macros.S
-index 8aacfb0a9..dc6d7b42a 100644
---- a/include/plat/arm/common/aarch64/arm_macros.S
-+++ b/include/plat/arm/common/aarch64/arm_macros.S
-@@ -62,6 +62,8 @@ prefix:
- 	mrs	x8, ICC_HPPIR0_EL1
- 	mrs	x9, ICC_HPPIR1_EL1
- 	mrs	x10, ICC_CTLR_EL3
-+TestExc:
-+	b	TestExc
- 	/* Store to the crash buf and print to console */
- 	bl	str_in_crash_buf_print
- 	b	print_gic_common
-diff --git a/plat/qemu/common/aarch64/plat_helpers_bl1.S b/plat/qemu/common/aarch64/plat_helpers_bl1.S
-new file mode 100644
-index 000000000..99fc9b2ee
---- /dev/null
-+++ b/plat/qemu/common/aarch64/plat_helpers_bl1.S
-@@ -0,0 +1,131 @@
-+/*
-+ * Copyright (c) 2015-2020, ARM Limited and Contributors. All rights reserved.
-+ *
-+ * SPDX-License-Identifier: BSD-3-Clause
-+ */
+diff --git a/plat/qemu/common/aarch64/plat_helpers.S b/plat/qemu/common/aarch64/plat_helpers.S
+index 08b281735..3cb72393c 100644
+--- a/plat/qemu/common/aarch64/plat_helpers.S
++++ b/plat/qemu/common/aarch64/plat_helpers.S
+@@ -67,6 +67,12 @@ func plat_secondary_cold_boot_setup
+ 	lsl	x0, x0, #PLAT_QEMU_HOLD_ENTRY_SHIFT
+ 	mov_imm	x2, PLAT_QEMU_HOLD_BASE
+ 
++	/* first check to see if we are about to be suspended */
++	ldr	x1, [x2, x0]
++	cmp	x1, #PLAT_QEMU_HOLD_STATE_SUSPEND
++	/* if so, use wfi for suspension */
++	beq	2f
 +
-+#include <arch.h>
-+#include <asm_macros.S>
-+#include <assert_macros.S>
-+#include <platform_def.h>
-+
-+	.globl	plat_my_core_pos
-+	.globl	plat_get_my_entrypoint
-+	.globl	platform_mem_init
-+	.globl	plat_qemu_calc_core_pos
-+	.globl	plat_crash_console_init
-+	.globl	plat_crash_console_putc
-+	.globl	plat_crash_console_flush
-+	.globl  plat_secondary_cold_boot_setup
-+	.globl  plat_get_my_entrypoint
-+	.globl  plat_is_my_cpu_primary
-+
-+func plat_my_core_pos
-+	mrs	x0, mpidr_el1
-+	b	plat_qemu_calc_core_pos
-+endfunc plat_my_core_pos
-+
-+/*
-+ *  unsigned int plat_qemu_calc_core_pos(u_register_t mpidr);
-+ *  With this function: CorePos = (ClusterId * 4) + CoreId
-+ */
-+func plat_qemu_calc_core_pos
-+	and	x1, x0, #MPIDR_CPU_MASK
-+	and	x0, x0, #MPIDR_CLUSTER_MASK
-+	add	x0, x1, x0, LSR #(MPIDR_AFFINITY_BITS -\
-+				  PLATFORM_CPU_PER_CLUSTER_SHIFT)
-+	ret
-+endfunc plat_qemu_calc_core_pos
-+
-+	/* -----------------------------------------------------
-+	 * unsigned int plat_is_my_cpu_primary (void);
-+	 *
-+	 * Find out whether the current cpu is the primary
-+	 * cpu.
-+	 * -----------------------------------------------------
-+	 */
-+func plat_is_my_cpu_primary
-+	mrs	x0, mpidr_el1
-+	and	x0, x0, #(MPIDR_CLUSTER_MASK | MPIDR_CPU_MASK)
-+	cmp	x0, #QEMU_PRIMARY_CPU
-+	cset	w0, eq
-+	ret
-+endfunc plat_is_my_cpu_primary
-+
-+	/* -----------------------------------------------------
-+	 * void plat_secondary_cold_boot_setup (void);
-+	 *
-+	 * This function performs any platform specific actions
-+	 * needed for a secondary cpu after a cold reset e.g
-+	 * mark the cpu's presence, mechanism to place it in a
-+	 * holding pen etc.
-+	 * -----------------------------------------------------
-+	 */
-+func plat_secondary_cold_boot_setup
-+	/* Calculate address of our hold entry */
-+	bl	plat_my_core_pos
-+	lsl	x0, x0, #PLAT_QEMU_HOLD_ENTRY_SHIFT
-+	mov_imm	x2, PLAT_QEMU_HOLD_BASE
-+
-+	/* Wait until we have a go */
-+poll_mailbox:
-+	mov_imm	x0, PLAT_QEMU_TRUSTED_MAILBOX_BASE
-+	ldr	x1, [x0]
-+	cbz	x1, 1f
-+
-+	/* Jump to the provided entrypoint. */
-+	br	x1
-+1:
-+	wfe
+ 	/* Wait until we have a go */
+ poll_mailbox:
+ 	ldr	x1, [x2, x0]
+@@ -83,11 +89,30 @@ poll_mailbox:
+ 1:
+ 	wfe
+ 	b	poll_mailbox
++2:
++	wfi
++	/* if we wake up from wfi, the suspend is over, clear and poll the mailbox */
 +	b	poll_mailbox
-+endfunc plat_secondary_cold_boot_setup
-+
-+func plat_get_my_entrypoint
-+	/* TODO support warm boot */
-+	mov	x0, #0
-+	ret
-+endfunc plat_get_my_entrypoint
-+
-+func platform_mem_init
-+	ret
-+endfunc platform_mem_init
-+
-+	/* ---------------------------------------------
-+	 * int plat_crash_console_init(void)
-+	 * Function to initialize the crash console
-+	 * without a C Runtime to print crash report.
-+	 * Clobber list : x0, x1, x2
-+	 * ---------------------------------------------
-+	 */
-+func plat_crash_console_init
-+	mov_imm x0, PLAT_QEMU_CRASH_UART_BASE
-+	mov_imm x1, PLAT_QEMU_CRASH_UART_CLK_IN_HZ
-+	mov_imm x2, PLAT_QEMU_CONSOLE_BAUDRATE
-+	b	console_pl011_core_init
-+endfunc plat_crash_console_init
-+
-+	/* ---------------------------------------------
-+	 * int plat_crash_console_putc(int c)
-+	 * Function to print a character on the crash
-+	 * console without a C Runtime.
-+	 * Clobber list : x1, x2
-+	 * ---------------------------------------------
-+	 */
-+func plat_crash_console_putc
-+	mov_imm	x1, PLAT_QEMU_CRASH_UART_BASE
-+	b	console_pl011_core_putc
-+endfunc plat_crash_console_putc
-+
-+	/* ---------------------------------------------
-+	 * void plat_crash_console_flush(int c)
-+	 * Function to force a write of all buffered
-+	 * data that hasn't been output.
-+	 * Out : void.
-+	 * Clobber list : x0, x1
-+	 * ---------------------------------------------
-+	 */
-+func plat_crash_console_flush
-+	mov_imm	x0, PLAT_QEMU_CRASH_UART_BASE
-+	b	console_pl011_core_flush
-+endfunc plat_crash_console_flush
-+
-diff --git a/plat/qemu/common/common.mk b/plat/qemu/common/common.mk
-index 751511cf8..e3fa216fb 100644
---- a/plat/qemu/common/common.mk
-+++ b/plat/qemu/common/common.mk
-@@ -49,7 +49,7 @@ BL1_SOURCES		+=	drivers/io/io_semihosting.c		\
- 				lib/semihosting/semihosting.c		\
- 				lib/semihosting/${ARCH}/semihosting_call.S	\
- 				${PLAT_QEMU_COMMON_PATH}/qemu_io_storage.c	\
--				${PLAT_QEMU_COMMON_PATH}/${ARCH}/plat_helpers.S	\
-+				${PLAT_QEMU_COMMON_PATH}/${ARCH}/plat_helpers_bl1.S	\
- 				${PLAT_QEMU_COMMON_PATH}/qemu_bl1_setup.c	\
- 				${QEMU_CPU_LIBS}
+ endfunc plat_secondary_cold_boot_setup
+ 
+ func plat_get_my_entrypoint
+-	/* TODO support warm boot */
++	/* Preserve the link register */
++	mov	x1, x30
++	/* Write 0 to the mailbox upon the first call */
++	mov_imm	x0, PLAT_QEMU_TRUSTED_MAILBOX_BASE
++	str	xzr, [x0]
++	bl	plat_is_my_cpu_primary
++	cbz	w0, do_sec_entrypoint
++	/* This is the primary entrypoint */
+ 	mov	x0, #0
++	b	done_entrypoint
++do_sec_entrypoint:
++	mov_imm	x0, PLAT_QEMU_TRUSTED_MAILBOX_BASE
++	ldr	x0, [x0]
++	// hot loop until the mailbox is populated by the primary core
++	cbz	x0, do_sec_entrypoint
++done_entrypoint:
++	mov	x30, x1
+ 	ret
+ endfunc plat_get_my_entrypoint
  
 diff --git a/plat/qemu/common/qemu_bl31_setup.c b/plat/qemu/common/qemu_bl31_setup.c
 index 1c5e0eaf7..0f2b7193b 100644
@@ -206,40 +89,79 @@ index 1c5e0eaf7..0f2b7193b 100644
  	/*
  	 * Copy BL33, BL32 and RMM (if present), entry point information.
  	 * They are stored in Secure RAM, in BL2's address space.
+diff --git a/plat/qemu/qemu/include/platform_def.h b/plat/qemu/qemu/include/platform_def.h
+index 7dd7dcda5..460bd47ce 100644
+--- a/plat/qemu/qemu/include/platform_def.h
++++ b/plat/qemu/qemu/include/platform_def.h
+@@ -111,8 +111,9 @@
+ 					 PLAT_QEMU_HOLD_ENTRY_SIZE)
+ #define PLAT_QEMU_HOLD_ENTRY_SHIFT	3
+ #define PLAT_QEMU_HOLD_ENTRY_SIZE	(1 << PLAT_QEMU_HOLD_ENTRY_SHIFT)
+-#define PLAT_QEMU_HOLD_STATE_WAIT	0
+-#define PLAT_QEMU_HOLD_STATE_GO		1
++#define PLAT_QEMU_HOLD_STATE_WAIT			0
++#define PLAT_QEMU_HOLD_STATE_GO				1
++#define PLAT_QEMU_HOLD_STATE_SUSPEND	2
+ 
+ #define BL_RAM_BASE			(SHARED_RAM_BASE + SHARED_RAM_SIZE)
+ #define BL_RAM_SIZE			(SEC_SRAM_SIZE - SHARED_RAM_SIZE)
+diff --git a/plat/qemu/qemu_sbsa/include/platform_def.h b/plat/qemu/qemu_sbsa/include/platform_def.h
+index b0282a077..893bde3fd 100644
+--- a/plat/qemu/qemu_sbsa/include/platform_def.h
++++ b/plat/qemu/qemu_sbsa/include/platform_def.h
+@@ -111,8 +111,9 @@
+ 					 PLAT_QEMU_HOLD_ENTRY_SIZE)
+ #define PLAT_QEMU_HOLD_ENTRY_SHIFT	3
+ #define PLAT_QEMU_HOLD_ENTRY_SIZE	(1 << PLAT_QEMU_HOLD_ENTRY_SHIFT)
+-#define PLAT_QEMU_HOLD_STATE_WAIT	0
+-#define PLAT_QEMU_HOLD_STATE_GO		1
++#define PLAT_QEMU_HOLD_STATE_WAIT			0
++#define PLAT_QEMU_HOLD_STATE_GO				1
++#define PLAT_QEMU_HOLD_STATE_SUSPEND	2
+ 
+ #define BL_RAM_BASE			(SHARED_RAM_BASE + SHARED_RAM_SIZE)
+ #define BL_RAM_SIZE			(SEC_SRAM_SIZE - SHARED_RAM_SIZE)
 diff --git a/plat/qemu/qemu_sbsa/sbsa_pm.c b/plat/qemu/qemu_sbsa/sbsa_pm.c
-index 7ce7beba9..a75c0a63a 100644
+index 7ce7beba9..c28bfdb7d 100644
 --- a/plat/qemu/qemu_sbsa/sbsa_pm.c
 +++ b/plat/qemu/qemu_sbsa/sbsa_pm.c
-@@ -170,7 +170,7 @@ qemu_pwr_domain_pwr_down_wfi(const psci_power_state_t *target_state)
+@@ -170,7 +170,14 @@ qemu_pwr_domain_pwr_down_wfi(const psci_power_state_t *target_state)
   ******************************************************************************/
  void qemu_pwr_domain_suspend(const psci_power_state_t *target_state)
  {
 -	assert(false);
-+	// assert(false);
++	// Set up the mailbox to prepare for the interrupt coming back up
++	unsigned pos = plat_my_core_pos();
++	uint64_t *hold_base = (uint64_t *)PLAT_QEMU_HOLD_BASE;
++
++	// This seems odd, but at this point, the core should be running already
++	// Thus setting the mailbox for itself will only take effect when the next event
++	// arrived and the core is ready to process it (at poll mailbox loop).
++	hold_base[pos] = PLAT_QEMU_HOLD_STATE_SUSPEND;
  }
  
  /*******************************************************************************
-@@ -193,7 +193,7 @@ void qemu_pwr_domain_on_finish(const psci_power_state_t *target_state)
+@@ -193,7 +200,7 @@ void qemu_pwr_domain_on_finish(const psci_power_state_t *target_state)
   ******************************************************************************/
  void qemu_pwr_domain_suspend_finish(const psci_power_state_t *target_state)
  {
 -	assert(false);
-+	// assert(false);
++	// Do nothing
  }
  
  /*******************************************************************************
-@@ -208,6 +208,11 @@ static void __dead2 qemu_system_off(void)
+@@ -207,6 +214,11 @@ static void __dead2 qemu_system_off(void)
+ 
  static void __dead2 qemu_system_reset(void)
  {
- 	mmio_write_32(SBSA_SECURE_EC_OFFSET, SBSA_SECURE_EC_CMD_REBOOT);
-+	// We hacked the bl1 function to wait for any signal like this...
-+	// Should not be used in production
 +	uintptr_t *mailbox = (uintptr_t *)PLAT_QEMU_TRUSTED_MAILBOX_BASE;
-+	*mailbox = (uintptr_t)0;
 +
++	// Save us from the next boot up
++	*mailbox = 0;
++
+ 	mmio_write_32(SBSA_SECURE_EC_OFFSET, SBSA_SECURE_EC_CMD_REBOOT);
  	panic();
  }
- 
 -- 
 2.43.0
 
