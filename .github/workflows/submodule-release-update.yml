@@ -39,7 +39,7 @@ jobs:
           private-key: ${{ secrets.MU_ACCESS_APP_PRIVATE_KEY }}
 
       - name: Update Submodules to Latest Release
-        uses: microsoft/mu_devops/.github/actions/submodule-release-updater@v17.0.1
+        uses: microsoft/mu_devops/.github/actions/submodule-release-updater@v18.0.0
         with:
           GH_PAT: ${{ steps.app-token.outputs.token }}
           GH_USER: "ProjectMuBot"
