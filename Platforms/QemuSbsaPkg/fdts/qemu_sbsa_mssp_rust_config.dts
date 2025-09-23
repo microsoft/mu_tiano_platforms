@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020-21, ARM Limited and Contributors. All rights reserved.
+ * Copyright (c) Microsoft Corporation.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -21,22 +22,22 @@
 	/*
 	 * FF-A compatible Secure Partition Manager parses the
 	 * config file and fetch the following booting arguments to
-	 * pass on to the  Secure Partition.
+	 * pass on to the Secure Partition.
 	 */
 	compatible = "arm,ffa-manifest-1.0";
 
 	description = "Microsoft Services";
 	ffa-version = <0x00010002>; /* 31:16 - Major, 15:0 - Minor */
-	uuid = <0xa462b817 0xaf4f0618 0x9a08b386 0x61383558>;
-	id = <0x8002>;
+	uuid = <0x7ed874e4 0x44403157 0x3ecb27a7 0xdfc8f38c>, <0xb3d9fae0 0xc5425c7f 0xa8b7eeb2 0xb2cd1323>;
+	id = <0x8003>;
 	execution-ctx-count = <1>;
-	exception-level = <1>; /* SEL0*/
+	exception-level = <2>; /* SEL1*/
 	execution-state = <0>; /* AArch64*/
-	load-address = <0x0 0x20400000>;
-	entrypoint-offset = <0x10000>;
+	load-address = <0x0 0x20800000>;
+	entrypoint-offset = <0x2000>;
 	image-size = <0x0 0x400000>;
 	xlat-granule = <0>; /* 4KiB */
-	boot-order = <1>;
+	boot-order = <2>;
 	messaging-method = <0x603>; /* Direct request/response supported. */
 	ns-interrupts-action = <0>; /* Non-secure interrupt is queued */
 	notification-support; /* Support receipt of notifications. */
@@ -47,29 +48,28 @@
 		ffa_manifest;
 	};
 
-	device-regions {
-		compatible = "arm,ffa-manifest-device-regions";
+	memory-regions {
+		compatible = "arm,ffa-manifest-memory-regions";
 
 		/*
-		 * Secure UART region.
+		 * Memory shared between EL3 and S-EL0.
+		 * Similar to ARM_SPM_BUF_EL0_MMAP.
 		 */
-		secure_uart {
-			base-address = <0x0 0x60030000>;
-			pages-count = <0x1>;
+		rx-tx-buffers {
+			description = "shared-buff";
+			base-address = <0x100 0x600A0000>;
+			pages-count = <0x2>;
 			attributes = <0x3>;
 		};
 
-		internal_tpm_crb {
-			description = "internal tpm crb";
-			base-address = <0x00000100 0x00200000>;
-			pages-count = <0x10>;
-			attributes = <0x3>;
-		};
-
-		external_tpm_crb {
-			description = "external tpm crb";
-			base-address = <0x00000000 0x60120000>;
-			pages-count = <0x10>;
+		/*
+		 * Memory shared between S-EL0 and NS-EL1.
+		 * Similar to ARM_SPM_BUF_NS_MMAP.
+		 */
+		smem-buffers {
+			description = "smem-buff";
+			base-address = <0x100 0x60000000>;
+			pages-count = <0x2>;
 			attributes = <0x3>;
 		};
 	};
