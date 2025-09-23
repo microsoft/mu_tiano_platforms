@@ -325,6 +325,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         self.env.SetValue("CONF_AUTOGEN_INCLUDE_PATH", self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuSbsaPkg", "Include"), "Platform Defined")
         self.env.SetValue("MU_SCHEMA_DIR", self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuSbsaPkg", "CfgData"), "Platform Defined")
         self.env.SetValue("MU_SCHEMA_FILE_NAME", "QemuSbsaPkgCfgData.xml", "Platform Hardcoded")
+        self.env.SetValue("HAF_TFA_BUILD", "TRUE", "Default to false when running locally")
 
         if self.Helper.generate_secureboot_pcds(self) != 0:
             logging.error("Failed to generate include PCDs")
@@ -357,7 +358,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             fd.write(patchImage)
         return 0
 
-    def PlatformPostBuild(self):
+    def HafTfaBuild(self):
+        logging.info("Starting Hafnium and TF-A build")
         src_dir = os.path.join(self.GetWorkspaceRoot (), "Platforms/QemuSbsaPkg/mu")
         dest_dir = os.path.join(self.GetWorkspaceRoot (), "Silicon/Arm/HAF/project/mu")
 
@@ -527,11 +529,84 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         # Revert the build vars to the original state
         shell_environment.RevertBuildVars()
 
-        # Now that BL31 is built with BL32 supplied, patch BL1 and BL31 built fip.bin into the SECURE_FLASH0.fd
+        # Copy output binaries to a known location
+        output_dir = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "HafTfaBins")
+        os.makedirs(output_dir, exist_ok=True)
+
+        # Copy Hafnium binary
+        hafnium_src = os.path.join(haf_out, 'secure_qemu_aarch64_clang', 'hafnium.bin')
+        if os.path.exists(hafnium_src):
+            hafnium_output = os.path.join(output_dir, "hafnium.bin")
+            shutil.copy2(hafnium_src, hafnium_output)
+            logging.info(f"Hafnium binary saved to: {hafnium_output}")
+        else:
+            logging.error(f"Hafnium binary not found at {hafnium_src}")
+            return -1
+
+        # Copy TF-A binaries
         op_tfa = os.path.join (
             self.env.GetValue("ARM_TFA_PATH"), "build",
             self.env.GetValue("QEMU_PLATFORM").lower(),
             self.env.GetValue("TARGET").lower())
+
+        # Copy BL1
+        bl1_src = os.path.join(op_tfa, "bl1.bin")
+        if os.path.exists(bl1_src):
+            bl1_output = os.path.join(output_dir, "bl1.bin")
+            shutil.copy2(bl1_src, bl1_output)
+            logging.info(f"BL1 binary saved to: {bl1_output}")
+        else:
+            logging.error(f"BL1 binary not found at {bl1_src}")
+            return -1
+        
+        # Copy BL2
+        bl2_src = os.path.join(op_tfa, "bl2.bin")
+        if os.path.exists(bl2_src):
+            bl2_output = os.path.join(output_dir, "bl2.bin")
+            shutil.copy2(bl2_src, bl2_output)
+            logging.info(f"BL2 binary saved to: {bl2_output}")
+        else:
+            logging.error(f"BL2 binary not found at {bl2_src}")
+            return -1
+        
+        # Copy BL31
+        bl31_src = os.path.join(op_tfa, "bl31.bin")
+        if os.path.exists(bl31_src):
+            bl31_output = os.path.join(output_dir, "bl31.bin")
+            shutil.copy2(bl31_src, bl31_output)
+            logging.info(f"BL31 (TF-A) binary saved to: {bl31_output}")
+        else:
+            logging.error(f"BL31 binary not found at {bl31_src}")
+            return -1
+
+        # Copy FIP binary 
+        fip_src = os.path.join(op_tfa, "fip.bin")
+        if os.path.exists(fip_src):
+            fip_output = os.path.join(output_dir, "fip.bin")
+            shutil.copy2(fip_src, fip_output)
+            logging.info(f"FIP binary saved to: {fip_output}")
+        else:
+            logging.error(f"FIP binary not found at {fip_src}")
+            return -1
+
+        logging.info(f"All firmware binaries saved to: {output_dir}")
+        return 0
+
+    def PlatformPostBuild(self):
+        if self.env.GetValue("HAF_TFA_BUILD") == "TRUE":
+            ret = self.HafTfaBuild()
+            if ret != 0:
+                return ret
+            op_tfa = os.path.join (
+                self.env.GetValue("ARM_TFA_PATH"), "build",
+                self.env.GetValue("QEMU_PLATFORM").lower(),
+                self.env.GetValue("TARGET").lower())
+        else:
+            op_tfa = self.env.GetValue("HAF_TFA_BINS")
+
+        # Now that BL31 is built with BL32 supplied, patch BL1 and BL31 built fip.bin into the SECURE_FLASH0.fd
+        # Add a post build step to build BL31 and assemble the FD files
+        op_fv = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
 
         logging.info("Patching BL1 region")
         ret = self.PatchRegion(

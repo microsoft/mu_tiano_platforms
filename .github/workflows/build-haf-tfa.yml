@@ -1,0 +1,123 @@
+# This workflow automatically publishes the HAF and TFA binaries for a given
+# release.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+name: HafTfa Build
+
+on:
+  release:
+    types:
+      - published
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - '**'  # Matches all branches
+    paths:
+      - '**'  # Matches all paths
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: HafTfa Build
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            tool_chain: GCC5
+            target: X64
+
+    runs-on: ${{ matrix.os }}
+    container:
+      image: ghcr.io/microsoft/mu_devops/ubuntu-24-dev:latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Pip Modules
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r pip-requirements.txt
+
+      - name: Configure Git identity
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global --add safe.directory $GITHUB_WORKSPACE
+
+      - name: Stuart Setup
+        run: python Platforms/QemuSbsaPkg/PlatformBuild.py --setup
+
+      - name: Stuart Update
+        run: python Platforms/QemuSbsaPkg/PlatformBuild.py --update
+
+      - name: Stuart Build
+        run: python Platforms/QemuSbsaPkg/PlatformBuild.py HAF_TFA_BUILD=TRUE
+
+      - name: Upload Build Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-${{ matrix.tool_chain }}-${{ matrix.target }}
+          if-no-files-found: warn
+          path: |
+            Build/SETUPLOG.txt
+            Build/UPDATE_LOG.txt
+
+      - name: Upload Firmware Binaries (artifacts)
+        uses: actions/upload-artifact@v4
+        with:
+          # One artifact per matrix target so they don't overwrite each other
+          name: haf-tfa-firmware-${{ matrix.tool_chain }}-${{ matrix.target }}
+          if-no-files-found: error
+          path: |
+            Build/QemuSbsaPkg/DEBUG_GCC5/HafTfaBins/**
+          retention-days: 14
+
+  publish:
+    name: Publish HAF/TFA Firmware Binaries
+    needs: build
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/artifacts
+
+      - name: Show downloaded layout
+        run: |
+          echo "Artifacts downloaded to: $RUNNER_TEMP/artifacts"
+          ls -R "$RUNNER_TEMP/artifacts"
+
+      - name: Create per-target archives
+        run: |
+          set -euo pipefail
+          cd "${RUNNER_TEMP}/artifacts"
+          for d in */ ; do
+            d="${d%/}"
+            echo "Zipping $d ..."
+            ( cd "$d" && zip -r "${RUNNER_TEMP}/${d}-${{ github.event.release.tag_name }}.zip" . )
+            ( cd "$d" && tar -czf "${RUNNER_TEMP}/${d}-${{ github.event.release.tag_name }}.tar.gz" . )
+          done
+          echo "Done creating archives:"
+          ls -lh "${RUNNER_TEMP}"/*.zip "${RUNNER_TEMP}"/*.tar.gz
+
+      - name: Upload Release Assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ github.event.release.tag_name }}" "${RUNNER_TEMP}"/*.zip --clobber
+          gh release upload "${{ github.event.release.tag_name }}" "${RUNNER_TEMP}"/*.tar.gz --clobber
