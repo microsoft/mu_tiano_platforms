@@ -1,0 +1,162 @@
+# A callable Github Action to build a QEMU mu_tiano_platforms firmware that supports the stuart build system.
+#
+##
+# Copyright (c) Microsoft Corporation.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+name: Build QEMU Platform Firmware
+description: Build a QEMU platform firmware using Stuart
+
+inputs:
+  platform-config:
+    description: 'Path to the Stuart platform configuration file (.py)'
+    required: true
+  platform-name:
+    description: 'Name of the platform being built (for logging purposes)'
+    required: true
+  target:
+    description: 'Build target (e.g., DEBUG, RELEASE)'
+    required: false
+    default: 'DEBUG'
+  tool-chain:
+    description: 'Tool chain to use (e.g., VS2022, GCC)'
+    required: false
+    default: 'VS2022'
+  stuart-args:
+    description: 'Additional build arguments to pass to stuart_build'
+    required: false
+    default: ''
+  flash:
+    description: 'Whether to flash the built platform firmware image (if supported)'
+    required: false
+    default: 'false'
+  publish-logs:
+    description: 'Whether to publish build logs'
+    required: false
+    default: 'false'
+
+runs:
+  using: composite
+
+  steps:
+  # Optional: Create a temporary directory for logs if publish-logs is true
+  - name: Create Temporary Directory
+    id: tempdir
+    shell: bash
+    run: |
+      # if publish-logs is true, create a temp dir to capture logs
+      if [ "${{ inputs.publish-logs }}" != "false" ]; then
+        mkdir -p "$RUNNER_TEMP"/build-logs
+        echo "path="$RUNNER_TEMP"/build-logs" >> $GITHUB_OUTPUT
+      else
+        echo "path=" >> $GITHUB_OUTPUT
+      fi
+
+  # Cannot use ENV in a composite action, so lets create our reusable argument string here
+  - name: Setup Total Stuart arguments
+    id: stuart
+    shell: bash
+    run: |
+      ARGS="TARGET=${{ inputs.target }} TOOL_CHAIN_TAG=${{ inputs.tool-chain }} ${{ inputs.stuart-args }}"
+      echo "arguments=$ARGS" >> $GITHUB_OUTPUT
+
+  # Create a cache key based on the submodule hashes to speed up repeated builds
+  - name: Gather submodule hashes
+    id: submodules-hash
+    shell: bash
+    run: |
+      HASH=$(git submodule foreach --quiet 'echo $sha1' | sha256sum | awk '{print $1}')
+      echo "hash=$HASH" >> $GITHUB_OUTPUT
+  
+  # Use the cache key to attempt to restore cached submodules
+  - name: Cache submodules
+    uses: actions/cache@v4
+    with:
+      path: .git/modules
+      key: ${{ runner.os }}-${{ inputs.platform-name }}-submodules-${{ steps.submodules-hash.outputs.hash}}
+
+  # Stuart setup should be slightly faster if we were able to restore the cache to .git/modules
+  - name: Download required submodules (stuart_setup)
+    shell: bash
+    run: |
+      stuart_setup -c ${{ inputs.platform-config }} ${{ steps.stuart.outputs.arguments }}
+  
+  # Optional: Move the setup log to the temporary directory if it was created
+  - name: Move setup log
+    if: ${{ always() && steps.tempdir.outputs.path }}
+    shell: bash
+    env:
+      TEMP_DIR: ${{ steps.tempdir.outputs.path }}
+    run: |
+      mv Build/SETUP*.txt "$TEMP_DIR"
+
+  # Download external dependencies
+  - name: Download external dependencies (stuart_update)
+    shell: bash
+    run: |
+      stuart_update -c ${{ inputs.platform-config }} ${{ steps.stuart.outputs.arguments }}
+  
+  # Optional: Move the update log to the temporary directory if it was created
+  - name: Move update log
+    if: ${{ always() && steps.tempdir.outputs.path }}
+    shell: bash
+    env:
+      TEMP_DIR: ${{ steps.tempdir.outputs.path }}
+    run: |
+      mv Build/UPDATE*.txt "$TEMP_DIR"
+  
+  # Build the platform
+  - name: Build platform (stuart_build)
+    shell: bash
+    run: |
+      stuart_build -c ${{ inputs.platform-config }} ${{ steps.stuart.outputs.arguments }}
+  
+  # Optional: Move the build logs to the temporary directory if it was created
+  - name: Move build log
+    if: ${{ always() && steps.tempdir.outputs.path }}
+    shell: bash
+    env:
+      TEMP_DIR: ${{ steps.tempdir.outputs.path }}
+    run: |
+      shopt -s globstar nullglob
+      files=(**/BUILDLOG* **/BUILD_REPORT.TXT **/OVERRIDELOG.TXT)
+
+      if ((${#files[@]})); then
+        echo "Moving ${#files[@]} log files"
+        mv "${files[@]}" "$TEMP_DIR"
+      else
+        echo "No matching log files found"
+      fi
+  
+  # Optional: Flash the platform if requested
+  - name: Flash platform (stuart_build --FLASHONLY)
+    if: ${{ inputs.flash != 'false' }}
+    shell: bash
+    run: |
+      stuart_build -c ${{ inputs.platform-config }} --FLASHONLY ${{ steps.stuart.outputs.arguments }}
+
+  # Optional: Move the run logs to the temporary directory if it was created
+  - name: Move run log
+    if: ${{ always() && inputs.flash && steps.tempdir.outputs.path }}
+    shell: bash
+    env:
+      TEMP_DIR: ${{ steps.tempdir.outputs.path }}
+    run: |
+      shopt -s globstar nullglob
+      files=(**/*Run.txt)
+
+      if ((${#files[@]})); then
+        echo "Moving ${#files[@]} log files"
+        mv "${files[@]}" "$TEMP_DIR"
+      else
+        echo "No matching log files found"
+      fi
+
+  # Optional: Publish the logs as an artifact if the temporary directory was created
+  - name: Publish Logs
+    if: ${{ always() && steps.tempdir.outputs.path }}
+    uses: actions/upload-artifact@v4
+    with:
+      name: build-logs-${{ inputs.platform-name }}-${{ inputs.target }}-${{ inputs.tool-chain }}
+      path: ${{ steps.tempdir.outputs.path }}

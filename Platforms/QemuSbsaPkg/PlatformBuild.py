@@ -360,11 +360,11 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
     def HafTfaBuild(self):
         logging.info("Starting Hafnium and TF-A build")
-        src_dir = os.path.join(self.GetWorkspaceRoot (), "Platforms/QemuSbsaPkg/mu")
-        dest_dir = os.path.join(self.GetWorkspaceRoot (), "Silicon/Arm/HAF/project/mu")
+        src_dir = Path(self.GetWorkspaceRoot()) / "Platforms/QemuSbsaPkg/mu"
+        dest_dir = Path(self.GetWorkspaceRoot()) / "Silicon/Arm/HAF/project/mu"
 
         # Remove the directory if it exists
-        if os.path.exists(dest_dir):
+        if dest_dir.exists():
             shutil.rmtree(dest_dir)
 
         # Copy the mu directory and its contents
@@ -372,14 +372,14 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         shutil.copytree(src_dir, dest_dir)
 
         # Add a post build step to build BL31 and assemble the FD files
-        op_fv = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
+        op_fv = Path(self.env.GetValue("BUILD_OUTPUT_BASE")) / "FV"
 
         logging.info("Building Hafnium")
-        haf_out = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "HAF")
+        haf_out = Path(self.env.GetValue("BUILD_OUTPUT_BASE")) / "HAF"
         cmd = "make"
         args = "PROJECT=mu PLATFORM=secure_qemu_aarch64"
-        args += " OUT=" + haf_out
-        ret = RunCmd(cmd, args, workingdir= self.env.GetValue("ARM_HAF_PATH"))
+        args += " OUT=" + str(haf_out)
+        ret = RunCmd(cmd, args, workingdir=self.env.GetValue("ARM_HAF_PATH"))
         if ret != 0:
             return ret
 
@@ -387,15 +387,15 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         shell_environment.CheckpointBuildVars()  # checkpoint our config before we mess with it
         if self.env.GetValue("TOOL_CHAIN_TAG") == "CLANGPDB":
-            if os.name == 'nt':
+            if os.name == "nt":
                 # If this is a Windows build, we need to demolish the path and inject the VC variables of interest
                 # otherwise the build could pick up wrong tools
-                shell_environment.GetEnvironment().set_path('')
+                shell_environment.GetEnvironment().set_path("")
                 self.InjectVcVarsOfInterests(["LIB", "Path"])
 
                 clang_exe = "clang.exe"
                 choco_path = shell_environment.GetEnvironment().get_shell_var("CHOCOLATEYINSTALL")
-                shell_environment.GetEnvironment().insert_path(os.path.join(choco_path, "bin"))
+                shell_environment.GetEnvironment().insert_path(str(Path(choco_path) / "bin"))
                 shell_environment.GetEnvironment().insert_path(shell_environment.GetEnvironment().get_shell_var("CLANG_BIN"))
 
                 # Need to build fiptool separately because the build system will override LIB with LIBC for firmware builds
@@ -409,18 +409,18 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                 clang_exe = "clang"
 
         # Specify the filename
-        filename = os.path.join(self.env.GetValue('BUILD_OUTPUT_BASE'), 'sp_layout.json')
+        filename = Path(self.env.GetValue("BUILD_OUTPUT_BASE")) / "sp_layout.json"
 
         # Writing JSON data
-        with open(filename, 'w') as f:
+        with open(filename, "w") as f:
             data = {
                 "stmm": {
                     "image": {
-                        "file": os.path.join(op_fv, 'BL32_AP_MM.fd'),
+                        "file": str(op_fv / "BL32_AP_MM.fd"),
                         "offset": "0x2000"
                     },
                     "pm": {
-                        "file": os.path.join(os.path.dirname(__file__), "fdts/qemu_sbsa_stmm_config.dts"),
+                        "file": str(Path(__file__).parent / "fdts/qemu_sbsa_stmm_config.dts"),
                         "offset": "0x1000"
                     },
                     "package": "tl_pkg",
@@ -430,11 +430,11 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                 },
                 "mssp": {
                     "image": {
-                        "file": os.path.join(op_fv, 'BL32_AP_MS_SP.fd'),
+                        "file": str(op_fv / "BL32_AP_MS_SP.fd"),
                         "offset": "0x10000"
                     },
                     "pm": {
-                        "file": os.path.join(os.path.dirname(__file__), "fdts/qemu_sbsa_mssp_config.dts"),
+                        "file": str(Path(__file__).parent / "fdts/qemu_sbsa_mssp_config.dts"),
                         "offset": "0x1000"
                     },
                     "uuid": "b8bcbd0c-8e8f-4ebe-99eb-3cbbdd0cd412",
@@ -442,11 +442,11 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                 },
                 "mssp-rust": {
                     "image": {
-                        "file": os.path.join(self.env.GetValue("SECURE_PARTITION_BINARIES"), "msft-sp.bin"),
+                        "file": str(Path(self.env.GetValue("SECURE_PARTITION_BINARIES")) / "msft-sp.bin"),
                         "offset": "0x2000"
                     },
                     "pm": {
-                        "file": os.path.join(os.path.dirname(__file__), "fdts/qemu_sbsa_mssp_rust_config.dts"),
+                        "file": str(Path(__file__).parent / "fdts/qemu_sbsa_mssp_rust_config.dts"),
                         "offset": "0x1000"
                     },
                     "uuid": "AFF0C73B-47E7-4A5B-AFFC-0052305A6520",
@@ -461,15 +461,15 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         virtual_env = ""
         if sys.base_prefix != sys.prefix:
             # If we are in a virtual environment, we need to activate it before we can build the firmware.
-            virtual_env = os.path.join(sys.prefix, "bin", "activate")
-            if not os.path.exists(virtual_env):
+            virtual_env = Path(sys.prefix) / "bin" / "activate"
+            if not virtual_env.exists():
                 logging.error("Virtual environment not found")
                 return -1
 
         # Second, put together the command to build the firmware.
         cmd = "make"
         if self.env.GetValue("TOOL_CHAIN_TAG") == "CLANGPDB":
-            args = "CC="+clang_exe
+            args = "CC=" + clang_exe
         elif self.env.GetValue("TOOL_CHAIN_TAG") == "GCC5":
             args = "CROSS_COMPILE=" + shell_environment.GetEnvironment().get_shell_var("GCC5_AARCH64_PREFIX")
             args += " -j $(nproc)"
@@ -483,11 +483,11 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         args += f" SPD=spmd SPMD_SPM_AT_SEL2=1 SP_LAYOUT_FILE={filename}"
         args += " ENABLE_FEAT_HCX=1 HOB_LIST=1 TRANSFER_LIST=1 LOG_LEVEL=40" # Features used by hypervisor
         # args += " FEATURE_DETECTION=1" # Enforces support for features enabled.
-        args += f" BL32={os.path.join(haf_out, 'secure_qemu_aarch64_clang', 'hafnium.bin')}"
+        args += f" BL32={str(haf_out / 'secure_qemu_aarch64_clang' / 'hafnium.bin')}"
         args += " all fip"
 
         # Third, write a temp bash file to activate the virtual environment and build the firmware.
-        temp_bash = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "temp.sh")
+        temp_bash = Path(self.env.GetValue("BUILD_OUTPUT_BASE")) / "temp.sh"
         with open(temp_bash, "w") as f:
             f.write("#!/bin/bash\n")
             f.write("poetry --verbose install\n")
@@ -506,14 +506,14 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             arm_tfa_git_head = outstream.getvalue().strip()
             logging.info(f"TFA HEAD: {arm_tfa_git_head}")
 
-            patches = os.path.join(self.GetWorkspaceRoot(), "Platforms/QemuSbsaPkg/tfa_patches/*.patch")
+            patches = str(Path(self.GetWorkspaceRoot()) / "Platforms/QemuSbsaPkg/tfa_patches" / "*.patch")
             # Log the patch files for debugging
             ret = RunCmd("git", f"am {patches}", workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
             if ret != 0:
                 return ret
 
         # Fifth, run the temp bash file to build the firmware.
-        ret = RunCmd("bash", temp_bash, workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
+        ret = RunCmd("bash", str(temp_bash), workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
         if patch_tfa:
             # Always revert before returning
             revert_ret = RunCmd("git", f"checkout {arm_tfa_git_head}", workingdir=self.env.GetValue("ARM_TFA_PATH"), environ=cached_enivron)
@@ -529,67 +529,31 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         # Revert the build vars to the original state
         shell_environment.RevertBuildVars()
 
-        # Copy output binaries to a known location
-        output_dir = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "HafTfaBins")
+        # Create output directory to store all Hafnium and TFA bins
+        output_dir = Path(self.env.GetValue("BUILD_OUTPUT_BASE")) / "HafTfaBins"
         os.makedirs(output_dir, exist_ok=True)
 
-        # Copy Hafnium binary
-        hafnium_src = os.path.join(haf_out, 'secure_qemu_aarch64_clang', 'hafnium.bin')
-        if os.path.exists(hafnium_src):
-            hafnium_output = os.path.join(output_dir, "hafnium.bin")
-            shutil.copy2(hafnium_src, hafnium_output)
-            logging.info(f"Hafnium binary saved to: {hafnium_output}")
-        else:
-            logging.error(f"Hafnium binary not found at {hafnium_src}")
-            return -1
+        # Copy firmware binaries
 
-        # Copy TF-A binaries
-        op_tfa = os.path.join (
-            self.env.GetValue("ARM_TFA_PATH"), "build",
-            self.env.GetValue("QEMU_PLATFORM").lower(),
-            self.env.GetValue("TARGET").lower())
+        # Collect hafnium.bin explicitly
+        hafnium_bin = haf_out / "secure_qemu_aarch64_clang" / "hafnium.bin"
+        if not hafnium_bin.exists():
+            logging.error(f"Hafnium binary not found at {hafnium_bin}")
+            return -1
+        shutil.copy2(hafnium_bin, output_dir)
+        logging.debug(f"{hafnium_bin} saved to: {output_dir}")
 
-        # Copy BL1
-        bl1_src = os.path.join(op_tfa, "bl1.bin")
-        if os.path.exists(bl1_src):
-            bl1_output = os.path.join(output_dir, "bl1.bin")
-            shutil.copy2(bl1_src, bl1_output)
-            logging.info(f"BL1 binary saved to: {bl1_output}")
-        else:
-            logging.error(f"BL1 binary not found at {bl1_src}")
-            return -1
-        
-        # Copy BL2
-        bl2_src = os.path.join(op_tfa, "bl2.bin")
-        if os.path.exists(bl2_src):
-            bl2_output = os.path.join(output_dir, "bl2.bin")
-            shutil.copy2(bl2_src, bl2_output)
-            logging.info(f"BL2 binary saved to: {bl2_output}")
-        else:
-            logging.error(f"BL2 binary not found at {bl2_src}")
-            return -1
-        
-        # Copy BL31
-        bl31_src = os.path.join(op_tfa, "bl31.bin")
-        if os.path.exists(bl31_src):
-            bl31_output = os.path.join(output_dir, "bl31.bin")
-            shutil.copy2(bl31_src, bl31_output)
-            logging.info(f"BL31 (TF-A) binary saved to: {bl31_output}")
-        else:
-            logging.error(f"BL31 binary not found at {bl31_src}")
-            return -1
+        # Copy any *.bin artifacts from op_tfa
+        op_tfa = Path(self.env.GetValue("ARM_TFA_PATH")) / "build" / self.env.GetValue("QEMU_PLATFORM").lower() / self.env.GetValue("TARGET").lower()
+        for bin_file in op_tfa.glob("*.bin"):
+            try:
+                shutil.copy2(bin_file, output_dir)
+                logging.debug(f"{bin_file} saved to: {output_dir}")
+            except Exception as e:
+                logging.error(f"Failed to copy {bin_file}: {e}")
+                return -1
 
-        # Copy FIP binary 
-        fip_src = os.path.join(op_tfa, "fip.bin")
-        if os.path.exists(fip_src):
-            fip_output = os.path.join(output_dir, "fip.bin")
-            shutil.copy2(fip_src, fip_output)
-            logging.info(f"FIP binary saved to: {fip_output}")
-        else:
-            logging.error(f"FIP binary not found at {fip_src}")
-            return -1
-
-        logging.info(f"All firmware binaries saved to: {output_dir}")
+        logging.debug(f"Copied all Hafnium and TFA binaries to {output_dir}")
         return 0
 
     def PlatformPostBuild(self):
@@ -597,46 +561,43 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             ret = self.HafTfaBuild()
             if ret != 0:
                 return ret
-            op_tfa = os.path.join (
-                self.env.GetValue("ARM_TFA_PATH"), "build",
-                self.env.GetValue("QEMU_PLATFORM").lower(),
-                self.env.GetValue("TARGET").lower())
+            op_tfa = Path(self.env.GetValue("ARM_TFA_PATH")) / "build" / self.env.GetValue("QEMU_PLATFORM").lower() / self.env.GetValue("TARGET").lower()
         else:
-            op_tfa = self.env.GetValue("HAF_TFA_BINS")
+            op_tfa = Path(self.env.GetValue("HAF_TFA_BINS"))
 
         # Now that BL31 is built with BL32 supplied, patch BL1 and BL31 built fip.bin into the SECURE_FLASH0.fd
         # Add a post build step to build BL31 and assemble the FD files
-        op_fv = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
+        op_fv = Path(self.env.GetValue("BUILD_OUTPUT_BASE")) / "FV"
 
         logging.info("Patching BL1 region")
         ret = self.PatchRegion(
-                os.path.join(op_fv, "SECURE_FLASH0.fd"),
-                int(self.env.GetValue("SECURE_FLASH_REGION_BL1_OFFSET"), 16),
-                int( self.env.GetValue("SECURE_FLASH_REGION_BL1_SIZE"), 16),
-                os.path.join(op_tfa, "bl1.bin"),
-                )
+            op_fv / "SECURE_FLASH0.fd",
+            int(self.env.GetValue("SECURE_FLASH_REGION_BL1_OFFSET"), 16),
+            int(self.env.GetValue("SECURE_FLASH_REGION_BL1_SIZE"), 16),
+            op_tfa / "bl1.bin",
+        )
         if ret != 0:
             return ret
 
         logging.info("Patching FIP region")
         ret = self.PatchRegion(
-                os.path.join(op_fv, "SECURE_FLASH0.fd"),
-                int(self.env.GetValue("SECURE_FLASH_REGION_FIP_OFFSET"), 16),
-                int( self.env.GetValue("SECURE_FLASH_REGION_FIP_SIZE"), 16),
-                os.path.join(op_tfa, "fip.bin")
-                )
+            op_fv / "SECURE_FLASH0.fd",
+            int(self.env.GetValue("SECURE_FLASH_REGION_FIP_OFFSET"), 16),
+            int(self.env.GetValue("SECURE_FLASH_REGION_FIP_SIZE"), 16),
+            op_tfa / "fip.bin",
+        )
         if ret != 0:
             return ret
 
         # Pad both fd to 256mb, as required by QEMU
-        OutputPath_FV = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
-        Built_FV = os.path.join(OutputPath_FV, "QEMU_EFI.fd")
+        OutputPath_FV = Path(self.env.GetValue("BUILD_OUTPUT_BASE")) / "FV"
+        Built_FV = OutputPath_FV / "QEMU_EFI.fd"
         with open(Built_FV, "ab") as fvfile:
             fvfile.seek(0, os.SEEK_END)
             additional = b'\0' * ((256 * 1024 * 1024)-fvfile.tell())
             fvfile.write(additional)
 
-        bl3 = os.path.join(OutputPath_FV, "SECURE_FLASH0.fd")
+        bl3 = OutputPath_FV / "SECURE_FLASH0.fd"
         with open(bl3, "ab") as fvfile:
             fvfile.seek(0, os.SEEK_END)
             additional = b'\0' * ((256 * 1024 * 1024)-fvfile.tell())
