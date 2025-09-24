@@ -15,7 +15,7 @@ on:
     branches:
       - '**'  # Matches all branches
     paths:
-      - '**'  # Matches all paths
+      - 'Platforms/QemuSbsaPkg/**'
   workflow_dispatch:
 
 jobs:
