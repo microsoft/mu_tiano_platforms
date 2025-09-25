@@ -905,7 +905,7 @@ QemuQ35Pkg/Library/ResetSystemLib/BaseResetSystemLib.inf
 QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
 QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
 
-  QemuQ35Pkg/ResetVector/ResetVector.inf
+QemuQ35Pkg/ResetVector/ResetVector.inf
 
   #########################################
   # SEC Phase modules

@@ -36,10 +36,6 @@ Main16:
 
 BITS    32
 
-    ; Clear the WorkArea header. The SEV probe routines will populate the
-    ; work area when detected.
-    mov     byte[WORK_AREA_GUEST_TYPE], 0
-
 %ifdef ARCH_X64
 
     jmp SearchBfv
@@ -48,7 +44,6 @@ BITS    32
 ; Entry point of Main32
 ;
 Main32:
-    OneTimeCall InitTdx
 
 SearchBfv:
 

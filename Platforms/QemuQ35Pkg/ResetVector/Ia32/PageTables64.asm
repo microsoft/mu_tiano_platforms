@@ -37,31 +37,10 @@ BITS    32
                        PAGE_READ_WRITE + \
                        PAGE_PRESENT)
 
-%define TDX_BSP         1
-%define TDX_AP          2
-
 ;
 ; Modified:  EAX, EBX, ECX, EDX
 ;
 SetCr3ForPageTables64:
-    ; Check the TDX features.
-    ; If it is TDX APs, then jump to SetCr3 directly.
-    ; In TD guest the initialization is done by BSP, including building
-    ; the page tables. APs will spin on until byte[TDX_WORK_AREA_PGTBL_READY]
-    ; is set.
-    OneTimeCall   CheckTdxFeaturesBeforeBuildPagetables
-    cmp       eax, TDX_BSP
-    je        ClearOvmfPageTables
-    cmp       eax, TDX_AP
-    je        SetCr3
-
-    ; Check whether the SEV is active and populate the SevEsWorkArea
-    OneTimeCall   CheckSevFeatures
-
-    ; If SEV is enabled, the C-bit position is always above 31.
-    ; The mask will be saved in the EDX and applied during the
-    ; the page table build below.
-    OneTimeCall   GetSevCBitMaskAbove31
 
 ClearOvmfPageTables:
     ;
@@ -111,13 +90,6 @@ pageTableEntriesLoop:
     mov     [ecx * 8 + PT_ADDR (0x2000 - 8)], eax
     mov     [(ecx * 8 + PT_ADDR (0x2000 - 8)) + 4], edx
     loop    pageTableEntriesLoop
-
-    ; Clear the C-bit from the GHCB page if the SEV-ES is enabled.
-    OneTimeCall   SevClearPageEncMaskForGhcbPage
-
-    ; TDX will do some PostBuildPages task, such as setting
-    ; byte[TDX_WORK_AREA_PGTBL_READY].
-    OneTimeCall   TdxPostBuildPageTables
 
 SetCr3:
     ;
