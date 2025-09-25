@@ -41,59 +41,41 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global --add safe.directory $GITHUB_WORKSPACE
 
-      - name: Stuart Build and Run 
-        uses: ./.github/actions/build-platform
-        with:
-          platform-config: 'Platforms/QemuSbsaPkg/PlatformBuild.py'
-          platform-name: 'SBSA'
-          tool-chain: 'GCC5'
-          stuart-args: 'HAF_TFA_BUILD=TRUE'
-          publish-logs: 'true'
+      - name: Stuart Setup
+        run: python Platforms/QemuSbsaPkg/PlatformBuild.py --setup
 
-      - name: Upload Firmware Binaries (artifacts)
-        uses: actions/upload-artifact@v4
-        with:
-          # One artifact per matrix target so they don't overwrite each other
-          name: haf-tfa-firmware
-          if-no-files-found: error
-          path: |
-            Build/QemuSbsaPkg/DEBUG_GCC5/HafTfaBins/**
-          retention-days: 14
+      - name: Stuart Update
+        run: python Platforms/QemuSbsaPkg/PlatformBuild.py --update
 
-  publish:
-    name: Publish HAF/TFA Firmware Binaries
-    needs: build
-    if: github.event_name == 'release'
-    runs-on: ubuntu-latest
+      - name: Stuart Build
+        run: python Platforms/QemuSbsaPkg/PlatformBuild.py HAF_TFA_BUILD=TRUE
 
-    permissions:
-      contents: write
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: ${{ runner.temp }}/artifacts
+      - name: Install archive tools
+        if: github.event_name == 'release'
+        run: |
+          apt-get update -y
+          apt-get install -y zip tar gh
 
       - name: Create per-target archives
+        if: github.event_name == 'release'
+        shell: bash
         run: |
           set -euo pipefail
-          cd "${RUNNER_TEMP}/artifacts"
-          for d in */ ; do
-            d="${d%/}"
-            echo "Zipping $d ..."
-            ( cd "$d" && zip -r "${RUNNER_TEMP}/${d}-${{ github.event.release.tag_name }}.zip" . )
-            ( cd "$d" && tar -czf "${RUNNER_TEMP}/${d}-${{ github.event.release.tag_name }}.tar.gz" . )
-          done
-          echo "Done creating archives:"
-          ls -lh "${RUNNER_TEMP}"/*.zip "${RUNNER_TEMP}"/*.tar.gz
+          BIN_DIR="Build/QemuSbsaPkg/DEBUG_GCC5/HafTfaBins"
+          echo "Packaging binaries from ${BIN_DIR}"
+          if [ ! -d "$BIN_DIR" ]; then
+            echo "Binary directory not found: $BIN_DIR" >&2
+            exit 1
+          fi
+          ZIP_PATH="${RUNNER_TEMP}/haf-tfa-firmware-${{ github.event.release.tag_name }}.zip"
+          TAR_PATH="${RUNNER_TEMP}/haf-tfa-firmware-${{ github.event.release.tag_name }}.tar.gz"
+          (cd "$BIN_DIR" && zip -r "$ZIP_PATH" .)
+          (cd "$BIN_DIR" && tar -czf "$TAR_PATH" .)
+          echo "Created archives:"
+          ls -lh "$ZIP_PATH" "$TAR_PATH"
 
       - name: Upload Release Assets
+        if: github.event_name == 'release'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

@@ -316,8 +316,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         # Default turn on build reporting.
         self.env.SetValue("BUILDREPORTING", "TRUE", "Enabling build report")
         self.env.SetValue("BUILDREPORT_TYPES", "PCD DEPEX FLASH BUILD_FLAGS LIBRARY FIXED_ADDRESS HASH", "Setting build report types")
-        self.env.SetValue("ARM_TFA_PATH", os.path.join (self.GetWorkspaceRoot (), "Silicon/Arm/TFA"), "Platform hardcoded")
-        self.env.SetValue("ARM_HAF_PATH", os.path.join (self.GetWorkspaceRoot (), "Silicon/Arm/HAF"), "Platform hardcoded")
+        self.env.SetValue("ARM_TFA_PATH", str(Path(self.GetWorkspaceRoot()) / "Silicon" / "Arm" / "TFA"), "Platform hardcoded")
+        self.env.SetValue("ARM_HAF_PATH", str(Path(self.GetWorkspaceRoot()) / "Silicon" / "Arm" / "HAF"), "Platform hardcoded")
         self.env.SetValue("BLD_*_QEMU_CORE_NUM", "4", "Default")
         self.env.SetValue("BLD_*_MEMORY_PROTECTION", "TRUE", "Default")
         # Include the MFCI test cert by default, override on the commandline with "BLD_*_SHIP_MODE=TRUE" if you want the retail MFCI cert
@@ -325,7 +325,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         self.env.SetValue("CONF_AUTOGEN_INCLUDE_PATH", self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuSbsaPkg", "Include"), "Platform Defined")
         self.env.SetValue("MU_SCHEMA_DIR", self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuSbsaPkg", "CfgData"), "Platform Defined")
         self.env.SetValue("MU_SCHEMA_FILE_NAME", "QemuSbsaPkgCfgData.xml", "Platform Hardcoded")
-        self.env.SetValue("HAF_TFA_BUILD", "TRUE", "Default to false when running locally")
+        self.env.SetValue("HAF_TFA_BUILD", "TRUE", "Platform Hardcoded")
 
         if self.Helper.generate_secureboot_pcds(self) != 0:
             logging.error("Failed to generate include PCDs")
