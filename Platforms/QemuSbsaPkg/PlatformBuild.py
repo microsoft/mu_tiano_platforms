@@ -477,7 +477,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         args += " PLAT=" + self.env.GetValue("QEMU_PLATFORM").lower()
         args += " ARCH=" + self.env.GetValue("TARGET_ARCH").lower()
         args += " DEBUG=" + str(1 if self.env.GetValue("TARGET").lower() == 'debug' else 0)
-        args += " ENABLE_SME_FOR_SWD=1 ENABLE_SVE_FOR_SWD=1 ENABLE_SME_FOR_NS=1 ENABLE_SVE_FOR_NS=1"
+        args += " ENABLE_SME_FOR_SWD=0 ENABLE_SVE_FOR_SWD=0 ENABLE_SME_FOR_NS=0 ENABLE_SVE_FOR_NS=0"
         args += f" SPD=spmd SPMD_SPM_AT_SEL2=1 SP_LAYOUT_FILE={filename}"
         args += " ENABLE_FEAT_HCX=1 HOB_LIST=1 TRANSFER_LIST=1 LOG_LEVEL=40" # Features used by hypervisor
         # args += " FEATURE_DETECTION=1" # Enforces support for features enabled.
