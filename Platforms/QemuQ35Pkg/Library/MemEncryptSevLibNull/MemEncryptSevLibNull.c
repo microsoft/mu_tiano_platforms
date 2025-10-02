@@ -3,19 +3,59 @@
   Secure Encrypted Virtualization (SEV) library helper function
 
   Copyright (c) 2017 - 2020, AMD Incorporated. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include <Library/BaseLib.h>
-#include <Library/DebugLib.h>
+#include <Uefi.h>
 #include <Library/MemEncryptSevLib.h>
-#include <Register/Amd/Cpuid.h>
-#include <Register/Amd/Msr.h>
-#include <Register/Cpuid.h>
 
-#include "VirtualMemory.h"
+/**
+  Returns a boolean to indicate whether SEV-SNP is enabled.
+
+  @retval TRUE           SEV-SNP is enabled
+  @retval FALSE          SEV-SNP is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevSnpIsEnabled (
+  VOID
+  )
+{
+  return FALSE;
+}
+
+/**
+  Returns a boolean to indicate whether SEV-ES is enabled.
+
+  @retval TRUE           SEV-ES is enabled
+  @retval FALSE          SEV-ES is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevEsIsEnabled (
+  VOID
+  )
+{
+  return FALSE;
+}
+
+/**
+  Returns a boolean to indicate whether SEV is enabled.
+
+  @retval TRUE           SEV is enabled
+  @retval FALSE          SEV is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevIsEnabled (
+  VOID
+  )
+{
+  return FALSE;
+}
 
 /**
   This function clears memory encryption bit for the memory region specified by
@@ -42,11 +82,7 @@ MemEncryptSevClearPageEncMask (
   IN UINTN             NumPages
   )
 {
-  return InternalMemEncryptSevSetMemoryDecrypted (
-           Cr3BaseAddress,
-           BaseAddress,
-           EFI_PAGES_TO_SIZE (NumPages)
-           );
+  return RETURN_UNSUPPORTED;
 }
 
 /**
@@ -74,11 +110,61 @@ MemEncryptSevSetPageEncMask (
   IN UINTN             NumPages
   )
 {
-  return InternalMemEncryptSevSetMemoryEncrypted (
-           Cr3BaseAddress,
-           BaseAddress,
-           EFI_PAGES_TO_SIZE (NumPages)
-           );
+  return RETURN_UNSUPPORTED;
+}
+
+/**
+  Locate the page range that covers the initial (pre-SMBASE-relocation) SMRAM
+  Save State Map.
+
+  @param[out] BaseAddress     The base address of the lowest-address page that
+                              covers the initial SMRAM Save State Map.
+
+  @param[out] NumberOfPages   The number of pages in the page range that covers
+                              the initial SMRAM Save State Map.
+
+  @retval RETURN_SUCCESS      BaseAddress and NumberOfPages have been set on
+                              output.
+
+  @retval RETURN_UNSUPPORTED  SMM is unavailable.
+**/
+RETURN_STATUS
+EFIAPI
+MemEncryptSevLocateInitialSmramSaveStateMapPages (
+  OUT UINTN  *BaseAddress,
+  OUT UINTN  *NumberOfPages
+  )
+{
+  return RETURN_UNSUPPORTED;
+}
+
+/**
+  Returns the SEV encryption mask.
+
+  @return  The SEV pagtable encryption mask
+**/
+UINT64
+EFIAPI
+MemEncryptSevGetEncryptionMask (
+  VOID
+  )
+{
+  return 0;
+}
+
+/**
+  Returns a boolean to indicate whether DebugVirtualization is enabled.
+
+  @retval TRUE           DebugVirtualization is enabled
+  @retval FALSE          DebugVirtualization is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevEsDebugVirtualizationIsEnabled (
+  VOID
+  )
+{
+  return FALSE;
 }
 
 /**
@@ -104,21 +190,17 @@ MemEncryptSevGetAddressRangeState (
   IN UINTN             Length
   )
 {
-  return InternalMemEncryptSevGetAddressRangeState (
-           Cr3BaseAddress,
-           BaseAddress,
-           Length
-           );
+  return MemEncryptSevAddressRangeUnencrypted;
 }
 
 /**
-  This function clears memory encryption bit for the mmio region specified by
+  This function clears memory encryption bit for the MMIO region specified by
   BaseAddress and NumPages.
 
   @param[in]  Cr3BaseAddress          Cr3 Base Address (if zero then use
                                       current CR3)
   @param[in]  BaseAddress             The physical address that is the start
-                                      address of a mmio region.
+                                      address of a MMIO region.
   @param[in]  NumPages                The number of pages from start memory
                                       region.
 
@@ -136,9 +218,24 @@ MemEncryptSevClearMmioPageEncMask (
   IN UINTN             NumPages
   )
 {
-  return InternalMemEncryptSevClearMmioPageEncMask (
-           Cr3BaseAddress,
-           BaseAddress,
-           EFI_PAGES_TO_SIZE (NumPages)
-           );
+  return RETURN_UNSUPPORTED;
+}
+
+/**
+  Pre-validate the system RAM when SEV-SNP is enabled in the guest VM.
+
+  @param[in]  BaseAddress             Base address
+  @param[in]  NumPages                Number of pages starting from the base address
+
+**/
+VOID
+EFIAPI
+MemEncryptSevSnpPreValidateSystemRam (
+  IN PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN             NumPages
+  )
+{
+  //
+  // Do nothing
+  //
 }
