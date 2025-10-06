@@ -966,7 +966,6 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   MdeModulePkg/Universal/FaultTolerantWritePei/FaultTolerantWritePei.inf
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
   QemuQ35Pkg/SmmAccess/SmmAccessPei.inf
-  MmSupervisorPkg/Drivers/StandaloneMmHob/StandaloneMmHob.inf
   MmSupervisorPkg/Drivers/MmCommunicationBuffer/MmCommunicationBufferPei.inf
 !if $(PEI_MM_IPL_ENABLED) == TRUE
   MmSupervisorPkg/Drivers/MmPeiLaunchers/MmIplPei.inf
@@ -1428,10 +1427,11 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
     <LibraryClasses>
       NULL|StandaloneMmPkg/Library/VariableMmDependency/VariableMmDependency.inf
   }
+  StandaloneMmPkg/Drivers/MmCommunicationDxe/MmCommunicationDxe.inf
 !else
-  QemuQ35Pkg/SmmAccess/SmmAccess2Dxe.inf
   MmSupervisorPkg/Drivers/StandaloneMmIpl/PiSmmIpl.inf
 !endif
+  QemuQ35Pkg/SmmAccess/SmmAccess2Dxe.inf
   MmSupervisorPkg/Drivers/MmSupervisorErrorReport/MmSupervisorErrorReport.inf
 
   #
