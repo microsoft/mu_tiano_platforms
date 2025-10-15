@@ -1,4 +1,4 @@
-From c9537c20b8cda91c8214be04b842695321199d68 Mon Sep 17 00:00:00 2001
+From bfafebc19c8ebbc6a73108753708767d5ee8f503 Mon Sep 17 00:00:00 2001
 From: Kun Qin <kuqin@microsoft.com>
 Date: Thu, 31 Oct 2024 00:41:05 -0700
 Subject: [PATCH 1/2] Changes needed to hack through QEMU SBSA usage
@@ -11,20 +11,20 @@ Co-authored-by: rdiaz <raymonddiaz@microsoft.com>
 
 Updated DTS files to include the correct UUID for the Notification SP and added the device regions for the TPM CRBs
 ---
- .../fdts/qemu_sbsa_spmc_sp_manifest.dts       | 118 ++++++++++++++++++
- .../qemu_sbsa/fdts/qemu_sbsa_tb_fw_config.dts |  42 +++++++
- plat/qemu/qemu_sbsa/include/platform_def.h    |  35 ++++--
- plat/qemu/qemu_sbsa/platform.mk               |  21 ++++
- 4 files changed, 209 insertions(+), 7 deletions(-)
+ .../fdts/qemu_sbsa_spmc_sp_manifest.dts       | 136 ++++++++++++++++++
+ .../qemu_sbsa/fdts/qemu_sbsa_tb_fw_config.dts |  47 ++++++
+ plat/qemu/qemu_sbsa/include/platform_def.h    |  35 ++++-
+ plat/qemu/qemu_sbsa/platform.mk               |  21 +++
+ 4 files changed, 232 insertions(+), 7 deletions(-)
  create mode 100644 plat/qemu/qemu_sbsa/fdts/qemu_sbsa_spmc_sp_manifest.dts
  create mode 100644 plat/qemu/qemu_sbsa/fdts/qemu_sbsa_tb_fw_config.dts
 
 diff --git a/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_spmc_sp_manifest.dts b/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_spmc_sp_manifest.dts
 new file mode 100644
-index 000000000..3c0187cfa
+index 000000000..69b24a68f
 --- /dev/null
 +++ b/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_spmc_sp_manifest.dts
-@@ -0,0 +1,118 @@
+@@ -0,0 +1,136 @@
 +/*
 + * Copyright (c) 2022, Arm Limited. All rights reserved.
 + *
@@ -67,7 +67,15 @@ index 000000000..3c0187cfa
 +     vm2 {
 +       is_ffa_partition;
 +       load_address = <0x0 0x20400000>;
-+       debug_name = "therm";
++       debug_name = "mssp";
++       vcpu_count = <1>;
++       mem_size = <0x400000>;
++     };
++     /* Example Rust Service */
++     vm3 {
++       is_ffa_partition;
++       load_address = <0x0 0x20800000>;
++       debug_name = "mssp-rust";
 +       vcpu_count = <1>;
 +       mem_size = <0x400000>;
 +     };
@@ -142,13 +150,23 @@ index 000000000..3c0187cfa
 +    device_type = "device-memory"; /* External CRB */
 +    reg = <0x00000000 0x60120000 0x0 0x00010000>;
 +  };
++
++  memory@10 {
++    device_type = "memory"; /* External CRB */
++    reg = <0x00000100 0x60000000 0x0 0x00002000>;
++  };
++
++  memory@11 {
++    device_type = "memory"; /* External CRB */
++    reg = <0x00000100 0x600A0000 0x0 0x00002000>;
++  };
 +};
 diff --git a/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_tb_fw_config.dts b/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_tb_fw_config.dts
 new file mode 100644
-index 000000000..1e9284248
+index 000000000..5b655c37a
 --- /dev/null
 +++ b/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_tb_fw_config.dts
-@@ -0,0 +1,42 @@
+@@ -0,0 +1,47 @@
 +/*
 + * Copyright (c) 2022, ARM Limited and Contributors. All rights reserved.
 + *
@@ -189,10 +207,15 @@ index 000000000..1e9284248
 +      load-address = <0x20400000>;
 +      owner = "Plat";
 +    };
++    example_rust {
++      uuid = "AFF0C73B-47E7-4A5B-AFFC-0052305A6520";
++      load-address = <0x20800000>;
++      owner = "Plat";
++    };
 +   };
 + };
 diff --git a/plat/qemu/qemu_sbsa/include/platform_def.h b/plat/qemu/qemu_sbsa/include/platform_def.h
-index 9979fe11e..d9b210bdf 100644
+index 85bd233d4..b0282a077 100644
 --- a/plat/qemu/qemu_sbsa/include/platform_def.h
 +++ b/plat/qemu/qemu_sbsa/include/platform_def.h
 @@ -148,11 +148,33 @@
@@ -204,7 +227,7 @@ index 9979fe11e..d9b210bdf 100644
  #define BL31_BASE			(BL31_LIMIT - BL31_SIZE)
  #define BL31_LIMIT			(BL1_RW_BASE - FW_HANDOFF_SIZE)
  #define BL31_PROGBITS_LIMIT		BL1_RW_BASE
-
+ 
 +/*
 + * Configuration defines.
 + *
@@ -236,7 +259,7 @@ index 9979fe11e..d9b210bdf 100644
  #define BL32_SRAM_BASE			BL_RAM_BASE
 -#define BL32_SRAM_LIMIT			BL2_BASE
 +#define BL32_SRAM_LIMIT			SPMD_BASE
-
+ 
 -#define BL32_MEM_BASE			BL_RAM_BASE
 -#define BL32_MEM_SIZE			(BL_RAM_SIZE - RME_GPT_DRAM_SIZE - \
 -					BL1_SIZE - BL2_SIZE - BL31_SIZE)
@@ -246,7 +269,7 @@ index 9979fe11e..d9b210bdf 100644
 +#define BL32_MEM_SIZE			(SPMD_LIMIT - SPMD_BASE)
 +#define BL32_BASE					SPMD_BASE
 +#define BL32_LIMIT			  SPMD_LIMIT
-
+ 
  #define NS_IMAGE_OFFSET			(NS_DRAM0_BASE + 0x20000000)
  #define NS_IMAGE_MAX_SIZE		(NS_DRAM0_SIZE - 0x20000000)
 diff --git a/plat/qemu/qemu_sbsa/platform.mk b/plat/qemu/qemu_sbsa/platform.mk
@@ -256,7 +279,7 @@ index 8ec3a8249..d3ef3dda7 100644
 @@ -29,6 +29,13 @@ ifeq ($(NEED_BL32),yes)
  $(eval $(call add_define,QEMU_LOAD_BL32))
  endif
-
+ 
 +ifeq (${SPMD_SPM_AT_SEL2}, 1)
 +FDT_SOURCES		+=  ${PLAT_QEMU_PATH}/fdts/${PLAT}_tb_fw_config.dts
 +BL32_CONFIG_DTS		:=	${PLAT_QEMU_PATH}/fdts/${PLAT}_spmc_sp_manifest.dts
@@ -266,11 +289,11 @@ index 8ec3a8249..d3ef3dda7 100644
 +
  # Include GICv3 driver files
  include drivers/arm/gic/v3/gicv3.mk
-
+ 
 @@ -47,6 +54,20 @@ ifeq (${SPM_MM},1)
  	BL31_SOURCES		+=	${PLAT_QEMU_COMMON_PATH}/qemu_spm.c
  endif
-
+ 
 +ifeq (${SPMD_SPM_AT_SEL2}, 1)
 +BL1_SOURCES += plat/common/plat_spmd_manifest.c
 +
@@ -288,6 +311,6 @@ index 8ec3a8249..d3ef3dda7 100644
  # Use known base for UEFI if not given from command line
  # By default BL33 is at FLASH1 base
  PRELOADED_BL33_BASE	?= 0x10000000
---
-2.34.1
+-- 
+2.43.0
 

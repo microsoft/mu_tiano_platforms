@@ -116,7 +116,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         args += " -m 2048"
 
         args += " -machine sbsa-ref" #,accel=(tcg|kvm)"
-        args += " -cpu max"
+        args += " -cpu max,sve=off,sme=off"
         if env.GetBuildValue ("QEMU_CORE_NUM") is not None:
           args += " -smp " + env.GetBuildValue ("QEMU_CORE_NUM")
         args += " -global driver=cfi.pflash01,property=secure,value=on"

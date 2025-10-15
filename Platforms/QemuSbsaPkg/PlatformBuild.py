@@ -414,7 +414,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             data = {
                 "stmm": {
                     "image": {
-                        "file": os.path.join(self.env.GetValue('BUILD_OUTPUT_BASE'), 'FV', 'BL32_AP_MM.fd'),
+                        "file": os.path.join(op_fv, 'BL32_AP_MM.fd'),
                         "offset": "0x2000"
                     },
                     "pm": {
@@ -428,7 +428,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                 },
                 "mssp": {
                     "image": {
-                        "file": os.path.join(self.env.GetValue('BUILD_OUTPUT_BASE'), 'FV', 'BL32_AP_MM_SP1.fd'),
+                        "file": os.path.join(op_fv, 'BL32_AP_MS_SP.fd'),
                         "offset": "0x10000"
                     },
                     "pm": {
@@ -436,6 +436,18 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                         "offset": "0x1000"
                     },
                     "uuid": "b8bcbd0c-8e8f-4ebe-99eb-3cbbdd0cd412",
+                    "owner": "Plat"
+                },
+                "mssp-rust": {
+                    "image": {
+                        "file": os.path.join(self.env.GetValue("SECURE_PARTITION_BINARIES"), "msft-sp.bin"),
+                        "offset": "0x2000"
+                    },
+                    "pm": {
+                        "file": os.path.join(os.path.dirname(__file__), "fdts/qemu_sbsa_mssp_rust_config.dts"),
+                        "offset": "0x1000"
+                    },
+                    "uuid": "AFF0C73B-47E7-4A5B-AFFC-0052305A6520",
                     "owner": "Plat"
                 }
             }
@@ -465,7 +477,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         args += " PLAT=" + self.env.GetValue("QEMU_PLATFORM").lower()
         args += " ARCH=" + self.env.GetValue("TARGET_ARCH").lower()
         args += " DEBUG=" + str(1 if self.env.GetValue("TARGET").lower() == 'debug' else 0)
-        args += " ENABLE_SME_FOR_SWD=1 ENABLE_SVE_FOR_SWD=1 ENABLE_SME_FOR_NS=1 ENABLE_SVE_FOR_NS=1"
+        args += " ENABLE_SME_FOR_SWD=0 ENABLE_SVE_FOR_SWD=0 ENABLE_SME_FOR_NS=0 ENABLE_SVE_FOR_NS=0"
         args += f" SPD=spmd SPMD_SPM_AT_SEL2=1 SP_LAYOUT_FILE={filename}"
         args += " ENABLE_FEAT_HCX=1 HOB_LIST=1 TRANSFER_LIST=1 LOG_LEVEL=40" # Features used by hypervisor
         # args += " FEATURE_DETECTION=1" # Enforces support for features enabled.
