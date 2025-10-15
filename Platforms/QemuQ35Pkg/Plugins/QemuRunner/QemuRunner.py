@@ -241,7 +241,11 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
                 std_handle = None
 
         # Run QEMU
-        ret = utility_functions.RunCmd(executable, args)
+        try:
+            ret = utility_functions.RunCmd(executable, args)
+        except KeyboardInterrupt:
+            logging.critical("QEMU run interrupted.")
+            ret = -1
 
         ## TODO: restore the customized RunCmd once unit tests with asserts are figured out
         if ret == 0xc0000005:
