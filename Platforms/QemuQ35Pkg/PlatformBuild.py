@@ -68,7 +68,7 @@ class CommonPlatform():
         '''
         dsc = "QemuQ35Pkg"
         if ArchCsv.upper() == "IA32,X64":
-            dsc += "Ia32X64"
+            dsc += "IA32X64"
         else:
             dsc += "X64"
         dsc += ".dsc"
