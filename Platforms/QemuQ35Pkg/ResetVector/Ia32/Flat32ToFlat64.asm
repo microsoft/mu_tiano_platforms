@@ -21,6 +21,10 @@ Transition32FlatTo64Flat:
     bts     eax, 5                      ; enable PAE
     mov     cr4, eax
 
+    mov     ecx, 0xc0000080
+    rdmsr
+    bts     eax, 8                      ; set LME
+    wrmsr
 
 EnablePaging:
     mov     eax, cr0

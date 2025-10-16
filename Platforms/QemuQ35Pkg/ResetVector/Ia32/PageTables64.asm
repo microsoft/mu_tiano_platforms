@@ -64,19 +64,19 @@ clearPageTablesMemoryLoop:
     ; Top level Page Directory Pointers (1 * 512GB entry)
     ;
     mov     dword[PT_ADDR (0)], PT_ADDR (0x1000) + PAGE_PDP_ATTR
-    mov     dword[PT_ADDR (4)], edx
+    mov     dword[PT_ADDR (4)], 0
 
     ;
     ; Next level Page Directory Pointers (4 * 1GB entries => 4GB)
     ;
     mov     dword[PT_ADDR (0x1000)], PT_ADDR (0x2000) + PAGE_PDP_ATTR
-    mov     dword[PT_ADDR (0x1004)], edx
+    mov     dword[PT_ADDR (0x1004)], 0
     mov     dword[PT_ADDR (0x1008)], PT_ADDR (0x3000) + PAGE_PDP_ATTR
-    mov     dword[PT_ADDR (0x100C)], edx
+    mov     dword[PT_ADDR (0x100C)], 0
     mov     dword[PT_ADDR (0x1010)], PT_ADDR (0x4000) + PAGE_PDP_ATTR
-    mov     dword[PT_ADDR (0x1014)], edx
+    mov     dword[PT_ADDR (0x1014)], 0
     mov     dword[PT_ADDR (0x1018)], PT_ADDR (0x5000) + PAGE_PDP_ATTR
-    mov     dword[PT_ADDR (0x101C)], edx
+    mov     dword[PT_ADDR (0x101C)], 0
 
     ;
     ; Page Table Entries (2048 * 2MB entries => 4GB)
@@ -87,8 +87,8 @@ pageTableEntriesLoop:
     dec     eax
     shl     eax, 21
     add     eax, PAGE_2M_PDE_ATTR
-    mov     [ecx * 8 + PT_ADDR (0x2000 - 8)], eax
-    mov     [(ecx * 8 + PT_ADDR (0x2000 - 8)) + 4], edx
+    mov     dword[ecx * 8 + PT_ADDR (0x2000 - 8)], eax
+    mov     dword[(ecx * 8 + PT_ADDR (0x2000 - 8)) + 4], 0
     loop    pageTableEntriesLoop
 
 SetCr3:
