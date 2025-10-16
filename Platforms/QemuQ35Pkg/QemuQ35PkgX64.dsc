@@ -97,6 +97,8 @@
   DxeServicesTableLib         |MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   UefiHiiServicesLib          |MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
   RegisterFilterLib           |MdePkg/Library/RegisterFilterLibNull/RegisterFilterLibNull.inf
+  MmSupervisorCoreInitLib     |MmSupervisorPkg/Library/BaseMmSupervisorCoreInitLibNull/BaseMmSupervisorCoreInitLibNull.inf
+  Tpm2HelpLib                 |SecurityPkg/Library/Tpm2HelpLib/Tpm2HelpLib.inf
 
   # Math Libraries
   FltUsedLib |MdePkg/Library/FltUsedLib/FltUsedLib.inf
@@ -401,8 +403,6 @@
   Tcg2PreUefiEventLogLib     |QemuPkg/Library/QemuPreUefiEventLogLibNull/QemuPreUefiEventLogLibNull.inf
 !endif
   RngLib                     |MdePkg/Library/PeiRngLib/PeiRngLib.inf
-
-  CpuExceptionHandlerLib     |UefiCpuPkg/Library/CpuExceptionHandlerLib/SecPeiCpuExceptionHandlerLib.inf
 
 #########################################
 # DXE Libraries
