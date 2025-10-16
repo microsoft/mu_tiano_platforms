@@ -1548,6 +1548,8 @@ QemuQ35Pkg/ResetVector/ResetVector.inf
 
 [BuildOptions.common.PEIM, BuildOptions.common.PEI_CORE, BuildOptions.common.SEC]
   MSFT:*_*_*_DLINK_FLAGS = /ALIGN:64
+  GCC:*_GCC5_*_DLINK_FLAGS = -z common-page-size=64
+  GCC:*_CLANGPDB_*_DLINK_FLAGS = /ALIGN:64
 
 # Force PE/COFF sections to be aligned at 4KB boundaries to support page level
 # protection of DXE_SMM_DRIVER/SMM_CORE modules
