@@ -698,7 +698,7 @@ FindAndReportEntryPoints (
 
   return;
 }
-volatile BOOLEAN  loop = TRUE;
+
 VOID
 EFIAPI
 SecCoreStartupWithStack (
