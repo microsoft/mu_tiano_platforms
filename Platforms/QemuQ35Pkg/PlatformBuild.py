@@ -77,18 +77,11 @@ class CommonPlatform():
     @staticmethod
     def add_common_command_line_options(parserObj) -> None:
         """Adds command line options common to settings managers."""
-        parserObj.add_argument('-a', "--arch", dest="build_arch", type=str, default="X64",
-            help="Optional - CSV of architecture to build. "
-            "X64 will use X64 for both PEI and DXE.  IA32,X64 will use IA32 for PEI and "
-            "X64 for DXE. Default is X64")
         codeql_helpers.add_command_line_option(parserObj)
 
     @staticmethod
     def get_common_command_line_options(settings, args) -> None:
         """Retrieves command line options common to settings managers."""
-        shell_environment.GetBuildVars().SetValue("TARGET_ARCH"," ".join(args.build_arch.upper().split(",")), "From CmdLine")
-        dsc = CommonPlatform.GetDscName(args.build_arch)
-        shell_environment.GetBuildVars().SetValue("ACTIVE_PLATFORM", f"QemuQ35Pkg/{dsc}", "From CmdLine")
         settings.codeql = CommonPlatform.is_codeql_enabled(args)
 
     @staticmethod
@@ -223,10 +216,17 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
     def AddCommandLineOptions(self, parserObj):
         ''' Add command line options to the argparser '''
+        parserObj.add_argument('-a', "--arch", dest="build_arch", type=str, default="X64",
+            help="Optional - CSV of architecture to build. "
+            "X64 will use X64 for both PEI and DXE.  IA32,X64 will use IA32 for PEI and "
+            "X64 for DXE. Default is X64")
         CommonPlatform.add_common_command_line_options(parserObj)
 
     def RetrieveCommandLineOptions(self, args):
         '''  Retrieve command line options from the argparser '''
+        shell_environment.GetBuildVars().SetValue("TARGET_ARCH"," ".join(args.build_arch.upper().split(",")), "From CmdLine")
+        dsc = CommonPlatform.GetDscName(args.build_arch)
+        shell_environment.GetBuildVars().SetValue("ACTIVE_PLATFORM", f"QemuQ35Pkg/{dsc}", "From CmdLine")
         CommonPlatform.get_common_command_line_options(self, args)
 
     def GetWorkspaceRoot(self):
