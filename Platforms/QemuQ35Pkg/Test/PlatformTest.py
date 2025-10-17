@@ -25,7 +25,7 @@ import PlatformBuild  # noqa: E402
 
 PLATFORM_NAME = 'QemuQ35Pkg'
 PLATFORM_TEST_DSC = 'QemuQ35Pkg/Test/QemuQ35PkgHostTest.dsc'
-PLATFORM_DSC = 'QemuQ35Pkg/QemuQ35Pkg.dsc'
+PLATFORM_DSC = 'QemuQ35Pkg/QemuQ35PkgX64.dsc'
 PLATFORMBUILD_DIR = str(Path(__file__).parent.parent)
 
 
@@ -49,16 +49,16 @@ class TestManager(BuildSettingsManager, UefiBuilder):
         if loggerType == 'con':
             return logging.INFO
         return logging.DEBUG
-    
+
     def GetWorkspaceRoot(self) -> str:
         return str(Path(__file__).parent.parent.parent.parent)
-    
+
     def GetPackagesPath(self):
         return PlatformBuild.CommonPlatform.PackagesPath
 
     def GetActiveScopes(self):
         return ('qemu', 'qemuq35', 'edk2-build', 'cibuild', 'host-based-test')
-    
+
     def GetName(self):
         return f"{PLATFORM_NAME}_HostBasedTest"
 
@@ -78,7 +78,7 @@ class TestManager(BuildSettingsManager, UefiBuilder):
         if self.env.GetValue("CODE_COVERAGE") == "TRUE":
             self.FlashImage = True
         return 0
-    
+
     def SetPlatformDefaultEnv(self):
         Env = namedtuple("Env", ["name", "default", "description"])
 
@@ -153,7 +153,7 @@ class TestManager(BuildSettingsManager, UefiBuilder):
             must_use_tests = set([module for module, source in host_tests if source in used_source])
 
             unused_tests = must_use_tests - used_tests
-        
+
         if len(unused_tests) > 0:
             logging.error("The following host based unit tests test files used by the "
                           "platform, but are not in the host based unit test dsc:")
@@ -191,7 +191,7 @@ class TestManager(BuildSettingsManager, UefiBuilder):
             logging.error("stuart_report Failed to generate a report.")
             return False
         return True
-        
+
     def _generate_reports(self, cov_file: str, out_dir: str, reporttypes: list) -> bool:
         """Generates one or more coverage report types using reportgenerator."""
         if self.env.GetValue("REPORTTYPES") == 'Cobertura':

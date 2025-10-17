@@ -733,13 +733,11 @@ SecCoreStartupWithStack (
   for (Index = 0; Index < SEC_IDT_ENTRY_COUNT; Index++) {
     UINT8  *Src;
     UINT8  *Dst;
-    UINTN  Byte;
 
     Src = (UINT8 *)&mIdtEntryTemplate;
     Dst = (UINT8 *)&IdtTableInStack.IdtTable[Index];
-    for (Byte = 0; Byte < sizeof (mIdtEntryTemplate); Byte++) {
-      Dst[Byte] = Src[Byte];
-    }
+
+    CopyMem (Dst, Src, sizeof (mIdtEntryTemplate));
   }
 
   IdtDescriptor.Base  = (UINTN)&IdtTableInStack.IdtTable;

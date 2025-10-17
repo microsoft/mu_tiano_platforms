@@ -28,12 +28,12 @@ jobs:
     os_type: Linux
     container_image: linux-gcc
     build_matrix:
-      QemuQ35_DEBUG:
+      QemuQ35_X64_DEBUG:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
         BuildFlags: ""
         BuildTarget: "DEBUG"
-        BuildExtraTag: ""
+        BuildExtraTag: "X64"
         BuildExtraStep:
           - script: echo No extra steps provided
         Run: true
@@ -42,12 +42,12 @@ jobs:
           **/QEMUQ35_*.fd
         BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuQ35_RELEASE:
+      QemuQ35_X64_RELEASE:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
         BuildFlags: ""
         BuildTarget: "RELEASE"
-        BuildExtraTag: ""
+        BuildExtraTag: "X64"
         BuildExtraStep:
           - script: echo No extra steps provided
         Run: true
@@ -56,12 +56,40 @@ jobs:
           **/QEMUQ35_*.fd
         BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuQ35_DEBUG_ARM:
+      QemuQ35_IA32X64_DEBUG:
+        BuildPackage: QemuQ35Pkg
+        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+        BuildFlags: "-a IA32,X64"
+        BuildTarget: "DEBUG"
+        BuildExtraTag: "IA32X64"
+        BuildExtraStep:
+          - script: echo No extra steps provided
+        Run: true
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+        BuildArtifactsBinary: |
+          **/QEMUQ35_*.fd
+        BuildArtifactsOther: "**/unit_test_results/*"
+
+      QemuQ35_IA32X64_RELEASE:
+        BuildPackage: QemuQ35Pkg
+        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+        BuildFlags: "-a IA32,X64"
+        BuildTarget: "RELEASE"
+        BuildExtraTag: "IA32X64"
+        BuildExtraStep:
+          - script: echo No extra steps provided
+        Run: true
+        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+        BuildArtifactsBinary: |
+          **/QEMUQ35_*.fd
+        BuildArtifactsOther: "**/unit_test_results/*"
+
+      QemuQ35_X64_DEBUG_ARM:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
         BuildFlags: ""
         BuildTarget: "DEBUG"
-        BuildExtraTag: "ON_ARM"
+        BuildExtraTag: "X64_ON_ARM"
         BuildExtraStep:
           - script: echo No extra steps provided
         Run: false
@@ -72,12 +100,12 @@ jobs:
           **/*/*TestApp.efi
         BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuQ35_RELEASE_ARM:
+      QemuQ35_X64_RELEASE_ARM:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
         BuildFlags: ""
         BuildTarget: "RELEASE"
-        BuildExtraTag: "ON_ARM"
+        BuildExtraTag: "X64_ON_ARM"
         BuildExtraStep:
           - script: echo No extra steps provided
         Run: false
