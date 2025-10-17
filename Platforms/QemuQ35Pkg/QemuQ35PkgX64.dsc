@@ -16,7 +16,7 @@
 ################################################################################
 [Defines]
   PLATFORM_NAME                  = QemuQ35
-  PLATFORM_GUID                  = 163b507c-8702-496a-99d7-566c36e14728
+  PLATFORM_GUID                  = 9EE23FF6-5170-4BFF-A786-390F606F3404
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/QemuQ35X64Pkg
