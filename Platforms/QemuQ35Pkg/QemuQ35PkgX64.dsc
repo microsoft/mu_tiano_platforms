@@ -19,7 +19,7 @@
   PLATFORM_GUID                  = 9EE23FF6-5170-4BFF-A786-390F606F3404
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
-  OUTPUT_DIRECTORY               = Build/QemuQ35X64Pkg
+  OUTPUT_DIRECTORY               = Build/QemuQ35PkgX64
   SUPPORTED_ARCHITECTURES        = X64
   PEI_CRYPTO_ARCH                = X64
 

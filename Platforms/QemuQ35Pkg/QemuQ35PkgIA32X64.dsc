@@ -19,7 +19,7 @@
   PLATFORM_GUID                  = 163b507c-8702-496a-99d7-566c36e14728
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
-  OUTPUT_DIRECTORY               = Build/QemuQ35IA32X64Pkg
+  OUTPUT_DIRECTORY               = Build/QemuQ35PkgIA32X64
   SUPPORTED_ARCHITECTURES        = IA32|X64
   PEI_CRYPTO_ARCH                = IA32
 
