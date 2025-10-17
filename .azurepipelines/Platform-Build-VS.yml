@@ -30,7 +30,7 @@ jobs:
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
         BuildFlags: ""
         BuildTarget: "DEBUG"
-        BuildExtraTag: ""
+        BuildExtraTag: "X64"
         BuildExtraStep:
           - script: echo No extra steps provided
         Run: true
@@ -44,7 +44,7 @@ jobs:
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
         BuildFlags: ""
         BuildTarget: "RELEASE"
-        BuildExtraTag: ""
+        BuildExtraTag: "X64"
         BuildExtraStep:
           - script: echo No extra steps provided
         Run: true
@@ -56,9 +56,9 @@ jobs:
       QemuQ35_IA32X64_DEBUG:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-        BuildFlags: "BLD_*_PEI_32BIT=TRUE"
+        BuildFlags: "-a IA32,X64"
         BuildTarget: "DEBUG"
-        BuildExtraTag: ""
+        BuildExtraTag: "IA32X64"
         BuildExtraStep:
           - script: echo No extra steps provided
         Run: true
@@ -70,9 +70,9 @@ jobs:
       QemuQ35_IA32X64_RELEASE:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-        BuildFlags: ""
+        BuildFlags: "-a IA32,X64"
         BuildTarget: "RELEASE"
-        BuildExtraTag: "BLD_*_PEI_32BIT=TRUE"
+        BuildExtraTag: "IA32X64"
         BuildExtraStep:
           - script: echo No extra steps provided
         Run: true
@@ -86,7 +86,7 @@ jobs:
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
         BuildFlags: ""
         BuildTarget: "DEBUG"
-        BuildExtraTag: "ON_ARM"
+        BuildExtraTag: "X64_ON_ARM"
         BuildExtraStep:
           - script: echo No extra steps provided
         Run: false
@@ -102,7 +102,7 @@ jobs:
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
         BuildFlags: ""
         BuildTarget: "RELEASE"
-        BuildExtraTag: "ON_ARM"
+        BuildExtraTag: "X64_ON_ARM"
         BuildExtraStep:
           - script: echo No extra steps provided
         Run: false
