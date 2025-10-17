@@ -67,10 +67,10 @@ class CommonPlatform():
         ArchCsv: csv string containing all architectures to build
         '''
         dsc = "QemuQ35Pkg"
-        if ArchCsv.upper().contains("IA32"):
+        if "IA32" in ArchCsv.upper():
             dsc += "IA32"
 
-        if ArchCsv.upper().contains("X64"):
+        if "X64" in ArchCsv.upper():
             dsc += "X64"
 
         dsc += ".dsc"
