@@ -56,10 +56,10 @@ jobs:
           **/QEMUQ35_*.fd
         BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuQ35x86_DEBUG:
+      QemuQ35ia32x64_DEBUG:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-        BuildFlags: "-a IA32,X64"
+        BuildFlags: "BLD_*_PEI_32BIT=TRUE"
         BuildTarget: "DEBUG"
         BuildExtraTag: ""
         BuildExtraStep:
@@ -70,10 +70,10 @@ jobs:
           **/QEMUQ35_*.fd
         BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuQ35x86_RELEASE:
+      QemuQ35ia32x64_RELEASE:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-        BuildFlags: "-a IA32,X64"
+        BuildFlags: "BLD_*_PEI_32BIT=TRUE"
         BuildTarget: "RELEASE"
         BuildExtraTag: ""
         BuildExtraStep:
