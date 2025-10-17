@@ -28,7 +28,7 @@ jobs:
     os_type: Linux
     container_image: linux-gcc
     build_matrix:
-      QemuQ35x64_DEBUG:
+      QemuQ35_X64_DEBUG:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
         BuildFlags: ""
@@ -42,7 +42,7 @@ jobs:
           **/QEMUQ35_*.fd
         BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuQ35x64_RELEASE:
+      QemuQ35_X64_RELEASE:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
         BuildFlags: ""
@@ -56,7 +56,7 @@ jobs:
           **/QEMUQ35_*.fd
         BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuQ35ia32x64_DEBUG:
+      QemuQ35_IA32X64_DEBUG:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
         BuildFlags: "BLD_*_PEI_32BIT=TRUE"
@@ -70,7 +70,7 @@ jobs:
           **/QEMUQ35_*.fd
         BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuQ35ia32x64_RELEASE:
+      QemuQ35_IA32X64_RELEASE:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
         BuildFlags: "BLD_*_PEI_32BIT=TRUE"
@@ -84,7 +84,7 @@ jobs:
           **/QEMUQ35_*.fd
         BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuQ35x64_DEBUG_ARM:
+      QemuQ35_X64_DEBUG_ARM:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
         BuildFlags: ""
@@ -100,7 +100,7 @@ jobs:
           **/*/*TestApp.efi
         BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuQ35x64_RELEASE_ARM:
+      QemuQ35_X64_RELEASE_ARM:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
         BuildFlags: ""
