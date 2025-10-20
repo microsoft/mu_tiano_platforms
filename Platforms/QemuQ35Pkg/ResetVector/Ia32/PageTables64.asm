@@ -37,31 +37,10 @@ BITS    32
                        PAGE_READ_WRITE + \
                        PAGE_PRESENT)
 
-%define TDX_BSP         1
-%define TDX_AP          2
-
 ;
 ; Modified:  EAX, EBX, ECX, EDX
 ;
 SetCr3ForPageTables64:
-    ; Check the TDX features.
-    ; If it is TDX APs, then jump to SetCr3 directly.
-    ; In TD guest the initialization is done by BSP, including building
-    ; the page tables. APs will spin on until byte[TDX_WORK_AREA_PGTBL_READY]
-    ; is set.
-    OneTimeCall   CheckTdxFeaturesBeforeBuildPagetables
-    cmp       eax, TDX_BSP
-    je        ClearOvmfPageTables
-    cmp       eax, TDX_AP
-    je        SetCr3
-
-    ; Check whether the SEV is active and populate the SevEsWorkArea
-    OneTimeCall   CheckSevFeatures
-
-    ; If SEV is enabled, the C-bit position is always above 31.
-    ; The mask will be saved in the EDX and applied during the
-    ; the page table build below.
-    OneTimeCall   GetSevCBitMaskAbove31
 
 ClearOvmfPageTables:
     ;
@@ -85,19 +64,19 @@ clearPageTablesMemoryLoop:
     ; Top level Page Directory Pointers (1 * 512GB entry)
     ;
     mov     dword[PT_ADDR (0)], PT_ADDR (0x1000) + PAGE_PDP_ATTR
-    mov     dword[PT_ADDR (4)], edx
+    mov     dword[PT_ADDR (4)], 0
 
     ;
     ; Next level Page Directory Pointers (4 * 1GB entries => 4GB)
     ;
     mov     dword[PT_ADDR (0x1000)], PT_ADDR (0x2000) + PAGE_PDP_ATTR
-    mov     dword[PT_ADDR (0x1004)], edx
+    mov     dword[PT_ADDR (0x1004)], 0
     mov     dword[PT_ADDR (0x1008)], PT_ADDR (0x3000) + PAGE_PDP_ATTR
-    mov     dword[PT_ADDR (0x100C)], edx
+    mov     dword[PT_ADDR (0x100C)], 0
     mov     dword[PT_ADDR (0x1010)], PT_ADDR (0x4000) + PAGE_PDP_ATTR
-    mov     dword[PT_ADDR (0x1014)], edx
+    mov     dword[PT_ADDR (0x1014)], 0
     mov     dword[PT_ADDR (0x1018)], PT_ADDR (0x5000) + PAGE_PDP_ATTR
-    mov     dword[PT_ADDR (0x101C)], edx
+    mov     dword[PT_ADDR (0x101C)], 0
 
     ;
     ; Page Table Entries (2048 * 2MB entries => 4GB)
@@ -108,16 +87,9 @@ pageTableEntriesLoop:
     dec     eax
     shl     eax, 21
     add     eax, PAGE_2M_PDE_ATTR
-    mov     [ecx * 8 + PT_ADDR (0x2000 - 8)], eax
-    mov     [(ecx * 8 + PT_ADDR (0x2000 - 8)) + 4], edx
+    mov     dword[ecx * 8 + PT_ADDR (0x2000 - 8)], eax
+    mov     dword[(ecx * 8 + PT_ADDR (0x2000 - 8)) + 4], 0
     loop    pageTableEntriesLoop
-
-    ; Clear the C-bit from the GHCB page if the SEV-ES is enabled.
-    OneTimeCall   SevClearPageEncMaskForGhcbPage
-
-    ; TDX will do some PostBuildPages task, such as setting
-    ; byte[TDX_WORK_AREA_PGTBL_READY].
-    OneTimeCall   TdxPostBuildPageTables
 
 SetCr3:
     ;

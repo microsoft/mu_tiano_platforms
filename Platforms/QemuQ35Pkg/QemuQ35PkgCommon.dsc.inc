@@ -15,12 +15,6 @@
 #
 ################################################################################
 [Defines]
-  PLATFORM_NAME                  = QemuQ35
-  PLATFORM_GUID                  = 163b507c-8702-496a-99d7-566c36e14728
-  PLATFORM_VERSION               = 0.1
-  DSC_SPECIFICATION              = 0x00010005
-  OUTPUT_DIRECTORY               = Build/QemuQ35Pkg
-  SUPPORTED_ARCHITECTURES        = IA32|X64
   BUILD_TARGETS                  = NOOPT|DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = QemuQ35Pkg/QemuQ35Pkg.fdf
@@ -57,7 +51,6 @@
   SMM_CRYPTO_SERVICES = NONE
   STANDALONEMM_CRYPTO_SERVICES = NONE
   STANDALONEMM_MMSUPV_CRYPTO_SERVICES = STANDARD
-  PEI_CRYPTO_ARCH = IA32
   DXE_CRYPTO_ARCH = X64
   RUNTIMEDXE_CRYPTO_ARCH = X64
   SMM_CRYPTO_ARCH = NONE
@@ -325,7 +318,6 @@
 
   HobPrintLib|MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
 
-[LibraryClasses.IA32, LibraryClasses.X64]
   XenHypercallLib|QemuQ35Pkg/Library/XenHypercallLib/XenHypercallLib.inf
 
 
@@ -403,9 +395,6 @@
   Tcg2PreUefiEventLogLib     |QemuPkg/Library/QemuPreUefiEventLogLibNull/QemuPreUefiEventLogLibNull.inf
 !endif
   RngLib                     |MdePkg/Library/PeiRngLib/PeiRngLib.inf
-
-[LibraryClasses.X64.PEIM]
-  CpuExceptionHandlerLib     |UefiCpuPkg/Library/CpuExceptionHandlerLib/SecPeiCpuExceptionHandlerLib.inf
 
 #########################################
 # DXE Libraries
@@ -560,35 +549,31 @@
   AssertLib|AdvLoggerPkg/Library/AssertLib/AssertLib.inf
   AdvancedLoggerAccessLib|AdvLoggerPkg/Library/AdvancedLoggerAccessLib/AdvancedLoggerAccessLib.inf
 
-[LibraryClasses.IA32.PEI_CORE]
+[LibraryClasses.common.PEI_CORE]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/PeiCore/AdvancedLoggerLib.inf
 
-[LibraryClasses.IA32.PEIM]
+[LibraryClasses.common.PEIM]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Pei/AdvancedLoggerLib.inf
 !ifndef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|AdvLoggerPkg/Library/PeiDebugLibAdvancedLogger/PeiDebugLibAdvancedLogger.inf
-!endif
+!endif 
 
-[LibraryClasses.X64.PEIM]
-  AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Pei64/AdvancedLoggerLib.inf
-
-[LibraryClasses.X64]
+[LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.UEFI_APPLICATION]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Dxe/AdvancedLoggerLib.inf
-  AdvancedLoggerAccessLib|AdvLoggerPkg/Library/AdvancedLoggerAccessLib/AdvancedLoggerAccessLib.inf
 
-[LibraryClasses.X64.DXE_CORE]
+[LibraryClasses.common.DXE_CORE]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/DxeCore/AdvancedLoggerLib.inf
 
-[LibraryClasses.X64.DXE_SMM_DRIVER]
+[LibraryClasses.common.DXE_SMM_DRIVER]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Smm/AdvancedLoggerLib.inf
 
-[LibraryClasses.X64.SMM_CORE]
+[LibraryClasses.common.SMM_CORE]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Smm/AdvancedLoggerLib.inf
 
-[LibraryClasses.X64.DXE_RUNTIME_DRIVER]
+[LibraryClasses.common.DXE_RUNTIME_DRIVER]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Runtime/AdvancedLoggerLib.inf
 
-[LibraryClasses.X64.MM_CORE_STANDALONE, LibraryClasses.X64.MM_STANDALONE]
+[LibraryClasses.common.MM_CORE_STANDALONE, LibraryClasses.common.MM_STANDALONE]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/MmCore/AdvancedLoggerLib.inf
 
 ################################################################################
@@ -781,7 +766,6 @@
   # to 1, which by default it is not. Using BLD_*_DXE_DBG_BRK=TRUE will set this to 1.
   DebuggerFeaturePkgTokenSpaceGuid.PcdInitialBreakpointTimeoutMs|0
 
-[PcdsFixedAtBuild.IA32]
   #
   # The NumberOfPages values below are ad-hoc. They are updated sporadically at
   # best (please refer to git-blame for past updates). The values capture a set
@@ -798,8 +782,6 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0x100
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x1C0
 !endif
-
-[PcdsFixedAtBuild.X64]
 
   #
   # Network Pcds
@@ -914,114 +896,6 @@ QemuQ35Pkg/Library/PeiFvMeasurementExclusionLib/PeiFvMeasurementExclusionLib.inf
 QemuQ35Pkg/Library/ResetSystemLib/BaseResetSystemLib.inf
 QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
 QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
-
-[Components.IA32]
-  QemuQ35Pkg/ResetVector/ResetVector.inf
-
-  #########################################
-  # SEC Phase modules
-  #########################################
-  QemuQ35Pkg/Sec/SecMain.inf {
-    <LibraryClasses>
-      NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
-  }
-
-  #########################################
-  # PEI Phase modules
-  #########################################
-  MdeModulePkg/Core/Pei/PeiMain.inf
-  MdeModulePkg/Universal/PCD/Pei/Pcd.inf  {
-    <LibraryClasses>
-      PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-  }
-  MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei.inf {
-    <LibraryClasses>
-      PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-  }
-  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf {
-    <LibraryClasses>
-      PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-  }
-  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
-
-!if $(TPM_REPLAY_ENABLED) == TRUE
-  TpmTestingPkg/TpmReplayPei/Pei/TpmReplayPei.inf {
-    <LibraryClasses>
-      FvMeasurementExclusionLib|QemuQ35Pkg/Library/PeiFvMeasurementExclusionLib/PeiFvMeasurementExclusionLib.inf
-      InputChannelLib|QemuPkg/Library/BaseFwCfgInputChannelLib/BaseFwCfgInputChannelLib.inf
-      Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
-    <PcdsPatchableInModule>
-      gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x3F
-    <PcdsFixedAtBuild>
-      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80480246
-  }
-!endif
-
-  SecurityPkg/RandomNumberGenerator/RngPei/RngPei.inf {
-    <LibraryClasses>
-      RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
-  }
-
-  QemuQ35Pkg/PlatformPei/PlatformPei.inf {
-    <LibraryClasses>
-      NULL|StandaloneMmPkg/Library/PeiStandaloneMmHobProductionLib/PeiStandaloneMmHobProductionLib.inf
-  }
-  MdeModulePkg/Universal/FaultTolerantWritePei/FaultTolerantWritePei.inf
-  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
-  QemuQ35Pkg/SmmAccess/SmmAccessPei.inf
-  MmSupervisorPkg/Drivers/StandaloneMmHob/StandaloneMmHob.inf
-  MmSupervisorPkg/Drivers/MmCommunicationBuffer/MmCommunicationBufferPei.inf
-!if $(PEI_MM_IPL_ENABLED) == TRUE
-  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmIplPei.inf
-  QemuQ35Pkg/SmmControl2Dxe/MmControlPei.inf
-!endif
-
-  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
-
-!if $(TPM_ENABLE) == TRUE
-  QemuPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
-  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf {
-    <LibraryClasses>
-      HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCryptoRouterPei.inf
-      NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1.inf
-      NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSha256.inf
-      NULL|SecurityPkg/Library/HashInstanceLibSha384/HashInstanceLibSha384.inf
-      NULL|SecurityPkg/Library/HashInstanceLibSha512/HashInstanceLibSha512.inf
-      NULL|SecurityPkg/Library/HashInstanceLibSm3/HashInstanceLibSm3.inf
-  }
-!endif
-
-  #
-  # MU Modules
-  #
-  ## PEI
-  MdeModulePkg/Universal/ResetSystemPei/ResetSystemPei.inf
-  MsCorePkg/Universal/StatusCodeHandler/Serial/Pei/SerialStatusCodeHandlerPei.inf {
-    <LibraryClasses>
-      DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-  }
-
-  MsCorePkg/Core/GuidedSectionExtractPeim/GuidedSectionExtract.inf {
-    <LibraryClasses>
-    NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
-  }
-  MsWheaPkg/MsWheaReport/Pei/MsWheaReportPei.inf
-
-  MsGraphicsPkg/MsUiTheme/Pei/MsUiThemePpi.inf
-  MsGraphicsPkg/MsEarlyGraphics/Pei/MsEarlyGraphics.inf
-  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTablePei/FirmwarePerformancePei.inf
-  OemPkg/DeviceStatePei/DeviceStatePei.inf
-  MfciPkg/MfciPei/MfciPei.inf
-
-  PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
-  QemuQ35Pkg/ConfigKnobs/ConfigKnobs.inf
-  OemPkg/OemConfigPolicyCreatorPei/OemConfigPolicyCreatorPei.inf {
-    <LibraryClasses>
-      # producer of config data
-      NULL|QemuQ35Pkg/Library/Q35ConfigDataLib/Q35ConfigDataLib.inf
-  }
-
-  DebuggerFeaturePkg/DebugConfigPei/DebugConfigPei.inf
 
 [Components.X64]
   #########################################
@@ -1538,32 +1412,3 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   }
 
 !include TpmTestingPkg/TpmReplay.dsc.inc
-
-################################################################################
-#
-# Build Options
-#
-################################################################################
-[BuildOptions]
-  GCC:RELEASE_*_*_CC_FLAGS             = -DMDEPKG_NDEBUG
-  MSFT:RELEASE_*_*_CC_FLAGS            = /D MDEPKG_NDEBUG
-
-  # Exception tables are required for stack walks in the debugger.
-  MSFT:*_*_X64_GENFW_FLAGS  = --keepexceptiontable
-  GCC:*_*_X64_GENFW_FLAGS   = --keepexceptiontable
-
-  #
-  # Disable deprecated APIs.
-  #
-  MSFT:*_*_*_CC_FLAGS = /D DISABLE_NEW_DEPRECATED_INTERFACES
-  GCC:*_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
-
-[BuildOptions.IA32]
-  MSFT:*_*_*_DLINK_FLAGS = /ALIGN:64
-
-# Force PE/COFF sections to be aligned at 4KB boundaries to support page level
-# protection of DXE_SMM_DRIVER/SMM_CORE modules
-[BuildOptions.common.EDKII.DXE_SMM_DRIVER, BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER, BuildOptions.common.EDKII.SMM_CORE, BuildOptions.common.EDKII.DXE_DRIVER, BuildOptions.common.EDKII.DXE_CORE, BuildOptions.common.EDKII.UEFI_DRIVER, BuildOptions.common.EDKII.UEFI_APPLICATION, BuildOptions.common.EDKII.MM_CORE_STANDALONE, BuildOptions.common.EDKII.MM_STANDALONE]
-  MSFT:*_*_*_DLINK_FLAGS = /ALIGN:4096
-  GCC:*_GCC5_*_DLINK_FLAGS = -z common-page-size=0x1000
-  GCC:*_CLANGPDB_*_DLINK_FLAGS = /ALIGN:4096

@@ -60,6 +60,22 @@ class CommonPlatform():
         "Features/MM_SUPV"
     )
 
+    @classmethod
+    def GetDscName(cls, ArchCsv: str) -> str:
+        ''' return the DSC given the architectures requested.
+
+        ArchCsv: csv string containing all architectures to build
+        '''
+        dsc = "QemuQ35Pkg"
+        if "IA32" in ArchCsv.upper():
+            dsc += "IA32"
+
+        if "X64" in ArchCsv.upper():
+            dsc += "X64"
+
+        dsc += ".dsc"
+        return dsc
+
     @staticmethod
     def add_common_command_line_options(parserObj) -> None:
         """Adds command line options common to settings managers."""
@@ -202,10 +218,17 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
     def AddCommandLineOptions(self, parserObj):
         ''' Add command line options to the argparser '''
+        parserObj.add_argument('-a', "--arch", dest="build_arch", type=str, default="X64",
+            help="Optional - CSV of architecture to build. "
+            "X64 will use X64 for both PEI and DXE.  IA32,X64 will use IA32 for PEI and "
+            "X64 for DXE. Default is X64")
         CommonPlatform.add_common_command_line_options(parserObj)
 
     def RetrieveCommandLineOptions(self, args):
         '''  Retrieve command line options from the argparser '''
+        shell_environment.GetBuildVars().SetValue("TARGET_ARCH"," ".join(args.build_arch.upper().split(",")), "From CmdLine")
+        dsc = CommonPlatform.GetDscName(args.build_arch)
+        shell_environment.GetBuildVars().SetValue("ACTIVE_PLATFORM", f"QemuQ35Pkg/{dsc}", "From CmdLine")
         CommonPlatform.get_common_command_line_options(self, args)
 
     def GetWorkspaceRoot(self):
@@ -259,8 +282,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
     def SetPlatformEnv(self):
         logging.debug("PlatformBuilder SetPlatformEnv")
         self.env.SetValue("PRODUCT_NAME", "QemuQ35", "Platform Hardcoded")
-        self.env.SetValue("ACTIVE_PLATFORM", "QemuQ35Pkg/QemuQ35Pkg.dsc", "Platform Hardcoded")
-        self.env.SetValue("TARGET_ARCH", "IA32 X64", "Platform Hardcoded")
         self.env.SetValue("EMPTY_DRIVE", "FALSE", "Default to false")
         self.env.SetValue("RUN_TESTS", "FALSE", "Default to false")
         self.env.SetValue("QEMU_HEADLESS", "FALSE", "Default to false")
