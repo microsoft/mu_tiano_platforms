@@ -110,7 +110,6 @@ ASM_PFX(gPatchSmmInitCr4):
     rdmsr
     or      eax, ebx                    ; set NXE bit if NX is available
     wrmsr
-    jmp $
     mov     eax, strict dword 0         ; source operand will be patched
 ASM_PFX(gPatchSmmInitCr0):
     mov     di, PROTECT_MODE_DS
@@ -126,6 +125,7 @@ BITS 32
     mov     ss, edi
     mov     esp, strict dword 0         ; source operand will be patched
 ASM_PFX(gPatchSmmInitStack):
+    jmp $
     call    ASM_PFX(SmmInitHandler)
     StuffRsb32
     rsm
