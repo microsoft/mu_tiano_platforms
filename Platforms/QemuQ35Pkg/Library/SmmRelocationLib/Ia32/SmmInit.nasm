@@ -125,7 +125,6 @@ BITS 32
     mov     ss, edi
     mov     esp, strict dword 0         ; source operand will be patched
 ASM_PFX(gPatchSmmInitStack):
-    jmp $
     call    ASM_PFX(SmmInitHandler)
     StuffRsb32
     rsm
