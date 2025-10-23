@@ -133,6 +133,7 @@ BITS 16
 ASM_PFX(gcSmmInitTemplate):
     mov ebp, ASM_PFX(SmmStartup)
     sub ebp, 0x30000
+    jmp $
     jmp ebp
 
 ASM_PFX(gcSmmInitSize): DW $ - ASM_PFX(gcSmmInitTemplate)
