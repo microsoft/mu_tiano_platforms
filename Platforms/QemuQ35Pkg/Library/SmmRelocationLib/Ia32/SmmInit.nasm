@@ -102,6 +102,7 @@ ASM_PFX(SmmStartup):
     mov     eax, strict dword 0         ; source operand will be patched
 ASM_PFX(gPatchSmmInitCr3):
     mov     cr3, eax
+    jmp $
 o32 lgdt    [cs:ebp + (ASM_PFX(gcSmmInitGdtr) - ASM_PFX(SmmStartup))]
     mov     eax, strict dword 0         ; source operand will be patched
 ASM_PFX(gPatchSmmInitCr4):
@@ -133,7 +134,6 @@ BITS 16
 ASM_PFX(gcSmmInitTemplate):
     mov ebp, ASM_PFX(SmmStartup)
     sub ebp, 0x30000
-    jmp $
     jmp ebp
 
 ASM_PFX(gcSmmInitSize): DW $ - ASM_PFX(gcSmmInitTemplate)
