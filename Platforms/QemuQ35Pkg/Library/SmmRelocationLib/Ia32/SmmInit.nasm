@@ -102,7 +102,6 @@ ASM_PFX(SmmStartup):
     mov     eax, strict dword 0         ; source operand will be patched
 ASM_PFX(gPatchSmmInitCr3):
     mov     cr3, eax
-    jmp $
 o32 lgdt    [cs:ebp + (ASM_PFX(gcSmmInitGdtr) - ASM_PFX(SmmStartup))]
     mov     eax, strict dword 0         ; source operand will be patched
 ASM_PFX(gPatchSmmInitCr4):
@@ -111,6 +110,7 @@ ASM_PFX(gPatchSmmInitCr4):
     rdmsr
     or      eax, ebx                    ; set NXE bit if NX is available
     wrmsr
+    jmp $
     mov     eax, strict dword 0         ; source operand will be patched
 ASM_PFX(gPatchSmmInitCr0):
     mov     di, PROTECT_MODE_DS
