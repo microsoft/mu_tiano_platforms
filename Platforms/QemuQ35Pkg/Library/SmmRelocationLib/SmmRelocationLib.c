@@ -135,20 +135,15 @@ SmmInitHandler (
   VOID
   )
 {
-  DEBUG ((DEBUG_ERROR, "%a Entry %d\n", __FUNCTION__, __LINE__));
   //
   // Update SMM IDT entries' code segment and load IDT
   //
   AsmWriteIdtr (&gcSmmInitIdtr);
 
-  DEBUG ((DEBUG_ERROR, "%a Entry %d\n", __FUNCTION__, __LINE__));
-
   //
   // Configure SmBase.
   //
   ConfigureSmBase (mSmBase);
-
-  DEBUG ((DEBUG_ERROR, "%a Entry %d\n", __FUNCTION__, __LINE__));
 
   //
   // Hook return after RSM to set SMM re-based flag
@@ -156,8 +151,6 @@ SmmInitHandler (
   // by next AP flow before it take effect.
   //
   SemaphoreHook (&mRebased);
-
-  DEBUG ((DEBUG_ERROR, "%a Entry %d\n", __FUNCTION__, __LINE__));
 }
 
 /**
