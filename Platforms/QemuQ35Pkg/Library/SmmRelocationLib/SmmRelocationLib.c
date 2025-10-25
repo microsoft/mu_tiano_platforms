@@ -422,7 +422,7 @@ SplitSmramHobForSmmRelocation (
   @retval Others                CPU SmmBase Relocation failed.
 
 **/
-volatile BOOLEAN loop = TRUE;
+// volatile BOOLEAN loop = TRUE;
 EFI_STATUS
 EFIAPI
 SmmRelocationInit (
@@ -445,7 +445,8 @@ SmmRelocationInit (
     return EFI_INVALID_PARAMETER;
   }
 
-  while (loop) {}
+  // while (loop) {}
+  InitializeSpinLock (&mSmmRelocationSemaphore);
 
   //
   // Get the number of processors

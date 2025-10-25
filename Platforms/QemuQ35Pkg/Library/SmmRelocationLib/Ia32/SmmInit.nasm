@@ -15,6 +15,7 @@
 %include "StuffRsbNasm.inc"
 
 extern ASM_PFX(SmmInitHandler)
+extern ASM_PFX(ReleaseSmmRelocationSemaphore)
 extern ASM_PFX(mRebasedFlag)
 extern ASM_PFX(mSmmRelocationOriginalAddress)
 
@@ -148,7 +149,13 @@ ASM_PFX(SmmRelocationSemaphoreComplete):
     mov     eax, [ASM_PFX(mRebasedFlag)]
     mov     byte [eax], 1
     pop     eax
-    jmp     [ASM_PFX(mSmmRelocationOriginalAddress)]
+    ; load the contents in ASM_PFX(mSmmRelocationOriginalAddress)
+    mov     eax, [ASM_PFX(mSmmRelocationOriginalAddress)]
+    push    eax
+    ; Release the semaphore to let other CPUs proceed
+    call    ASM_PFX(ReleaseSmmRelocationSemaphore)
+    ; this is essentially jmp to eax we pushed earlier and also balances the stack
+    ret
 
 global ASM_PFX(SmmInitFixupAddress)
 ASM_PFX(SmmInitFixupAddress):
