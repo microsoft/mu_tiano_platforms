@@ -13,6 +13,9 @@ UINTN             mSmmRelocationOriginalAddress;
 volatile BOOLEAN  *mRebasedFlag;
 SPIN_LOCK         mSmmRelocationSemaphore;
 
+/**
+  Acquire the SMM Relocation Semaphore.
+**/
 VOID
 EFIAPI
 AcquireSmmRelocationSemaphore (
@@ -22,6 +25,9 @@ AcquireSmmRelocationSemaphore (
   AcquireSpinLock (&mSmmRelocationSemaphore);
 }
 
+/**
+  Release the SMM Relocation Semaphore.
+**/
 VOID
 EFIAPI
 ReleaseSmmRelocationSemaphore (

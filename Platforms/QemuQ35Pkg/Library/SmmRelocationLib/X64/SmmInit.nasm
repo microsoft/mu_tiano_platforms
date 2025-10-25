@@ -15,6 +15,7 @@
 %include "StuffRsbNasm.inc"
 
 extern ASM_PFX(SmmInitHandler)
+extern ASM_PFX(ReleaseSmmRelocationSemaphore)
 extern ASM_PFX(mRebasedFlag)
 extern ASM_PFX(mSmmRelocationOriginalAddress)
 
@@ -185,8 +186,14 @@ ASM_PFX(SmmRelocationSemaphoreComplete32):
 ASM_PFX(gPatchRebasedFlagAddr32):
     mov     byte [eax], 1
     pop     eax
-    jmp     dword [dword 0]                    ; destination will be patched
+    ; load the contents in ASM_PFX(mSmmRelocationOriginalAddress)
+    mov     eax, [ASM_PFX(mSmmRelocationOriginalAddress)]
 ASM_PFX(gPatchSmmRelocationOriginalAddressPtr32):
+    push    eax
+    ; Release the semaphore to let other CPUs proceed
+    call    ASM_PFX(ReleaseSmmRelocationSemaphore)
+    ; this is essentially jmp to eax we pushed earlier and also balances the stack
+    ret
 
 BITS 64
 global ASM_PFX(SmmInitFixupAddress)
