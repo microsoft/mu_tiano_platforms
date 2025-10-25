@@ -173,11 +173,32 @@ ASM_PFX(SmmRelocationSemaphoreComplete):
     mov     rax, [ASM_PFX(mRebasedFlag)]
     mov     byte [rax], 1
     pop     rax
+    ; save the volatile registers before messing with them...
+    push    rax
+    push    rcx
+    push    rdx
+    push    r8
+    push    r9
+    push    r10
+    push    r11
     ; load the contents in ASM_PFX(mSmmRelocationOriginalAddress)
     mov     rax, [ASM_PFX(mSmmRelocationOriginalAddress)]
     push    rax
+    ; now the stack should still be the same alignment as before
+    add     rsp, -0x20
     ; Release the semaphore to let other CPUs proceed
     call    ASM_PFX(ReleaseSmmRelocationSemaphore)
+    add     rsp, 0x20
+    pop     rax
+    ; restore the volatile registers
+    pop     r11
+    pop     r10
+    pop     r9
+    pop     r8
+    pop     rdx
+    pop     rcx
+    ; here we need to swap the top of stack with rax
+    xchg    rax, [rsp]
     ; this is essentially jmp to eax we pushed earlier and also balances the stack
     ret
 
@@ -192,12 +213,24 @@ ASM_PFX(SmmRelocationSemaphoreComplete32):
 ASM_PFX(gPatchRebasedFlagAddr32):
     mov     byte [eax], 1
     pop     eax
+    ; save the volatile registers before messing with them...
+    push    eax
+    push    ecx
+    push    edx
     ; load the contents in gPatchSmmRelocationOriginalAddressPtr32
     mov     eax, dword [dword 0]
 ASM_PFX(gPatchSmmRelocationOriginalAddressPtr32):
     push    eax
+    add     esp, -0x20
     ; Release the semaphore to let other CPUs proceed
     call    ASM_PFX(ReleaseSmmRelocationSemaphore)
+    add     esp, 0x20
+    pop     eax
+    ; restore the volatile registers
+    pop     edx
+    pop     ecx
+    ; here we need to swap the top of stack with eax
+    xchg    eax, [esp]
     ; this is essentially jmp to eax we pushed earlier and also balances the stack
     ret
 
