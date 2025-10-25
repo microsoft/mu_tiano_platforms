@@ -11,6 +11,25 @@
 
 UINTN             mSmmRelocationOriginalAddress;
 volatile BOOLEAN  *mRebasedFlag;
+SPIN_LOCK         mSmmRelocationSemaphore;
+
+VOID
+EFIAPI
+AcquireSmmRelocationSemaphore (
+  VOID
+  )
+{
+  AcquireSpinLock (&mSmmRelocationSemaphore);
+}
+
+VOID
+EFIAPI
+ReleaseSmmRelocationSemaphore (
+  VOID
+  )
+{
+  ReleaseSpinLock (&mSmmRelocationSemaphore);
+}
 
 /**
   Hook return address of SMM Save State so that semaphore code
@@ -31,6 +50,7 @@ SemaphoreHook (
   mRebasedFlag = RebasedFlag;
 
   CpuState                      = (SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
+  AcquireSmmRelocationSemaphore ();
   mSmmRelocationOriginalAddress = (UINTN)HookReturnFromSmm (
                                            CpuState,
                                            (UINT64)(UINTN)&SmmRelocationSemaphoreComplete,
