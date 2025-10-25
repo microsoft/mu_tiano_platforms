@@ -72,7 +72,7 @@ SemaphoreHook (
     4
     );
 
-  CpuState                      = (SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
+  CpuState = (SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
   AcquireSmmRelocationSemaphore ();
   mSmmRelocationOriginalAddress = HookReturnFromSmm (
                                     CpuState,
