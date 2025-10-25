@@ -173,7 +173,13 @@ ASM_PFX(SmmRelocationSemaphoreComplete):
     mov     rax, [ASM_PFX(mRebasedFlag)]
     mov     byte [rax], 1
     pop     rax
-    jmp     [ASM_PFX(mSmmRelocationOriginalAddress)]
+    ; load the contents in ASM_PFX(mSmmRelocationOriginalAddress)
+    mov     rax, [ASM_PFX(mSmmRelocationOriginalAddress)]
+    push    rax
+    ; Release the semaphore to let other CPUs proceed
+    call    ASM_PFX(ReleaseSmmRelocationSemaphore)
+    ; this is essentially jmp to eax we pushed earlier and also balances the stack
+    ret
 
 ;
 ; Semaphore code running in 32-bit mode
@@ -186,8 +192,8 @@ ASM_PFX(SmmRelocationSemaphoreComplete32):
 ASM_PFX(gPatchRebasedFlagAddr32):
     mov     byte [eax], 1
     pop     eax
-    ; load the contents in ASM_PFX(mSmmRelocationOriginalAddress)
-    mov     eax, [ASM_PFX(mSmmRelocationOriginalAddress)]
+    ; load the contents in gPatchSmmRelocationOriginalAddressPtr32
+    mov     eax, dword [dword 0]
 ASM_PFX(gPatchSmmRelocationOriginalAddressPtr32):
     push    eax
     ; Release the semaphore to let other CPUs proceed
