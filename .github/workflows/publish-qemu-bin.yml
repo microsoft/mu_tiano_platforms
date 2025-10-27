@@ -49,7 +49,7 @@ jobs:
         Get-ChildItem -Path "C:\Program Files\qemu" -Filter *.dll | Move-Item -Destination "temp"
 
     - name: Upload Qemu Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: qemu-windows
         path: |
@@ -111,7 +111,7 @@ jobs:
         cp qemu/bin/qemu-bundle/usr/local/share/qemu/vgabios-bochs-display.bin temp/share
         cp qemu/bin/qemu-bundle/usr/local/share/qemu/kvmvapic.bin temp/share
     - name: Upload Qemu Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: qemu-linux
         path: |
@@ -166,7 +166,7 @@ jobs:
           cd ../Linux/ && tar -czf ${{github.workspace}}/qemu-linux-${{github.event.release.tag_name}}.tar.gz *
 
       - name: Upload Ext-Dep (Artifact)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
         with:
           name: qemu-extdep-binaries
