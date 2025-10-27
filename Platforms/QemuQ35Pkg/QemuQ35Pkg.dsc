@@ -969,6 +969,7 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   MmSupervisorPkg/Drivers/MmCommunicationBuffer/MmCommunicationBufferPei.inf
 !if $(PEI_MM_IPL_ENABLED) == TRUE
   MmSupervisorPkg/Drivers/MmPeiLaunchers/MmIplPei.inf
+  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmPeiSupport.inf
   QemuQ35Pkg/SmmControl2Dxe/MmControlPei.inf
 !endif
 

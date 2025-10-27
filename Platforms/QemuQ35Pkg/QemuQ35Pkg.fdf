@@ -444,6 +444,7 @@ INF  QemuQ35Pkg/SmmAccess/SmmAccess2Dxe.inf
 !if $(PEI_MM_IPL_ENABLED) == TRUE
   INF  QemuQ35Pkg/SmmControl2Dxe/MmControlPei.inf
   INF  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmIplPei.inf
+  INF  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmPeiSupport.inf
   INF  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmIplX64Relay.inf
   INF  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmDxeSupport.inf
   INF  StandaloneMmPkg/Drivers/MmCommunicationDxe/MmCommunicationDxe.inf
