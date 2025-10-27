@@ -444,6 +444,8 @@ SmmRelocationInit (
     return EFI_INVALID_PARAMETER;
   }
 
+  InitializeSpinLock (&mSmmRelocationSemaphore);
+
   //
   // Get the number of processors
   //
