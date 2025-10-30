@@ -26,6 +26,7 @@
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/SmmRelocationLib.h>
+#include <Library/SynchronizationLib.h>
 #include <Guid/SmramMemoryReserve.h>
 #include <Guid/SmmBaseHob.h>
 #include <Register/Intel/Cpuid.h>
@@ -35,6 +36,7 @@
 extern IA32_DESCRIPTOR  gcSmmInitGdtr;
 extern CONST UINT16     gcSmmInitSize;
 extern CONST UINT8      gcSmmInitTemplate[];
+extern SPIN_LOCK        mSmmRelocationSemaphore;
 
 X86_ASSEMBLY_PATCH_LABEL  gPatchSmmInitCr0;
 X86_ASSEMBLY_PATCH_LABEL  gPatchSmmInitCr3;
