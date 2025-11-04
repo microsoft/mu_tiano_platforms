@@ -21,7 +21,8 @@
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/QemuQ35PkgIA32X64
   SUPPORTED_ARCHITECTURES        = IA32|X64
-  PEI_CRYPTO_ARCH                = IA32
+  PRIMARY_PEI_ARCH               = IA32
+  PEI_CRYPTO_ARCH                = $(PRIMARY_PEI_ARCH)
 
 [LibraryClasses.X64.PEIM]
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/SecPeiCpuExceptionHandlerLib.inf
@@ -36,6 +37,10 @@
 
 [Components.IA32]
 !include QemuQ35Pkg/QemuQ35PkgCommonPei.dsc.inc
+
+!if $(PEI_MM_IPL_ENABLED) == TRUE
+  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmIplPei.inf
+!endif
 
 ################################################################################
 #

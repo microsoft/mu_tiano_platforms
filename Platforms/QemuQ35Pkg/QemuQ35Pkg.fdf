@@ -443,7 +443,11 @@ INF  QemuQ35Pkg/SmmControl2Dxe/SmmControl2Dxe.inf
 INF  QemuQ35Pkg/SmmAccess/SmmAccess2Dxe.inf
 !if $(PEI_MM_IPL_ENABLED) == TRUE
   INF  QemuQ35Pkg/SmmControl2Dxe/MmControlPei.inf
-  INF  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmIplPei.inf
+  !if $(PRIMARY_PEI_ARCH) == "IA32"
+    INF  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmIplPei.inf
+  !else
+    INF  StandaloneMmPkg/Drivers/StandaloneMmIplPei/StandaloneMmIplPei.inf
+  !endif
   INF  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmPeiSupport.inf
   INF  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmIplX64Relay.inf
   INF  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmDxeSupport.inf

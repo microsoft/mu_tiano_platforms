@@ -21,12 +21,20 @@
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/QemuQ35PkgX64
   SUPPORTED_ARCHITECTURES        = X64
-  PEI_CRYPTO_ARCH                = X64
+  PRIMARY_PEI_ARCH               = X64
+  PEI_CRYPTO_ARCH                = $(PRIMARY_PEI_ARCH)
 
 !include QemuQ35Pkg/QemuQ35PkgCommon.dsc.inc
 
+[LibraryClasses.common.PEIM]
+  MmPlatformHobProducerLib|QemuQ35Pkg/Library/MmPlatformHobProducerLib/MmPlatformHobProducerLib.inf
+
 [Components.X64]
 !include QemuQ35Pkg/QemuQ35PkgCommonPei.dsc.inc
+
+!if $(PEI_MM_IPL_ENABLED) == TRUE
+  StandaloneMmPkg/Drivers/StandaloneMmIplPei/StandaloneMmIplPei.inf
+!endif
 
 ################################################################################
 #
