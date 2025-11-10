@@ -1,4 +1,4 @@
-From 9fe61d752c88007a7bbf9a654234e044b11e542b Mon Sep 17 00:00:00 2001
+From a4a4316014aac9c52cea8ad0373033dda9cf8322 Mon Sep 17 00:00:00 2001
 From: Kun Qin <kuqin@microsoft.com>
 Date: Thu, 21 Aug 2025 16:54:57 -0700
 Subject: [PATCH 2/2] Fixing SBSA MP usage (#4)
