@@ -718,9 +718,10 @@
 !endif
 
   #
-  # MM Communicate
+  # MM Communicate buffer size, should match ns_comm_buffer pages count in STMM
+  # secure partition manifest.
   #
-  gArmTokenSpaceGuid.PcdMmBufferSize|0x200000
+  gArmTokenSpaceGuid.PcdMmBufferSize|0x30000
 
   #
   # PLDA PCI Root Complex
@@ -914,9 +915,10 @@
 !endif
 
   #
-  # MM Communicate. The MM buffer base will be computed and set at runtime to top of memory.
+  # MM Communicate. The MM buffer base is defined as ns_comm_buffer in the STMM secure
+  # partition manifest.
   #
-  gArmTokenSpaceGuid.PcdMmBufferBase
+  gArmTokenSpaceGuid.PcdMmBufferBase|0x000001007fe00000
 
 [PcdsDynamicHii]
 !if $(TPM2_ENABLE) == TRUE
@@ -1390,7 +1392,6 @@
     <LibraryClasses>
       NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
     <PcdsFixedAtBuild>
-      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
       gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60040000
       gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
     <PcdsPatchableInModule>
@@ -1399,7 +1400,6 @@
 
   ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf {
     <PcdsFixedAtBuild>
-      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
       gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60040000
       gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
   }
