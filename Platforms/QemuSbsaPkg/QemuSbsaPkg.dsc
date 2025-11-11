@@ -1392,6 +1392,7 @@
     <LibraryClasses>
       NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
     <PcdsFixedAtBuild>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
       gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60040000
       gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
     <PcdsPatchableInModule>
@@ -1400,6 +1401,7 @@
 
   ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf {
     <PcdsFixedAtBuild>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
       gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60040000
       gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
   }
