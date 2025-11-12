@@ -87,6 +87,8 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         # Mount disk with either startup.nsh or OS image
         path_to_os = env.GetValue("PATH_TO_OS")
         if path_to_os is not None:
+            args += " -m 8192"
+
             file_extension = Path(path_to_os).suffix.lower().replace('"', '')
 
             storage_format = {
@@ -104,16 +106,14 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
                 args += f" -drive file=\"{path_to_os}\",format={storage_format},if=none,id=os_disk"
                 args += " -device ahci,id=ahci"
                 args += " -device ide-hd,drive=os_disk,bus=ahci.0"
-        elif os.path.isfile(VirtualDrive):
-            args += f" -drive file={VirtualDrive},if=virtio"
-        elif os.path.isdir(VirtualDrive):
-            args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
         else:
-            logging.critical("Virtual Drive Path Invalid")
-
-        # TODO: Set the memory size to be 2GB regardless. Not sure why 8GB does
-        # not work.
-        args += " -m 2048"
+            args += " -m 2048"
+            if os.path.isfile(VirtualDrive):
+                args += f" -drive file={VirtualDrive},if=virtio"
+            elif os.path.isdir(VirtualDrive):
+                args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
+            else:
+                logging.critical("Virtual Drive Path Invalid")
 
         args += " -machine sbsa-ref" #,accel=(tcg|kvm)"
         args += " -cpu max,sve=off,sme=off"
