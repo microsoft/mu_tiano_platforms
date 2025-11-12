@@ -1,4 +1,4 @@
-From bfafebc19c8ebbc6a73108753708767d5ee8f503 Mon Sep 17 00:00:00 2001
+From d5ea1c624216edb0a5e758ef2b9a784d1a4c87c7 Mon Sep 17 00:00:00 2001
 From: Kun Qin <kuqin@microsoft.com>
 Date: Thu, 31 Oct 2024 00:41:05 -0700
 Subject: [PATCH 1/2] Changes needed to hack through QEMU SBSA usage
@@ -10,6 +10,8 @@ Co-authored-by: rdiaz <raymonddiaz@microsoft.com>
 (cherry picked from commit 584847543e91dff3eef4732fcf456bcc675ba37f)
 
 Updated DTS files to include the correct UUID for the Notification SP and added the device regions for the TPM CRBs
+
+The memory is over-subscribed to 8G as the maximal supported DRAM size.
 ---
  .../fdts/qemu_sbsa_spmc_sp_manifest.dts       | 136 ++++++++++++++++++
  .../qemu_sbsa/fdts/qemu_sbsa_tb_fw_config.dts |  47 ++++++
@@ -21,7 +23,7 @@ Updated DTS files to include the correct UUID for the Notification SP and added 
 
 diff --git a/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_spmc_sp_manifest.dts b/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_spmc_sp_manifest.dts
 new file mode 100644
-index 000000000..69b24a68f
+index 000000000..8ff3ae203
 --- /dev/null
 +++ b/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_spmc_sp_manifest.dts
 @@ -0,0 +1,136 @@
@@ -138,7 +140,7 @@ index 000000000..69b24a68f
 +
 +  memory@2 {
 +    device_type = "ns-memory";
-+    reg = <0x00000100 0x00000000 0x0 0x80000000>;
++    reg = <0x00000100 0x00000000 0x2 0x00000000>;
 +  };
 +
 +  memory@8 {
