@@ -385,6 +385,8 @@
   OemMfciLib                 |OemPkg/Library/OemMfciLib/OemMfciLibPei.inf
   ConfigKnobShimLib          |SetupDataPkg/Library/ConfigKnobShimLib/ConfigKnobShimPeiLib/ConfigKnobShimPeiLib.inf
   PolicyLib                  |PolicyServicePkg/Library/PeiPolicyLib/PeiPolicyLib.inf
+  BaseCryptLib               |CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
+  TlsLib                     |CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
   SmmRelocationLib           |QemuQ35Pkg/Library/SmmRelocationLib/SmmRelocationLib.inf
 !if $(TPM_ENABLE) == TRUE
   Tpm12DeviceLib             |SecurityPkg/Library/Tpm12DeviceLibDTpm/Tpm12DeviceLibDTpm.inf
@@ -420,6 +422,8 @@
   PciLib   |QemuQ35Pkg/Library/DxePciLibI440FxQ35/DxePciLibI440FxQ35.inf
 
   OemMfciLib |OemPkg/Library/OemMfciLib/OemMfciLibDxe.inf
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/DxeCryptLib.inf
+  TlsLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/DxeCryptLib.inf
 
 [LibraryClasses.common.DXE_CORE]
   HobLib                  |MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
@@ -438,6 +442,8 @@
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeRuntimeCapsuleLib.inf
   VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/RuntimeDxeCryptLib.inf
+  TlsLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/RuntimeDxeCryptLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_DRIVER]
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
@@ -528,6 +534,8 @@
   IoLib|MmSupervisorPkg/Library/BaseIoLibIntrinsicSysCall/BaseIoLibIntrinsic.inf
   SysCallLib|MmSupervisorPkg/Library/SysCallLib/SysCallLib.inf
   CpuLib|MmSupervisorPkg/Library/BaseCpuLibSysCall/BaseCpuLib.inf
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/StandaloneMmCryptLib.inf
+  TlsLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/StandaloneMmCryptLib.inf
 
 !if $(PERF_TRACE_ENABLE) == TRUE
   PerformanceLib|MdeModulePkg/Library/SmmPerformanceLib/StandaloneMmPerformanceLib.inf
@@ -888,13 +896,15 @@
 #
 ################################################################################
 [Components]
-  !include $(SHARED_CRYPTO_PATH)/Driver/Bin/CryptoDriver.inc.dsc
+  $(ONE_CRYPTO_PATH)/Driver/OneCryptoDxeLoader.inf
+  $(ONE_CRYPTO_PATH)/Driver/OneCryptoLoaderMm.inf
+  $(ONE_CRYPTO_PATH)/StandaloneOneCrypto/OneCryptoMmBin.inf
+  
+  QemuQ35Pkg/Library/PeiFvMeasurementExclusionLib/PeiFvMeasurementExclusionLib.inf
 
-QemuQ35Pkg/Library/PeiFvMeasurementExclusionLib/PeiFvMeasurementExclusionLib.inf
-
-QemuQ35Pkg/Library/ResetSystemLib/BaseResetSystemLib.inf
-QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
-QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
+  QemuQ35Pkg/Library/ResetSystemLib/BaseResetSystemLib.inf
+  QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
+  QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
 
 [Components.X64]
   #########################################
@@ -1240,7 +1250,7 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
 ## Where-Object {(Select-String -InputObject $_ -Pattern "MODULE_TYPE\s*=\s*UEFI_APPLICATION")} | ^
 ## ForEach-Object {$path = $_.FullName -replace '\\','/'; Write-Output $path}
 !if $(BUILD_UNIT_TESTS) == TRUE
-
+  CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf
   AdvLoggerPkg/UnitTests/LineParser/LineParserTestApp.inf
   DfciPkg/UnitTests/DeviceIdTest/DeviceIdTestApp.inf
   # DfciPkg/UnitTests/DfciVarLockAudit/UEFI/DfciVarLockAuditTestApp.inf # DOESN'T PRODUCE OUTPUT

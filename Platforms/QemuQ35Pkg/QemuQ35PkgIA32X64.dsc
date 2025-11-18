@@ -34,6 +34,12 @@
 
 !include QemuQ35Pkg/QemuQ35PkgCommon.dsc.inc
 
+[LibraryClasses.X64.PEIM, LibraryClasses.X64.PEI_CORE]
+  # For now PEI will continue to use BaseCryptLibOnProtocolPpi instead of
+  # BaseCryptLibOnOneCrypto
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
+  TlsLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
+
 [Components.IA32]
 !include QemuQ35Pkg/QemuQ35PkgCommonPei.dsc.inc
 
