@@ -896,9 +896,9 @@
 #
 ################################################################################
 [Components]
-  $(ONE_CRYPTO_PATH)/Driver/OneCryptoDxeLoader.inf
-  $(ONE_CRYPTO_PATH)/Driver/OneCryptoLoaderMm.inf
-  $(ONE_CRYPTO_PATH)/StandaloneOneCrypto/OneCryptoMmBin.inf
+  $(ONE_CRYPTO_PATH)/OneCryptoLoaders/OneCryptoLoaderDxe.inf
+  $(ONE_CRYPTO_PATH)/OneCryptoLoaders/OneCryptoLoaderSupvMm.inf
+  $(ONE_CRYPTO_PATH)/OneCryptoBin/OneCryptoBinSupvMm.inf
   
   QemuQ35Pkg/Library/PeiFvMeasurementExclusionLib/PeiFvMeasurementExclusionLib.inf
 
