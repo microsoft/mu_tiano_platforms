@@ -519,9 +519,9 @@ INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
   # the shared cryptographic library for use in the UEFI environment. It provides 
   # cryptographic services to other components in the firmware.
   #
-  INF $(ONE_CRYPTO_PATH)/Driver/OneCryptoDxeLoader.inf
-  INF $(ONE_CRYPTO_PATH)/Driver/OneCryptoLoaderMm.inf
-  INF $(ONE_CRYPTO_PATH)/StandaloneOneCrypto/OneCryptoMmBin.inf
+  INF $(ONE_CRYPTO_PATH)/OneCryptoLoaders/OneCryptoLoaderDxe.inf
+  INF $(ONE_CRYPTO_PATH)/OneCryptoLoaders/OneCryptoLoaderSupvMm.inf
+  INF $(ONE_CRYPTO_PATH)/OneCryptoBin/OneCryptoBinSupvMm.inf
 !else
   !include $(SHARED_CRYPTO_PATH)/Driver/Bin/CryptoDriver.RUNTIMEDXE.inc.fdf
 !endif
