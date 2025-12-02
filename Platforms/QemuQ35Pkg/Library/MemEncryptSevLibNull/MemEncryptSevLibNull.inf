@@ -1,5 +1,5 @@
 ## @file
-#  Library provides the helper functions for SEV guest
+#  Library provides the null implementation for MemEncryptSevLib
 #
 # Copyright (c) 2017 - 2024, Advanced Micro Devices. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.
