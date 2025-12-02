@@ -1302,10 +1302,11 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
     <LibraryClasses>
       NULL|StandaloneMmPkg/Library/VariableMmDependency/VariableMmDependency.inf
   }
+  StandaloneMmPkg/Drivers/MmCommunicationDxe/MmCommunicationDxe.inf
 !else
-  QemuQ35Pkg/SmmAccess/SmmAccess2Dxe.inf
   MmSupervisorPkg/Drivers/StandaloneMmIpl/PiSmmIpl.inf
 !endif
+  QemuQ35Pkg/SmmAccess/SmmAccess2Dxe.inf
   MmSupervisorPkg/Drivers/MmSupervisorErrorReport/MmSupervisorErrorReport.inf
 
   #
