@@ -239,7 +239,6 @@ INF  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
 
 !if $(SMM_ENABLED) == TRUE
 INF  QemuQ35Pkg/SmmAccess/SmmAccessPei.inf
-INF  MmSupervisorPkg/Drivers/StandaloneMmHob/StandaloneMmHob.inf
 INF  MmSupervisorPkg/Drivers/MmCommunicationBuffer/MmCommunicationBufferPei.inf
 !endif
 
@@ -441,13 +440,14 @@ INF  QemuQ35Pkg/IoMmuDxe/IoMmuDxe.inf
 
 !if $(SMM_ENABLED) == TRUE
 INF  QemuQ35Pkg/SmmControl2Dxe/SmmControl2Dxe.inf
+INF  QemuQ35Pkg/SmmAccess/SmmAccess2Dxe.inf
 !if $(PEI_MM_IPL_ENABLED) == TRUE
   INF  QemuQ35Pkg/SmmControl2Dxe/MmControlPei.inf
   INF  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmIplPei.inf
   INF  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmIplX64Relay.inf
   INF  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmDxeSupport.inf
+  INF  StandaloneMmPkg/Drivers/MmCommunicationDxe/MmCommunicationDxe.inf
 !else
-  INF  QemuQ35Pkg/SmmAccess/SmmAccess2Dxe.inf
   INF  MmSupervisorPkg/Drivers/StandaloneMmIpl/PiSmmIpl.inf
 !endif
 INF  MmSupervisorPkg/Core/MmSupervisorCore.inf
