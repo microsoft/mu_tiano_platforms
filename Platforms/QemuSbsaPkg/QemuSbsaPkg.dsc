@@ -807,6 +807,11 @@
   # PPI #10
   gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|26
 
+  # ARM Generic Watchdog Timer
+  gArmTokenSpaceGuid.PcdGenericWatchdogControlBase|0x50011000
+  gArmTokenSpaceGuid.PcdGenericWatchdogRefreshBase|0x50010000
+  gArmTokenSpaceGuid.PcdGenericWatchdogEl2IntrNum|48
+
   # Set this to be gOemConfigPolicyGuid
   gSetupDataPkgTokenSpaceGuid.PcdConfigurationPolicyGuid|{GUID("ba320ade-e132-4c99-a3df-74d673ea6f76")}
 
@@ -1048,7 +1053,7 @@
 
   ArmPkg/Drivers/ArmGicDxe/ArmGicDxe.inf
   ArmPkg/Drivers/TimerDxe/TimerDxe.inf
-  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
+  ArmPkg/Drivers/GenericWatchdogDxe/GenericWatchdogDxe.inf
 
   #
   # Status Code Routing
