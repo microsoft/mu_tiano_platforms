@@ -1,0 +1,83 @@
+# This workflow automatically publishes the HAF and TFA binaries for a given
+# release.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+name: Hafnium and Trusted Firmware-A Build
+
+on:
+  release:
+    types:
+      - published
+  pull_request:
+    branches:
+      - '**'  # Matches all branches
+    paths:
+      - 'Platforms/QemuSbsaPkg/**'
+      - 'Silicon/Arm/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Hafnium and Trusted Firmware-A Build
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/microsoft/mu_devops/ubuntu-24-dev:latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Pip Modules
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r pip-requirements.txt
+
+      - name: Configure Git identity
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global --add safe.directory $GITHUB_WORKSPACE
+
+      - name: Stuart Setup
+        run: python Platforms/QemuSbsaPkg/PlatformBuild.py --setup
+
+      - name: Stuart Update
+        run: python Platforms/QemuSbsaPkg/PlatformBuild.py --update
+
+      - name: Stuart Build
+        run: python Platforms/QemuSbsaPkg/PlatformBuild.py HAF_TFA_BUILD=TRUE
+
+      - name: Install archive tools
+        if: github.event_name == 'release'
+        run: |
+          apt-get update -y
+          apt-get install -y zip tar gh
+
+      - name: Create per-target archives
+        if: github.event_name == 'release'
+        shell: bash
+        run: |
+          set -euo pipefail
+          BIN_DIR="Build/QemuSbsaPkg/DEBUG_GCC5/HafTfaBins"
+          echo "Packaging binaries from ${BIN_DIR}"
+          if [ ! -d "$BIN_DIR" ]; then
+            echo "Binary directory not found: $BIN_DIR" >&2
+            exit 1
+          fi
+          ZIP_PATH="${RUNNER_TEMP}/haf-tfa-firmware-${{ github.event.release.tag_name }}.zip"
+          TAR_PATH="${RUNNER_TEMP}/haf-tfa-firmware-${{ github.event.release.tag_name }}.tar.gz"
+          (cd "$BIN_DIR" && zip -r "$ZIP_PATH" .)
+          (cd "$BIN_DIR" && tar -czf "$TAR_PATH" .)
+          echo "Created archives:"
+          ls -lh "$ZIP_PATH" "$TAR_PATH"
+
+      - name: Upload Release Assets
+        if: github.event_name == 'release'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ github.event.release.tag_name }}" "${RUNNER_TEMP}"/*.zip
+          gh release upload "${{ github.event.release.tag_name }}" "${RUNNER_TEMP}"/*.tar.gz
