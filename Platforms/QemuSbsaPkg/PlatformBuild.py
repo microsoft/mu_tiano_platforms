@@ -553,6 +553,14 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                 logging.error(f"Failed to copy {bin_file}: {e}")
                 return -1
 
+        # Copy fiptool artifact from op_tfa Silicon/Arm/TFA/tools/fiptool/fiptool
+        fiptool_path = Path(self.env.GetValue("ARM_TFA_PATH")) / "tools" / "fiptool" / "fiptool"
+        if not fiptool_path.exists():
+            logging.error(f"Fiptool binary not found at {fiptool_path}")
+            return -1
+        shutil.copy2(fiptool_path, output_dir)
+        logging.debug(f"{fiptool_path} saved to: {output_dir}")
+
         logging.debug(f"Copied all Hafnium and TFA binaries to {output_dir}")
         return 0
 
