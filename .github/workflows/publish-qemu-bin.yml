@@ -134,12 +134,12 @@ jobs:
           qemuVersion=$(jq -r .linux $QEMU_VERSION_FILE)
           echo "QEMU_VERSION=$qemuVersion" >> $GITHUB_OUTPUT
       - name: Download Windows Qemu Artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: qemu-windows
           path: windows
       - name: Download Linux Qemu Artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: qemu-linux
           path: linux
