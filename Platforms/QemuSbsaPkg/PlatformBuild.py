@@ -7,6 +7,7 @@
 import datetime
 import logging
 import os
+import re
 import sys
 from typing import Tuple
 import uuid
@@ -358,6 +359,324 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             fd.write(patchImage)
         return 0
 
+    #
+    # Update the transfer list checksum after patching content within a TL package.
+    # The transfer list header has checksum at offset 4, and the checksum covers
+    # all bytes from the TL base to the end of the used size.
+    #
+    def UpdateTransferListChecksum(self, file_name, tl_offset):
+        """
+        Update the transfer list checksum in a fip.bin file.
+
+        Args:
+            file_name: Path to the fip.bin file
+            tl_offset: Offset of the transfer list header in the file
+
+        Reference: Silicon/Arm/TFA/include/lib/transfer_list.h
+        The transfer_list_header struct layout:
+            uint32_t signature;   // offset 0, size 4
+            uint8_t  checksum;    // offset 4, size 1
+            uint8_t  version;     // offset 5, size 1
+            uint8_t  hdr_size;    // offset 6, size 1
+            uint8_t  alignment;   // offset 7, size 1
+            uint32_t size;        // offset 8, size 4 (TL header + all TEs)
+            uint32_t max_size;    // offset 12, size 4
+            uint32_t flags;       // offset 16, size 4
+            uint32_t reserved;    // offset 20, size 4
+            Total header size: 24 bytes (0x18)
+        """
+        # Constants from TF-A transfer_list.h
+        # See: Silicon/Arm/TFA/include/lib/transfer_list.h
+        #   #define TRANSFER_LIST_SIGNATURE U(0x4a0fb10b)
+        TL_SIGNATURE = 0x4A0FB10B
+
+        # Offsets derived from struct transfer_list_header in transfer_list.h
+        TL_HEADER_SIZE = 0x18          # Total size of transfer_list_header (24 bytes)
+        TL_SIGNATURE_OFFSET = 0        # uint32_t signature at offset 0
+        TL_SIGNATURE_SIZE = 4          # signature is 4 bytes
+        TL_CHECKSUM_OFFSET = 4         # uint8_t checksum at offset 4
+        TL_SIZE_OFFSET = 8             # uint32_t size at offset 8 (used size: header + all TEs)
+        TL_SIZE_FIELD_SIZE = 4         # size field is 4 bytes
+
+        with open(file_name, "r+b") as file:
+            # Read the TL header
+            file.seek(tl_offset)
+            header = file.read(TL_HEADER_SIZE)
+
+            # Validate signature
+            signature = int.from_bytes(
+                header[TL_SIGNATURE_OFFSET:TL_SIGNATURE_OFFSET + TL_SIGNATURE_SIZE],
+                'little'
+            )
+            if signature != TL_SIGNATURE:
+                logging.error(f"Invalid transfer list signature: 0x{signature:x}, expected 0x{TL_SIGNATURE:x}")
+                return -1
+
+            # Get the used size (TL header + all TEs)
+            used_size = int.from_bytes(
+                header[TL_SIZE_OFFSET:TL_SIZE_OFFSET + TL_SIZE_FIELD_SIZE],
+                'little'
+            )
+            logging.info(f"Transfer list used size: 0x{used_size:x}")
+
+            # Read the entire TL content
+            file.seek(tl_offset)
+            tl_data = bytearray(file.read(used_size))
+
+            # First, zero out the checksum byte for calculation
+            # Calculate new checksum (sum of all bytes mod 256, then 256 - sum)
+            # Ensures new_checksum is uint8
+            # This is the same calculation as calc_byte_sum in TFA transfer_list.c
+            tl_data[TL_CHECKSUM_OFFSET] = 0
+            byte_sum = sum(tl_data) % 256
+            new_checksum = (256 - byte_sum) % 256
+
+            logging.info(f"New transfer list checksum: 0x{new_checksum:x}")
+
+            # Write the new checksum back
+            file.seek(tl_offset + TL_CHECKSUM_OFFSET)
+            file.write(bytes([new_checksum]))
+
+        return 0
+
+    def GetFipBlobOffsets(self, fip_path, fiptool_path):
+        """
+        Run fiptool info on fip.bin and parse the output to get UUID-to-offset/size mapping.
+
+        Args:
+            fip_path: Path to the fip.bin file
+            fiptool_path: Path to the fiptool binary
+
+        Returns:
+            Dictionary mapping uppercase UUIDs to dict with 'offset' and 'size' in fip.bin
+        """
+        outstream = StringIO()
+        ret = RunCmd(str(fiptool_path), f"info {fip_path}", outstream=outstream)
+        if ret != 0:
+            logging.error(f"Failed to run fiptool info on {fip_path}")
+            return None
+
+        uuid_to_info = {}
+        output = outstream.getvalue()
+
+        # Parse lines like:
+        # EABA83D8-BAAF-4EAF-8144-F7FDCBE544A7: offset=0x54D03, size=0x283000, cmdline="--blob"
+        # Also handle named entries like:
+        # Trusted Boot Firmware BL2: offset=0x178, size=0x9B69, cmdline="--tb-fw"
+        for line in output.splitlines():
+            # Try to match UUID pattern (8-4-4-4-12 hex format) with offset and size
+            uuid_match = re.match(r'^([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}):\s*offset=(0x[0-9A-Fa-f]+),\s*size=(0x[0-9A-Fa-f]+)', line)
+            if uuid_match:
+                blob_uuid = uuid_match.group(1).upper()
+                offset = int(uuid_match.group(2), 16)
+                size = int(uuid_match.group(3), 16)
+                uuid_to_info[blob_uuid] = {'offset': offset, 'size': size}
+                logging.debug(f"Found blob UUID {blob_uuid} at offset 0x{offset:x}, size 0x{size:x}")
+
+        return uuid_to_info
+
+    def SaveFipBlobManifest(self, uuid_to_info, manifest_path):
+        """
+        Save the FIP blob UUID-to-offset/size mapping to a JSON manifest file.
+
+        Args:
+            uuid_to_info: Dictionary mapping UUIDs to {'offset': int, 'size': int}
+            manifest_path: Path to save the JSON manifest
+        """
+        with open(manifest_path, 'w') as f:
+            json.dump(uuid_to_info, f, indent=4)
+        logging.info(f"Saved FIP blob manifest to {manifest_path}")
+
+    def LoadFipBlobManifest(self, manifest_path):
+        """
+        Load the FIP blob UUID-to-offset/size mapping from a JSON manifest file.
+
+        Args:
+            manifest_path: Path to the JSON manifest file
+
+        Returns:
+            Dictionary mapping uppercase UUIDs to {'offset': int, 'size': int}
+        """
+        if not manifest_path.exists():
+            logging.error(f"FIP blob manifest not found at {manifest_path}")
+            return None
+
+        with open(manifest_path, 'r') as f:
+            manifest_data = json.load(f)
+
+        # Ensure UUIDs are uppercase for consistent lookup
+        uuid_to_info = {}
+        for uuid_key, info in manifest_data.items():
+            uuid_to_info[uuid_key.upper()] = info
+        logging.info(f"Loaded FIP blob manifest from {manifest_path}")
+        return uuid_to_info
+
+    def GetSpLayoutData(self):
+        """
+        Get the Secure Partition layout data.
+
+        Returns:
+            Dictionary containing the SP layout data
+        """
+        op_fv = Path(self.env.GetValue("BUILD_OUTPUT_BASE")) / "FV"
+
+        # The SP layout structure - this matches what HafTfaBuild generates
+        data = {
+            "stmm": {
+                "image": {
+                    "file": str(op_fv / "BL32_AP_MM.fd"),
+                    "offset": "0x2000"
+                },
+                "pm": {
+                    "file": str(Path(__file__).parent / "fdts/qemu_sbsa_stmm_config.dts"),
+                    "offset": "0x1000"
+                },
+                "package": "tl_pkg",
+                "uuid": "eaba83d8-baaf-4eaf-8144-f7fdcbe544a7",
+                "owner": "Plat",
+                "size": "0x300000"
+            },
+            "mssp": {
+                "image": {
+                    "file": str(op_fv / "BL32_AP_MS_SP.fd"),
+                    "offset": "0x10000"
+                },
+                "pm": {
+                    "file": str(Path(__file__).parent / "fdts/qemu_sbsa_mssp_config.dts"),
+                    "offset": "0x1000"
+                },
+                "uuid": "b8bcbd0c-8e8f-4ebe-99eb-3cbbdd0cd412",
+                "owner": "Plat"
+            },
+            "mssp-rust": {
+                "image": {
+                    "file": str(Path(self.env.GetValue("SECURE_PARTITION_BINARIES")) / "msft-sp.bin"),
+                    "offset": "0x2000"
+                },
+                "pm": {
+                    "file": str(Path(__file__).parent / "fdts/qemu_sbsa_mssp_rust_config.dts"),
+                    "offset": "0x1000"
+                },
+                "uuid": "AFF0C73B-47E7-4A5B-AFFC-0052305A6520",
+                "owner": "Plat"
+            }
+        }
+
+        return data
+
+    def PatchSecurePartitions(self, op_tfa):
+        """
+        Copy fip.bin to a working directory and patch secure partition images into it.
+
+        This function:
+        1. Copies fip.bin from op_tfa to a working directory to avoid modifying originals
+        2. Loads the FIP blob manifest to find blob offsets by UUID
+        3. Iterates through the SP layout and patches each SP image at the correct offset
+        4. Updates transfer list checksums for tl_pkg packages
+
+        Args:
+            op_tfa: Path to the TF-A output directory containing fip.bin and fip_blob_manifest.json
+
+        Returns:
+            Path to the patched working fip.bin on success, None on failure
+        """
+        # Copy fip.bin to the build output directory to avoid modifying the original files.
+        # This way we don't accidentally corrupt the extdep files on subsequent runs.
+        temp_fip_dir = Path(self.env.GetValue("BUILD_OUTPUT_BASE")) / "FIP"
+        os.makedirs(temp_fip_dir, exist_ok=True)
+        shutil.copy2(op_tfa / "fip.bin", temp_fip_dir / "fip.bin")
+        working_fip = temp_fip_dir / "fip.bin"
+
+        # Load UUID-to-offset/size mapping from the pre-generated manifest
+        # This manifest is created during HAF_TFA_BUILD=TRUE and stored alongside the binaries
+        manifest_path = op_tfa / "fip_blob_manifest.json"
+        uuid_to_info = self.LoadFipBlobManifest(manifest_path)
+        if uuid_to_info is None:
+            return None
+
+        # Get SP layout data
+        sp_layout = self.GetSpLayoutData()
+
+        # Iterate through SP layout and patch each SP image
+        for sp_name, sp_config in sp_layout.items():
+            sp_uuid = sp_config.get("uuid")
+            if sp_uuid is None:
+                logging.error(f"SP {sp_name} missing required 'uuid' field")
+                return None
+            sp_uuid = sp_uuid.upper()
+
+            # Find the blob info in fip.bin for this UUID
+            blob_info = uuid_to_info.get(sp_uuid)
+            if blob_info is None:
+                logging.error(f"UUID {sp_uuid} for SP {sp_name} not found in fip.bin")
+                return None
+            blob_offset = blob_info['offset']
+            blob_size = blob_info['size']
+
+            # Get the image file path and offset
+            image_config = sp_config.get("image")
+            if image_config is None:
+                logging.error(f"SP {sp_name} missing required 'image' field")
+                return None
+
+            image_file_str = image_config.get("file")
+            if image_file_str is None:
+                logging.error(f"SP {sp_name} missing required 'image.file' field")
+                return None
+            image_file = Path(image_file_str)
+
+            image_offset_str = image_config.get("offset")
+            if image_offset_str is None:
+                logging.error(f"SP {sp_name} missing required 'image.offset' field")
+                return None
+            image_offset = int(image_offset_str, 16)
+
+            if not image_file.exists():
+                logging.error(f"Image file {image_file} for SP {sp_name} not found")
+                return None
+
+            # For tl_pkg packages, the image offset needs to account for the pm offset
+            # The actual image is at pm_offset + image_offset from the transfer list
+            is_tl_pkg = sp_config.get("package") == "tl_pkg"
+            pm_offset = 0
+            if is_tl_pkg:
+                pm_config = sp_config.get("pm")
+                if pm_config is None:
+                    logging.error(f"SP {sp_name} is tl_pkg but missing required 'pm' field")
+                    return None
+                pm_offset_str = pm_config.get("offset")
+                if pm_offset_str is None:
+                    logging.error(f"SP {sp_name} missing required 'pm.offset' field")
+                    return None
+                pm_offset = int(pm_offset_str, 16)
+
+            final_offset = blob_offset + pm_offset + image_offset
+
+            if os.stat(image_file).st_size > (blob_size - pm_offset):
+                logging.error(f"Image file {image_file} size exceeds allocated blob size for SP {sp_name}. Must build HAF/TFA locally. Use HAF_TFA_BUILD=TRUE.")
+                return None
+
+            logging.info(f"Patching SP {sp_name} (UUID: {sp_uuid}) at offset 0x{final_offset:x}")
+            logging.info(f"  Blob size: 0x{blob_size:x}, Image file: {image_file}, size: {os.stat(image_file).st_size}")
+
+            ret = self.PatchRegion(
+                working_fip,
+                final_offset,
+                os.stat(image_file).st_size,
+                image_file,
+            )
+            if ret != 0:
+                return None
+
+            # Update transfer list checksum if this is a tl_pkg
+            if is_tl_pkg:
+                logging.info(f"Updating transfer list checksum for SP {sp_name}")
+                ret = self.UpdateTransferListChecksum(working_fip, blob_offset)
+                if ret != 0:
+                    return None
+
+        return working_fip
+
     def HafTfaBuild(self):
         logging.info("Starting Hafnium and TF-A build")
         src_dir = Path(self.GetWorkspaceRoot()) / "Platforms/QemuSbsaPkg/mu"
@@ -413,47 +732,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         # Writing JSON data
         with open(filename, "w") as f:
-            data = {
-                "stmm": {
-                    "image": {
-                        "file": str(op_fv / "BL32_AP_MM.fd"),
-                        "offset": "0x2000"
-                    },
-                    "pm": {
-                        "file": str(Path(__file__).parent / "fdts/qemu_sbsa_stmm_config.dts"),
-                        "offset": "0x1000"
-                    },
-                    "package": "tl_pkg",
-                    "uuid": "eaba83d8-baaf-4eaf-8144-f7fdcbe544a7",
-                    "owner": "Plat",
-                    "size": "0x300000"
-                },
-                "mssp": {
-                    "image": {
-                        "file": str(op_fv / "BL32_AP_MS_SP.fd"),
-                        "offset": "0x10000"
-                    },
-                    "pm": {
-                        "file": str(Path(__file__).parent / "fdts/qemu_sbsa_mssp_config.dts"),
-                        "offset": "0x1000"
-                    },
-                    "uuid": "b8bcbd0c-8e8f-4ebe-99eb-3cbbdd0cd412",
-                    "owner": "Plat"
-                },
-                "mssp-rust": {
-                    "image": {
-                        "file": str(Path(self.env.GetValue("SECURE_PARTITION_BINARIES")) / "msft-sp.bin"),
-                        "offset": "0x2000"
-                    },
-                    "pm": {
-                        "file": str(Path(__file__).parent / "fdts/qemu_sbsa_mssp_rust_config.dts"),
-                        "offset": "0x1000"
-                    },
-                    "uuid": "AFF0C73B-47E7-4A5B-AFFC-0052305A6520",
-                    "owner": "Plat"
-                }
-            }
-            json.dump(data, f, indent=4)
+            json.dump(self.GetSpLayoutData(), f, indent=4)
 
         # This is an unorthodox build, as TF-A uses poetry to manage dependencies and build the firmware.
         # First, we need to know what the name of the virtual environment is.
@@ -553,13 +832,20 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                 logging.error(f"Failed to copy {bin_file}: {e}")
                 return -1
 
-        # Copy fiptool artifact from op_tfa Silicon/Arm/TFA/tools/fiptool/fiptool
         fiptool_path = Path(self.env.GetValue("ARM_TFA_PATH")) / "tools" / "fiptool" / "fiptool"
         if not fiptool_path.exists():
             logging.error(f"Fiptool binary not found at {fiptool_path}")
             return -1
-        shutil.copy2(fiptool_path, output_dir)
-        logging.debug(f"{fiptool_path} saved to: {output_dir}")
+
+        # Generate FIP blob manifest for use when HAF_TFA_BUILD=FALSE
+        # This allows local builds to patch SPs without needing to run fiptool
+        fip_path = op_tfa / "fip.bin"
+        uuid_to_info = self.GetFipBlobOffsets(fip_path, fiptool_path)
+        if uuid_to_info:
+            self.SaveFipBlobManifest(uuid_to_info, output_dir / "fip_blob_manifest.json")
+        else:
+            logging.error("Failed to generate FIP blob manifest - patching may not work with HAF_TFA_BUILD=FALSE")
+            return -1
 
         logging.debug(f"Copied all Hafnium and TFA binaries to {output_dir}")
         return 0
@@ -570,8 +856,16 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             if ret != 0:
                 return ret
             op_tfa = Path(self.env.GetValue("ARM_TFA_PATH")) / "build" / self.env.GetValue("QEMU_PLATFORM").lower() / self.env.GetValue("TARGET").lower()
+            working_fip = op_tfa / "fip.bin"
         else:
-            op_tfa = Path(self.env.GetValue("HAF_TFA_BINS"))
+            ext_dep_bins = self.env.GetValue("HAF_TFA_BINS")
+            if not ext_dep_bins:
+                logging.error("HAF_TFA_BINS not set. Cannot patch secure partitions.")
+                return -1
+            op_tfa = Path(ext_dep_bins)
+            working_fip = self.PatchSecurePartitions(op_tfa) # Patch secure partition images into a working copy of fip.bin
+            if working_fip is None:
+                return -1
 
         # Now that BL31 is built with BL32 supplied, patch BL1 and BL31 built fip.bin into the SECURE_FLASH0.fd
         # Add a post build step to build BL31 and assemble the FD files
@@ -592,7 +886,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             op_fv / "SECURE_FLASH0.fd",
             int(self.env.GetValue("SECURE_FLASH_REGION_FIP_OFFSET"), 16),
             int(self.env.GetValue("SECURE_FLASH_REGION_FIP_SIZE"), 16),
-            op_tfa / "fip.bin",
+            working_fip,
         )
         if ret != 0:
             return ret
