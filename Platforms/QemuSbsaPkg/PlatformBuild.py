@@ -417,7 +417,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                 header[TL_SIZE_OFFSET:TL_SIZE_OFFSET + TL_SIZE_FIELD_SIZE],
                 'little'
             )
-            logging.info(f"Transfer list used size: 0x{used_size:x}")
+            logging.debug(f"Transfer list used size: 0x{used_size:x}")
 
             # Read the entire TL content
             file.seek(tl_offset)
@@ -431,7 +431,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             byte_sum = sum(tl_data) % 256
             new_checksum = (256 - byte_sum) % 256
 
-            logging.info(f"New transfer list checksum: 0x{new_checksum:x}")
+            logging.debug(f"New transfer list checksum: 0x{new_checksum:x}")
 
             # Write the new checksum back
             file.seek(tl_offset + TL_CHECKSUM_OFFSET)
@@ -485,7 +485,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         """
         with open(manifest_path, 'w') as f:
             json.dump(uuid_to_info, f, indent=4)
-        logging.info(f"Saved FIP blob manifest to {manifest_path}")
+        logging.debug(f"Saved FIP blob manifest to {manifest_path}")
 
     def LoadFipBlobManifest(self, manifest_path):
         """
@@ -508,7 +508,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         uuid_to_info = {}
         for uuid_key, info in manifest_data.items():
             uuid_to_info[uuid_key.upper()] = info
-        logging.info(f"Loaded FIP blob manifest from {manifest_path}")
+        logging.debug(f"Loaded FIP blob manifest from {manifest_path}")
         return uuid_to_info
 
     def GetSpLayoutData(self):
@@ -656,8 +656,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                 logging.error(f"Image file {image_file} size exceeds allocated blob size for SP {sp_name}. Must build HAF/TFA locally. Use HAF_TFA_BUILD=TRUE.")
                 return None
 
-            logging.info(f"Patching SP {sp_name} (UUID: {sp_uuid}) at offset 0x{final_offset:x}")
-            logging.info(f"  Blob size: 0x{blob_size:x}, Image file: {image_file}, size: {os.stat(image_file).st_size}")
+            logging.debug(f"Patching SP {sp_name} (UUID: {sp_uuid}) at offset 0x{final_offset:x}")
+            logging.debug(f"  Blob size: 0x{blob_size:x}, Image file: {image_file}, size: {os.stat(image_file).st_size}")
 
             ret = self.PatchRegion(
                 working_fip,
@@ -670,7 +670,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
             # Update transfer list checksum if this is a tl_pkg
             if is_tl_pkg:
-                logging.info(f"Updating transfer list checksum for SP {sp_name}")
+                logging.debug(f"Updating transfer list checksum for SP {sp_name}")
                 ret = self.UpdateTransferListChecksum(working_fip, blob_offset)
                 if ret != 0:
                     return None
