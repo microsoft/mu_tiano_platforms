@@ -8,9 +8,9 @@ scope: qemusbsa
 id: haf-tfa-bin
 type: web
 name: HAF_TFA_BUILD
-source: https://github.com/eeshanl/mu_tiano_platforms/releases/download/test16_tag/haf-tfa-firmware-test16_tag.zip
+source: https://github.com/microsoft/mu_tiano_platforms/releases/download/v10.0.0/haf-tfa-firmware-v10.0.0.zip
 
-version: test6
+version: v10.0.0
 sha256: 9970d7d17d18506c0e91092e17d47655c0eb5f1ca41b3e78580be9889010f911
 internal_path: /
 compression_type: zip
