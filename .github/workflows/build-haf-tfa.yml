@@ -25,16 +25,10 @@ jobs:
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/microsoft/mu_devops/ubuntu-24-dev:latest
+    permissions:
+      contents: write
 
     steps:
-      - name: Generate Token
-        id: app-token
-        uses: actions/create-github-app-token@v2
-        with:
-          app-id: ${{ vars.MU_ACCESS_APP_ID }}
-          private-key: ${{ secrets.MU_ACCESS_APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
-
       - name: Checkout Code
         uses: actions/checkout@v4
 
