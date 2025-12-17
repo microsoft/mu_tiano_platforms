@@ -85,7 +85,7 @@ jobs:
       - name: Upload Release Assets
         if: github.event_name == 'release'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           gh release upload "${{ github.event.release.tag_name }}" "${RUNNER_TEMP}"/*.zip
           gh release upload "${{ github.event.release.tag_name }}" "${RUNNER_TEMP}"/*.tar.gz
