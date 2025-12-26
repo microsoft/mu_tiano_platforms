@@ -1,0 +1,21 @@
+##
+# Download the compiled HAF and TFA bins from the github release
+#
+# Copyright (c) 2025, Microsoft Corporation
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+scope: qemusbsa
+id: haf-tfa-bin
+type: web
+name: HAF_TFA_BUILD
+source: https://github.com/microsoft/mu_tiano_platforms/releases/download/v11.0.2/haf-tfa-firmware-v11.0.2.zip
+
+version: v11.0.2
+sha256: 20a3728b4918cbd9955bc1aa671bd2f49c61d23c9e0d03c55922e4a0bac4a5b9
+internal_path: /
+compression_type: zip
+flags:
+  - set_shell_var
+  - set_build_var
+  - set_path
+var_name: HAF_TFA_BINS
