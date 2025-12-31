@@ -313,6 +313,9 @@ READ_LOCK_STATUS   = TRUE
   # Policy and configuration
   #
   INF PolicyServicePkg/PolicyService/DxeMm/PolicyDxe.inf
+  INF OemPkg/OemConfigPolicyCreatorDxe/OemConfigPolicyCreatorDxe.inf
+  INF QemuSbsaPkg/ConfigKnobs/ConfigKnobs.inf
+  INF OemPkg/DeviceStateDxe/DeviceStateDxe.inf
 
   #
   # Frontpages
