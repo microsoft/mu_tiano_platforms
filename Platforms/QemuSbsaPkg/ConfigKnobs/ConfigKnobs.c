@@ -11,7 +11,6 @@
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/PeiServicesLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PolicyLib.h>
@@ -26,16 +25,16 @@
 /**
   Module entry point that will check configuration data and publish them to policy database.
 
-  @param FileHandle                     The image handle.
-  @param PeiServices                    The PEI services table.
+  @param    ImageHandle     Image handle of this driver.
+  @param    SystemTable     Pointer to the system table.
 
   @retval Status                        From internal routine or boot object, should not fail
 **/
 EFI_STATUS
 EFIAPI
 ConfigKnobsEntry (
-  IN EFI_PEI_FILE_HANDLE     FileHandle,
-  IN CONST EFI_PEI_SERVICES  **PeiServices
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
