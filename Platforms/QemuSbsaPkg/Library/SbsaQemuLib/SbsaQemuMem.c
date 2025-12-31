@@ -228,6 +228,18 @@ ArmPlatformGetVirtualMemoryMap (
     BuildMemoryAllocationHob (TpmBase, TpmSize, EfiACPIMemoryNVS);
   }
 
+  BuildMemoryAllocationHob (
+    PcdGet64 (PcdMmBufferBase),
+    PcdGet64 (PcdMmBufferSize),
+    EfiRuntimeServicesData
+    );
+
+  BuildMemoryAllocationHob (
+    PcdGet64 (PcdAdvancedLoggerBase),
+    PcdGet32 (PcdAdvancedLoggerPages) * EFI_PAGE_SIZE,
+    EfiRuntimeServicesData
+    );
+
   ASSERT (VirtualMemoryMap != NULL);
 
   VirtualMemoryTable = AllocatePool (
