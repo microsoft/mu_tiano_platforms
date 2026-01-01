@@ -21,7 +21,7 @@
 #include <Guid/DxeMemoryProtectionSettings.h>
 
 // Number of Virtual Memory Map Descriptors
-#define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS  6
+#define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS  5
 
 // MU_CHANGE START
 
@@ -50,11 +50,13 @@ ArmPlatformGetPeiMemory (
   This function will parse the device tree blob to find the memory nodes and create
   the necessary HOBs to describe the system memory layout for the PEI phase.
 
-  @return  VOID
+  @return  EFI_INVALID_PARAMETER  One or more parameters are invalid.
+  @return  EFI_SUCCESS            The memory configuration was initialized successfully.
 **/
-VOID
+EFI_STATUS
 InitializeMemoryConfiguration (
-  VOID
+  OUT EFI_PHYSICAL_ADDRESS  *UefiMemoryBase,
+  OUT UINT64                *UefiMemorySize
   )
 {
   VOID                            *DeviceTreeBase;
@@ -66,6 +68,10 @@ InitializeMemoryConfiguration (
   CONST UINT64                    *RegProp;
   DXE_MEMORY_PROTECTION_SETTINGS  DxeSettings;
   UINTN                           FdtSize;
+
+  if ((UefiMemoryBase == NULL) || (UefiMemorySize == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   if (FeaturePcdGet (PcdEnableMemoryProtection) == TRUE) {
     DxeSettings = (DXE_MEMORY_PROTECTION_SETTINGS)DXE_MEMORY_PROTECTION_SETTINGS_DEBUG;
@@ -154,6 +160,7 @@ InitializeMemoryConfiguration (
     // Make sure the start of DRAM matches our expectation
   if (FixedPcdGet64 (PcdSystemMemoryBase) != NewBase) {
     PANIC ("System Memory Base Mismatch.\n");
+    return EFI_DEVICE_ERROR;
   }
 
   if (NewSize > PcdGet64 (PcdSystemMemorySize)) {
@@ -170,6 +177,8 @@ InitializeMemoryConfiguration (
       EFI_MEMORY_WB,
       NULL
       );
+  } else {
+    NewSize = PcdGet64 (PcdSystemMemorySize);
   }
 
   BuildResourceDescriptorV2 (
@@ -185,6 +194,11 @@ InitializeMemoryConfiguration (
     EFI_MEMORY_WB,
     NULL
     );
+
+  *UefiMemoryBase = NewBase;
+  *UefiMemorySize = NewSize;
+
+  return EFI_SUCCESS;
 }
 
 // MU_CHANGE END
@@ -220,6 +234,11 @@ ArmPlatformGetVirtualMemoryMap (
 
   UINT64      TpmBase;
   UINT32      TpmSize;
+
+  EFI_PHYSICAL_ADDRESS  UefiMemoryBase;
+  UINT64                UefiMemorySize;
+  EFI_STATUS           Status;
+
   TpmBase = PcdGet64 (PcdTpmBaseAddress);
   TpmSize = PcdGet32 (PcdTpmCrbRegionSize);
 
@@ -231,7 +250,7 @@ ArmPlatformGetVirtualMemoryMap (
   BuildMemoryAllocationHob (
     PcdGet64 (PcdMmBufferBase),
     PcdGet64 (PcdMmBufferSize),
-    EfiRuntimeServicesData
+    EfiReservedMemoryType
     );
 
   BuildMemoryAllocationHob (
@@ -252,10 +271,16 @@ ArmPlatformGetVirtualMemoryMap (
     return;
   }
 
+  Status = InitializeMemoryConfiguration (&UefiMemoryBase, &UefiMemorySize);
+  if (EFI_ERROR (Status)) {
+    PANIC ("Failed to initialize memory configuration from device tree.\n");
+    return;
+  }
+
   // System DRAM
-  VirtualMemoryTable[0].PhysicalBase = PcdGet64 (PcdSystemMemoryBase);
+  VirtualMemoryTable[0].PhysicalBase = UefiMemoryBase;
   VirtualMemoryTable[0].VirtualBase  = VirtualMemoryTable[0].PhysicalBase;
-  VirtualMemoryTable[0].Length       = PcdGet64 (PcdSystemMemorySize);
+  VirtualMemoryTable[0].Length       = UefiMemorySize;
   VirtualMemoryTable[0].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
 
   DEBUG ((
@@ -288,16 +313,8 @@ ArmPlatformGetVirtualMemoryMap (
   VirtualMemoryTable[3].Length       = PcdGet64 (PcdMmBufferSize);
   VirtualMemoryTable[3].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED;
 
-  // Advanced Logger Memory Space
-  VirtualMemoryTable[4].PhysicalBase = PcdGet64 (PcdAdvancedLoggerBase);
-  VirtualMemoryTable[4].VirtualBase  = PcdGet64 (PcdAdvancedLoggerBase);
-  VirtualMemoryTable[4].Length       = PcdGet32 (PcdAdvancedLoggerPages) * EFI_PAGE_SIZE;
-  VirtualMemoryTable[4].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
-
   // End of Table
-  ZeroMem (&VirtualMemoryTable[5], sizeof (ARM_MEMORY_REGION_DESCRIPTOR));
-
-  InitializeMemoryConfiguration ();
+  ZeroMem (&VirtualMemoryTable[4], sizeof (ARM_MEMORY_REGION_DESCRIPTOR));
 
   *VirtualMemoryMap = VirtualMemoryTable;
 }
