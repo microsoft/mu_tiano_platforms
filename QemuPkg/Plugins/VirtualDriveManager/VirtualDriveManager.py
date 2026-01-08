@@ -8,6 +8,7 @@
 import errno
 import logging
 import string
+import shutil
 import tempfile
 import os
 import xml.etree.ElementTree
@@ -76,8 +77,12 @@ class VirtualDrive:
 
     def wipe(self, size: int = 60):
         """Deletes the virtual drive and creates an empty one at the same location."""
-        self.drive_path.unlink(missing_ok=True)
+        self.delete()
         self.make_drive(size)
+    
+    def delete(self):
+        """Deletes the virtual drive."""
+        self.drive_path.unlink(missing_ok=True)
 
     def add_startup_script(self, lines: list[str] = [], auto_shutdown = True):
         """Adds a startup script that executes on boot.
@@ -169,7 +174,12 @@ class LinuxVirtualDrive(VirtualDrive):
             raise RuntimeError(e)
 
         # Format the image as FAT32
-        cmd = "mkfs.vfat"
+        cmd = self._locate_cmd("mkfs.vfat")
+        if not cmd:
+            e = f"Could not locate executable `mkfs.vfat` on the $PATH."
+            logging.error(e)
+            raise RuntimeError(e)
+
         args = f"{self.drive_path}"
         result = RunCmd(cmd, args)
         if result != 0:
@@ -178,15 +188,22 @@ class LinuxVirtualDrive(VirtualDrive):
             logger.error(e)
             raise RuntimeError(e)
 
+        rc = 0
         # Create an mtools config file to virtually map the image to a drive letter
         conf_path = os.path.join(os.path.dirname(self.drive_path), "mtool.conf")
         if os.path.exists(conf_path):
             # This should be repopulated per build
-            RunCmd("rm", conf_path)
-        RunCmd("echo", "mtools_skip_check=1 > ~/.mtoolsrc")
-        RunCmd("echo", f"drive+ {self.drive_letter}: >> {conf_path}")
-        RunCmd("echo", f"\"  file=\\\"{self.drive_path}\\\" exclusive\" >> {conf_path}")
+            rc |= RunCmd("rm", conf_path)
+        rc |= RunCmd("echo", "mtools_skip_check=1 > ~/.mtoolsrc")
+        rc |= RunCmd("echo", f"drive+ {self.drive_letter}: >> {conf_path}")
+        rc |= RunCmd("echo", f"\"  file=\\\"{self.drive_path}\\\" exclusive\" >> {conf_path}")
         shell_environment.GetEnvironment().set_shell_var ("MTOOLSRC", conf_path)
+        
+        if rc != 0:
+            self.delete()
+            e = f"Failed to map image to drive letter. Review above command errors."
+            logger.error(e)
+            raise RuntimeError(e)
 
     def add_file(self, filepath: PathLike):
         """Adds a file to the virtual drive."""
@@ -258,6 +275,25 @@ class LinuxVirtualDrive(VirtualDrive):
 
         raise ValueError("No unused drive letters available")
 
+    def _locate_cmd(self, cmd: str) -> str | None:
+        """Locates a command on a linux file system using `which`."""  
+        # 1. Search for the command on the $PATH
+        path = shutil.which(cmd, mode = os.X_OK)
+        if path:
+            return path
+        
+        # 2. Search for the command in /sbin in case /sbin is not on the $PATH
+        path = shutil.which(cmd, mode = os.X_OK, path = "/sbin")
+        if path:
+            return path
+        
+        # 3. Search for the command in /usr/sbin in case /usr/sbin is not on the $PATH
+        path = shutil.which(cmd, mode = os.X_OK, path = "/usr/sbin")
+        if path:
+            return path
+        
+        # 4. We failed to find it in our normal search paths
+        return None
 
 class WindowsVirtualDrive(VirtualDrive):
     def __init__(self, path: PathLike):
