@@ -313,6 +313,9 @@ READ_LOCK_STATUS   = TRUE
   # Policy and configuration
   #
   INF PolicyServicePkg/PolicyService/DxeMm/PolicyDxe.inf
+  INF OemPkg/OemConfigPolicyCreatorDxe/OemConfigPolicyCreatorDxe.inf
+  INF QemuSbsaPkg/ConfigKnobs/ConfigKnobs.inf
+  INF OemPkg/DeviceStateDxe/DeviceStateDxe.inf
 
   #
   # Frontpages
@@ -325,7 +328,6 @@ READ_LOCK_STATUS   = TRUE
   #
   # MFCI support
   #
-  # TODO: This is not enabled, due to variable PEI is currently not supported...
   INF MfciPkg/MfciDxe/MfciDxe.inf
 
   #
@@ -498,37 +500,7 @@ READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
-  INF ArmPlatformPkg/Sec/Sec.inf
-  INF MdeModulePkg/Core/Pei/PeiMain.inf
-  INF SecurityPkg/RandomNumberGenerator/RngPei/RngPei.inf
-  INF ArmPlatformPkg/PlatformPei/PlatformPeim.inf
-  INF ArmPlatformPkg/MemoryInitPei/MemoryInitPeim.inf
-  INF ArmPkg/Drivers/CpuPei/CpuPei.inf
-  INF ArmPkg/Drivers/MmCommunicationPei/MmCommunicationPei.inf
-  INF MdeModulePkg/Universal/Variable/MmVariablePei/MmVariablePei.inf
-  INF MdeModulePkg/Universal/PCD/Pei/Pcd.inf
-  INF MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
-  INF MsGraphicsPkg/MsUiTheme/Pei/MsUiThemePpi.inf
-  INF MsGraphicsPkg/MsEarlyGraphics/Pei/MsEarlyGraphics.inf
-  INF MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
-  INF MsCorePkg/Core/GuidedSectionExtractPeim/GuidedSectionExtract.inf
-  INF MsWheaPkg/MsWheaReport/Pei/MsWheaReportPei.inf
-  INF OemPkg/DeviceStatePei/DeviceStatePei.inf
-
-  !include $(SHARED_CRYPTO_PATH)/Driver/Bin/CryptoDriver.PEI.inc.fdf
-
-  INF MfciPkg/MfciPei/MfciPei.inf
-
-  INF  PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
-  INF  DebuggerFeaturePkg/DebugConfigPei/DebugConfigPei.inf
-
-  INF  QemuSbsaPkg/ConfigKnobs/ConfigKnobs.inf
-  INF  OemPkg/OemConfigPolicyCreatorPei/OemConfigPolicyCreatorPei.inf
-
-!if $(TPM2_ENABLE) == TRUE
-  INF MdeModulePkg/Universal/ResetSystemPei/ResetSystemPei.inf
-  INF SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
-!endif
+  INF ArmPlatformPkg/PeilessSec/PeilessSec.inf
 
   FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
     SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
@@ -622,19 +594,6 @@ READ_LOCK_STATUS   = TRUE
     TE  TE Align = Auto             $(INF_OUTPUT)/$(MODULE_NAME).efi
   }
 
-[Rule.Common.PEI_CORE]
-  FILE PEI_CORE = $(NAMED_GUID) FIXED {
-    TE     TE Align = Auto              $(INF_OUTPUT)/$(MODULE_NAME).efi
-    UI     STRING ="$(MODULE_NAME)" Optional
-  }
-
-[Rule.Common.PEIM]
-  FILE PEIM = $(NAMED_GUID) FIXED {
-     PEI_DEPEX PEI_DEPEX Optional       $(INF_OUTPUT)/$(MODULE_NAME).depex
-     TE       TE Align = Auto           $(INF_OUTPUT)/$(MODULE_NAME).efi
-     UI       STRING="$(MODULE_NAME)" Optional
-  }
-
 [Rule.Common.DXE_CORE]
   FILE DXE_CORE = $(NAMED_GUID) {
     PE32     PE32                       $(INF_OUTPUT)/$(MODULE_NAME).efi
@@ -695,14 +654,6 @@ READ_LOCK_STATUS   = TRUE
 [Rule.Common.MM_CORE_STANDALONE]
   FILE SEC = $(NAMED_GUID) RELOCS_STRIPPED FIXED {
     PE32  PE32 Align = Auto             $(INF_OUTPUT)/$(MODULE_NAME).efi
-  }
-
-[Rule.Common.PEIM.BINARY]
-  FILE PEIM = $(NAMED_GUID) {
-    PEI_DEPEX PEI_DEPEX Optional      |.depex
-    PE32      PE32     Align = Auto   |.efi
-    UI        STRING="$(MODULE_NAME)" Optional
-    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
 [Rule.Common.DXE_DRIVER.BINARY]
