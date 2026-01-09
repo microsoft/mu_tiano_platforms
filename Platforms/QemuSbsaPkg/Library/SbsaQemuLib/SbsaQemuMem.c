@@ -17,6 +17,7 @@
 #include <Library/PcdLib.h>
 #include <Library/PanicLib.h>
 #include <libfdt.h>
+#include <Library/PlatformSmmuConfigLib.h>
 
 #include <Guid/DxeMemoryProtectionSettings.h>
 
@@ -68,6 +69,7 @@ InitializeMemoryConfiguration (
   CONST UINT64                    *RegProp;
   DXE_MEMORY_PROTECTION_SETTINGS  DxeSettings;
   UINTN                           FdtSize;
+  EFI_STATUS                      Status;
 
   if ((UefiMemoryBase == NULL) || (UefiMemorySize == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -200,6 +202,12 @@ InitializeMemoryConfiguration (
 
   *UefiMemoryBase = NewBase;
   *UefiMemorySize = NewSize;
+
+  Status = BuildSmmuConfigHob ();
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Failed to build SMMU Config HOB\n", __func__));
+    return EFI_SECURITY_VIOLATION;
+  }
 
   return EFI_SUCCESS;
 }
