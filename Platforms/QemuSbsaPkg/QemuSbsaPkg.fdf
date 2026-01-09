@@ -404,6 +404,11 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
   #
+  # SMMU Support
+  #
+  INF ArmPkg/Drivers/SmmuDxe/SmmuDxe.inf
+
+  #
   # TPM2 support
   #
 !if $(TPM2_ENABLE) == TRUE
