@@ -234,7 +234,8 @@
   UnitTestResultReportLib |XmlSupportPkg/Library/UnitTestResultReportJUnitFormatLib/UnitTestResultReportLib.inf
 
   # General IOMMU Libraries
-  IoMmuLib|MdeModulePkg/Library/IoMmuLibNull/IoMmuLibNull.inf
+  IoMmuLib|MdeModulePkg/Library/IoMmuLib/IoMmuLib.inf
+  PlatformSmmuConfigLib|QemuSbsaPkg/Library/PlatformSmmuConfigLib/PlatformSmmuConfigLib.inf
 
   # Base ARM libraries
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
@@ -1140,6 +1141,11 @@
   MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
   MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.inf
+
+  #
+  # SMMU Support
+  #
+  ArmPkg/Drivers/SmmuDxe/SmmuDxe.inf
 
   #
   # TPM2 support
