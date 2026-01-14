@@ -40,7 +40,7 @@
   PcdLib
   HobLib
   PanicLib
-  PlatformSmmuConfigLib
+  SecPlatformSmmuConfigLib
 
 [Pcd]
   gArmTokenSpaceGuid.PcdSystemMemoryBase

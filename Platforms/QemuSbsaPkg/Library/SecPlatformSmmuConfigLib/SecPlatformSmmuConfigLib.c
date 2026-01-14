@@ -1,4 +1,4 @@
-/** @file PlatformSmmuConfigLib.c
+/** @file SecPlatformSmmuConfigLib.c
 
   This file contains a utility function to build the SMMU_CONFIG HOB.
   It takes the platform specific IORT and builds the SMMU_CONFIG HOB.
@@ -13,7 +13,7 @@
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/PlatformSmmuConfigLib.h>
+#include <Library/SecPlatformSmmuConfigLib.h>
 #include "Iort.aslc"
 
 /**
@@ -46,6 +46,6 @@ BuildSmmuConfigHob (
 
   FreePool (SmmuConfig);
 
-  DEBUG ((DEBUG_INFO, "%a: Configured SmmuConfig Hob.\n", __func__));
+  DEBUG ((DEBUG_VERBOSE, "%a: Configured SmmuConfig Hob.\n", __func__));
   return EFI_SUCCESS;
 }

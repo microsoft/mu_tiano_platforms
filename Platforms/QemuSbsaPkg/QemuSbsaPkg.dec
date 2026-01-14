@@ -31,8 +31,8 @@
   FdtHelperLib|Include/Library/FdtHelperLib.h
   VirtNorFlashPlatformLib|Include/Library/VirtNorFlashPlatformLib.h
 
-  ## @libraryclass PlatformSmmuConfigLib Builds SMMU_CONFIG HOB for SmmuDxe to consume
-  PlatformSmmuConfigLib|Include/Library/PlatformSmmuConfigLib.h
+  ## @libraryclass SecPlatformSmmuConfigLib Builds SMMU_CONFIG HOB for SmmuDxe to consume
+  SecPlatformSmmuConfigLib|Include/Library/SecPlatformSmmuConfigLib.h
 
 [Guids]
   gQemuSbsaPkgTokenSpaceGuid                             = { 0x549288f7, 0x4281, 0x4f08, { 0x8f, 0x9e, 0x89, 0xe8, 0xd2, 0xf1, 0x8f, 0x2b } }

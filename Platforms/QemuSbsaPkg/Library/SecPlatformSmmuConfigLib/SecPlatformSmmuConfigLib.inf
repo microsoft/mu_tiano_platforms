@@ -1,4 +1,4 @@
-## @file  PlatformSmmuConfigLib.inf
+## @file  SecPlatformSmmuConfigLib.inf
 #
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -7,14 +7,14 @@
 
 [Defines]
   INF_VERSION                    = 0x0001001c
-  BASE_NAME                      = PlatformSmmuConfigLib
+  BASE_NAME                      = SecPlatformSmmuConfigLib
   FILE_GUID                      = b701b4de-d6de-4778-a136-c5f2ecb169fd
   MODULE_TYPE                    = SEC
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PlatformSmmuConfigLib
+  LIBRARY_CLASS                  = SecPlatformSmmuConfigLib
 
 [Sources]
-  PlatformSmmuConfigLib.c
+  SecPlatformSmmuConfigLib.c
   Iort.aslc
 
 [Packages]

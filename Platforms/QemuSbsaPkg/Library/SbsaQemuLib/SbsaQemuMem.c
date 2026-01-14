@@ -17,7 +17,7 @@
 #include <Library/PcdLib.h>
 #include <Library/PanicLib.h>
 #include <libfdt.h>
-#include <Library/PlatformSmmuConfigLib.h>
+#include <Library/SecPlatformSmmuConfigLib.h>
 
 #include <Guid/DxeMemoryProtectionSettings.h>
 

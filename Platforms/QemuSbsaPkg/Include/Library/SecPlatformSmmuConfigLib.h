@@ -1,12 +1,12 @@
-/** @file PlatformSmmuConfigLib.h
+/** @file SecPlatformSmmuConfigLib.h
 
     Copyright (c) Microsoft Corporation.
     SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef PLATFORM_SMMU_CONFIG_LIB_H_
-#define PLATFORM_SMMU_CONFIG_LIB_H_
+#ifndef SEC_PLATFORM_SMMU_CONFIG_LIB_H_
+#define SEC_PLATFORM_SMMU_CONFIG_LIB_H_
 
 #include <Uefi/UefiBaseType.h>
 
@@ -26,4 +26,4 @@ BuildSmmuConfigHob (
   VOID
   );
 
-#endif // PLATFORM_SMMU_CONFIG_LIB_H_
+#endif // SEC_PLATFORM_SMMU_CONFIG_LIB_H_

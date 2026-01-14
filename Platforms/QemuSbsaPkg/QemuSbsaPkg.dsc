@@ -235,7 +235,7 @@
 
   # General IOMMU Libraries
   IoMmuLib|MdeModulePkg/Library/IoMmuLib/IoMmuLib.inf
-  PlatformSmmuConfigLib|QemuSbsaPkg/Library/PlatformSmmuConfigLib/PlatformSmmuConfigLib.inf
+  SecPlatformSmmuConfigLib|QemuSbsaPkg/Library/SecPlatformSmmuConfigLib/SecPlatformSmmuConfigLib.inf
 
   # Base ARM libraries
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
