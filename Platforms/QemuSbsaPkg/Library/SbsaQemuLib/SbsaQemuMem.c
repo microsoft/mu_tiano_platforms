@@ -206,7 +206,7 @@ InitializeMemoryConfiguration (
   Status = BuildSmmuConfigHob ();
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: Failed to build SMMU Config HOB\n", __func__));
-    return EFI_SECURITY_VIOLATION;
+    return Status;
   }
 
   return EFI_SUCCESS;

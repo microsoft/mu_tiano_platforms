@@ -34,7 +34,11 @@ BuildSmmuConfigHob (
 {
   SMMU_CONFIG  *SmmuConfig;
 
-  SmmuConfig               = (SMMU_CONFIG *)AllocateZeroPool (sizeof (SMMU_CONFIG) + sizeof (IortData));
+  SmmuConfig = (SMMU_CONFIG *)AllocateZeroPool (sizeof (SMMU_CONFIG) + sizeof (IortData));
+  if (SmmuConfig == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   SmmuConfig->VersionMajor = CURRENT_SMMU_CONFIG_VERSION_MAJOR;
   SmmuConfig->VersionMinor = CURRENT_SMMU_CONFIG_VERSION_MINOR;
   SmmuConfig->IortSize     = sizeof (IortData);    // Size of the IORT table in the structure
