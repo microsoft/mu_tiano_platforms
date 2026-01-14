@@ -1,0 +1,469 @@
+From 4b60c8972af55a25ef4a97d81d155f935d2e8344 Mon Sep 17 00:00:00 2001
+From: rdiaz <raymonddiaz@microsoft.com>
+Date: Sat, 19 Jul 2025 00:34:57 +0000
+Subject: [PATCH] Added support for logical secure partitions in TF-A. Added a
+ logical secure-partition to handle locality management. Initializes the
+ locality states upon start-up. Added code to handle DRTM locality management
+ when measuring to the TPM. Added support for sending DIRECT_REQ2 messages
+ from TF-A. Added support for closing localities 2 and 3 as an SMC to TF-A.
+
+---
+ include/services/el3_spmd_logical_sp.h        |   6 +-
+ include/services/qemu_sbsa_spmd_logical_sp.h  |  12 ++
+ plat/qemu/qemu_sbsa/platform.mk               |   8 +-
+ .../qemu_sbsa/qemu_sbsa_spmd_logical_sp.c     | 141 ++++++++++++++++
+ services/std_svc/drtm/drtm_main.c             |  17 +-
+ services/std_svc/spmd/spmd_logical_sp.c       | 152 +++++++++++++++++-
+ 6 files changed, 329 insertions(+), 7 deletions(-)
+ create mode 100644 include/services/qemu_sbsa_spmd_logical_sp.h
+ create mode 100644 plat/qemu/qemu_sbsa/qemu_sbsa_spmd_logical_sp.c
+
+diff --git a/include/services/el3_spmd_logical_sp.h b/include/services/el3_spmd_logical_sp.h
+index 2e965c060..3beff1c53 100644
+--- a/include/services/el3_spmd_logical_sp.h
++++ b/include/services/el3_spmd_logical_sp.h
+@@ -99,7 +99,8 @@ static inline bool is_ffa_success(struct ffa_value *retval)
+ static inline bool is_ffa_direct_msg_resp(struct ffa_value *retval)
+ {
+ 	return (retval->func == FFA_MSG_SEND_DIRECT_RESP_SMC32) ||
+-		(retval->func == FFA_MSG_SEND_DIRECT_RESP_SMC64);
++		(retval->func == FFA_MSG_SEND_DIRECT_RESP_SMC64) ||
++		(retval->func == FFA_MSG_SEND_DIRECT_RESP2_SMC64);
+ }
+ 
+ static inline uint16_t ffa_partition_info_regs_get_last_idx(
+@@ -148,6 +149,9 @@ bool spmd_el3_ffa_msg_direct_req(uint64_t x1,
+ 				 void *handle,
+ 				 struct ffa_value *retval);
+ 
++bool spmd_el3_ffa_msg_direct_req2(struct ffa_value message,
++				 struct ffa_value *retval);
++
+ uintptr_t plat_spmd_logical_sp_smc_handler(unsigned int smc_fid,
+ 		u_register_t x1,
+ 		u_register_t x2,
+diff --git a/include/services/qemu_sbsa_spmd_logical_sp.h b/include/services/qemu_sbsa_spmd_logical_sp.h
+new file mode 100644
+index 000000000..e832f1be3
+--- /dev/null
++++ b/include/services/qemu_sbsa_spmd_logical_sp.h
+@@ -0,0 +1,12 @@
++/*
++ * Copyright (c) 2023, ARM Limited and Contributors. All rights reserved.
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++#ifndef QEMU_SBSA_SPMD_LOGICAL_SP_H
++#define QEMU_SBSA_SPMD_LOGICAL_SP_H
++
++int32_t qemu_sbsa_spmd_lsp_open_locality(uint8_t locality);
++int32_t qemu_sbsa_spmd_lsp_close_locality(uint8_t locality);
++int32_t qemu_sbsa_spmd_lsp_query(void);
++
++#endif
+diff --git a/plat/qemu/qemu_sbsa/platform.mk b/plat/qemu/qemu_sbsa/platform.mk
+index d3ef3dda7..f7d3fb44c 100644
+--- a/plat/qemu/qemu_sbsa/platform.mk
++++ b/plat/qemu/qemu_sbsa/platform.mk
+@@ -25,6 +25,8 @@ include plat/qemu/common/common.mk
+ # Enable new version of image loading on QEMU platforms
+ LOAD_IMAGE_V2		:=	1
+ 
++ENABLE_SPMD_LP		:=	1
++
+ ifeq ($(NEED_BL32),yes)
+ $(eval $(call add_define,QEMU_LOAD_BL32))
+ endif
+@@ -46,7 +48,8 @@ BL31_SOURCES		+=	${PLAT_QEMU_PATH}/sbsa_gic.c 			\
+ 				${PLAT_QEMU_PATH}/sbsa_platform.c		\
+ 				${PLAT_QEMU_PATH}/sbsa_pm.c			\
+ 				${PLAT_QEMU_PATH}/sbsa_sip_svc.c		\
+-				${PLAT_QEMU_PATH}/sbsa_topology.c
++				${PLAT_QEMU_PATH}/sbsa_topology.c		\
++				${PLAT_QEMU_PATH}/qemu_sbsa_spmd_logical_sp.c
+ 
+ BL31_SOURCES		+=	${FDT_WRAPPERS_SOURCES}
+ 
+@@ -60,7 +63,8 @@ BL1_SOURCES += plat/common/plat_spmd_manifest.c
+ BL2_SOURCES += ${PLAT_QEMU_COMMON_PATH}/qemu_io_storage.c \
+ 				common/uuid.c
+ 
+-BL31_SOURCES += plat/common/plat_spmd_manifest.c
++BL31_SOURCES += plat/common/plat_spmd_manifest.c	\
++				common/uuid.c
+ 
+ TOS_FW_CONFIG		:=	${BUILD_PLAT}/fdts/qemu_sbsa_spmc_sp_manifest.dtb
+ $(eval $(call TOOL_ADD_PAYLOAD,${TOS_FW_CONFIG},--tos-fw-config,${TOS_FW_CONFIG}))
+diff --git a/plat/qemu/qemu_sbsa/qemu_sbsa_spmd_logical_sp.c b/plat/qemu/qemu_sbsa/qemu_sbsa_spmd_logical_sp.c
+new file mode 100644
+index 000000000..a0fa51b91
+--- /dev/null
++++ b/plat/qemu/qemu_sbsa/qemu_sbsa_spmd_logical_sp.c
+@@ -0,0 +1,141 @@
++/*
++ * QEMU SBSA Logical Secure Partition - DRTM/TPM
++ * 
++ * Copyright (c), Microsoft Corporation.
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <common/debug.h>
++#include <services/qemu_sbsa_spmd_logical_sp.h>
++#include <services/el3_spmd_logical_sp.h>
++#include <services/ffa_svc.h>
++#include <smccc_helpers.h>
++
++#define SPMD_LP_PARTITION_ID SPMD_LP_ID_START
++#define SPMD_LP_UUID {0x7189D19E, 0xB57A4C0A, 0xB1D4AFDD, 0xBD971646}
++/* SPMD Logical SP currently only supports sending direct req2 messages. */
++#define SPMD_PARTITION_PROPERTIES FFA_PARTITION_DIRECT_REQ2_SEND
++
++#define MSSP_ID 0x8002
++#define TPM_GUID { 0x17, 0xb8, 0x62, 0xa4, 0x18, 0x06, 0x4f, 0xaf, 0x86, 0xb3, 0x08, 0x9a, 0x58, 0x35, 0x38, 0x61 }
++#define GET_INTERFACE_VERSION_CMD 0x0f000001
++#define START_CMD 0x0f000201
++#define TPM_START_PROCESS_OPEN_LOC 0x100
++#define TPM_START_PROCESS_CLOSE_LOC 0x101
++#define MANAGE_LOCALITY_CMD 0x1f000001
++#define MANAGE_LOCALITY_OPEN 0
++#define MANAGE_LOCALITY_CLOSE 1
++
++static uint16_t SwapBytes16 (uint16_t Value)
++{
++  return (uint16_t) ((Value << 8) | (Value >> 8));
++}
++
++static uint32_t SwapBytes32 (uint32_t Value)
++{
++  uint32_t  LowerBytes;
++  uint32_t  HigherBytes;
++
++  LowerBytes  = (uint32_t) SwapBytes16 ((uint16_t) Value);
++  HigherBytes = (uint32_t) SwapBytes16 ((uint16_t) (Value >> 16));
++  return (LowerBytes << 16 | HigherBytes);
++}
++
++static void PrepareUuid (uint8_t* Uuid)
++{
++  uint32_t *Data32;
++  uint16_t *Data16;
++
++  if (Uuid == NULL) {
++    return;
++  }
++
++  Data32    = (uint32_t *)Uuid;
++  Data32[0] = SwapBytes32 (Data32[0]);
++  Data16    = (uint16_t *)&Data32[1];
++  Data16[0] = SwapBytes16 (Data16[0]);
++  Data16[1] = SwapBytes16 (Data16[1]);
++}
++
++static int32_t qemu_sbsa_spmd_logical_partition_init(void)
++{
++  INFO("QEMU SBSA SPMD LSP: Init function called.\n");
++  INFO("LSP ID: %x\n", SPMD_LP_PARTITION_ID);
++
++  /* Open Locality 0 and 1 */
++  qemu_sbsa_spmd_lsp_open_locality(0);
++  qemu_sbsa_spmd_lsp_open_locality(1);
++
++  /* Close Locality 2, 3, and 4 */
++  qemu_sbsa_spmd_lsp_close_locality(2);
++  qemu_sbsa_spmd_lsp_close_locality(3);
++  qemu_sbsa_spmd_lsp_close_locality(4);
++
++	return 0;
++}
++
++int32_t qemu_sbsa_spmd_lsp_open_locality(uint8_t locality)
++{
++  struct ffa_value Message = {0};
++  struct ffa_value Return;
++  uint64_t* UuidHiLo;
++  uint8_t Uuid[] = TPM_GUID;
++  PrepareUuid(Uuid);
++
++  UuidHiLo = (uint64_t*)Uuid;
++
++  Message.func = FFA_MSG_SEND_DIRECT_REQ2_SMC64;
++  Message.arg1 = ((uint64_t)SPMD_LP_PARTITION_ID << 16) | (uint64_t)MSSP_ID;
++  Message.arg2 = UuidHiLo[0];
++  Message.arg3 = UuidHiLo[1];
++  Message.arg4 = MANAGE_LOCALITY_CMD;
++  Message.arg5 = MANAGE_LOCALITY_OPEN;
++  Message.arg6 = locality;
++
++  if (!spmd_el3_ffa_msg_direct_req2(Message, &Return))
++  {
++    panic();
++  }
++
++  return 0;
++}
++
++int32_t qemu_sbsa_spmd_lsp_close_locality(uint8_t locality)
++{
++  struct ffa_value Message = {0};
++  struct ffa_value Return;
++  uint64_t* UuidHiLo;
++  uint8_t Uuid[] = TPM_GUID;
++  PrepareUuid(Uuid);
++
++  UuidHiLo = (uint64_t*)Uuid;
++
++  Message.func = FFA_MSG_SEND_DIRECT_REQ2_SMC64;
++  Message.arg1 = ((uint64_t)SPMD_LP_PARTITION_ID << 16) | (uint64_t)MSSP_ID;
++  Message.arg2 = UuidHiLo[0];
++  Message.arg3 = UuidHiLo[1];
++  Message.arg4 = MANAGE_LOCALITY_CMD;
++  Message.arg5 = MANAGE_LOCALITY_CLOSE;
++  Message.arg6 = locality;
++
++  if (!spmd_el3_ffa_msg_direct_req2(Message, &Return))
++  {
++    panic();
++  }
++
++  return 0;
++}
++
++int32_t qemu_sbsa_spmd_lsp_query(void)
++{
++  return 0;
++}
++
++/* Register SPMD logical partition  */
++DECLARE_SPMD_LOGICAL_PARTITION(
++	qemu_sbsa_spmd_logical_partition,
++	qemu_sbsa_spmd_logical_partition_init, /* Init Function */
++	SPMD_LP_PARTITION_ID,                  /* FF-A Partition ID */
++	SPMD_LP_UUID,                          /* UUID */
++	SPMD_PARTITION_PROPERTIES              /* Partition Properties. */
++);
+diff --git a/services/std_svc/drtm/drtm_main.c b/services/std_svc/drtm/drtm_main.c
+index b7a03f376..309b78ff1 100644
+--- a/services/std_svc/drtm/drtm_main.c
++++ b/services/std_svc/drtm/drtm_main.c
+@@ -28,6 +28,7 @@
+ #include <services/drtm_svc.h>
+ #include <services/sdei.h>
+ #include <platform_def.h>
++#include <services/qemu_sbsa_spmd_logical_sp.h>
+ 
+ /* Structure to store DRTM features specific to the platform. */
+ static drtm_features_t plat_drtm_features;
+@@ -680,11 +681,17 @@ static uint64_t drtm_dynamic_launch(uint64_t x1, void *handle)
+ 	 * protections before returning to the caller.
+ 	 */
+ 
++	qemu_sbsa_spmd_lsp_open_locality(2);
++	qemu_sbsa_spmd_lsp_open_locality(3);
++	qemu_sbsa_spmd_lsp_open_locality(4);
++
+ 	ret = drtm_take_measurements(&args);
+ 	if (ret != SUCCESS) {
+ 		goto err_undo_dma_prot;
+ 	}
+ 
++	qemu_sbsa_spmd_lsp_close_locality(4);
++
+ 	ret = drtm_dl_prepare_dlme_data(&args);
+ 	if (ret != SUCCESS) {
+ 		goto err_undo_dma_prot;
+@@ -775,9 +782,13 @@ uint64_t drtm_smc_handler(uint32_t smc_fid,
+ 				break;	/* not reached */
+ 
+ 			case ARM_DRTM_SVC_CLOSE_LOCALITY:
+-				WARN("ARM_DRTM_SVC_CLOSE_LOCALITY feature %s",
+-				     "is not supported\n");
+-				SMC_RET1(handle, NOT_SUPPORTED);
++				if ((x1 != 2) && (x1 != 3)) {
++					ERROR("Invalid Locality\n");
++					SMC_RET1(handle, INVALID_PARAMETERS);
++				} else {
++					qemu_sbsa_spmd_lsp_close_locality(x1);
++					SMC_RET1(handle, SUCCESS);
++				}
+ 				break;	/* not reached */
+ 
+ 			case ARM_DRTM_SVC_GET_ERROR:
+diff --git a/services/std_svc/spmd/spmd_logical_sp.c b/services/std_svc/spmd/spmd_logical_sp.c
+index 132b3bee7..536b95f8d 100644
+--- a/services/std_svc/spmd/spmd_logical_sp.c
++++ b/services/std_svc/spmd/spmd_logical_sp.c
+@@ -103,7 +103,8 @@ static int el3_spmd_sp_desc_validate(struct spmd_lp_desc *lp_array)
+ 		}
+ 
+ 		/* Ensure that SPMD LP only supports sending direct requests. */
+-		if (lp_desc->properties != FFA_PARTITION_DIRECT_REQ_SEND) {
++		if ((lp_desc->properties != FFA_PARTITION_DIRECT_REQ_SEND) &&
++		    (lp_desc->properties != FFA_PARTITION_DIRECT_REQ2_SEND)) {
+ 			ERROR("Invalid SPMD logical partition properties (0x%x)\n",
+ 			      lp_desc->properties);
+ 			return -EINVAL;
+@@ -150,6 +151,39 @@ static void spmd_build_direct_message_req(spmd_spm_core_context_t *ctx,
+ 	write_ctx_reg(gpregs, CTX_GPREG_X7, 0U);
+ }
+ 
++static void spmd_build_direct_message_req2(spmd_spm_core_context_t *ctx,
++					  uint64_t x1, uint64_t x2,
++					  uint64_t x3, uint64_t x4,
++					  uint64_t x5, uint64_t x6,
++					  uint64_t x7, uint64_t x8,
++					  uint64_t x9, uint64_t x10,
++					  uint64_t x11, uint64_t x12,
++					  uint64_t x13, uint64_t x14,
++					  uint64_t x15, uint64_t x16,
++					  uint64_t x17)
++{
++	gp_regs_t *gpregs = get_gpregs_ctx(&ctx->cpu_ctx);
++
++	write_ctx_reg(gpregs, CTX_GPREG_X0, FFA_MSG_SEND_DIRECT_REQ2_SMC64);
++	write_ctx_reg(gpregs, CTX_GPREG_X1, x1);
++	write_ctx_reg(gpregs, CTX_GPREG_X2, x2);
++	write_ctx_reg(gpregs, CTX_GPREG_X3, x3);
++	write_ctx_reg(gpregs, CTX_GPREG_X4, x4);
++	write_ctx_reg(gpregs, CTX_GPREG_X5, x5);
++	write_ctx_reg(gpregs, CTX_GPREG_X6, x6);
++	write_ctx_reg(gpregs, CTX_GPREG_X7, x7);
++	write_ctx_reg(gpregs, CTX_GPREG_X8, x8);
++	write_ctx_reg(gpregs, CTX_GPREG_X9, x9);
++	write_ctx_reg(gpregs, CTX_GPREG_X10, x10);
++	write_ctx_reg(gpregs, CTX_GPREG_X11, x11);
++	write_ctx_reg(gpregs, CTX_GPREG_X12, x12);
++	write_ctx_reg(gpregs, CTX_GPREG_X13, x13);
++	write_ctx_reg(gpregs, CTX_GPREG_X14, x14);
++	write_ctx_reg(gpregs, CTX_GPREG_X15, x15);
++	write_ctx_reg(gpregs, CTX_GPREG_X16, x16);
++	write_ctx_reg(gpregs, CTX_GPREG_X17, x17);
++}
++
+ static void spmd_encode_ctx_to_ffa_value(spmd_spm_core_context_t *ctx,
+ 					 struct ffa_value *retval)
+ {
+@@ -723,6 +757,122 @@ bool spmd_el3_ffa_msg_direct_req(uint64_t x1,
+ #endif
+ }
+ 
++bool spmd_el3_ffa_msg_direct_req2(struct ffa_value message,
++				 struct ffa_value *retval)
++{
++#if ENABLE_SPMD_LP
++	uint64_t rc = UINT64_MAX;
++	spmd_spm_core_context_t *ctx = spmd_get_context();
++
++	if (retval == NULL) {
++		return false;
++	}
++
++	memset(retval, 0, sizeof(*retval));
++
++	if (!is_spmc_inited) {
++		ERROR("Cannot send SPMD logical partition direct message,"
++			" SPMC not initialized.\n");
++			spmd_encode_ffa_error(retval, FFA_ERROR_DENIED);
++		return true;
++	}
++
++	if (!is_spmd_lp_id(ffa_endpoint_source(message.arg1))) {
++		ERROR("Source ID must be valid SPMD logical partition"
++			" ID.\n");
++			spmd_encode_ffa_error(retval,
++					      FFA_ERROR_INVALID_PARAMETER);
++		return true;
++	}
++
++	if (is_spmd_lp_id(ffa_endpoint_destination(message.arg1))) {
++		ERROR("Destination ID must not be SPMD logical partition"
++			" ID.\n");
++			spmd_encode_ffa_error(retval,
++					      FFA_ERROR_INVALID_PARAMETER);
++		return true;
++	}
++
++	if (!ffa_is_secure_world_id(ffa_endpoint_destination(message.arg1))) {
++		ERROR("Destination ID must be secure world ID.\n");
++			spmd_encode_ffa_error(retval,
++					      FFA_ERROR_INVALID_PARAMETER);
++		return true;
++	}
++
++	if (ffa_endpoint_destination(message.arg1) == SPMD_DIRECT_MSG_ENDPOINT_ID) {
++		ERROR("Destination ID must not be SPMD ID.\n");
++			spmd_encode_ffa_error(retval,
++					      FFA_ERROR_INVALID_PARAMETER);
++		return true;
++	}
++
++	if (ffa_endpoint_destination(message.arg1) == spmd_spmc_id_get()) {
++		ERROR("Destination ID must not be SPMC ID.\n");
++			spmd_encode_ffa_error(retval,
++					      FFA_ERROR_INVALID_PARAMETER);
++		return true;
++	}
++
++/* Save the non-secure context before entering SPMC */
++#if SPMD_SPM_AT_SEL2
++	cm_el2_sysregs_context_save(NON_SECURE);
++#else
++	cm_el1_sysregs_context_save(NON_SECURE);
++#endif
++
++	/*
++	 * Perform synchronous entry into the SPMC. Synchronous entry is
++	 * required because the spec requires that a direct message request
++	 * from an SPMD LP look like a function call from it's perspective.
++	 */
++	spmd_build_direct_message_req2(ctx, message.arg1, message.arg2, message.arg3, 
++								   message.arg4, message.arg5, message.arg6, message.arg7,
++								   message.arg8, message.arg9, message.arg10, message.arg11,
++								   message.arg12, message.arg13, message.arg14, message.arg15,
++								   message.arg16, message.arg17);
++	spmd_logical_sp_set_dir_req_ongoing(ctx);
++
++	rc = spmd_spm_core_sync_entry(ctx);
++
++	spmd_logical_sp_reset_dir_req_ongoing(ctx);
++
++	if (rc != 0ULL) {
++		ERROR("%s failed (%lx) on CPU%u\n", __func__, rc,
++		      plat_my_core_pos());
++		panic();
++	} else {
++		spmd_encode_ctx_to_ffa_value(ctx, retval);
++
++		/*
++		 * Only expect error or direct response,
++		 * spmd_spm_core_sync_exit should not be called on other paths.
++		 * Checks are asserts since the LSP can fail gracefully if the
++		 * source or destination ids are not the same. Panic'ing would
++		 * not provide any benefit.
++		 */
++		assert(is_ffa_error(retval) || is_ffa_direct_msg_resp(retval));
++		assert(is_ffa_error(retval) ||
++			(ffa_endpoint_destination(retval->arg1) ==
++				ffa_endpoint_source(message.arg1)));
++		assert(is_ffa_error(retval) ||
++			(ffa_endpoint_source(retval->arg1) ==
++				ffa_endpoint_destination(message.arg1)));
++	}
++
++#if SPMD_SPM_AT_SEL2
++	cm_el2_sysregs_context_restore(NON_SECURE);
++#else
++	cm_el1_sysregs_context_restore(NON_SECURE);
++#endif
++	cm_set_next_eret_context(NON_SECURE);
++
++	return true;
++#else
++	return false;
++#endif
++}
++
+ bool
+ is_spmd_logical_sp_info_regs_req_in_progress(const spmd_spm_core_context_t *ctx)
+ {
+-- 
+2.34.1
+
