@@ -514,14 +514,14 @@ INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
 
 !if $(SMM_ENABLED) == TRUE
   #
-  # This INF file describes the OneCryptoLoader DXE driver, which is part of the 
-  # MU_BASECORE CryptoPkg. The driver is responsible for loading and initializing 
-  # the shared cryptographic library for use in the UEFI environment. It provides 
+  # This INF file describes the OneCryptoLoader DXE driver, which is part of the
+  # MU_BASECORE CryptoPkg. The driver is responsible for loading and initializing
+  # the shared cryptographic library for use in the UEFI environment. It provides
   # cryptographic services to other components in the firmware.
   #
-  INF $(ONE_CRYPTO_PATH)/OneCryptoLoaders/OneCryptoLoaderDxe.inf
-  INF $(ONE_CRYPTO_PATH)/OneCryptoLoaders/OneCryptoLoaderSupvMm.inf
-  INF $(ONE_CRYPTO_PATH)/OneCryptoBin/OneCryptoBinSupvMm.inf
+  INF $(ONE_CRYPTO_PATH)/$(TARGET)/$(ARCH)/OneCryptoLoaders/OneCryptoLoaderDxe.inf
+  INF $(ONE_CRYPTO_PATH)/$(TARGET)/$(ARCH)/OneCryptoLoaders/OneCryptoLoaderSupvMm.inf
+  INF $(ONE_CRYPTO_PATH)/$(TARGET)/$(ARCH)/OneCryptoBin/OneCryptoBinSupvMm.inf
 !else
   !include $(SHARED_CRYPTO_PATH)/Driver/Bin/CryptoDriver.RUNTIMEDXE.inc.fdf
 !endif

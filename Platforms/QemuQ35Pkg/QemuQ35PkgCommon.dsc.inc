@@ -896,10 +896,6 @@
 #
 ################################################################################
 [Components]
-  $(ONE_CRYPTO_PATH)/OneCryptoLoaders/OneCryptoLoaderDxe.inf
-  $(ONE_CRYPTO_PATH)/OneCryptoLoaders/OneCryptoLoaderSupvMm.inf
-  $(ONE_CRYPTO_PATH)/OneCryptoBin/OneCryptoBinSupvMm.inf
-  
   QemuQ35Pkg/Library/PeiFvMeasurementExclusionLib/PeiFvMeasurementExclusionLib.inf
 
   QemuQ35Pkg/Library/ResetSystemLib/BaseResetSystemLib.inf
@@ -907,6 +903,20 @@
   QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
 
 [Components.X64]
+
+  $(ONE_CRYPTO_PATH)/$(TARGET)/X64/OneCryptoLoaders/OneCryptoLoaderDxe.inf {
+    <PcdsPatchableInModule>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8040004F
+  }
+  $(ONE_CRYPTO_PATH)/$(TARGET)/X64/OneCryptoLoaders/OneCryptoLoaderSupvMm.inf {
+    <PcdsPatchableInModule>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8040004F
+  }
+  $(ONE_CRYPTO_PATH)/$(TARGET)/X64/OneCryptoBin/OneCryptoBinSupvMm.inf {
+    <PcdsPatchableInModule>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8040004F
+  }
+
   #########################################
   # DXE Phase modules
   #########################################
