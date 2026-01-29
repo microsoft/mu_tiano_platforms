@@ -75,17 +75,19 @@
   DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS  = TRUE
   DEFINE NETWORK_ISCSI_ENABLE            = FALSE
 
+  # PEI uses BaseCrypto (OneCrypto doesn't have PEI support yet)
   PEI_CRYPTO_SERVICES                 = TINY_SHA
-  DXE_CRYPTO_SERVICES                 = STANDARD
-  RUNTIMEDXE_CRYPTO_SERVICES          = NONE
-  STANDALONEMM_CRYPTO_SERVICES        = STANDARD
-  STANDALONEMM_MMSUPV_CRYPTO_SERVICES = NONE
-  SMM_CRYPTO_SERVICES                 = NONE
   PEI_CRYPTO_ARCH                     = AARCH64
-  DXE_CRYPTO_ARCH                     = AARCH64
+  # DXE and StandaloneMM use OneCrypto - set to NONE to skip BaseCrypto drivers
+  DXE_CRYPTO_SERVICES                 = NONE
+  DXE_CRYPTO_ARCH                     = NONE
+  RUNTIMEDXE_CRYPTO_SERVICES          = NONE
   RUNTIMEDXE_CRYPTO_ARCH              = NONE
-  STANDALONEMM_CRYPTO_ARCH            = AARCH64
+  STANDALONEMM_CRYPTO_SERVICES        = NONE
+  STANDALONEMM_CRYPTO_ARCH            = NONE
+  STANDALONEMM_MMSUPV_CRYPTO_SERVICES = NONE
   STANDALONEMM_MMSUPV_CRYPTO_ARCH     = NONE
+  SMM_CRYPTO_SERVICES                 = NONE
   SMM_CRYPTO_ARCH                     = NONE
 
 !if $(NETWORK_SNP_ENABLE) == TRUE
@@ -423,6 +425,9 @@
   PolicyLib|PolicyServicePkg/Library/DxePolicyLib/DxePolicyLib.inf
   MuArmGicExLib|MsCorePkg/Library/MuArmGicExLib/MuArmGicExLib.inf
   ConfigKnobShimLib|SetupDataPkg/Library/ConfigKnobShimLib/ConfigKnobShimDxeLib/ConfigKnobShimDxeLib.inf
+  # OneCrypto library for DXE drivers
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/DxeCryptLib.inf
+  TlsLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/DxeCryptLib.inf
 
 !if $(TPM2_ENABLE) == TRUE
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibFfa/Tpm2DeviceLibFfa.inf
@@ -433,6 +438,9 @@
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
   ResetSystemLib|MdeModulePkg/Library/RuntimeResetSystemLib/RuntimeResetSystemLib.inf
+  # OneCrypto library for runtime drivers
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/DxeCryptLib.inf
+  TlsLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/DxeCryptLib.inf
 
 [LibraryClasses.common.MM_CORE_STANDALONE]
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
@@ -464,6 +472,9 @@
   VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerPhyCounterLib/ArmGenericTimerPhyCounterLib.inf
+  # OneCrypto library for StandaloneMM - uses gOneCryptoProtocolGuid
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/StandaloneMmCryptLib.inf
+  TlsLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/StandaloneMmCryptLib.inf
 
   VirtNorFlashPlatformLib|QemuSbsaPkg/Library/SbsaQemuNorFlashLib/SbsaQemuNorFlashLib.inf
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
