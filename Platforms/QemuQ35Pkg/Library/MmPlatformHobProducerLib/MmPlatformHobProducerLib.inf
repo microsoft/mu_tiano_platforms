@@ -37,6 +37,7 @@
   gMmCommonRegionHobGuid                   ## CONSUMES
   gEfiMmPeiMmramMemoryReserveGuid          ## CONSUMES
   gEfiSmmSmramMemoryGuid                   ## CONSUMES
+  gMmSupvUnblockRegionHobGuid              ## CONSUMES
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress

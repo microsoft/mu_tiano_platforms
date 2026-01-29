@@ -25,6 +25,69 @@
 #define NUMBER_OF_HOB_RESOURCE_DESCRIPTOR  3
 
 /**
+  Copies a data buffer to a newly-built HOB for GUID HOB
+
+  This function builds a customized HOB tagged with a GUID for identification, copies the
+  input data to the HOB data field and returns the start address of the GUID HOB data.
+  If new HOB buffer is NULL or the GUID HOB could not found, then ASSERT().
+
+  @param[in]       HobBuffer            The pointer of HOB buffer.
+  @param[in, out]  HobBufferSize        The available size of the HOB buffer when as input.
+                                        The used size of when as output.
+  @param[in]       Guid                 The GUID of the GUID type HOB.
+
+  @retval          EFI_SUCCESS            The request succeeded.
+  @retval          EFI_INVALID_PARAMETER  HobBufferSize is NULL, or HobBuffer is not NULL while the size is non-zero.
+  @retval
+**/
+EFI_STATUS
+MmPlatformHobCopyGuidHob (
+  IN UINT8      *HobBuffer,
+  IN OUT UINTN  *HobBufferSize,
+  IN EFI_GUID   *Guid
+  )
+{
+  EFI_HOB_GENERIC_HEADER  *GuidHob;
+  UINTN                   UsedSize;
+  EFI_STATUS              Status;
+
+  if (HobBufferSize == NULL) {
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
+  }
+
+  if ((HobBuffer == NULL) && (*HobBufferSize != 0)) {
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
+  }
+
+  UsedSize = 0;
+  GuidHob  = GetFirstGuidHob (Guid);
+  ASSERT (GuidHob != NULL);
+
+  Status = EFI_SUCCESS;
+
+  while (GuidHob != NULL) {
+    if (*HobBufferSize >= UsedSize + GuidHob->HobLength) {
+      if (HobBuffer != NULL) {
+        CopyMem (HobBuffer + UsedSize, GuidHob, GuidHob->HobLength);
+      }
+    } else {
+      Status = EFI_BUFFER_TOO_SMALL;
+    }
+
+    UsedSize += GuidHob->HobLength;
+
+    GuidHob = GetNextGuidHob (Guid, GET_NEXT_HOB (GuidHob));
+  }
+
+  *HobBufferSize = UsedSize;
+
+Done:
+  return Status;
+}
+
+/**
   Create the platform specific HOBs needed by the Standalone MM environment.
 
   The following HOBs are created by StandaloneMm IPL common logic.
@@ -66,6 +129,7 @@ CreateMmPlatformHob (
   EFI_HOB_GUID_TYPE  *AdvLoggerGuidHob;
   EFI_HOB_GUID_TYPE  *SupvCommGuidHob;
   UINTN              Size;
+  UINTN              UnblockSize;
   UINTN              NumberOfHobResourceDescriptor;
   EFI_HOB_RESOURCE_DESCRIPTOR  Hob;
   EFI_HOB_GUID_TYPE               *MmramRangesHob;
@@ -73,6 +137,7 @@ CreateMmPlatformHob (
   EFI_MMRAM_DESCRIPTOR            *MmramRanges;
   UINTN                           MmramRangeCount;
   UINTN                           Index;
+  EFI_STATUS                      Status;
 
   if (BufferSize == NULL) {
     return RETURN_INVALID_PARAMETER;
@@ -118,6 +183,16 @@ CreateMmPlatformHob (
   // supervisor comm buffer.
   SupvCommGuidHob = GetFirstGuidHob (&gMmCommonRegionHobGuid);
   Size   += GET_HOB_LENGTH (SupvCommGuidHob);
+
+  // Then coalesce all the supervisor unblock requests.
+  UnblockSize = 0;
+  Status = MmPlatformHobCopyGuidHob (NULL, &UnblockSize, &gMmSupvUnblockRegionHobGuid);
+  if (Status != RETURN_BUFFER_TOO_SMALL) {
+    // This cannot be right...
+    return RETURN_DEVICE_ERROR;
+  } else {
+    Size += UnblockSize;
+  }
 
   if (Size > *BufferSize) {
     *BufferSize = Size;
@@ -200,6 +275,14 @@ CreateMmPlatformHob (
     CopyMem ((UINT8 *)Buffer + Size, &Hob, sizeof (EFI_HOB_RESOURCE_DESCRIPTOR));
     Size += sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
     NumberOfHobResourceDescriptor++;
+  }
+
+  // Finally copy over all the unblock requests
+  UnblockSize = *BufferSize - Size;
+  Status = MmPlatformHobCopyGuidHob ((UINT8 *)Buffer + Size, &UnblockSize, &gMmSupvUnblockRegionHobGuid);
+  if (EFI_ERROR (Status)) {
+    // This cannot be right...
+    return Status;
   }
 
   return EFI_SUCCESS;
