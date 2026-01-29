@@ -615,6 +615,8 @@
   gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedFileLoggerFlush|3
   gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedLoggerPreMemPages|3
   gEfiSecurityPkgTokenSpaceGuid.PcdUserPhysicalPresence|FALSE
+  gStandaloneMmPkgTokenSpaceGuid.PcdShadowBfv|FALSE
+  gUefiCpuPkgTokenSpaceGuid.PcdSmmExceptionRebootInsteadOfHaltDefault|FALSE
 
 !if $(NETWORK_TLS_ENABLE) == FALSE
   # match PcdFlashNvStorageVariableSize purely for convenience
@@ -1312,7 +1314,21 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   #
   # SMM_CORE
   #
-  MmSupervisorPkg/Core/MmSupervisorCore.inf
+  MmSupervisorPkg/Core/Init/MmSupervisorInit.inf
+  MmSupervisorPkg/Core/Runtime/MmSupervisorCore.inf {
+    <LibraryClasses>
+      StandaloneMmCoreEntryPoint|MmSupervisorPkg/Library/SupervisorRuntimeEntryPoint/StandaloneMmCoreEntryPoint.inf
+  }
+  StandaloneMmPkg/Core/StandaloneMmCore.inf {
+    <LibraryClasses>
+      MemLib|StandaloneMmPkg/Library/StandaloneMmMemLib/StandaloneMmMemLib.inf
+      StandaloneMmCoreEntryPoint|MmSupervisorPkg/Library/StandaloneMmUserEntryPoint/StandaloneMmDriverEntryPoint.inf
+      SysCallLib|MmSupervisorPkg/Library/SysCallLib/SysCallLib.inf
+      BaseLib|MmSupervisorPkg/Library/BaseLibSysCall/BaseLib.inf
+      IoLib|MmSupervisorPkg/Library/BaseIoLibIntrinsicSysCall/BaseIoLibIntrinsic.inf
+      PciLib|QemuQ35Pkg/Library/DxePciLibI440FxQ35/DxePciLibI440FxQ35.inf
+      MemLib|MmSupervisorPkg/Library/MmSupervisorMemLib/MmSupervisorMemLibSyscall.inf
+  }
 
   #
   # Privileged drivers (DXE_SMM_DRIVER modules)

@@ -455,7 +455,9 @@ INF  QemuQ35Pkg/SmmAccess/SmmAccess2Dxe.inf
 !else
   INF  MmSupervisorPkg/Drivers/StandaloneMmIpl/PiSmmIpl.inf
 !endif
-INF  MmSupervisorPkg/Core/MmSupervisorCore.inf
+INF  MmSupervisorPkg/Core/Init/MmSupervisorInit.inf
+INF  MmSupervisorPkg/Core/Runtime/MmSupervisorCore.inf
+INF  StandaloneMmPkg/Core/StandaloneMmCore.inf
 INF  UefiCpuPkg/CpuIo2Smm/CpuIo2StandaloneMm.inf
 !endif
 
