@@ -49,13 +49,13 @@
   DXE_CRYPTO_SERVICES = STANDARD
   RUNTIMEDXE_CRYPTO_SERVICES = STANDARD
   SMM_CRYPTO_SERVICES = NONE
-  STANDALONEMM_CRYPTO_SERVICES = NONE
-  STANDALONEMM_MMSUPV_CRYPTO_SERVICES = STANDARD
+  STANDALONEMM_CRYPTO_SERVICES = STANDARD
+  STANDALONEMM_MMSUPV_CRYPTO_SERVICES = NONE
   DXE_CRYPTO_ARCH = X64
   RUNTIMEDXE_CRYPTO_ARCH = X64
   SMM_CRYPTO_ARCH = NONE
-  STANDALONEMM_CRYPTO_ARCH = NONE
-  STANDALONEMM_MMSUPV_CRYPTO_ARCH = X64
+  STANDALONEMM_CRYPTO_ARCH = X64
+  STANDALONEMM_MMSUPV_CRYPTO_ARCH = NONE
 
 ################################################################################
 #
@@ -511,14 +511,14 @@
 
 [LibraryClasses.common.MM_STANDALONE]
   TimerLib|QemuQ35Pkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
-  MmServicesTableLib|MmSupervisorPkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
+  MmServicesTableLib|MdePkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
   MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
-  HobLib|MmSupervisorPkg/Library/StandaloneMmHobLibSyscall/StandaloneMmHobLibSyscall.inf
+  HobLib|StandaloneMmPkg/Library/StandaloneMmHobLib/StandaloneMmHobLib.inf
   MemLib|MmSupervisorPkg/Library/MmSupervisorMemLib/MmSupervisorMemLibSyscall.inf
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/SmmCpuExceptionHandlerLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/SmmReportStatusCodeLib/StandaloneMmReportStatusCodeLib.inf
   HwResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
-  StandaloneMmDriverEntryPoint|MmSupervisorPkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
+  StandaloneMmDriverEntryPoint|MdePkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
   AdvLoggerAccessLib|AdvLoggerPkg/Library/AdvLoggerMmAccessLib/AdvLoggerMmAccessLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibStandaloneMm.inf
   RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
@@ -537,11 +537,8 @@
 # Advanced Logger Libraries
 #########################################
 [LibraryClasses]
-!ifndef $(DEBUG_ON_SERIAL_PORT)
-  DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
-!else
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-!endif
+
   AdvancedLoggerHdwPortLib|AdvLoggerPkg/Library/AdvancedLoggerHdwPortLib/AdvancedLoggerHdwPortLib.inf
   AssertLib|AdvLoggerPkg/Library/AssertLib/AssertLib.inf
   AdvancedLoggerAccessLib|AdvLoggerPkg/Library/AdvancedLoggerAccessLib/AdvancedLoggerAccessLib.inf
@@ -976,10 +973,10 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
 !endif
   }
 
-  MmSupervisorPkg/Drivers/MmSupervisorRing3Broker/MmSupervisorRing3Broker.inf {
-    <LibraryClasses>
-      PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
-  }
+  # MmSupervisorPkg/Drivers/MmSupervisorRing3Broker/MmSupervisorRing3Broker.inf {
+  #   <LibraryClasses>
+  #     PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
+  # }
 !if $(PERF_TRACE_ENABLE) == TRUE
   MmSupervisorPkg/Drivers/MmSupervisorRing3Performance/MmSupervisorRing3Performance.inf {
     <LibraryClasses>
