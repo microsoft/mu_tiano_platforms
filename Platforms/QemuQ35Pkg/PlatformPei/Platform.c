@@ -249,7 +249,7 @@ MemMapInitialization (
     DEBUG ((
       DEBUG_INFO,
       "%a: Claim MMIO region for flash. Base=0x%Lx Size=0x%Lx\n",
-      __FUNCTION__,
+      __func__,
       PcdGet32 (PcdOvmfFdBaseAddress),
       PcdGet32 (PcdOvmfFirmwareFdSize)
       ));
@@ -359,7 +359,7 @@ MicrovmInitialization (
 
   Status = QemuFwCfgFindFile ("etc/fdt", &FdtItem, &FdtSize);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "%a: no etc/fdt found in fw_cfg, using dummy\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a: no etc/fdt found in fw_cfg, using dummy\n", __func__));
     FdtItem = 0;
     FdtSize = sizeof (EmptyFdt);
   }
@@ -367,7 +367,7 @@ MicrovmInitialization (
   FdtPages = EFI_SIZE_TO_PAGES (FdtSize);
   NewBase  = AllocatePages (FdtPages);
   if (NewBase == NULL) {
-    DEBUG ((DEBUG_INFO, "%a: AllocatePages failed\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a: AllocatePages failed\n", __func__));
     return;
   }
 
@@ -380,14 +380,14 @@ MicrovmInitialization (
 
   FdtHobData = BuildGuidHob (&gFdtHobGuid, sizeof (*FdtHobData));
   if (FdtHobData == NULL) {
-    DEBUG ((DEBUG_INFO, "%a: BuildGuidHob failed\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a: BuildGuidHob failed\n", __func__));
     return;
   }
 
   DEBUG ((
     DEBUG_INFO,
     "%a: fdt at 0x%x (size %d)\n",
-    __FUNCTION__,
+    __func__,
     NewBase,
     FdtSize
     ));
@@ -439,14 +439,14 @@ MiscInitialization (
       AcpiEnBit  = ICH9_ACPI_CNTL_ACPI_EN;
       break;
     case 0xffff: /* microvm */
-      DEBUG ((DEBUG_INFO, "%a: microvm\n", __FUNCTION__));
+      DEBUG ((DEBUG_INFO, "%a: microvm\n", __func__));
       MicrovmInitialization ();
       // MU_CHANGE: Remove dynamic PCD set to support usage in Standalone MM
       PcdStatus = EFI_UNSUPPORTED;
       ASSERT_RETURN_ERROR (PcdStatus);
       return;
     case CLOUDHV_DEVICE_ID:
-      DEBUG ((DEBUG_INFO, "%a: Cloud Hypervisor host bridge\n", __FUNCTION__));
+      DEBUG ((DEBUG_INFO, "%a: Cloud Hypervisor host bridge\n", __func__));
       // MU_CHANGE: Remove dynamic PCD set to support usage in Standalone MM
       PcdStatus = EFI_UNSUPPORTED;
       ASSERT_RETURN_ERROR (PcdStatus);
@@ -455,7 +455,7 @@ MiscInitialization (
       DEBUG ((
         DEBUG_ERROR,
         "%a: Unknown Host Bridge Device ID: 0x%04x\n",
-        __FUNCTION__,
+        __func__,
         mHostBridgeDevId
         ));
       ASSERT (FALSE);
@@ -590,7 +590,7 @@ Q35BoardVerification (
     DEBUG_ERROR,
     "%a: no TSEG (SMRAM) on host bridge DID=0x%04x; "
     "only DID=0x%04x (Q35) is supported\n",
-    __FUNCTION__,
+    __func__,
     mHostBridgeDevId,
     INTEL_Q35_MCH_DEVICE_ID
     ));
@@ -622,7 +622,7 @@ MaxCpuCountInitialization (
     // until PcdCpuApInitTimeOutInMicroSeconds elapses (whichever is reached
     // first).
     //
-    DEBUG ((DEBUG_WARN, "%a: boot CPU count unavailable\n", __FUNCTION__));
+    DEBUG ((DEBUG_WARN, "%a: boot CPU count unavailable\n", __func__));
     mMaxCpuCount = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
   } else {
     //
@@ -675,7 +675,7 @@ MaxCpuCountInitialization (
     //    steps. Both cases confirm modern mode.
     //
     CmdData2 = IoRead32 (CpuHpBase + QEMU_CPUHP_R_CMD_DATA2);
-    DEBUG ((DEBUG_VERBOSE, "%a: CmdData2=0x%x\n", __FUNCTION__, CmdData2));
+    DEBUG ((DEBUG_VERBOSE, "%a: CmdData2=0x%x\n", __func__, CmdData2));
     if (CmdData2 != 0) {
       //
       // QEMU doesn't support the modern CPU hotplug interface. Assume that the
@@ -684,7 +684,7 @@ MaxCpuCountInitialization (
       DEBUG ((
         DEBUG_WARN,
         "%a: modern CPU hotplug interface unavailable\n",
-        __FUNCTION__
+        __func__
         ));
       mMaxCpuCount = BootCpuCount;
     } else {
@@ -739,7 +739,7 @@ MaxCpuCountInitialization (
           DEBUG_WARN,
           "%a: QEMU v2.7 reset bug: BootCpuCount=%d "
           "Present=%u\n",
-          __FUNCTION__,
+          __func__,
           BootCpuCount,
           Present
           ));
@@ -759,7 +759,7 @@ MaxCpuCountInitialization (
   DEBUG ((
     DEBUG_INFO,
     "%a: BootCpuCount=%d mMaxCpuCount=%u\n",
-    __FUNCTION__,
+    __func__,
     BootCpuCount,
     mMaxCpuCount
     ));

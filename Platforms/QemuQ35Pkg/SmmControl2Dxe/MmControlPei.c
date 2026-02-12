@@ -210,7 +210,7 @@ MmControlPeiEntryPoint (
     DEBUG ((
       DEBUG_ERROR,
       "%a: this Q35 implementation lacks SMI\n",
-      __FUNCTION__
+      __func__
       ));
     goto FatalError;
   }
@@ -239,7 +239,7 @@ MmControlPeiEntryPoint (
     DEBUG ((
       DEBUG_ERROR,
       "%a: failed to lock down GBL_SMI_EN\n",
-      __FUNCTION__
+      __func__
       ));
     goto FatalError;
   }
@@ -253,7 +253,7 @@ MmControlPeiEntryPoint (
     DEBUG ((
       DEBUG_ERROR,
       "%a: InstallMultipleProtocolInterfaces: %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     goto FatalError;

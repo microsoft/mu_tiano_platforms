@@ -57,7 +57,7 @@ PreBootVolumeUpButtonThenPowerButtonCheck (
 {
   FRONT_PAGE_BUTTON_SERVICES_PROTOCOL  *Bsp;
 
-  DEBUG ((DEBUG_VERBOSE, "%a \n", __FUNCTION__));
+  DEBUG ((DEBUG_VERBOSE, "%a \n", __func__));
 
   Bsp                                   = MS_BSP_FROM_BSP (This);
   *PreBootVolumeUpButtonThenPowerButton = (Bsp->ButtonState == VolUpButton);
@@ -81,7 +81,7 @@ PreBootVolumeDownButtonThenPowerButtonCheck (
 {
   FRONT_PAGE_BUTTON_SERVICES_PROTOCOL  *Bsp;
 
-  DEBUG ((DEBUG_VERBOSE, "%a \n", __FUNCTION__));
+  DEBUG ((DEBUG_VERBOSE, "%a \n", __func__));
   Bsp                                     = MS_BSP_FROM_BSP (This);
   *PreBootVolumeDownButtonThenPowerButton = (Bsp->ButtonState == VolDownButton);
   return EFI_SUCCESS;
@@ -102,7 +102,7 @@ PreBootClearVolumeButtonState (
 {
   FRONT_PAGE_BUTTON_SERVICES_PROTOCOL  *Bsp;
 
-  DEBUG ((DEBUG_VERBOSE, "%a \n", __FUNCTION__));
+  DEBUG ((DEBUG_VERBOSE, "%a \n", __func__));
   Bsp              = MS_BSP_FROM_BSP (This);
   Bsp->ButtonState = NoButtons;
 
@@ -168,11 +168,11 @@ GetButtonState (
 
   Status = EFI_SUCCESS;
 
-  DEBUG ((DEBUG_VERBOSE, "%a: Entry\n", __FUNCTION__));
+  DEBUG ((DEBUG_VERBOSE, "%a: Entry\n", __func__));
 
   Status = gBS->LocateProtocol (&gEfiSmbiosProtocolGuid, NULL, (VOID *)&Smbios);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Unable to locate SmBiosProtocol.  Code=%r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: Unable to locate SmBiosProtocol.  Code=%r\n", __func__, Status));
     goto Exit;
   }
 
@@ -183,7 +183,7 @@ GetButtonState (
 
   Status = Smbios->GetNext (Smbios, &SmbiosHandle, &SmbiosType, &SmbiosRecord, NULL);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Unable to get type 3 SMBIOS record.  Code=%r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: Unable to get type 3 SMBIOS record.  Code=%r\n", __func__, Status));
     goto Exit;
   }
 
@@ -202,19 +202,19 @@ GetButtonState (
         (0 == AsciiStrCmp (BiosString, SMBIOS_VOLUME_UP)))
     {
       Bsp->ButtonState = VolUpButton;
-      DEBUG ((DEBUG_INFO, "%a: Vol+ Button Detected\n", __FUNCTION__));
+      DEBUG ((DEBUG_INFO, "%a: Vol+ Button Detected\n", __func__));
     }
 
     if ((StrLen == AsciiStrLen (SMBIOS_VOLUME_DOWN)) &&
         (0 == AsciiStrCmp (BiosString, SMBIOS_VOLUME_DOWN)))
     {
       Bsp->ButtonState = VolDownButton;
-      DEBUG ((DEBUG_INFO, "%a: Vol- Button Detected\n", __FUNCTION__));
+      DEBUG ((DEBUG_INFO, "%a: Vol- Button Detected\n", __func__));
     }
   }
 
   if (Bsp->ButtonState == NoButtons) {
-    DEBUG ((DEBUG_INFO, "%a: Neither Vol+ nor Vol- detected\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a: Neither Vol+ nor Vol- detected\n", __func__));
   }
 
 Exit:
@@ -240,7 +240,7 @@ ButtonsInit (
   FRONT_PAGE_BUTTON_SERVICES_PROTOCOL  *Bsp   = NULL;
   EFI_STATUS                           Status = EFI_SUCCESS;
 
-  DEBUG ((DEBUG_INFO, "%a \n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a \n", __func__));
 
   Bsp = AllocateZeroPool (sizeof (FRONT_PAGE_BUTTON_SERVICES_PROTOCOL));
   if (Bsp == NULL) {

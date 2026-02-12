@@ -40,18 +40,18 @@ ConfigKnobsEntry (
   EFI_STATUS  Status;
   BOOLEAN     GfxEnablePort0;
 
-  DEBUG ((DEBUG_INFO, "%a - Entry.\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a - Entry.\n", __func__));
 
   Status = ConfigGetPowerOnPort0 (&GfxEnablePort0);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a Failed to get PowerOnPort0 config knob! - %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a Failed to get PowerOnPort0 config knob! - %r\n", __func__, Status));
     ASSERT (FALSE);
     goto Done;
   }
 
   Status = ApplyGfxConfigToPolicy (&GfxEnablePort0);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a Failed to apply configuration data to the GFX silicon policy - %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a Failed to apply configuration data to the GFX silicon policy - %r\n", __func__, Status));
     ASSERT (FALSE);
     goto Done;
   }

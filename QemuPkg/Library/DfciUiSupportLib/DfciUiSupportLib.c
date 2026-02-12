@@ -94,7 +94,7 @@ DfciUiDisplayMessageBox (
   if (!EFI_ERROR (Status)) {
     *Result = (DFCI_MB_RESULT)SwmResult;
   } else {
-    DEBUG ((DEBUG_ERROR, "%a: SwmDialogBox error code=%r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: SwmDialogBox error code=%r\n", __func__, Status));
   }
 
   return Status;
@@ -141,7 +141,7 @@ DfciUiDisplayPasswordDialog (
   if (!EFI_ERROR (Status)) {
     *Result = (DFCI_MB_RESULT)SwmResult;
   } else {
-    DEBUG ((DEBUG_ERROR, "%a: SwmDialogsPasswordPrompt error code=%r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: SwmDialogsPasswordPrompt error code=%r\n", __func__, Status));
   }
 
   return Status;
@@ -203,7 +203,7 @@ DfciUiDisplayAuthDialog (
       *Result = (DFCI_MB_RESULT)SwmResult;
     }
   } else {
-    DEBUG ((DEBUG_ERROR, "%a: SwmDialogsVerifyThumbprintPrompt error code=%r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: SwmDialogsVerifyThumbprintPrompt error code=%r\n", __func__, Status));
   }
 
   return Status;
