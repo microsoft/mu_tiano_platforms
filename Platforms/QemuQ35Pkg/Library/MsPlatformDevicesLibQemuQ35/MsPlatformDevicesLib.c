@@ -701,7 +701,7 @@ ConnectVirtioPciRng (
   return EFI_SUCCESS;
 
 Error:
-  DEBUG ((DEBUG_ERROR, "%a: %r\n", __FUNCTION__, Status));
+  DEBUG ((DEBUG_ERROR, "%a: %r\n", __func__, Status));
   return Status;
 }
 
@@ -906,7 +906,7 @@ SetPciIntLine (
       DEBUG ((
         DEBUG_ERROR,
         "%a: PCI host bridge (00:00.0) should have no interrupts!\n",
-        __FUNCTION__
+        __func__
         ));
       ASSERT (FALSE);
     }
@@ -961,7 +961,7 @@ SetPciIntLine (
       DEBUG ((
         DEBUG_VERBOSE,
         "%a: [%02x:%02x.%x] %s -> 0x%02x\n",
-        __FUNCTION__,
+        __func__,
         (UINT32)Bus,
         (UINT32)Device,
         (UINT32)Function,
@@ -1036,7 +1036,7 @@ PciAcpiInitialization (
       DEBUG ((
         DEBUG_ERROR,
         "%a: Unknown Host Bridge Device ID: 0x%04x\n",
-        __FUNCTION__,
+        __func__,
         mHostBridgeDevId
         ));
       ASSERT (FALSE);
@@ -1279,7 +1279,7 @@ GetPlatformPreferredConsole (
   Status = gBS->LocateDevicePath (&gEfiPciIoProtocolGuid, &TempDevicePath, &Handle);
   if (!EFI_ERROR (Status) && IsDevicePathEnd (TempDevicePath) && IsVgaHandle (Handle)) {
   } else {
-    DEBUG ((DEBUG_ERROR, "%a - Unable to locate platform preferred console. Code=%r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a - Unable to locate platform preferred console. Code=%r\n", __func__, Status));
     Status = EFI_DEVICE_ERROR;
   }
 

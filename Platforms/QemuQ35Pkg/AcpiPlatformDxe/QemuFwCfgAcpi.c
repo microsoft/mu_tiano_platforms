@@ -236,7 +236,7 @@ CollectAllocationsRestrictedTo32Bit (
     }
 
     if (AddPointer->PointeeFile[QEMU_LOADER_FNAME_SIZE - 1] != '\0') {
-      DEBUG ((DEBUG_ERROR, "%a: malformed file name\n", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a: malformed file name\n", __func__));
       Status = EFI_PROTOCOL_ERROR;
       goto RollBack;
     }
@@ -251,7 +251,7 @@ CollectAllocationsRestrictedTo32Bit (
         DEBUG ((
           DEBUG_VERBOSE,
           "%a: restricting blob \"%a\" from 64-bit allocation\n",
-          __FUNCTION__,
+          __func__,
           AddPointer->PointeeFile
           ));
         break;
@@ -328,7 +328,7 @@ ProcessCmdAllocate (
   BLOB                  *Blob;
 
   if (Allocate->File[QEMU_LOADER_FNAME_SIZE - 1] != '\0') {
-    DEBUG ((DEBUG_ERROR, "%a: malformed file name\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: malformed file name\n", __func__));
     return EFI_PROTOCOL_ERROR;
   }
 
@@ -336,7 +336,7 @@ ProcessCmdAllocate (
     DEBUG ((
       DEBUG_ERROR,
       "%a: unsupported alignment 0x%x\n",
-      __FUNCTION__,
+      __func__,
       Allocate->Alignment
       ));
     return EFI_UNSUPPORTED;
@@ -347,7 +347,7 @@ ProcessCmdAllocate (
     DEBUG ((
       DEBUG_ERROR,
       "%a: QemuFwCfgFindFile(\"%a\"): %r\n",
-      __FUNCTION__,
+      __func__,
       Allocate->File,
       Status
       ));
@@ -390,7 +390,7 @@ ProcessCmdAllocate (
     DEBUG ((
       DEBUG_ERROR,
       "%a: duplicated file \"%a\"\n",
-      __FUNCTION__,
+      __func__,
       Allocate->File
       ));
     Status = EFI_PROTOCOL_ERROR;
@@ -408,7 +408,7 @@ ProcessCmdAllocate (
     DEBUG_VERBOSE,
     "%a: File=\"%a\" Alignment=0x%x Zone=%d Size=0x%Lx "
     "Address=0x%Lx\n",
-    __FUNCTION__,
+    __func__,
     Allocate->File,
     Allocate->Alignment,
     Allocate->Zone,
@@ -460,7 +460,7 @@ ProcessCmdAddPointer (
   if ((AddPointer->PointerFile[QEMU_LOADER_FNAME_SIZE - 1] != '\0') ||
       (AddPointer->PointeeFile[QEMU_LOADER_FNAME_SIZE - 1] != '\0'))
   {
-    DEBUG ((DEBUG_ERROR, "%a: malformed file name\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: malformed file name\n", __func__));
     return EFI_PROTOCOL_ERROR;
   }
 
@@ -470,7 +470,7 @@ ProcessCmdAddPointer (
     DEBUG ((
       DEBUG_ERROR,
       "%a: invalid blob reference(s) \"%a\" / \"%a\"\n",
-      __FUNCTION__,
+      __func__,
       AddPointer->PointerFile,
       AddPointer->PointeeFile
       ));
@@ -487,7 +487,7 @@ ProcessCmdAddPointer (
     DEBUG ((
       DEBUG_ERROR,
       "%a: invalid pointer location or size in \"%a\"\n",
-      __FUNCTION__,
+      __func__,
       AddPointer->PointerFile
       ));
     return EFI_PROTOCOL_ERROR;
@@ -500,7 +500,7 @@ ProcessCmdAddPointer (
     DEBUG ((
       DEBUG_ERROR,
       "%a: invalid pointer value in \"%a\"\n",
-      __FUNCTION__,
+      __func__,
       AddPointer->PointerFile
       ));
     return EFI_PROTOCOL_ERROR;
@@ -520,7 +520,7 @@ ProcessCmdAddPointer (
       DEBUG_ERROR,
       "%a: relocated pointer value unrepresentable in "
       "\"%a\"\n",
-      __FUNCTION__,
+      __func__,
       AddPointer->PointerFile
       ));
     return EFI_PROTOCOL_ERROR;
@@ -532,7 +532,7 @@ ProcessCmdAddPointer (
     DEBUG_VERBOSE,
     "%a: PointerFile=\"%a\" PointeeFile=\"%a\" "
     "PointerOffset=0x%x PointerSize=%d\n",
-    __FUNCTION__,
+    __func__,
     AddPointer->PointerFile,
     AddPointer->PointeeFile,
     AddPointer->PointerOffset,
@@ -568,7 +568,7 @@ ProcessCmdAddChecksum (
   BLOB                      *Blob;
 
   if (AddChecksum->File[QEMU_LOADER_FNAME_SIZE - 1] != '\0') {
-    DEBUG ((DEBUG_ERROR, "%a: malformed file name\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: malformed file name\n", __func__));
     return EFI_PROTOCOL_ERROR;
   }
 
@@ -577,7 +577,7 @@ ProcessCmdAddChecksum (
     DEBUG ((
       DEBUG_ERROR,
       "%a: invalid blob reference \"%a\"\n",
-      __FUNCTION__,
+      __func__,
       AddChecksum->File
       ));
     return EFI_PROTOCOL_ERROR;
@@ -591,7 +591,7 @@ ProcessCmdAddChecksum (
     DEBUG ((
       DEBUG_ERROR,
       "%a: invalid checksum range in \"%a\"\n",
-      __FUNCTION__,
+      __func__,
       AddChecksum->File
       ));
     return EFI_PROTOCOL_ERROR;
@@ -605,7 +605,7 @@ ProcessCmdAddChecksum (
     DEBUG_VERBOSE,
     "%a: File=\"%a\" ResultOffset=0x%x Start=0x%x "
     "Length=0x%x\n",
-    __FUNCTION__,
+    __func__,
     AddChecksum->File,
     AddChecksum->ResultOffset,
     AddChecksum->Start,
@@ -654,7 +654,7 @@ ProcessCmdWritePointer (
   if ((WritePointer->PointerFile[QEMU_LOADER_FNAME_SIZE - 1] != '\0') ||
       (WritePointer->PointeeFile[QEMU_LOADER_FNAME_SIZE - 1] != '\0'))
   {
-    DEBUG ((DEBUG_ERROR, "%a: malformed file name\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: malformed file name\n", __func__));
     return EFI_PROTOCOL_ERROR;
   }
 
@@ -668,7 +668,7 @@ ProcessCmdWritePointer (
     DEBUG ((
       DEBUG_ERROR,
       "%a: invalid fw_cfg file or blob reference \"%a\" / \"%a\"\n",
-      __FUNCTION__,
+      __func__,
       WritePointer->PointerFile,
       WritePointer->PointeeFile
       ));
@@ -684,7 +684,7 @@ ProcessCmdWritePointer (
     DEBUG ((
       DEBUG_ERROR,
       "%a: invalid pointer location or size in \"%a\"\n",
-      __FUNCTION__,
+      __func__,
       WritePointer->PointerFile
       ));
     return EFI_PROTOCOL_ERROR;
@@ -693,7 +693,7 @@ ProcessCmdWritePointer (
   PointeeBlob  = OrderedCollectionUserStruct (PointeeEntry);
   PointerValue = WritePointer->PointeeOffset;
   if (PointerValue >= PointeeBlob->Size) {
-    DEBUG ((DEBUG_ERROR, "%a: invalid PointeeOffset\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: invalid PointeeOffset\n", __func__));
     return EFI_PROTOCOL_ERROR;
   }
 
@@ -710,7 +710,7 @@ ProcessCmdWritePointer (
     DEBUG ((
       DEBUG_ERROR,
       "%a: pointer value unrepresentable in \"%a\"\n",
-      __FUNCTION__,
+      __func__,
       WritePointer->PointerFile
       ));
     return EFI_PROTOCOL_ERROR;
@@ -731,7 +731,7 @@ ProcessCmdWritePointer (
     DEBUG_VERBOSE,
     "%a: PointerFile=\"%a\" PointeeFile=\"%a\" "
     "PointerOffset=0x%x PointeeOffset=0x%x PointerSize=%d\n",
-    __FUNCTION__,
+    __func__,
     WritePointer->PointerFile,
     WritePointer->PointeeFile,
     WritePointer->PointerOffset,
@@ -777,7 +777,7 @@ UndoCmdWritePointer (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: PointerFile=\"%a\" PointerOffset=0x%x PointerSize=%d\n",
-    __FUNCTION__,
+    __func__,
     WritePointer->PointerFile,
     WritePointer->PointerOffset,
     WritePointer->PointerSize
@@ -908,7 +908,7 @@ Process2ndPassCmdAddPointer (
       DEBUG ((
         DEBUG_VERBOSE,
         "%a: PointerValue=0x%Lx already processed, skipping.\n",
-        __FUNCTION__,
+        __func__,
         PointerValue
         ));
       Status = EFI_SUCCESS;
@@ -922,7 +922,7 @@ Process2ndPassCmdAddPointer (
     DEBUG_VERBOSE,
     "%a: checking for ACPI header in \"%a\" at 0x%Lx "
     "(remaining: 0x%Lx): ",
-    __FUNCTION__,
+    __func__,
     AddPointer->PointeeFile,
     PointerValue,
     (UINT64)Blob2Remaining
@@ -997,7 +997,7 @@ Process2ndPassCmdAddPointer (
     DEBUG ((
       DEBUG_ERROR,
       "%a: can't install more than %d tables\n",
-      __FUNCTION__,
+      __func__,
       INSTALLED_TABLES_MAX
       ));
     Status = EFI_OUT_OF_RESOURCES;
@@ -1014,7 +1014,7 @@ Process2ndPassCmdAddPointer (
     DEBUG ((
       DEBUG_ERROR,
       "%a: InstallAcpiTable(): %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     goto RollbackSeenPointer;
@@ -1081,7 +1081,7 @@ InstallQemuFwCfgTables (
     DEBUG ((
       DEBUG_ERROR,
       "%a: \"etc/table-loader\" has invalid size 0x%Lx\n",
-      __FUNCTION__,
+      __func__,
       (UINT64)FwCfgSize
       ));
     return EFI_PROTOCOL_ERROR;
@@ -1158,7 +1158,7 @@ InstallQemuFwCfgTables (
         DEBUG ((
           DEBUG_VERBOSE,
           "%a: unknown loader command: 0x%x\n",
-          __FUNCTION__,
+          __func__,
           LoaderEntry->Type
           ));
         break;
@@ -1211,7 +1211,7 @@ UninstallAcpiTables:
       AcpiProtocol->UninstallAcpiTable (AcpiProtocol, InstalledKey[Installed]);
     }
   } else {
-    DEBUG ((DEBUG_INFO, "%a: installed %d tables\n", __FUNCTION__, Installed));
+    DEBUG ((DEBUG_INFO, "%a: installed %d tables\n", __func__, Installed));
   }
 
   for (SeenPointerEntry = OrderedCollectionMin (SeenPointers);
@@ -1261,7 +1261,7 @@ RollbackWritePointersAndFreeTracker:
       DEBUG ((
         DEBUG_VERBOSE,
         "%a: freeing \"%a\"\n",
-        __FUNCTION__,
+        __func__,
         Blob->File
         ));
       gBS->FreePages ((UINTN)Blob->Base, EFI_SIZE_TO_PAGES (Blob->Size));
