@@ -245,6 +245,11 @@ MmControlPeiEntryPoint (
   }
 
   //
+  // QEMU can inject SMIs in different ways, negotiate our preferences.
+  //
+  NegotiateSmiFeatures ();
+
+  //
   // We have no pointers to convert to virtual addresses. The handle itself
   // doesn't matter, as protocol services are not accessible at runtime.
   //
