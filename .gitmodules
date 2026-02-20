@@ -30,7 +30,7 @@
 	url = https://github.com/microsoft/mu_feature_config.git
 [submodule "Features/MM_SUPV"]
 	path = Features/MM_SUPV
-	url = https://github.com/microsoft/mu_feature_mm_supv.git
+	url = https://windowspartners.visualstudio.com/MsCoreUefi_Thanos/_git/msft_mmsupervisor
 	branch = v13.0.0
 [submodule "Features/DEBUGGER"]
 	path = Features/DEBUGGER
