@@ -456,7 +456,11 @@ INF  QemuQ35Pkg/SmmAccess/SmmAccess2Dxe.inf
   INF  MmSupervisorPkg/Drivers/StandaloneMmIpl/PiSmmIpl.inf
 !endif
 INF  MmSupervisorPkg/Core/Init/MmSupervisorInit.inf
-INF  MmSupervisorPkg/Core/Runtime/MmSupervisorCore.inf
+# INF  MmSupervisorPkg/Core/Runtime/MmSupervisorCore.inf
+FILE MM_CORE_STANDALONE = gMmSupervisorCoreGuid {
+  SECTION PE32 = D:\Repos\patina\target\x86_64-unknown-uefi\debug\example_mm_supervisor.efi
+  SECTION UI   = "MmSupervisorCore"
+}
 INF  StandaloneMmPkg/Core/StandaloneMmCore.inf
 INF  UefiCpuPkg/CpuIo2Smm/CpuIo2StandaloneMm.inf
 !endif
@@ -572,7 +576,7 @@ FILE FREEFORM = PCD(gZeroTouchPkgTokenSpaceGuid.PcdZeroTouchCertificateFile) {
   INF MsGraphicsPkg/SimpleWindowManagerDxe/SimpleWindowManagerDxe.inf
   INF AdvLoggerPkg/Application/AdvancedLogDumper/AdvancedLogDumper.inf
 !if $(SMM_ENABLED) == TRUE
-  INF MmSupervisorPkg/Drivers/MmSupervisorErrorReport/MmSupervisorErrorReport.inf
+  # INF MmSupervisorPkg/Drivers/MmSupervisorErrorReport/MmSupervisorErrorReport.inf
 !endif
   FILE APPLICATION=PCD(gPcBdsPkgTokenSpaceGuid.PcdShellFile) {
     SECTION PE32=$(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/X64/Shell.efi
@@ -602,6 +606,9 @@ FILE FREEFORM = PCD(gZeroTouchPkgTokenSpaceGuid.PcdZeroTouchCertificateFile) {
   }
   FILE FREEFORM = gMmSupervisorPolicyFileGuid {
     SECTION RAW = $(POLICY_BIN_PATH)
+  }
+  FILE FREEFORM = gMmiEntrySeaFileGuid {
+    SECTION RAW = $(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/X64/SeaPkg/MmiEntrySea/MmiEntrySea/OUTPUT/MmiEntrySea.bin
   }
 
 ################################################################################

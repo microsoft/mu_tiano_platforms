@@ -537,8 +537,7 @@
 # Advanced Logger Libraries
 #########################################
 [LibraryClasses]
-  DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-
+  DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
   AdvancedLoggerHdwPortLib|AdvLoggerPkg/Library/AdvancedLoggerHdwPortLib/AdvancedLoggerHdwPortLib.inf
   AssertLib|AdvLoggerPkg/Library/AssertLib/AssertLib.inf
   AdvancedLoggerAccessLib|AdvLoggerPkg/Library/AdvancedLoggerAccessLib/AdvancedLoggerAccessLib.inf
@@ -1306,18 +1305,20 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   MmSupervisorPkg/Drivers/StandaloneMmIpl/PiSmmIpl.inf
 !endif
   QemuQ35Pkg/SmmAccess/SmmAccess2Dxe.inf
-  MmSupervisorPkg/Drivers/MmSupervisorErrorReport/MmSupervisorErrorReport.inf
+  # MmSupervisorPkg/Drivers/MmSupervisorErrorReport/MmSupervisorErrorReport.inf
 
   #
   # SMM_CORE
   #
   MmSupervisorPkg/Core/Init/MmSupervisorInit.inf
+  SeaPkg/MmiEntrySea/MmiEntrySea.inf
   MmSupervisorPkg/Core/Runtime/MmSupervisorCore.inf {
     <LibraryClasses>
       StandaloneMmCoreEntryPoint|MmSupervisorPkg/Library/SupervisorRuntimeEntryPoint/StandaloneMmCoreEntryPoint.inf
   }
   StandaloneMmPkg/Core/StandaloneMmCore.inf {
     <LibraryClasses>
+      DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
       MemLib|StandaloneMmPkg/Library/StandaloneMmMemLib/StandaloneMmMemLib.inf
       StandaloneMmCoreEntryPoint|MmSupervisorPkg/Library/StandaloneMmUserEntryPoint/StandaloneMmDriverEntryPoint.inf
       SysCallLib|MmSupervisorPkg/Library/SysCallLib/SysCallLib.inf
