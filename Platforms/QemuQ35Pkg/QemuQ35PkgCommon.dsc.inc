@@ -1316,6 +1316,7 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
     <LibraryClasses>
       StandaloneMmCoreEntryPoint|MmSupervisorPkg/Library/SupervisorRuntimeEntryPoint/StandaloneMmCoreEntryPoint.inf
   }
+  MmSupervisorPkg/Drivers/MmSupervisedCpu/MmSupervisedCpu.inf
   StandaloneMmPkg/Core/StandaloneMmCore.inf {
     <LibraryClasses>
       DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf

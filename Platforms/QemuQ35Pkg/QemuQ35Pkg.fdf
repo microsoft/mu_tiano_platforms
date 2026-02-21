@@ -461,6 +461,7 @@ FILE MM_CORE_STANDALONE = gMmSupervisorCoreGuid {
   SECTION PE32 = D:\Repos\patina\target\x86_64-unknown-uefi\debug\example_mm_supervisor.efi
   SECTION UI   = "MmSupervisorCore"
 }
+INF  MmSupervisorPkg/Drivers/MmSupervisedCpu/MmSupervisedCpu.inf
 INF  StandaloneMmPkg/Core/StandaloneMmCore.inf
 INF  UefiCpuPkg/CpuIo2Smm/CpuIo2StandaloneMm.inf
 !endif
