@@ -113,20 +113,6 @@ jobs:
           **/*/*TestApp.efi
         BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuQ35_NO_SMM_RELEASE:
-        BuildPackage: QemuQ35Pkg
-        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-        BuildFlags: "BLD_*_SMM_ENABLED=FALSE"
-        BuildTarget: "RELEASE"
-        BuildExtraTag: "NO_SMM"
-        BuildExtraStep:
-          - script: echo No extra steps provided
-        Run: true
-        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE"
-        BuildArtifactsBinary: |
-          **/QEMUQ35_*.fd
-        BuildArtifactsOther: ""
-
       QemuQ35_CODE_COVERAGE:
         BuildPackage: QemuQ35Pkg
         BuildFile: "Platforms/QemuQ35Pkg/Test/PlatformTest.py"

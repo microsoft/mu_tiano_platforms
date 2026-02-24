@@ -74,11 +74,6 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         # Turn off S3 support
         args += " -global ICH9-LPC.disable_s3=1"
 
-        if env.GetBuildValue("SMM_ENABLED") is None or env.GetBuildValue("SMM_ENABLED").lower() == "true":
-            smm_enabled = "on"
-        else:
-            smm_enabled = "off"
-
         accel = ""
         if env.GetValue("QEMU_ACCEL") is not None:
             if env.GetValue("QEMU_ACCEL").lower() == "kvm":
@@ -88,7 +83,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             elif env.GetValue("QEMU_ACCEL").lower() == "whpx":
                 accel = ",accel=whpx"
 
-        args += " -machine q35,smm=" + smm_enabled + accel
+        args += " -machine q35,smm=on" + accel
         path_to_os = env.GetValue("PATH_TO_OS")
         if path_to_os is not None:
             # Potentially dealing with big daddy, give it more juice...
@@ -125,8 +120,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
         if env.GetBuildValue ("QEMU_CORE_NUM") is not None:
             args += " -smp " + env.GetBuildValue ("QEMU_CORE_NUM")
-        if smm_enabled == "on":
-            args += " -global driver=cfi.pflash01,property=secure,value=on"
+        args += " -global driver=cfi.pflash01,property=secure,value=on"
 
         code_fd = os.path.join(OutputPath_FV, "QEMUQ35_CODE.fd")
         args += " -drive if=pflash,format=raw,unit=0,file=" + \
