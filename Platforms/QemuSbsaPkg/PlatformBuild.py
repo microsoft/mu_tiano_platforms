@@ -57,9 +57,7 @@ class CommonPlatform():
         "Platforms",
         "MU_BASECORE",
         "Common/MU",
-        "Common/MU_TIANO",
         "Common/MU_OEM_SAMPLE",
-        "Silicon/Arm/MU_TIANO",
         "Silicon/Arm/TFA",
         "Features/DEBUGGER",
         "Features/DFCI",
@@ -118,9 +116,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
         return [
             RequiredSubmodule("MU_BASECORE", False, ".pytool/CISettings.py"),
             RequiredSubmodule("Common/MU", False, ".pytool/CISettings.py"),
-            RequiredSubmodule("Common/MU_TIANO", False, ".pytool/CISettings.py"),
             RequiredSubmodule("Common/MU_OEM_SAMPLE", False, ".pytool/CISettings.py"),
-            RequiredSubmodule("Silicon/Arm/MU_TIANO", False, ".pytool/CISettings.py"),
             RequiredSubmodule("Silicon/Arm/TFA", True),
             RequiredSubmodule("Silicon/Arm/HAF", True),
             RequiredSubmodule("Features/DEBUGGER", True),
@@ -764,6 +760,9 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             args = "CC=" + clang_exe
         elif self.env.GetValue("TOOL_CHAIN_TAG") == "GCC5":
             args = "CROSS_COMPILE=" + shell_environment.GetEnvironment().get_shell_var("GCC5_AARCH64_PREFIX")
+            args += " -j $(nproc)"
+        elif self.env.GetValue("TOOL_CHAIN_TAG") == "GCC":
+            args = "CROSS_COMPILE=" + shell_environment.GetEnvironment().get_shell_var("GCC_AARCH64_PREFIX")
             args += " -j $(nproc)"
         else:
             logging.error("Unsupported toolchain")
