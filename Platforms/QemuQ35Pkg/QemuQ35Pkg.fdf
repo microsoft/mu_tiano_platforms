@@ -456,7 +456,6 @@ INF  QemuQ35Pkg/SmmAccess/SmmAccess2Dxe.inf
   INF  MmSupervisorPkg/Drivers/StandaloneMmIpl/PiSmmIpl.inf
 !endif
 INF  MmSupervisorPkg/Core/Init/MmSupervisorInit.inf
-# INF  MmSupervisorPkg/Core/Runtime/MmSupervisorCore.inf
 FILE MM_CORE_STANDALONE = gMmSupervisorCoreGuid {
   SECTION PE32 = D:\Repos\patina\target\x86_64-unknown-uefi\debug\example_mm_supervisor.efi
   SECTION UI   = "MmSupervisorCore"

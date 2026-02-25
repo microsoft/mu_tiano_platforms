@@ -1312,10 +1312,6 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   #
   MmSupervisorPkg/Core/Init/MmSupervisorInit.inf
   SeaPkg/MmiEntrySea/MmiEntrySea.inf
-  MmSupervisorPkg/Core/Runtime/MmSupervisorCore.inf {
-    <LibraryClasses>
-      StandaloneMmCoreEntryPoint|MmSupervisorPkg/Library/SupervisorRuntimeEntryPoint/StandaloneMmCoreEntryPoint.inf
-  }
   MmSupervisorPkg/Drivers/MmSupervisedCpu/MmSupervisedCpu.inf
   StandaloneMmPkg/Core/StandaloneMmCore.inf {
     <LibraryClasses>
