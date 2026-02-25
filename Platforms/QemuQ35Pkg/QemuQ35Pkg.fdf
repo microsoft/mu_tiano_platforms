@@ -444,6 +444,7 @@ INF  QemuQ35Pkg/SmmAccess/SmmAccess2Dxe.inf
   INF  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmIplX64Relay.inf
   INF  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmDxeSupport.inf
   INF  StandaloneMmPkg/Drivers/MmCommunicationDxe/MmCommunicationDxe.inf
+  INF  StandaloneMmPkg/Drivers/MmCommunicationNotifyDxe/MmCommunicationNotifyDxe.inf
 !else
   INF  MmSupervisorPkg/Drivers/StandaloneMmIpl/PiSmmIpl.inf
 !endif
