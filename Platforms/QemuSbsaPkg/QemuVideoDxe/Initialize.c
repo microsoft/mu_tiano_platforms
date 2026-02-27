@@ -244,7 +244,7 @@ QemuVideoBochsEdid (
     DEBUG ((
       DEBUG_INFO,
       "%a: mmio read failed\n",
-      __FUNCTION__
+      __func__
       ));
     return;
   }
@@ -255,7 +255,7 @@ QemuVideoBochsEdid (
     DEBUG ((
       DEBUG_INFO,
       "%a: magic check failed\n",
-      __FUNCTION__
+      __func__
       ));
     return;
   }
@@ -263,7 +263,7 @@ QemuVideoBochsEdid (
   DEBUG ((
     DEBUG_INFO,
     "%a: blob found (extensions: %d)\n",
-    __FUNCTION__,
+    __func__,
     Private->Edid[126]
     ));
 
@@ -273,7 +273,7 @@ QemuVideoBochsEdid (
     DEBUG ((
       DEBUG_INFO,
       "%a: no detailed timing descriptor\n",
-      __FUNCTION__
+      __func__
       ));
     return;
   }
@@ -283,7 +283,7 @@ QemuVideoBochsEdid (
   DEBUG ((
     DEBUG_INFO,
     "%a: default resolution: %dx%d\n",
-    __FUNCTION__,
+    __func__,
     *XRes,
     *YRes
     ));
@@ -370,7 +370,7 @@ QemuVideoBochsModeSetup (
         DEBUG_ERROR,
         "%a: can't read size of drawable buffer from QXL "
         "ROM\n",
-        __FUNCTION__
+        __func__
         ));
       return EFI_NOT_FOUND;
     }
@@ -382,7 +382,7 @@ QemuVideoBochsModeSetup (
   DEBUG ((
     DEBUG_INFO,
     "%a: AvailableFbSize=0x%x\n",
-    __FUNCTION__,
+    __func__,
     AvailableFbSize
     ));
 
@@ -416,12 +416,12 @@ QemuVideoBochsModeSetup (
     }
   }
 
-  DEBUG ((DEBUG_INFO, "%a Discovered HRes: %d VRes: %d\n", __FUNCTION__, NativeHorizontalResolution, NativeVerticalResolution));
+  DEBUG ((DEBUG_INFO, "%a Discovered HRes: %d VRes: %d\n", __func__, NativeHorizontalResolution, NativeVerticalResolution));
 
   if ((NativeHorizontalResolution == 0) && (NativeVerticalResolution == 0)) {
     NativeHorizontalResolution = XRes;
     NativeVerticalResolution   = YRes;
-    DEBUG ((DEBUG_INFO, "%a Using default resolutions %d by %d\n", __FUNCTION__, NativeHorizontalResolution, NativeVerticalResolution));
+    DEBUG ((DEBUG_INFO, "%a Using default resolutions %d by %d\n", __func__, NativeHorizontalResolution, NativeVerticalResolution));
   }
 
   QemuVideoBochsAddMode (

@@ -52,7 +52,6 @@ class CommonPlatform():
         "Platforms",
         "MU_BASECORE",
         "Common/MU",
-        "Common/MU_TIANO",
         "Common/MU_OEM_SAMPLE",
         "Features/DEBUGGER",
         "Features/DFCI",
@@ -143,7 +142,6 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
         return [
             RequiredSubmodule("MU_BASECORE", False, ".pytool/CISettings.py"),
             RequiredSubmodule("Common/MU", False, ".pytool/CISettings.py"),
-            RequiredSubmodule("Common/MU_TIANO", False, ".pytool/CISettings.py"),
             RequiredSubmodule("Common/MU_OEM_SAMPLE", False, ".pytool/CISettings.py"),
             RequiredSubmodule("Features/DEBUGGER", False, ".pytool/CISettings.py"),
             RequiredSubmodule("Features/DFCI", False, ".pytool/CISettings.py"),

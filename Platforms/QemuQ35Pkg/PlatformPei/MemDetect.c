@@ -83,7 +83,7 @@ Q35TsegMbytesInitialization (
   DEBUG ((
     DEBUG_INFO,
     "%a: QEMU offers an extended TSEG (%d MB)\n",
-    __FUNCTION__,
+    __func__,
     ExtendedTsegMbytes
     ));
   PcdStatus = PcdSet16S (PcdQ35TsegMbytes, ExtendedTsegMbytes);
@@ -105,7 +105,7 @@ Q35SmramAtDefaultSmbaseInitialization (
     DEBUG ((
       DEBUG_INFO,
       "%a: SMRAM at default SMBASE not checked due to CSM\n",
-      __FUNCTION__
+      __func__
       ));
   } else {
     UINTN  CtlReg;
@@ -119,7 +119,7 @@ Q35SmramAtDefaultSmbaseInitialization (
     DEBUG ((
       DEBUG_INFO,
       "%a: SMRAM at default SMBASE %a\n",
-      __FUNCTION__,
+      __func__,
       mQ35SmramAtDefaultSmbase ? "found" : "not found"
       ));
   }
@@ -182,7 +182,7 @@ QemuUc32BaseInitialization (
       DEBUG_VERBOSE,
       "%a: rounded UC32 base from 0x%x up to 0x%x, for "
       "an UC32 size of 0x%x\n",
-      __FUNCTION__,
+      __func__,
       LowerMemorySize,
       mQemuUc32Base,
       Uc32Size
@@ -253,7 +253,7 @@ ScanOrAdd64BitE820Ram (
     DEBUG ((
       DEBUG_VERBOSE,
       "%a: Base=0x%Lx Length=0x%Lx Type=%u\n",
-      __FUNCTION__,
+      __func__,
       E820Entry.BaseAddr,
       E820Entry.Length,
       E820Entry.Type
@@ -274,7 +274,7 @@ ScanOrAdd64BitE820Ram (
           DEBUG ((
             DEBUG_VERBOSE,
             "%a: AddMemoryRangeHob [0x%Lx, 0x%Lx)\n",
-            __FUNCTION__,
+            __func__,
             Base,
             End
             ));
@@ -290,7 +290,7 @@ ScanOrAdd64BitE820Ram (
           DEBUG ((
             DEBUG_VERBOSE,
             "%a: MaxAddress=0x%Lx\n",
-            __FUNCTION__,
+            __func__,
             *MaxAddress
             ));
         }
@@ -300,7 +300,7 @@ ScanOrAdd64BitE820Ram (
           DEBUG ((
             DEBUG_VERBOSE,
             "%a: LowMemory=0x%Lx\n",
-            __FUNCTION__,
+            __func__,
             *LowMemory
             ));
         }
@@ -447,7 +447,7 @@ GetFirstNonAddress (
       DEBUG ((
         DEBUG_WARN,
         "%a: ignoring malformed 64-bit PCI host aperture size from fw_cfg\n",
-        __FUNCTION__
+        __func__
         ));
       break;
   }
@@ -457,7 +457,7 @@ GetFirstNonAddress (
       DEBUG ((
         DEBUG_INFO,
         "%a: disabling 64-bit PCI host aperture\n",
-        __FUNCTION__
+        __func__
         ));
       PcdStatus = PcdSet64S (PcdPciMmio64Size, 0);
       ASSERT_RETURN_ERROR (PcdStatus);
@@ -488,7 +488,7 @@ GetFirstNonAddress (
     DEBUG ((
       DEBUG_VERBOSE,
       "%a: HotPlugMemoryEnd=0x%Lx\n",
-      __FUNCTION__,
+      __func__,
       HotPlugMemoryEnd
       ));
 
@@ -525,7 +525,7 @@ GetFirstNonAddress (
     DEBUG ((
       DEBUG_INFO,
       "%a: Pci64Base=0x%Lx Pci64Size=0x%Lx\n",
-      __FUNCTION__,
+      __func__,
       Pci64Base,
       Pci64Size
       ));
@@ -792,7 +792,7 @@ QemuInitializeRam (
   MTRR_SETTINGS         MtrrSettings;
   EFI_STATUS            Status;
 
-  DEBUG ((DEBUG_INFO, "%a called\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a called\n", __func__));
 
   //
   // Determine total memory size available
