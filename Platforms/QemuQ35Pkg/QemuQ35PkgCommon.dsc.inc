@@ -47,12 +47,10 @@
 
   PEI_CRYPTO_SERVICES = TINY_SHA
   DXE_CRYPTO_SERVICES = STANDARD
-  RUNTIMEDXE_CRYPTO_SERVICES = STANDARD
   SMM_CRYPTO_SERVICES = NONE
   STANDALONEMM_CRYPTO_SERVICES = NONE
   STANDALONEMM_MMSUPV_CRYPTO_SERVICES = STANDARD
   DXE_CRYPTO_ARCH = X64
-  RUNTIMEDXE_CRYPTO_ARCH = X64
   SMM_CRYPTO_ARCH = NONE
   STANDALONEMM_CRYPTO_ARCH = NONE
   STANDALONEMM_MMSUPV_CRYPTO_ARCH = X64
@@ -589,8 +587,8 @@
   gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedLoggerLocator|TRUE
   gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedLoggerAutoWrapEnable|TRUE
 
-  gQemuPkgTokenSpaceGuid.PcdSmmSmramRequire|$(SMM_ENABLED)
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdStandaloneMmEnable|$(SMM_ENABLED)
+  gQemuPkgTokenSpaceGuid.PcdSmmSmramRequire|TRUE
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdStandaloneMmEnable|TRUE
   gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugSupport|FALSE
 
   gQemuPkgTokenSpaceGuid.PcdEnableMemoryProtection|$(MEMORY_PROTECTION)
@@ -688,16 +686,17 @@
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xB0000000
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber|$(QEMU_CORE_NUM)
 
-!if $(SMM_ENABLED) == FALSE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|TRUE
-!endif
-
   # Use profile index 1
   gOemPkgTokenSpaceGuid.PcdActiveProfileIndex|0x1
 
 [PcdsFixedAtBuild.common]
   # a PCD that controls the enumeration and connection of ConIn's. When true, ConIn is only connected once a console input is requests
   gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand|TRUE
+
+  # QEMU lacks a simulation for the INIT process.
+  # To address this, PcdFirstTimeWakeUpAPsBySipi set to FALSE to
+  # broadcast INIT-SIPI-SIPI for the first time.
+  gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi|FALSE
 
 # Enable SHELL to build instead of just taking the binary
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|16000
@@ -774,13 +773,8 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS|0x80
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0x20
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x510
-!if $(SMM_ENABLED) == FALSE
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0x200
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x200
-!else
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0x100
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x1C0
-!endif
 
   #
   # Network Pcds
@@ -1335,12 +1329,6 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
       NULL|MdeModulePkg/Library/VarCheckPolicyLib/VarCheckPolicyLibStandaloneMm.inf
   }
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
-
-  #
-  # Variable driver stack (NO SMM)
-  #
-  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
-  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 
   #
   # TPM support

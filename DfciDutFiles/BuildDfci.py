@@ -18,7 +18,6 @@ if __name__ == "__main__":
     args = " BLD_*_GUI_FRONT_PAGE=TRUE"
     args += " BLD_*_NETWORK_ALLOW_HTTP_CONNECTIONS=TRUE"
     args += " BLD_*_QEMU_CORE_NUM=4"
-    args += " BLD_*_SMM_ENABLED=TRUE"
     args += " --clean"
 
     cmd = platformbuild + args

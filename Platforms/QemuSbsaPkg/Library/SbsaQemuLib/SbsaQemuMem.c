@@ -16,7 +16,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PanicLib.h>
-#include <libfdt.h>
+#include <Library/FdtLib.h>
 #include <Library/SecPlatformSmmuConfigLib.h>
 
 #include <Guid/DxeMemoryProtectionSettings.h>
@@ -66,7 +66,7 @@ InitializeMemoryConfiguration (
   UINT64                          NewSize, CurSize;
   CONST CHAR8                     *Type;
   INT32                           Len;
-  CONST UINT64                    *RegProp;
+  CONST FDT_PROPERTY              *PropertyPtr;
   DXE_MEMORY_PROTECTION_SETTINGS  DxeSettings;
   UINTN                           FdtSize;
   EFI_STATUS                      Status;
@@ -110,50 +110,55 @@ InitializeMemoryConfiguration (
   }
 
   // Make sure we have a valid device tree blob
-  if (fdt_check_header (DeviceTreeBase) != 0) {
+  if (FdtCheckHeader (DeviceTreeBase) != 0) {
     PANIC ("Device Tree Blob header is not valid. Cannot continue without a valid Device Tree Blob.\n");
   }
 
   // Look for the lowest memory node
   for (Prev = 0; ; Prev = Node) {
-    Node = fdt_next_node (DeviceTreeBase, Prev, NULL);
+    Node = FdtNextNode (DeviceTreeBase, Prev, NULL);
     if (Node < 0) {
       break;
     }
 
     // Check for memory node
-    Type = fdt_getprop (DeviceTreeBase, Node, "device_type", &Len);
-    if (Type && (AsciiStrnCmp (Type, "memory", Len) == 0)) {
-      // Get the 'reg' property of this node. For now, we will assume
-      // two 8 byte quantities for base and size, respectively.
-      RegProp = fdt_getprop (DeviceTreeBase, Node, "reg", &Len);
-      if ((RegProp != 0) && (Len == (2 * sizeof (UINT64)))) {
-        CurBase = fdt64_to_cpu (ReadUnaligned64 (RegProp));
-        CurSize = fdt64_to_cpu (ReadUnaligned64 (RegProp + 1));
+    PropertyPtr = FdtGetProperty (DeviceTreeBase, Node, "device_type", &Len);
+    if (PropertyPtr != NULL) {
+      Type = PropertyPtr->Data;
+      if (Type && (AsciiStrnCmp (Type, "memory", Len) == 0)) {
+        // Get the 'reg' property of this node. For now, we will assume
+        // two 8 byte quantities for base and size, respectively.
+        PropertyPtr = FdtGetProperty (DeviceTreeBase, Node, "reg", &Len);
+        if (PropertyPtr != NULL) {
+          if (Len == (2 * sizeof (UINT64))) {
+            CurBase = Fdt64ToCpu (ReadUnaligned64 ((UINT64 *)PropertyPtr->Data));
+            CurSize = Fdt64ToCpu (ReadUnaligned64 ((UINT64 *)(PropertyPtr->Data) + 1));
 
-        DEBUG ((
-          DEBUG_INFO,
-          "%a: System RAM @ 0x%lx - 0x%lx\n",
-          __FUNCTION__,
-          CurBase,
-          CurBase + CurSize - 1
-          ));
+            DEBUG ((
+              DEBUG_INFO,
+              "%a: System RAM @ 0x%lx - 0x%lx\n",
+              __FUNCTION__,
+              CurBase,
+              CurBase + CurSize - 1
+              ));
 
-        if ((NewBase > CurBase) || (NewBase == 0)) {
-          NewBase = CurBase;
-          NewSize = CurSize;
+            if ((NewBase > CurBase) || (NewBase == 0)) {
+              NewBase = CurBase;
+              NewSize = CurSize;
+            }
+          }
+        } else {
+          DEBUG ((
+            DEBUG_ERROR,
+            "%a: Failed to parse FDT memory node\n",
+            __FUNCTION__
+            ));
         }
-      } else {
-        DEBUG ((
-          DEBUG_ERROR,
-          "%a: Failed to parse FDT memory node\n",
-          __FUNCTION__
-          ));
       }
     }
   }
 
-  FdtSize = fdt_totalsize (DeviceTreeBase) + PcdGet32 (PcdDeviceTreeAllocationPadding);
+  FdtSize = FdtTotalSize (DeviceTreeBase) + PcdGet32 (PcdDeviceTreeAllocationPadding);
 
   // Create a memory allocation HOB for the device tree blob
   BuildMemoryAllocationHob (
@@ -278,7 +283,7 @@ ArmPlatformGetVirtualMemoryMap (
                          );
 
   if (VirtualMemoryTable == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Error: Failed AllocatePool()\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Error: Failed AllocatePool()\n", __func__));
     return;
   }
 
@@ -300,7 +305,7 @@ ArmPlatformGetVirtualMemoryMap (
     "\tPhysicalBase: 0x%lX\n"
     "\tVirtualBase: 0x%lX\n"
     "\tLength: 0x%lX\n",
-    __FUNCTION__,
+    __func__,
     VirtualMemoryTable[0].PhysicalBase,
     VirtualMemoryTable[0].VirtualBase,
     VirtualMemoryTable[0].Length

@@ -19,7 +19,6 @@
 #include <Library/PcdLib.h>
 #include <Library/SerialPortLib.h>
 #include <Library/TimerLib.h>
-#include <libfdt.h>
 
 /** Returns whether the specified processor is present or not.
 
