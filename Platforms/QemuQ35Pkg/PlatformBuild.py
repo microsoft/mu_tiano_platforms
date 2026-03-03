@@ -283,10 +283,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
     def SetPlatformEnv(self):
         logging.debug("PlatformBuilder SetPlatformEnv")
         self.env.SetValue("PRODUCT_NAME", "QemuQ35", "Platform Hardcoded")
-        self.env.SetValue("EMPTY_DRIVE", "FALSE", "Default to false")
-        self.env.SetValue("RUN_TESTS", "FALSE", "Default to false")
         self.env.SetValue("QEMU_HEADLESS", "FALSE", "Default to false")
-        self.env.SetValue("SHUTDOWN_AFTER_RUN", "FALSE", "Default to false")
         # needed to make FV size build report happy
         self.env.SetValue("BLD_*_BUILDID_STRING", "Unknown", "Default")
         # Default turn on build reporting.
@@ -325,6 +322,19 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             self.env.SetValue("VIRTUAL_DRIVE_PATH", Path(self.env.GetValue("BUILD_OUTPUT_BASE"), "VirtualDrive.img"), "Platform Hardcoded.")
 
         return 0
+
+    def SetPlatformDefaultEnv(self) -> list:
+        """Sets platform default environment variables whose purpose is printed when using -h or --help"""
+        from collections import namedtuple
+        Env = namedtuple('Env', ['name', 'default', 'description'])
+
+        return [
+            Env("FILE_REGEX", "", "Comma delimited list of regexes for files to be included in the shell."),
+            Env("RUN_TESTS", "FALSE", "Treats any files specified via FILE_REGEX as tests, running them and reporting JUNIT results."),
+            Env("STARTUP_NSH", "", "UEFI Shell Startup script to run if specified (Not compatible with `RUN_TESTS==TRUE`)."),
+            Env("EMPTY_DRIVE", "FALSE", "Whether to empty the virtual drive used by the shell before running."),
+            Env("SHUTDOWN_AFTER_RUN", "FALSE", "Whether or not to shutdown after the startup nsh runs."),
+        ]
 
     def PlatformPreBuild(self):
         # Here we build the secure policy blob for build system to use and add into the targeted FV
@@ -378,18 +388,23 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         return
 
     def FlashRomImage(self):
+        # Values with defaults specified via `SetPlatformDefaultEnv`
         run_tests = (self.env.GetValue("RUN_TESTS", "FALSE").upper() == "TRUE")
+        shutdown_after_run = (self.env.GetValue("SHUTDOWN_AFTER_RUN").upper() == "TRUE")
+        empty_drive = (self.env.GetValue("EMPTY_DRIVE").upper() == "TRUE")
+        file_regex = self.env.GetValue("FILE_REGEX")
+        startup_nsh = self.env.GetValue("STARTUP_NSH")
+
+        # Other configurable values
         output_base = self.env.GetValue("BUILD_OUTPUT_BASE")
-        shutdown_after_run = (self.env.GetValue("SHUTDOWN_AFTER_RUN", "FALSE").upper() == "TRUE")
-        empty_drive = (self.env.GetValue("EMPTY_DRIVE", "FALSE").upper() == "TRUE")
-        test_regex = self.env.GetValue("TEST_REGEX", "")
         drive_path = self.env.GetValue("VIRTUAL_DRIVE_PATH")
+        drive_size = int(self.env.GetValue("VIRTUAL_DRIVE_SIZE", 60))
         run_paging_audit = False
 
         # General debugging information for users
         if run_tests:
-            if test_regex == "":
-                logging.warning("Running tests, but no Tests specified. use TEST_REGEX to specify tests to run.")
+            if not file_regex:
+                logging.warning("Running tests, but no Tests specified. use FILE_REGEX to specify files to run.")
 
             if not empty_drive:
                 logging.info("EMPTY_DRIVE=FALSE. Old files can persist, could effect test results.")
@@ -401,25 +416,34 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         # Helper located at QemuPkg/Plugins/VirtualDriveManager
         virtual_drive = self.Helper.get_virtual_drive(drive_path)
         if empty_drive:
-            virtual_drive.wipe()
+            virtual_drive.wipe(drive_size)
 
         if not virtual_drive.exists():
-            virtual_drive.make_drive()
+            virtual_drive.make_drive(drive_size)
 
-        # Add tests if requested, auto run if requested
-        # Creates a startup script with the requested tests
-        test_list = []
-        if test_regex != "":
-            for pattern in test_regex.split(","):
-                test_list.extend(Path(output_base, "X64").glob(pattern))
+        # Glob files if requested
+        file_list = []
+        if file_regex:
+            for pattern in file_regex.split(","):
+                file_list.extend(Path(output_base, "X64").glob(pattern))
 
-            if any("DxePagingAuditTestApp.efi" in os.path.basename(test) for test in test_list):
+       # If running tests, add the files and auto-generate a startup nsh
+        if run_tests:
+            if any("DxePagingAuditTestApp.efi" in os.path.basename(test) for test in file_list):
                 run_paging_audit = True
 
-            self.Helper.add_tests(virtual_drive, test_list, auto_run = run_tests, auto_shutdown = shutdown_after_run, paging_audit = run_paging_audit)
-        # Otherwise add an empty startup script
+            self.Helper.add_tests(virtual_drive, file_list, auto_run = run_tests, auto_shutdown = shutdown_after_run, paging_audit = run_paging_audit)
+
+        # if a startup nsh was specified, insert files and startup script
+        elif startup_nsh:
+            lines = Path(startup_nsh).read_text().splitlines()
+            virtual_drive.add_startup_script(lines, auto_shutdown=shutdown_after_run)
+            [virtual_drive.add_file(file) for file in file_list]
+
+        # Otherwise just add the files and add an empty startup script (possibly shutdown after run)
         else:
             virtual_drive.add_startup_script([], auto_shutdown=shutdown_after_run)
+            [virtual_drive.add_file(file) for file in file_list]
 
         # Get the version number (repo release)
         outstream = StringIO()
@@ -457,8 +481,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             self.Helper.generate_paging_audit (virtual_drive, Path(drive_path).parent / "unit_test_results", self.env.GetValue("VERSION"), "Q35")
 
         # Filter out tests that are exempt
-        tests = list(filter(lambda file: file.name not in FET or not (now - FET.get(file.name)).total_seconds() < FEOL, test_list))
-        tests_exempt = list(filter(lambda file: file.name in FET and (now - FET.get(file.name)).total_seconds() < FEOL, test_list))
+        tests = list(filter(lambda file: file.name not in FET or not (now - FET.get(file.name)).total_seconds() < FEOL, file_list))
+        tests_exempt = list(filter(lambda file: file.name in FET and (now - FET.get(file.name)).total_seconds() < FEOL, file_list))
         if len(tests_exempt) > 0:
             self.Helper.report_results(virtual_drive, tests_exempt, Path(drive_path).parent / "unit_test_results")
         # Helper located at QemuPkg/Plugins/VirtualDriveManager
