@@ -247,7 +247,8 @@ MmControlPeiEntryPoint (
   //
   // QEMU can inject SMIs in different ways, negotiate our preferences.
   //
-  NegotiateSmiFeatures ();
+  BOOLEAN NegotiationSuccessful = NegotiateSmiFeatures ();
+  ASSERT (NegotiationSuccessful);
 
   //
   // We have no pointers to convert to virtual addresses. The handle itself
