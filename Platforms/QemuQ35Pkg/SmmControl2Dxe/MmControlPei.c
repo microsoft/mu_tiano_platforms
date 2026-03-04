@@ -247,7 +247,7 @@ MmControlPeiEntryPoint (
   //
   // QEMU can inject SMIs in different ways, negotiate our preferences.
   //
-  BOOLEAN NegotiationSuccessful = NegotiateSmiFeatures ();
+  BOOLEAN  NegotiationSuccessful = NegotiateSmiFeatures ();
 
   ASSERT (NegotiationSuccessful);
 
