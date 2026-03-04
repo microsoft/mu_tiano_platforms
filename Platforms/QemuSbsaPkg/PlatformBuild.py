@@ -39,6 +39,8 @@ FAILURE_EXEMPT_TESTS = {
 # Allow failure exempt tests to be ignored for 90 days
 FAILURE_EXEMPT_OMISSION_LENGTH = 90*24*60*60
 
+DXE_PAGING_AUDIT_BIN_NAME = "DxePagingAuditTestApp.efi"
+
     # ####################################################################################### #
     #                                Common Configuration                                     #
     # ####################################################################################### #
@@ -966,7 +968,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
        # If running tests, add the files and auto-generate a startup nsh
         if run_tests:
-            if any("DxePagingAuditTestApp.efi" in os.path.basename(test) for test in file_list):
+            if any(DXE_PAGING_AUDIT_BIN_NAME in os.path.basename(test) for test in file_list):
                 run_paging_audit = True
 
             self.Helper.add_tests(virtual_drive, file_list, auto_run = run_tests, auto_shutdown = shutdown_after_run, paging_audit = run_paging_audit)
