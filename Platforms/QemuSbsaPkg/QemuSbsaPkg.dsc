@@ -765,6 +765,9 @@
   # may eat console input if let poll on it. If BLD_*_DXE_DBG_BRK is set to TRUE, then the debugger will break in on
   # initialization. Otherwise, the debugger will not break in on initialization.
   DebuggerFeaturePkgTokenSpaceGuid.PcdDebugConfigFlags|0
+!if $(DXE_DBG_BRK) == TRUE
+  DebuggerFeaturePkgTokenSpaceGuid.PcdForceEnableDebugger|TRUE
+!endif
 
   # Set the debugger timeout to wait forever. This only takes effect if Bit 0 of PcdDebugConfigFlags is set
   # to 1, which by default it is not. Using BLD_*_DXE_DBG_BRK=TRUE will set this to 1.
