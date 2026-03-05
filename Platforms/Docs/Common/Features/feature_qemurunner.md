@@ -24,18 +24,18 @@ By default graphics will be used but in some server/remote scenarios headless is
 **TRUE**:   configure QEMU to run headless or with no graphics  
 **FALSE**:  configure QEMU for local graphics (default)
 
-### TEST_REGEX
+### FILE_REGEX
 
-Comma separated regular expressions to configure the plugin on how to identify a UEFI shell based
-unit test. If one is provided and the user is on a Windows OS, all tests found with the regular
-expressions will be added to the virtual drive
+Comma separated regular expressions to configure the plugin on how to identify a file to
+automatically move to the provided virtual drive. If `RUN_TEST=TRUE`, then these files will be
+treated as UEFI shell based unit test.
 
-Example: `TEST_REGEX=MyTestOne.efi,*UefiShellApp.efi`
+Example: `FILE_REGEX=MyTestOne.efi,*UefiShellApp.efi`
 
 ### RUN_TESTS
 
 Boolean string value to indicate the plugin should write all shell-based unit tests located with
-`TEST_REGEX` to `startup.nsh`.This startup.nsh is a special file that executes when the UEFI shell
+`FILE_REGEX` to `startup.nsh`.This startup.nsh is a special file that executes when the UEFI shell
 loads. See UEFI shell specification for more details. Unless `SHUTDOWN_AFTER_RUN=FALSE` is also passed,
 QEMU will shutdown after executing to parse and display the XML based results.
 
@@ -45,7 +45,7 @@ QEMU will shutdown after executing to parse and display the XML based results.
 ### SHUTDOWN_AFTER_RUN
 
 Boolean string value to indicate that QEMU should be shutdown once it has finished running. The
-system is finished running when it has booted to shell or all unit tests specified by `TEST_REGEX`
+system is finished running when it has booted to shell or all unit tests specified by `FILE_REGEX`
 and added to the `startup.nsh` script with `RUN_TESTS=TRUE` have finished execution.
 
 **TRUE**:   The system will automaticaly shutdown after booting to shell or running all unit tests  
