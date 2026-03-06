@@ -559,8 +559,6 @@ READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
-  INF FfaFeaturePkg/SecurePartitions/MsSecurePartition/MsSecurePartition.inf
-
 ################################################################################
 #
 # Rules are use with the [FV] section's module INF type to define
