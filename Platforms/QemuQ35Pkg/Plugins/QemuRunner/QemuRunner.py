@@ -164,7 +164,13 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
         # If DFCI_VAR_STORE is enabled, don't enable the Virtual Drive
         dfci_var_store = env.GetValue("DFCI_VAR_STORE")
-        if dfci_var_store is None:
+        pxe_boot_file = env.GetValue("PXE_BOOT_FILE")
+
+        # Auto-enable alternate boot for PXE so the firmware uses the
+        # USB -> PXE4 -> PXE6 -> HDD sequence instead of normal boot order.
+        if pxe_boot_file is not None and not boot_selection:
+            boot_selection += ",version=Vol-"
+        if dfci_var_store is None and pxe_boot_file is None:
             # Mount disk with startup.nsh
             if os.path.isfile(VirtualDrive):
                 args += f" -drive file={VirtualDrive},if=virtio"
@@ -180,9 +186,19 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
                 # forward ports for robotframework 8270 and 8271
                 args += ",hostfwd=tcp::8270-:8270,hostfwd=tcp::8271-:8271"
 
-            if boot_to_front_page is None:
+            if pxe_boot_file is not None:
+                pxe_boot_path = Path(pxe_boot_file).resolve()
+                pxe_tftp_root = str(pxe_boot_path.parent)
+                pxe_file_name = pxe_boot_path.name
+                args += f",tftp={pxe_tftp_root},bootfile={pxe_file_name}"
+                logging.log(logging.INFO, f"PXE boot enabled: tftp={pxe_tftp_root}, bootfile={pxe_file_name}")
+
+            if pxe_boot_file is not None:
+                # PXE boot requires virtio-net-pci (firmware has VirtioNetDxe built in)
+                args += " -device virtio-net-pci,netdev=net0"
+            elif boot_to_front_page is None:
                 # Booting to Windows, use a PCI nic
-                args += " -device e1000,netdev=net0"
+                args += " -device e1000e,netdev=net0"
             else:
                 # Booting to UEFI, use virtio-net-pci
                 args += " -device virtio-net-pci,netdev=net0"
