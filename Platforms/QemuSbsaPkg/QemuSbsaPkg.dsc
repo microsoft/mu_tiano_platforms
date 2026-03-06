@@ -1356,25 +1356,6 @@
   # FF-A test application to test the FF-A interface
   FfaFeaturePkg/Applications/FfaPartitionTest/FfaPartitionTestApp.inf
 
-  # Test secure partition
-  FfaFeaturePkg/SecurePartitions/MsSecurePartition/MsSecurePartition.inf {
-    <LibraryClasses>
-      NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
-      MemoryAllocationLib|MdeModulePkg/Library/BaseMemoryAllocationLibNull/BaseMemoryAllocationLibNull.inf
-      StandaloneMmCoreEntryPoint|FfaFeaturePkg/Library/SecurePartitionEntryPoint/SecurePartitionEntryPoint.inf
-      Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpmStandaloneMm.inf
-      ArmFfaLib|MdeModulePkg/Library/ArmFfaLib/ArmFfaLibBase.inf
-!if $(TPM2_ENABLE) == TRUE
-      NULL|FfaFeaturePkg/Library/TpmServiceLib/TpmServiceLib.inf
-      TpmServiceStateTranslationLib|FfaFeaturePkg/Library/TpmServiceStateTranslationLib/TpmServiceStateTranslationLib.inf
-!endif
-    <PcdsFixedAtBuild>
-      gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60030000
-      gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x60120000
-      gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
-    <PcdsPatchableInModule>
-      gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc|FALSE
-  }
 
 ###################################################################################################
 #
