@@ -501,8 +501,12 @@ INF  MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
 INF  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
 INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
 
-  !include $(SHARED_CRYPTO_PATH)/Driver/Bin/CryptoDriver.DXE.inc.fdf
-  !include $(SHARED_CRYPTO_PATH)/Driver/Bin/CryptoDriver.STANDALONEMM_MMSUPV.inc.fdf
+#
+# OneCrypto Drivers
+#
+INF $(ONE_CRYPTO_PATH)/$(TARGET)/$(ARCH)/OneCryptoBin/OneCryptoBinSupvMm.inf
+INF $(ONE_CRYPTO_PATH)/$(TARGET)/$(ARCH)/OneCryptoLoaders/OneCryptoLoaderDxe.inf
+INF $(ONE_CRYPTO_PATH)/$(TARGET)/$(ARCH)/OneCryptoLoaders/OneCryptoLoaderSupvMm.inf
 
 !if $(BUILD_UNIT_TESTS) == TRUE
   # INF UefiTestingPkg/FunctionalSystemTests/SmmPagingProtectionsTest/Smm/SmmPagingProtectionsTestStandaloneMm.inf # NOT YET SUPPORTED

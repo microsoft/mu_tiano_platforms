@@ -244,8 +244,11 @@ READ_LOCK_STATUS   = TRUE
   INF UefiTestingPkg/FunctionalSystemTests/MpManagement/Driver/MpManagement.inf
   INF UefiTestingPkg/FunctionalSystemTests/MpManagement/App/MpManagementTestApp.inf
 
-  !include $(SHARED_CRYPTO_PATH)/Driver/Bin/CryptoDriver.DXE.inc.fdf
-
+  #
+  # OneCrypto DXE Driver
+  #
+  INF $(ONE_CRYPTO_PATH)/$(TARGET)/$(ARCH)/OneCryptoLoaders/OneCryptoLoaderDxe.inf
+  INF $(ONE_CRYPTO_PATH)/$(TARGET)/$(ARCH)/OneCryptoBin/OneCryptoBinDxe.inf
   #
   # Multiple Console IO support
   #
@@ -532,7 +535,13 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
   INF StandaloneMmPkg/Core/StandaloneMmCore.inf
-  !include $(SHARED_CRYPTO_PATH)/Driver/Bin/CryptoDriver.STANDALONEMM.inc.fdf
+
+  #
+  # OneCrypto StandaloneMM Drivers
+  #
+  INF $(ONE_CRYPTO_PATH)/$(TARGET)/$(ARCH)/OneCryptoLoaders/OneCryptoLoaderStandaloneMm.inf
+  INF $(ONE_CRYPTO_PATH)/$(TARGET)/$(ARCH)/OneCryptoBin/OneCryptoBinStandaloneMm.inf
+
   INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteStandaloneMm.inf
   INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStandaloneMm.inf
   INF QemuSbsaPkg/VirtNorFlashStandaloneMm/VirtNorFlashStandaloneMm.inf
