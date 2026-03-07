@@ -173,11 +173,6 @@ MdeModulePkg/Universal/Variable/RuntimeDxe/RuntimeDxeUnitTest/VariableRuntimeDxe
     # SCT tests are noisy, so disable VERBOSE.
     gUnitTestFrameworkPkgTokenSpaceGuid.PcdUnitTestLogLevel|0x00000007
 }
-AdvLoggerPkg/Library/AdvancedLoggerLib/PeiCore/GoogleTest/AdvancedLoggerPeiCoreGoogleTest.inf {
-  <LibraryClasses>
-    AdvancedLoggerHdwPortLib|AdvLoggerPkg/Test/Mock/Library/GoogleTest/MockAdvancedLoggerHdwPortLib/MockAdvancedLoggerHdwPortLib.inf
-    PeiServicesLib|MdePkg/Test/Mock/Library/GoogleTest/MockPeiServicesLib/MockPeiServicesLib.inf
-}
 AdvLoggerPkg/Library/AdvancedLoggerLib/Pei/GoogleTest/AdvancedLoggerPeiLibGoogleTest.inf {
   <LibraryClasses>
     AdvancedLoggerHdwPortLib|AdvLoggerPkg/Test/Mock/Library/GoogleTest/MockAdvancedLoggerHdwPortLib/MockAdvancedLoggerHdwPortLib.inf
