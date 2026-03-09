@@ -1350,7 +1350,6 @@
   # FF-A test application to test the FF-A interface
   FfaFeaturePkg/Applications/FfaPartitionTest/FfaPartitionTestApp.inf
 
-
 ###################################################################################################
 #
 # BuildOptions Section - Define the module specific tool chain flags that should be used as
