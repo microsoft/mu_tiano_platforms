@@ -782,7 +782,7 @@
   # Network Pcds
   #
 !include NetworkPkg/NetworkFixedPcds.dsc.inc
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackSize|0x4000
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackSize|0x8000
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode|0x00
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout|1000000
 
