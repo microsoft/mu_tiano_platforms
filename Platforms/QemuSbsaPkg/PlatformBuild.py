@@ -695,6 +695,11 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         if dest_dir.exists():
             shutil.rmtree(dest_dir)
 
+        ret = RunCmd("git", "submodule update --init", workingdir=Path(self.GetWorkspaceRoot() / "Silicon/Arm/HAF/"))
+        if ret != 0:
+            logging.error("Failed to hydrate HAF submodule")
+            return ret
+
         # Copy the mu directory and its contents
         logging.info("Copying mu directory to Silicon/Arm/HAF/project")
         shutil.copytree(src_dir, dest_dir)
