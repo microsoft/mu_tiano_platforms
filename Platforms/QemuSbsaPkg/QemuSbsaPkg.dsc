@@ -239,7 +239,7 @@
 
   # Base ARM libraries
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
-  ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
+  ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
   MmuLib|ArmPkg/Library/MmuLib/BaseMmuLib.inf
   ArmSvcLib|MdePkg/Library/ArmSvcLib/ArmSvcLib.inf
 
@@ -355,6 +355,7 @@
   TpmMeasurementLib       |MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
   Tcg2PhysicalPresenceLib |QemuPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2PhysicalPresenceLib.inf
   Tpm2HelpLib             |SecurityPkg/Library/Tpm2HelpLib/Tpm2HelpLib.inf
+  Tpm2StartupLib          |SecurityPkg/Library/Tpm2StartupLibNull/Tpm2StartupLibNull.inf
 !if $(TPM2_ENABLE) == TRUE
   Tcg2PhysicalPresenceLib |SecurityPkg/Library/DxeTcg2PhysicalPresenceMinimumLib/DxeTcg2PhysicalPresenceMinimumLib.inf
   TpmMeasurementLib       |SecurityPkg/Library/DxeTpmMeasurementLib/DxeTpmMeasurementLib.inf
@@ -399,10 +400,19 @@
 
   PlatformPeiLib|ArmPlatformPkg/PlatformPei/PlatformPeiLib.inf
   MemoryInitPeiLib|ArmPlatformPkg/MemoryInitPei/MemoryInitPeiLib.inf
-  ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuPeiLib.inf
   PrePiHobListPointerLib|ArmPlatformPkg/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf
   PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
   ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
+
+  ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
+  ArmFfaLib|MdeModulePkg/Library/ArmFfaLib/ArmFfaSecLib.inf
+  Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibFfa/Tpm2DeviceSecLibFfa.inf
+  HashLib|SecurityPkg/Library/HashLibTpm2/HashLibTpm2PeilessSecLib.inf
+  PeilessSecMeasureLib|SecurityPkg/Library/PeilessSecMeasureLib/PeilessSecMeasureLibNull.inf
+
+!if $(TPM2_ENABLE) == TRUE
+  Tpm2StartupLib|SecurityPkg/Library/Tpm2StartupLib/Tpm2StartupLib.inf
+!endif
 
 [LibraryClasses.common.DXE_CORE]
   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
@@ -528,7 +538,6 @@
   ## If TRUE, Graphics Output Protocol will be installed on virtual handle created by ConsplitterDxe.
   #  It could be set FALSE to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|FALSE
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
 
@@ -586,19 +595,9 @@
   #
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0x40
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS|0x28
-!if $(TOOL_CHAIN_TAG) == GCC5     # This is really odd on why CLANGPDB has runtime memory consumption differences
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x505
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x258
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0x260
-!else
-!if $(TARGET) == RELEASE
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x505
-!else
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x30
-!endif
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x40
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0x300
-!endif
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesCode|0x5DC
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesData|0x2EE0
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderCode|0x14
@@ -623,10 +622,6 @@
   gPcBdsPkgTokenSpaceGuid.PcdLowResolutionInternalShell|FALSE
   gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedFileLoggerFlush|0x03
   gMsGraphicsPkgTokenSpaceGuid.PcdMsGopOverrideProtocolGuid|{0xF5, 0x3B, 0x5E, 0xAA, 0x8A, 0x81, 0x2D, 0x41, 0xA1, 0x8E, 0xD8, 0x79, 0x3B, 0xA0, 0x3A, 0x5C}
-
-!if $(ARCH) == AARCH64
-  gArmTokenSpaceGuid.PcdVFPEnabled|1
-!endif
 
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x1000007c000
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x10000
@@ -774,6 +769,9 @@
   # may eat console input if let poll on it. If BLD_*_DXE_DBG_BRK is set to TRUE, then the debugger will break in on
   # initialization. Otherwise, the debugger will not break in on initialization.
   DebuggerFeaturePkgTokenSpaceGuid.PcdDebugConfigFlags|0
+!if $(DXE_DBG_BRK) == TRUE
+  DebuggerFeaturePkgTokenSpaceGuid.PcdForceEnableDebugger|TRUE
+!endif
 
   # Set the debugger timeout to wait forever. This only takes effect if Bit 0 of PcdDebugConfigFlags is set
   # to 1, which by default it is not. Using BLD_*_DXE_DBG_BRK=TRUE will set this to 1.
@@ -1330,7 +1328,7 @@
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStandaloneMm.inf {
     <LibraryClasses>
       AdvLoggerAccessLib|MdeModulePkg/Library/AdvLoggerAccessLibNull/AdvLoggerAccessLib.inf
-      DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibStandaloneMm.inf
+      DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibBase.inf
       NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
       NULL|MdeModulePkg/Library/VarCheckPolicyLib/VarCheckPolicyLibStandaloneMm.inf
       BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
@@ -1355,26 +1353,6 @@
 
   # FF-A test application to test the FF-A interface
   FfaFeaturePkg/Applications/FfaPartitionTest/FfaPartitionTestApp.inf
-
-  # Test secure partition
-  FfaFeaturePkg/SecurePartitions/MsSecurePartition/MsSecurePartition.inf {
-    <LibraryClasses>
-      NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
-      MemoryAllocationLib|MdeModulePkg/Library/BaseMemoryAllocationLibNull/BaseMemoryAllocationLibNull.inf
-      StandaloneMmCoreEntryPoint|FfaFeaturePkg/Library/SecurePartitionEntryPoint/SecurePartitionEntryPoint.inf
-      Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpmStandaloneMm.inf
-      ArmFfaLib|MdeModulePkg/Library/ArmFfaLib/ArmFfaLibBase.inf
-!if $(TPM2_ENABLE) == TRUE
-      NULL|FfaFeaturePkg/Library/TpmServiceLib/TpmServiceLib.inf
-      TpmServiceStateTranslationLib|FfaFeaturePkg/Library/TpmServiceStateTranslationLib/TpmServiceStateTranslationLib.inf
-!endif
-    <PcdsFixedAtBuild>
-      gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60030000
-      gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x60120000
-      gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
-    <PcdsPatchableInModule>
-      gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc|FALSE
-  }
 
 ###################################################################################################
 #
@@ -1412,11 +1390,13 @@
 
 [BuildOptions.common.EDKII.DXE_CORE,BuildOptions.common.EDKII.DXE_DRIVER,BuildOptions.common.EDKII.UEFI_DRIVER,BuildOptions.common.EDKII.UEFI_APPLICATION,BuildOptions.common.EDKII.MM_CORE_STANDALONE,BuildOptions.common.EDKII.MM_STANDALONE]
   GCC:*_GCC5_*_DLINK_FLAGS = -z common-page-size=0x1000
+  GCC:*_GCC_*_DLINK_FLAGS = -z common-page-size=0x1000
   GCC:*_CLANGPDB_*_DLINK_FLAGS = /ALIGN:0x1000
   GCC:*_*_*_DLINK_XIPFLAGS = -z common-page-size=0x1000
 
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_GCC5_AARCH64_DLINK_FLAGS = -z common-page-size=0x10000
+  GCC:*_GCC_AARCH64_DLINK_FLAGS = -z common-page-size=0x10000
   GCC:*_CLANGPDB_AARCH64_DLINK_FLAGS = /ALIGN:0x10000
   RVCT:*_*_ARM_DLINK_FLAGS = --scatter $(EDK_TOOLS_PATH)/Scripts/Rvct-Align4K.sct
 

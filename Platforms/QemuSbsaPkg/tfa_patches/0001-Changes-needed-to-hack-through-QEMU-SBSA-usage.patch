@@ -26,7 +26,7 @@ new file mode 100644
 index 000000000..8ff3ae203
 --- /dev/null
 +++ b/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_spmc_sp_manifest.dts
-@@ -0,0 +1,136 @@
+@@ -0,0 +1,128 @@
 +/*
 + * Copyright (c) 2022, Arm Limited. All rights reserved.
 + *
@@ -65,16 +65,8 @@ index 000000000..8ff3ae203
 +       vcpu_count = <1>;
 +       mem_size = <0x0 0x300000>;
 +     };
-+     /* Example Service */
-+     vm2 {
-+       is_ffa_partition;
-+       load_address = <0x0 0x20400000>;
-+       debug_name = "mssp";
-+       vcpu_count = <1>;
-+       mem_size = <0x400000>;
-+     };
 +     /* Example Rust Service */
-+     vm3 {
++     vm2 {
 +       is_ffa_partition;
 +       load_address = <0x0 0x20800000>;
 +       debug_name = "mssp-rust";
@@ -168,7 +160,7 @@ new file mode 100644
 index 000000000..5b655c37a
 --- /dev/null
 +++ b/plat/qemu/qemu_sbsa/fdts/qemu_sbsa_tb_fw_config.dts
-@@ -0,0 +1,47 @@
+@@ -0,0 +1,42 @@
 +/*
 + * Copyright (c) 2022, ARM Limited and Contributors. All rights reserved.
 + *
@@ -202,11 +194,6 @@ index 000000000..5b655c37a
 +     stmm {
 +      uuid = "eaba83d8-baaf-4eaf-8144-f7fdcbe544a7";
 +      load-address = <0x20002000>;
-+      owner = "Plat";
-+    };
-+    example {
-+      uuid = "b8bcbd0c-8e8f-4ebe-99eb-3cbbdd0cd412";
-+      load-address = <0x20400000>;
 +      owner = "Plat";
 +    };
 +    example_rust {
