@@ -545,18 +545,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
                 "owner": "Plat",
                 "size": "0x300000"
             },
-            "mssp": {
-                "image": {
-                    "file": str(op_fv / "BL32_AP_MS_SP.fd"),
-                    "offset": "0x10000"
-                },
-                "pm": {
-                    "file": str(Path(__file__).parent / "fdts/qemu_sbsa_mssp_config.dts"),
-                    "offset": "0x1000"
-                },
-                "uuid": "b8bcbd0c-8e8f-4ebe-99eb-3cbbdd0cd412",
-                "owner": "Plat"
-            },
             "mssp-rust": {
                 "image": {
                     "file": str(Path(self.env.GetValue("SECURE_PARTITION_BINARIES")) / "msft-sp.bin"),

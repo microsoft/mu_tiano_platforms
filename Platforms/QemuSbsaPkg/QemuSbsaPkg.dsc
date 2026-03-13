@@ -355,6 +355,7 @@
   TpmMeasurementLib       |MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
   Tcg2PhysicalPresenceLib |QemuPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2PhysicalPresenceLib.inf
   Tpm2HelpLib             |SecurityPkg/Library/Tpm2HelpLib/Tpm2HelpLib.inf
+  Tpm2StartupLib          |SecurityPkg/Library/Tpm2StartupLibNull/Tpm2StartupLibNull.inf
 !if $(TPM2_ENABLE) == TRUE
   Tcg2PhysicalPresenceLib |SecurityPkg/Library/DxeTcg2PhysicalPresenceMinimumLib/DxeTcg2PhysicalPresenceMinimumLib.inf
   TpmMeasurementLib       |SecurityPkg/Library/DxeTpmMeasurementLib/DxeTpmMeasurementLib.inf
@@ -409,6 +410,9 @@
   HashLib|SecurityPkg/Library/HashLibTpm2/HashLibTpm2PeilessSecLib.inf
   PeilessSecMeasureLib|SecurityPkg/Library/PeilessSecMeasureLib/PeilessSecMeasureLibNull.inf
 
+!if $(TPM2_ENABLE) == TRUE
+  Tpm2StartupLib|SecurityPkg/Library/Tpm2StartupLib/Tpm2StartupLib.inf
+!endif
 
 [LibraryClasses.common.DXE_CORE]
   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
@@ -1349,7 +1353,6 @@
 
   # FF-A test application to test the FF-A interface
   FfaFeaturePkg/Applications/FfaPartitionTest/FfaPartitionTestApp.inf
-
 
 ###################################################################################################
 #

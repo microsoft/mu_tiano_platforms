@@ -153,17 +153,6 @@ NumBlocks     = 0x0e00
 gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = FV_STANDALONE_MM_COMPACT
 
-[FD.BL32_AP_MS_SP]
-BaseAddress   = 0x20410000|gArmTokenSpaceGuid.PcdFdBaseAddress  # UEFI in DRAM + 128MB.
-Size          = 0x003F0000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the device (64MiB).
-ErasePolarity = 1
-
-BlockSize     = 0x00001000
-NumBlocks     = 0x003F0
-
-0x00000000|0x003F0000
-FV = FV_MS_SECURE_PARTITION
-
 [FD.BL32_AP_MS_SP_RUST]
 BaseAddress   = 0x20800000|gArmTokenSpaceGuid.PcdFdBaseAddress  # UEFI in DRAM + 128MB.
 Size          = 0x00400000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the device (64MiB).
@@ -540,24 +529,6 @@ READ_LOCK_STATUS   = TRUE
 !if $(TPM2_ENABLE) == TRUE
   INF SecurityPkg/Tcg/Tcg2StandaloneMmArm/Tcg2StandaloneMmArm.inf
 !endif
-
-[FV.FV_MS_SECURE_PARTITION]
-FvAlignment        = 16
-ERASE_POLARITY     = 1
-MEMORY_MAPPED      = TRUE
-STICKY_WRITE       = TRUE
-LOCK_CAP           = TRUE
-LOCK_STATUS        = TRUE
-WRITE_DISABLED_CAP = TRUE
-WRITE_ENABLED_CAP  = TRUE
-WRITE_STATUS       = TRUE
-WRITE_LOCK_CAP     = TRUE
-WRITE_LOCK_STATUS  = TRUE
-READ_DISABLED_CAP  = TRUE
-READ_ENABLED_CAP   = TRUE
-READ_STATUS        = TRUE
-READ_LOCK_CAP      = TRUE
-READ_LOCK_STATUS   = TRUE
 
 ################################################################################
 #
