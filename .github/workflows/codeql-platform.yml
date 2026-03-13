@@ -313,6 +313,14 @@ jobs:
       run: |
         subst Z: ${{ github.workspace }}
 
+    - name: Redirect Submodule URLs
+      shell: pwsh
+      run: |
+        git config --global url."https://github.com/TF-Hafnium/hafnium-prebuilts".insteadOf "https://git.trustedfirmware.org/hafnium/prebuilts"
+        git config --global url."https://github.com/TF-Hafnium/hafnium-project-reference".insteadOf "https://git.trustedfirmware.org/hafnium/project/reference"
+        git config --global url."https://github.com/TF-Hafnium/hafnium-third_party-dtc".insteadOf "https://git.trustedfirmware.org/hafnium/third_party/dtc"
+        git config --global url."https://github.com/TF-Hafnium/hafnium-third_party-googletest".insteadOf "https://git.trustedfirmware.org/hafnium/third_party/googletest"
+
     - name: Setup
       if: steps.get_platform_info.outputs.setup_supported == 'true'
       shell: pwsh

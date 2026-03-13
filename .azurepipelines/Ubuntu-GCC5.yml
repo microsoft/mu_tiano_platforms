@@ -29,6 +29,13 @@ extends:
     container_build: true
     os_type: Linux
     rust_build: false
+    extra_steps:
+      - script: |
+          git config --global url."https://github.com/TF-Hafnium/hafnium-prebuilts".insteadOf "https://git.trustedfirmware.org/hafnium/prebuilts"
+          git config --global url."https://github.com/TF-Hafnium/hafnium-project-reference".insteadOf "https://git.trustedfirmware.org/hafnium/project/reference"
+          git config --global url."https://github.com/TF-Hafnium/hafnium-third_party-dtc".insteadOf "https://git.trustedfirmware.org/hafnium/third_party/dtc"
+          git config --global url."https://github.com/TF-Hafnium/hafnium-third_party-googletest".insteadOf "https://git.trustedfirmware.org/hafnium/third_party/googletest"
+        displayName: Redirect Submodule URLs
     extra_cargo_steps:
       - script: pip install -r pip-requirements.txt --upgrade
         displayName: Install and Upgrade pip Modules
