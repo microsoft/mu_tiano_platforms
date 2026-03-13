@@ -15,6 +15,7 @@ from io import StringIO
 from pathlib import Path
 import json
 import shutil
+import git
 
 from edk2toolext.environment import shell_environment
 from edk2toolext.environment.uefi_build import UefiBuilder
@@ -695,11 +696,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         if dest_dir.exists():
             shutil.rmtree(dest_dir)
 
-        ret = RunCmd("git", "submodule update --init", workingdir=(Path(self.GetWorkspaceRoot()) / "Silicon/Arm/HAF/"))
-        if ret != 0:
-            logging.error("Failed to hydrate HAF submodule")
-            return ret
-
         # Copy the mu directory and its contents
         logging.info("Copying mu directory to Silicon/Arm/HAF/project")
         shutil.copytree(src_dir, dest_dir)
@@ -865,6 +861,20 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             return -1
 
         logging.debug(f"Copied all Hafnium and TFA binaries to {output_dir}")
+        return 0
+
+    def PlatformPreBuild(self):
+        if self.env.GetValue("HAF_TFA_BUILD") == "TRUE":
+            haf_repo = git.Repo(Path(self.GetWorkspaceRoot()) / "Silicon/Arm/HAF")
+            try:
+                haf_repo.submodule_update(init=True)
+            except git.GitCommandError as e:
+                logging.error(f"Failed to hydrate HAF submodule: {e}")
+                return -1
+            logging.info("HAF submodule hydrated successfully")
+        else:
+            logging.info("HAF_TFA_BUILD=FALSE, skipping TF-A build and using prebuilt binaries. Make sure to build with HAF_TFA_BUILD=TRUE at least once to generate the necessary fip_blob_manifest.json for patching.")
+
         return 0
 
     def PlatformPostBuild(self):
