@@ -695,7 +695,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         if dest_dir.exists():
             shutil.rmtree(dest_dir)
 
-        ret = RunCmd("git", "submodule update --init", workingdir=Path(self.GetWorkspaceRoot() / "Silicon/Arm/HAF/"))
+        ret = RunCmd("git", "submodule update --init", workingdir=(Path(self.GetWorkspaceRoot()) / "Silicon/Arm/HAF/"))
         if ret != 0:
             logging.error("Failed to hydrate HAF submodule")
             return ret
