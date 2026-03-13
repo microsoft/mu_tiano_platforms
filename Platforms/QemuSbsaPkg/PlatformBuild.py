@@ -118,7 +118,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
             RequiredSubmodule("Common/MU", False, ".pytool/CISettings.py"),
             RequiredSubmodule("Common/MU_OEM_SAMPLE", False, ".pytool/CISettings.py"),
             RequiredSubmodule("Silicon/Arm/TFA", True),
-            RequiredSubmodule("Silicon/Arm/HAF", True),
+            RequiredSubmodule("Silicon/Arm/HAF", False),
             RequiredSubmodule("Features/DEBUGGER", True),
             RequiredSubmodule("Features/DFCI", True),
             RequiredSubmodule("Features/CONFIG", True),
