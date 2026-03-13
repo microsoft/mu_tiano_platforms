@@ -15,6 +15,7 @@ from io import StringIO
 from pathlib import Path
 import json
 import shutil
+import git
 
 from edk2toolext.environment import shell_environment
 from edk2toolext.environment.uefi_build import UefiBuilder
@@ -118,7 +119,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
             RequiredSubmodule("Common/MU", False, ".pytool/CISettings.py"),
             RequiredSubmodule("Common/MU_OEM_SAMPLE", False, ".pytool/CISettings.py"),
             RequiredSubmodule("Silicon/Arm/TFA", True),
-            RequiredSubmodule("Silicon/Arm/HAF", True),
+            RequiredSubmodule("Silicon/Arm/HAF", False),
             RequiredSubmodule("Features/DEBUGGER", True),
             RequiredSubmodule("Features/DFCI", True),
             RequiredSubmodule("Features/CONFIG", True),
@@ -848,6 +849,20 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             return -1
 
         logging.debug(f"Copied all Hafnium and TFA binaries to {output_dir}")
+        return 0
+
+    def PlatformPreBuild(self):
+        if self.env.GetValue("HAF_TFA_BUILD") == "TRUE":
+            haf_repo = git.Repo(Path(self.GetWorkspaceRoot()) / "Silicon/Arm/HAF")
+            try:
+                haf_repo.git.submodule("update", "--init", "--recursive")
+                logging.info("HAF submodule hydrated successfully")
+            except git.GitCommandError as e:
+                logging.error(f"Failed to hydrate HAF submodule: {e}")
+                return -1
+        else:
+            logging.info("HAF_TFA_BUILD=FALSE, skipping TF-A build and using prebuilt binaries. Make sure to build with HAF_TFA_BUILD=TRUE at least once to generate the necessary fip_blob_manifest.json for patching.")
+
         return 0
 
     def PlatformPostBuild(self):
