@@ -89,7 +89,7 @@ stages:
             BuildPackage: QemuSbsaPkg
             BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
             BuildArch: AARCH64
-            BuildFlags: "HAF_TFA_BUILD=TRUE"
+            BuildFlags: ""
             BuildTarget: "DEBUG"
             BuildExtraTag: ""
             BuildExtraStep:
@@ -107,7 +107,7 @@ stages:
             BuildPackage: QemuSbsaPkg
             BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
             BuildArch: AARCH64
-            BuildFlags: "HAF_TFA_BUILD=TRUE"
+            BuildFlags: ""
             BuildTarget: "RELEASE"
             BuildExtraTag: ""
             BuildExtraStep:
