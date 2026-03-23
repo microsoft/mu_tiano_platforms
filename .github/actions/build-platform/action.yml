@@ -1,0 +1,200 @@
+# A callable Github Action to build a QEMU platform firmware that supports the stuart build system.
+#
+##
+# Copyright (c) Microsoft Corporation.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+name: Build QEMU Platform Firmware
+description: Build a QEMU platform firmware using Stuart
+
+inputs:
+  command:
+    description: 'The action to perform: `build`, `flash`, or `all`'
+    required: false
+    default: 'all'
+  platform-config:
+    description: 'Path to the Stuart platform configuration file (.py)'
+    required: true
+  platform-name:
+    description: 'Name of the platform being built (for logging purposes)'
+    required: true
+  target:
+    description: 'Build target (e.g., DEBUG, RELEASE)'
+    required: false
+    default: 'DEBUG'
+  tool-chain:
+    description: 'Tool chain to use (e.g., VS2022, GCC)'
+    required: false
+    default: 'VS2022'
+  architecture:
+    description: 'Target architecture (e.g., X64; ARM64). By default, uses the architectures defined in the platform config.'
+    required: false
+    default: ''
+  stuart-args:
+    description: 'Additional build arguments to pass to stuart_build'
+    required: false
+    default: ''
+  log-identifier:
+    description: 'Extra identifier to append to the log folder name if needed.'
+    required: false
+    default: ''
+  working-directory:
+    description: 'The directory to run the build commands in. By default, the root of the repository.'
+    required: false
+    default: ${{ github.workspace }}
+
+outputs:
+  log-path:
+    description: 'Path to the folder containing the build logs'
+    value: ${{ steps.tempdir.outputs.path}}
+
+runs:
+  using: composite
+
+  steps:
+  - name: Validate command
+    id: validate
+    shell: bash
+    run: |
+      if [[ "${{ inputs.command }}" != "build" && "${{ inputs.command }}" != "flash" && "${{ inputs.command }}" != "all" ]]; then
+        echo "Invalid command: ${{ inputs.command }}. Must be one of: build, flash, all."
+        exit 1
+      fi
+
+  - name: Create Temporary Directory
+    id: tempdir
+    shell: bash
+    run: |
+      LOG_FOLDER_NAME="build-logs"
+      if [ -n "${{ inputs.log-identifier }}" ]; then
+        LOG_FOLDER_NAME="${LOG_FOLDER_NAME}-${{ inputs.log-identifier }}"
+      fi
+      mkdir -p "$RUNNER_TEMP"/$LOG_FOLDER_NAME
+      echo "path="$RUNNER_TEMP"/$LOG_FOLDER_NAME" >> $GITHUB_OUTPUT
+
+  # Cannot use ENV in a composite action, so lets create our reusable argument string here
+  - name: Setup Total Stuart arguments
+    id: stuart
+    shell: bash
+    run: |
+      ARGS="TARGET=${{ inputs.target }} TOOL_CHAIN_TAG=${{ inputs.tool-chain }} ${{ inputs.stuart-args }}"
+      echo "arguments=$ARGS" >> $GITHUB_OUTPUT
+
+  # Create a cache key based on the submodule hashes to speed up repeated builds
+  - name: Gather submodule hashes
+    id: submodules-hash
+    shell: bash
+    run: |
+      HASH=$(git submodule foreach --quiet 'echo $sha1' | sha256sum | awk '{print $1}')
+      echo "hash=$HASH" >> $GITHUB_OUTPUT
+    working-directory: ${{ inputs.working-directory }}
+
+  # Use the cache key to attempt to restore cached submodules
+  - name: Cache submodules
+    if: ${{ inputs.command == 'all' || inputs.command == 'build' }}
+    uses: actions/cache@v4
+    with:
+      path: .git/modules
+      key: ${{ runner.os }}-${{ inputs.platform-name }}-submodules-${{ steps.submodules-hash.outputs.hash}}
+
+  # Stuart setup should be slightly faster if we were able to restore the cache to .git/modules
+  - name: Download required submodules (stuart_setup)
+    if: ${{ inputs.command == 'all' || inputs.command == 'build' }}
+    shell: bash
+    run: |
+      stuart_setup -c ${{ inputs.platform-config }} ${{ steps.stuart.outputs.arguments }}
+    working-directory: ${{ inputs.working-directory }}
+
+  - name: Move setup log
+    if: always()
+    shell: bash
+    env:
+      TEMP_DIR: ${{ steps.tempdir.outputs.path }}
+    run: |
+      shopt -s globstar nullglob
+      files=(Build/SETUP*.txt)
+
+      if ((${#files[@]})); then
+        echo "Moving ${#files[@]} log files"
+        mv "${files[@]}" "$TEMP_DIR"
+      else
+        echo "No matching log files found"
+      fi
+    working-directory: ${{ inputs.working-directory }}
+
+  # Download external dependencies
+  - name: Download external dependencies (stuart_update)
+    if: ${{ inputs.command == 'all' || inputs.command == 'build' }}
+    shell: bash
+    run: |
+      stuart_update -c ${{ inputs.platform-config }} ${{ steps.stuart.outputs.arguments }}
+    working-directory: ${{ inputs.working-directory }}
+
+  - name: Move update log
+    if: always()
+    shell: bash
+    env:
+      TEMP_DIR: ${{ steps.tempdir.outputs.path }}
+    run: |
+      shopt -s globstar nullglob
+      files=(Build/UPDATE*.txt)
+
+      if ((${#files[@]})); then
+        echo "Moving ${#files[@]} log files"
+        mv "${files[@]}" "$TEMP_DIR"
+      else
+        echo "No matching log files found"
+      fi
+    working-directory: ${{ inputs.working-directory }}
+
+  # Build the platform, specify architecture if it is not empty
+  - name: Build platform (stuart_build)
+    if: ${{ inputs.command == 'all' || inputs.command == 'build' }}
+    shell: bash
+    run: |
+      stuart_build -c ${{ inputs.platform-config }} ${{ steps.stuart.outputs.arguments }} \
+      $([[ -n "${{ inputs.architecture }}" ]] && echo " -a ${{ inputs.architecture }}")
+    working-directory: ${{ inputs.working-directory }}
+
+  - name: Move build log
+    if: always()
+    shell: bash
+    env:
+      TEMP_DIR: ${{ steps.tempdir.outputs.path }}
+    run: |
+      shopt -s globstar nullglob
+      files=(Build/**/BUILDLOG* Build/**/BUILD_REPORT.TXT Build/**/OVERRIDELOG.TXT)
+
+      if ((${#files[@]})); then
+        echo "Moving ${#files[@]} log files"
+        mv "${files[@]}" "$TEMP_DIR"
+      else
+        echo "No matching log files found"
+      fi
+    working-directory: ${{ inputs.working-directory }}
+
+  - name: Flash platform (stuart_build --FLASHONLY)
+    if: ${{ inputs.command == 'all' || inputs.command == 'flash' }}
+    shell: bash
+    run: |
+      stuart_build -c ${{ inputs.platform-config }} --FLASHONLY ${{ steps.stuart.outputs.arguments }} \
+      $([[ -n "${{ inputs.architecture }}" ]] && echo " -a ${{ inputs.architecture }}")
+    working-directory: ${{ inputs.working-directory }}
+
+  - name: Move run log
+    if: always()
+    shell: bash
+    env:
+      TEMP_DIR: ${{ steps.tempdir.outputs.path }}
+    run: |
+      shopt -s globstar nullglob
+      files=(Build/**/*Run.txt)
+
+      if ((${#files[@]})); then
+        echo "Moving ${#files[@]} log files"
+        mv "${files[@]}" "$TEMP_DIR"
+      else
+        echo "No matching log files found"
+      fi
+    working-directory: ${{ inputs.working-directory }}

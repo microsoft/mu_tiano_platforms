@@ -1,0 +1,166 @@
+# A workflow to build the platform(s) in this repository using certain configurations.
+#
+##
+# Copyright (c) Microsoft Corporation.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+name: "Platform CI"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+
+  # A job to produce the environment constants for this repository, so that the build job can
+  # generate its matrix.
+  vars:
+    name: Get Repository Constants
+    uses: ./.github/workflows/constants.yml
+
+  # Builds the platform(s) in this repository as defined by the matrix.
+  build:
+    name: Build ${{ matrix.platform }} ${{ matrix.target }} ${{ matrix.tool-chain }} (${{ matrix.os }})
+
+    needs: 
+      - vars
+
+    runs-on: ${{ matrix.os }}
+
+    # If matrix.container is not defined, then `image` will be null and no container will be used.
+    container:
+      image: ${{ matrix.container || null }}
+      options: --security-opt seccomp=unconfined
+
+    strategy:
+      # This setting prevents the cancellation of other jobs when one job fails.
+      fail-fast: false
+
+      matrix:
+        target: [DEBUG, RELEASE]
+        tool-chain: [CLANGPDB, VS2022, GCC5]
+        os: [windows-latest, ubuntu-latest]
+        container: ['', '${{ needs.vars.outputs.container-image}}']
+        platform: [Q35, SBSA]
+
+        exclude:
+          # Exclude container builds on Windows
+          - os: windows-latest
+            container: ${{ needs.vars.outputs.container-image }}
+          # Exclude non-container builds on Ubuntu
+          - os: ubuntu-latest
+            container: ''
+          #########################################
+          # Temporary Filters until only CLANGPDB #
+          #########################################
+          # Exclude GCC5 builds on Windows
+          - os: windows-latest
+            tool-chain: GCC5
+          # Exclude VS builds on Ubuntu
+          - os: ubuntu-latest
+            tool-chain: VS2022
+          # Exclude VS SBSA builds
+          - platform: SBSA
+            tool-chain: VS2022
+          ##############################
+          # Temporary Filters for Bugs #
+          ##############################
+          # Exclude CLANGPDB RELEASE builds due to PEI bug
+          - tool-chain: CLANGPDB
+            target: RELEASE
+          # Exclude SBSA CLANG builds due to ldr assembly issue
+          - tool-chain: CLANGPDB
+            platform: SBSA
+
+    steps:
+      # Checkout the repository to the runner or container
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      
+      - name: Set platform config path
+        id: set-config
+        shell: bash
+        run: |
+          case "${{ matrix.platform }}" in
+            Q35)
+              CONFIG_PATH="Platforms/QemuQ35Pkg/PlatformBuild.py"
+              ;;
+            SBSA)
+              CONFIG_PATH="Platforms/QemuSbsaPkg/PlatformBuild.py"
+              ;;
+            *)
+              echo "Unknown platform: ${{ matrix.platform }}"
+              exit 1
+              ;;
+          esac
+
+          echo "path=$CONFIG_PATH" >> "$GITHUB_OUTPUT"
+      
+      # $GITHUB_WORKSPACE is mu_tiano_platforms/mu_tiano_platforms, which results in paths
+      # for certain drivers being too long and resulting in build failures.
+      - name: Create short path alias
+        id: short-path
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          subst S: "$(cygpath -w '${{ github.workspace }}')"
+          echo "short-path=S:" >> $GITHUB_OUTPUT
+
+      # Configure git for use in the container. Specifically needed for the FFA builds
+      - name: Container Configuration
+        if: ${{ matrix.container != null }}
+        run: |
+          git config --global --add safe.directory '*'
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      # Set the version of Python to use when outside of a container. Otherwise just use what's
+      # in the container.
+      - name: Setup Python ${{ needs.vars.outputs.python-version }}
+        if: ${{ matrix.container == null }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ needs.vars.outputs.python-version }}
+          cache: 'pip'
+          cache-dependency-path: 'pip-requirements.txt'
+
+      # Install the pip dependencies needed to run stuart for the platform(s)
+      - name: Install dependencies
+        run: pip install -r pip-requirements.txt
+
+      # Run the build-platform action, which calls stuart_setup, stuart_update, and stuart_build
+      - name: Prepare and Build ${{ matrix.platform }} ${{ matrix.target }} ${{ matrix.tool-chain}}
+        id: build-platform
+        uses: ./.github/actions/build-platform
+        with:
+          command: 'build'
+          platform-config: ${{ steps.set-config.outputs.path }}
+          platform-name: ${{ matrix.platform }}
+          target: ${{ matrix.target }}
+          tool-chain: ${{ matrix.tool-chain }}
+          stuart-args: 'SHUTDOWN_AFTER_RUN=TRUE FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=${{ needs.vars.outputs.qemu-core-count }}'
+          working-directory: ${{ steps.short-path.outputs.short-path || github.workspace }}
+
+      - name: Run ${{ matrix.platform }} ${{ matrix.target }} ${{ matrix.tool-chain}}
+        uses: ./.github/actions/build-platform
+        with:
+          command: 'flash'
+          platform-config: ${{ steps.set-config.outputs.path }}
+          platform-name: ${{ matrix.platform }}
+          target: ${{ matrix.target }}
+          tool-chain: ${{ matrix.tool-chain }}
+          stuart-args: 'SHUTDOWN_AFTER_RUN=TRUE FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=${{ needs.vars.outputs.qemu-core-count }}'
+          working-directory: ${{ steps.short-path.outputs.short-path || github.workspace }}
+
+      - name: Publish Logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-logs-${{ matrix.platform }}-${{ matrix.target }}-${{ matrix.tool-chain }}-${{ matrix.os}}
+          path: ${{ steps.build-platform.outputs.log-path }}
