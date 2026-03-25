@@ -26,7 +26,7 @@ jobs:
 
   # Builds the platform(s) in this repository as defined by the matrix.
   build:
-    name: Build ${{ matrix.platform }} ${{ matrix.target }} ${{ matrix.tool-chain }} (${{ matrix.os }})
+    name: ${{ matrix.platform }} ${{ matrix.architecture }} ${{ matrix.target }} ${{ matrix.tool-chain }} (${{ matrix.os }})
 
     needs: 
       - vars
@@ -48,6 +48,7 @@ jobs:
         os: [windows-latest, ubuntu-latest]
         container: ['', '${{ needs.vars.outputs.container-image}}']
         platform: [Q35, SBSA]
+        architecture: ['', 'IA32,X64']
 
         exclude:
           # Exclude container builds on Windows
@@ -56,6 +57,12 @@ jobs:
           # Exclude non-container builds on Ubuntu
           - os: ubuntu-latest
             container: ''
+          # Exclude SBSA X64 builds since they are not supported
+          - platform: SBSA
+            architecture: X64
+          # Exclude SBSA IA32,X64 builds since they are not supported
+          - platform: SBSA
+            architecture: "IA32,X64"
           #########################################
           # Temporary Filters until only CLANGPDB #
           #########################################
@@ -142,6 +149,7 @@ jobs:
           command: 'build'
           platform-config: ${{ steps.set-config.outputs.path }}
           platform-name: ${{ matrix.platform }}
+          architecture: ${{ matrix.architecture }}
           target: ${{ matrix.target }}
           tool-chain: ${{ matrix.tool-chain }}
           stuart-args: 'SHUTDOWN_AFTER_RUN=TRUE FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=${{ needs.vars.outputs.qemu-core-count }}'
@@ -153,6 +161,7 @@ jobs:
           command: 'flash'
           platform-config: ${{ steps.set-config.outputs.path }}
           platform-name: ${{ matrix.platform }}
+          architecture: ${{ matrix.architecture }}
           target: ${{ matrix.target }}
           tool-chain: ${{ matrix.tool-chain }}
           stuart-args: 'SHUTDOWN_AFTER_RUN=TRUE FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=${{ needs.vars.outputs.qemu-core-count }}'
@@ -162,5 +171,5 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: build-logs-${{ matrix.platform }}-${{ matrix.target }}-${{ matrix.tool-chain }}-${{ matrix.os}}
+          name: build-logs-${{ matrix.platform }}-${{ matrix.architecture }}-${{ matrix.target }}-${{ matrix.tool-chain }}-${{ matrix.os }}
           path: ${{ steps.build-platform.outputs.log-path }}
