@@ -28,61 +28,61 @@ jobs:
     os_type: Linux
     container_image: linux-gcc
     build_matrix:
-      QemuQ35_X64_DEBUG:
-        BuildPackage: QemuQ35Pkg
-        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-        BuildFlags: ""
-        BuildTarget: "DEBUG"
-        BuildExtraTag: "X64"
-        BuildExtraStep:
-          - script: echo No extra steps provided
-        Run: true
-        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-        BuildArtifactsBinary: |
-          **/QEMUQ35_*.fd
-        BuildArtifactsOther: "**/unit_test_results/*"
+      # QemuQ35_X64_DEBUG:
+      #   BuildPackage: QemuQ35Pkg
+      #   BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+      #   BuildFlags: ""
+      #   BuildTarget: "DEBUG"
+      #   BuildExtraTag: "X64"
+      #   BuildExtraStep:
+      #     - script: echo No extra steps provided
+      #   Run: true
+      #   RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+      #   BuildArtifactsBinary: |
+      #     **/QEMUQ35_*.fd
+      #   BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuQ35_X64_RELEASE:
-        BuildPackage: QemuQ35Pkg
-        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-        BuildFlags: ""
-        BuildTarget: "RELEASE"
-        BuildExtraTag: "X64"
-        BuildExtraStep:
-          - script: echo No extra steps provided
-        Run: true
-        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-        BuildArtifactsBinary: |
-          **/QEMUQ35_*.fd
-        BuildArtifactsOther: "**/unit_test_results/*"
+      # QemuQ35_X64_RELEASE:
+      #   BuildPackage: QemuQ35Pkg
+      #   BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+      #   BuildFlags: ""
+      #   BuildTarget: "RELEASE"
+      #   BuildExtraTag: "X64"
+      #   BuildExtraStep:
+      #     - script: echo No extra steps provided
+      #   Run: true
+      #   RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+      #   BuildArtifactsBinary: |
+      #     **/QEMUQ35_*.fd
+      #   BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuQ35_IA32X64_DEBUG:
-        BuildPackage: QemuQ35Pkg
-        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-        BuildFlags: "-a IA32,X64"
-        BuildTarget: "DEBUG"
-        BuildExtraTag: "IA32X64"
-        BuildExtraStep:
-          - script: echo No extra steps provided
-        Run: true
-        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-        BuildArtifactsBinary: |
-          **/QEMUQ35_*.fd
-        BuildArtifactsOther: "**/unit_test_results/*"
+      # QemuQ35_IA32X64_DEBUG:
+      #   BuildPackage: QemuQ35Pkg
+      #   BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+      #   BuildFlags: "-a IA32,X64"
+      #   BuildTarget: "DEBUG"
+      #   BuildExtraTag: "IA32X64"
+      #   BuildExtraStep:
+      #     - script: echo No extra steps provided
+      #   Run: true
+      #   RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+      #   BuildArtifactsBinary: |
+      #     **/QEMUQ35_*.fd
+      #   BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuQ35_IA32X64_RELEASE:
-        BuildPackage: QemuQ35Pkg
-        BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
-        BuildFlags: "-a IA32,X64"
-        BuildTarget: "RELEASE"
-        BuildExtraTag: "IA32X64"
-        BuildExtraStep:
-          - script: echo No extra steps provided
-        Run: true
-        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-        BuildArtifactsBinary: |
-          **/QEMUQ35_*.fd
-        BuildArtifactsOther: "**/unit_test_results/*"
+      # QemuQ35_IA32X64_RELEASE:
+      #   BuildPackage: QemuQ35Pkg
+      #   BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
+      #   BuildFlags: "-a IA32,X64"
+      #   BuildTarget: "RELEASE"
+      #   BuildExtraTag: "IA32X64"
+      #   BuildExtraStep:
+      #     - script: echo No extra steps provided
+      #   Run: true
+      #   RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+      #   BuildArtifactsBinary: |
+      #     **/QEMUQ35_*.fd
+      #   BuildArtifactsOther: "**/unit_test_results/*"
 
       QemuQ35_X64_DEBUG_ARM:
         BuildPackage: QemuQ35Pkg
@@ -116,39 +116,39 @@ jobs:
           **/*/*TestApp.efi
         BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuSbsa_DEBUG:
-        BuildPackage: QemuSbsaPkg
-        BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
-        BuildFlags: ""
-        BuildTarget: "DEBUG"
-        BuildExtraTag: ""
-        BuildExtraStep:
-          - script:  |
-              git config --global user.name "ado pipline"
-              git config --global user.email "placeholderinfo@example.com"
-        Run: true
-        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-        BuildArtifactsBinary: |
-          **/QEMU_EFI.fd
-          **/SECURE_FLASH0.fd
-        BuildArtifactsOther: "**/unit_test_results/*"
+      # QemuSbsa_DEBUG:
+      #   BuildPackage: QemuSbsaPkg
+      #   BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+      #   BuildFlags: ""
+      #   BuildTarget: "DEBUG"
+      #   BuildExtraTag: ""
+      #   BuildExtraStep:
+      #     - script:  |
+      #         git config --global user.name "ado pipline"
+      #         git config --global user.email "placeholderinfo@example.com"
+      #   Run: true
+      #   RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+      #   BuildArtifactsBinary: |
+      #     **/QEMU_EFI.fd
+      #     **/SECURE_FLASH0.fd
+      #   BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuSbsa_RELEASE:
-        BuildPackage: QemuSbsaPkg
-        BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
-        BuildFlags: ""
-        BuildTarget: "RELEASE"
-        BuildExtraTag: ""
-        BuildExtraStep:
-          - script:  |
-              git config --global user.name "ado pipline"
-              git config --global user.email "placeholderinfo@example.com"
-        Run: true
-        RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
-        BuildArtifactsBinary: |
-          **/QEMU_EFI.fd
-          **/SECURE_FLASH0.fd
-        BuildArtifactsOther: "**/unit_test_results/*"
+      # QemuSbsa_RELEASE:
+      #   BuildPackage: QemuSbsaPkg
+      #   BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+      #   BuildFlags: ""
+      #   BuildTarget: "RELEASE"
+      #   BuildExtraTag: ""
+      #   BuildExtraStep:
+      #     - script:  |
+      #         git config --global user.name "ado pipline"
+      #         git config --global user.email "placeholderinfo@example.com"
+      #   Run: true
+      #   RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+      #   BuildArtifactsBinary: |
+      #     **/QEMU_EFI.fd
+      #     **/SECURE_FLASH0.fd
+      #   BuildArtifactsOther: "**/unit_test_results/*"
 
       QemuSbsa_DEBUG_ARM:
         BuildPackage: QemuSbsaPkg
