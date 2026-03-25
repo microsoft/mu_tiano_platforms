@@ -9,16 +9,28 @@ name: Build QEMU Platform Firmware
 description: Build a QEMU platform firmware using Stuart
 
 inputs:
+  architecture:
+    description: 'Target architecture (e.g., X64; ARM64). By default, uses the architectures defined in the platform config.'
+    required: false
+    default: ''
   command:
     description: 'The action to perform: `build`, `flash`, or `all`'
     required: false
     default: 'all'
+  log-identifier:
+    description: 'Extra identifier to append to the log folder name if needed.'
+    required: false
+    default: ''
   platform-config:
     description: 'Path to the Stuart platform configuration file (.py)'
     required: true
   platform-name:
     description: 'Name of the platform being built (for logging purposes)'
     required: true
+  stuart-args:
+    description: 'Additional build arguments to pass to stuart_build'
+    required: false
+    default: ''
   target:
     description: 'Build target (e.g., DEBUG, RELEASE)'
     required: false
@@ -27,18 +39,6 @@ inputs:
     description: 'Tool chain to use (e.g., VS2022, GCC)'
     required: false
     default: 'VS2022'
-  architecture:
-    description: 'Target architecture (e.g., X64; ARM64). By default, uses the architectures defined in the platform config.'
-    required: false
-    default: ''
-  stuart-args:
-    description: 'Additional build arguments to pass to stuart_build'
-    required: false
-    default: ''
-  log-identifier:
-    description: 'Extra identifier to append to the log folder name if needed.'
-    required: false
-    default: ''
   working-directory:
     description: 'The directory to run the build commands in. By default, the root of the repository.'
     required: false
@@ -70,8 +70,8 @@ runs:
       if [ -n "${{ inputs.log-identifier }}" ]; then
         LOG_FOLDER_NAME="${LOG_FOLDER_NAME}-${{ inputs.log-identifier }}"
       fi
-      mkdir -p "$RUNNER_TEMP"/$LOG_FOLDER_NAME
-      echo "path="$RUNNER_TEMP"/$LOG_FOLDER_NAME" >> $GITHUB_OUTPUT
+      mkdir -p "${RUNNER_TEMP}/${LOG_FOLDER_NAME}"
+      echo "path=${RUNNER_TEMP}/${LOG_FOLDER_NAME}" >> $GITHUB_OUTPUT
 
   # Cannot use ENV in a composite action, so lets create our reusable argument string here
   - name: Setup Total Stuart arguments
@@ -93,7 +93,7 @@ runs:
   # Use the cache key to attempt to restore cached submodules
   - name: Cache submodules
     if: ${{ inputs.command == 'all' || inputs.command == 'build' }}
-    uses: actions/cache@v4
+    uses: actions/cache@v5
     with:
       path: .git/modules
       key: ${{ runner.os }}-${{ inputs.platform-name }}-submodules-${{ steps.submodules-hash.outputs.hash}}
