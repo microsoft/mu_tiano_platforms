@@ -1284,6 +1284,8 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
       #be tested in more of a release mode environment
       gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
   }
+
+  MdePkg/Test/UnitTest/BootManagerPolicyProtocol/BootManagerPolicyProtocolTest.inf
 !endif
   #########################################
   # SMM Phase modules

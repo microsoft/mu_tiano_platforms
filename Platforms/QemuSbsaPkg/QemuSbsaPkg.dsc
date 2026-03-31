@@ -1188,6 +1188,7 @@
     MdeModulePkg/Test/ShellTest/VariablePolicyFuncTestApp/VariablePolicyFuncTestApp.inf
   !endif
   # UefiTestingPkg/FunctionalSystemTests/MemoryAttributeProtocolFuncTestApp/MemoryAttributeProtocolFuncTestApp.inf # PROTOCOL NOT AVAILABLE ON SBSA
+  MdePkg/Test/UnitTest/BootManagerPolicyProtocol/BootManagerPolicyProtocolTest.inf
   MdePkg/Test/UnitTest/Library/BaseLib/BaseLibUnitTestApp.inf
   MdePkg/Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLibTestApp.inf
   MfciPkg/UnitTests/MfciPolicyParsingUnitTest/MfciPolicyParsingUnitTestApp.inf
@@ -1229,6 +1230,7 @@
       #be tested in more of a release mode environment
       gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
   }
+  
 !endif
 
   #
