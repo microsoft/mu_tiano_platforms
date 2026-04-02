@@ -98,7 +98,7 @@ new file mode 100644
 index 000000000..a0fa51b91
 --- /dev/null
 +++ b/plat/qemu/qemu_sbsa/qemu_sbsa_spmd_logical_sp.c
-@@ -0,0 +1,141 @@
+@@ -0,0 +1,099 @@
 +/*
 + * QEMU SBSA Logical Secure Partition - DRTM/TPM
 + * 
@@ -118,7 +118,6 @@ index 000000000..a0fa51b91
 +#define SPMD_PARTITION_PROPERTIES FFA_PARTITION_DIRECT_REQ2_SEND
 +
 +#define MSSP_ID 0x8002
-+#define TPM_GUID { 0x17, 0xb8, 0x62, 0xa4, 0x18, 0x06, 0x4f, 0xaf, 0x86, 0xb3, 0x08, 0x9a, 0x58, 0x35, 0x38, 0x61 }
 +#define GET_INTERFACE_VERSION_CMD 0x0f000001
 +#define START_CMD 0x0f000201
 +#define TPM_START_PROCESS_OPEN_LOC 0x100
@@ -126,37 +125,6 @@ index 000000000..a0fa51b91
 +#define MANAGE_LOCALITY_CMD 0x1f000001
 +#define MANAGE_LOCALITY_OPEN 0
 +#define MANAGE_LOCALITY_CLOSE 1
-+
-+static uint16_t SwapBytes16 (uint16_t Value)
-+{
-+  return (uint16_t) ((Value << 8) | (Value >> 8));
-+}
-+
-+static uint32_t SwapBytes32 (uint32_t Value)
-+{
-+  uint32_t  LowerBytes;
-+  uint32_t  HigherBytes;
-+
-+  LowerBytes  = (uint32_t) SwapBytes16 ((uint16_t) Value);
-+  HigherBytes = (uint32_t) SwapBytes16 ((uint16_t) (Value >> 16));
-+  return (LowerBytes << 16 | HigherBytes);
-+}
-+
-+static void PrepareUuid (uint8_t* Uuid)
-+{
-+  uint32_t *Data32;
-+  uint16_t *Data16;
-+
-+  if (Uuid == NULL) {
-+    return;
-+  }
-+
-+  Data32    = (uint32_t *)Uuid;
-+  Data32[0] = SwapBytes32 (Data32[0]);
-+  Data16    = (uint16_t *)&Data32[1];
-+  Data16[0] = SwapBytes16 (Data16[0]);
-+  Data16[1] = SwapBytes16 (Data16[1]);
-+}
 +
 +static int32_t qemu_sbsa_spmd_logical_partition_init(void)
 +{
@@ -172,23 +140,18 @@ index 000000000..a0fa51b91
 +  qemu_sbsa_spmd_lsp_close_locality(3);
 +  qemu_sbsa_spmd_lsp_close_locality(4);
 +
-+	return 0;
++  return 0;
 +}
 +
 +int32_t qemu_sbsa_spmd_lsp_open_locality(uint8_t locality)
 +{
 +  struct ffa_value Message = {0};
 +  struct ffa_value Return;
-+  uint64_t* UuidHiLo;
-+  uint8_t Uuid[] = TPM_GUID;
-+  PrepareUuid(Uuid);
-+
-+  UuidHiLo = (uint64_t*)Uuid;
 +
 +  Message.func = FFA_MSG_SEND_DIRECT_REQ2_SMC64;
 +  Message.arg1 = ((uint64_t)SPMD_LP_PARTITION_ID << 16) | (uint64_t)MSSP_ID;
-+  Message.arg2 = UuidHiLo[0];
-+  Message.arg3 = UuidHiLo[1];
++  Message.arg2 = 0xAF4F0618A462B817; // TPM_UUID LO
++  Message.arg3 = 0x613835589A08B386; // TPM UUID HI
 +  Message.arg4 = MANAGE_LOCALITY_CMD;
 +  Message.arg5 = MANAGE_LOCALITY_OPEN;
 +  Message.arg6 = locality;
@@ -205,16 +168,11 @@ index 000000000..a0fa51b91
 +{
 +  struct ffa_value Message = {0};
 +  struct ffa_value Return;
-+  uint64_t* UuidHiLo;
-+  uint8_t Uuid[] = TPM_GUID;
-+  PrepareUuid(Uuid);
-+
-+  UuidHiLo = (uint64_t*)Uuid;
 +
 +  Message.func = FFA_MSG_SEND_DIRECT_REQ2_SMC64;
 +  Message.arg1 = ((uint64_t)SPMD_LP_PARTITION_ID << 16) | (uint64_t)MSSP_ID;
-+  Message.arg2 = UuidHiLo[0];
-+  Message.arg3 = UuidHiLo[1];
++  Message.arg2 = 0xAF4F0618A462B817; // TPM_UUID LO
++  Message.arg3 = 0x613835589A08B386; // TPM UUID HI
 +  Message.arg4 = MANAGE_LOCALITY_CMD;
 +  Message.arg5 = MANAGE_LOCALITY_CLOSE;
 +  Message.arg6 = locality;
