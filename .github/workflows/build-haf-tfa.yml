@@ -18,6 +18,7 @@ on:
       - 'Platforms/QemuSbsaPkg/**'
       - 'Silicon/Arm/**'
   workflow_dispatch:
+  workflow_call:
 
 jobs:
   build:
@@ -67,13 +68,11 @@ jobs:
         run: python Platforms/QemuSbsaPkg/PlatformBuild.py HAF_TFA_BUILD=TRUE
 
       - name: Install archive tools
-        if: github.event_name == 'release'
         run: |
           apt-get update -y
           apt-get install -y zip tar gh
 
       - name: Create per-target archives
-        if: github.event_name == 'release'
         shell: bash
         run: |
           set -euo pipefail
@@ -89,6 +88,12 @@ jobs:
           (cd "$BIN_DIR" && tar -czf "$TAR_PATH" .)
           echo "Created archives:"
           ls -lh "$ZIP_PATH" "$TAR_PATH"
+      
+      - name: Upload Artifacts
+        if: github.event_name != 'release'
+        uses: actions/upload-artifact@v3
+        with:
+          name: haf-tfa-firmware
 
       - name: Upload Release Assets
         if: github.event_name == 'release'

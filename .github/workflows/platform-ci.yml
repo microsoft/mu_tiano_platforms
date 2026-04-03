@@ -23,6 +23,14 @@ jobs:
   vars:
     name: Get Repository Constants
     uses: ./.github/workflows/constants.yml
+  
+  build-haf-tfa:
+    needs: vars
+
+    if: ${{ needs.vars.outputs.build-haf-tfa == 'true' }}
+
+    name: Build Hafnium and Trusted Firmware-A
+    uses: ./.github/workflows/build-haf-tfa.yml
 
   # Builds the platform(s) in this repository as defined by the matrix.
   build:
@@ -30,6 +38,7 @@ jobs:
 
     needs: 
       - vars
+      - build-haf-tfa
 
     runs-on: ${{ matrix.os }}
 

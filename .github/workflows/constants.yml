@@ -20,11 +20,15 @@ on:
       qemu-core-count:
         description: 'Number of CPU cores for QEMU.'
         value: ${{ jobs.vars.outputs.qemu-core-count }}
+      build-haf-tfa:
+        description: 'Whether to run the Hafnium and Trusted Firmware-A build job'
+        value: ${{ jobs.vars.outputs.build-haf-tfa }}
 
 env:
   CONTAINER_IMAGE: 'ghcr.io/microsoft/mu_devops/ubuntu-24-test:latest'
   PYTHON_VERSION: '3.12'
   QEMU_CORE_COUNT: '2'
+  BUILD_HAF_TFA: 'true'
 
 jobs:
   vars:
@@ -35,6 +39,7 @@ jobs:
       container-image: ${{ steps.set-vars.outputs.container-image }}
       python-version: ${{ steps.set-vars.outputs.python-version }}
       qemu-core-count: ${{ steps.set-vars.outputs.qemu-core-count }}
+      build-haf-tfa: ${{ steps.set-vars.outputs.build-haf-tfa }}
 
     steps:
     - name: Set Environment Constants
@@ -44,3 +49,4 @@ jobs:
         echo "container-image=${CONTAINER_IMAGE}" >> $GITHUB_OUTPUT
         echo "python-version=${PYTHON_VERSION}" >> $GITHUB_OUTPUT
         echo "qemu-core-count=${QEMU_CORE_COUNT}" >> $GITHUB_OUTPUT
+        echo "build-haf-tfa=${BUILD_HAF_TFA}" >> $GITHUB_OUTPUT
