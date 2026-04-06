@@ -31,6 +31,12 @@ from edk2toollib.utility_functions import GetHostInfo
 
 cached_enivron = os.environ.copy()
 
+# This constant is used to indicate if the prebuilt HAF / TF-A binaries are in sync with the source code.
+# When the TF-A source code is updated in a way that is not compatible with the existing prebuilts, this should be set
+# to False, which ensures that HAF / TF-A will be build from source if supported. On Windows, TF-A cannot be built from
+# source, so the platform build will be skipped with a warning.
+HAF_TFA_EXTDEP_BINS_CURRENT = True
+
 # Declare test whose failure will not return a non-zero exit code
 FAILURE_EXEMPT_TESTS = {
     # example "PiValueTestApp.efi": datetime.datetime(3141, 5, 9, 2, 6, 53, 589793),
@@ -323,7 +329,22 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         self.env.SetValue("CONF_AUTOGEN_INCLUDE_PATH", self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuSbsaPkg", "Include"), "Platform Defined")
         self.env.SetValue("MU_SCHEMA_DIR", self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuSbsaPkg", "CfgData"), "Platform Defined")
         self.env.SetValue("MU_SCHEMA_FILE_NAME", "QemuSbsaPkgCfgData.xml", "Platform Hardcoded")
-        self.env.SetValue("HAF_TFA_BUILD", "FALSE", "Platform Hardcoded")
+        self.env.SetValue("HAF_TFA_BUILD", "FALSE", "Platform Hardcoded", overridable=True)
+        
+        # If HAF/TF-A binaries are not in sync, and we are on Windows, exit without building the platform because we
+        # cannot compile TF-A on Windows. Otherwise, (if on Linux) we force the build of TF-A to ensure the binaries
+        # are in sync.
+        if not HAF_TFA_EXTDEP_BINS_CURRENT:
+            if GetHostInfo().os == "Windows":
+                logging.warning("Prebuilt TF-A binaries are no longer in sync with source code and cannot be built on Windows.")
+                logging.warning("Only linux hosts are currently supported until the prebuilts can be updated.")
+                logging.warning("Skipping build.")
+                self.SkipPreBuild = True
+                self.SkipBuild = True
+                self.SkipPostBuild = True
+                self.FlashImage = False
+            else:
+                self.env.SetValue("HAF_TFA_BUILD", "TRUE", "Hardcoded due to TF-A prebuilts being out of date.")
 
         if self.Helper.generate_secureboot_pcds(self) != 0:
             logging.error("Failed to generate include PCDs")
