@@ -956,6 +956,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         empty_drive = (self.env.GetValue("EMPTY_DRIVE").upper() == "TRUE")
         file_regex = self.env.GetValue("FILE_REGEX")
         startup_nsh = self.env.GetValue("STARTUP_NSH")
+        target_arch = self.env.GetValue("TARGET_ARCH", "AARCH64")
 
         # Other configurable values
         output_base = self.env.GetValue("BUILD_OUTPUT_BASE")
@@ -987,7 +988,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         file_list = []
         if file_regex:
             for pattern in file_regex.split(","):
-                file_list.extend(Path(output_base, "AARCH64").glob(pattern))
+                file_list.extend(Path(output_base, target_arch).glob(pattern))
 
        # If running tests, add the files and auto-generate a startup nsh
         if run_tests:
