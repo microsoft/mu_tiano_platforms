@@ -117,8 +117,10 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
         args += " -machine sbsa-ref" #,accel=(tcg|kvm)"
         args += " -cpu max,sve=off,sme=off"
-        if env.GetBuildValue ("QEMU_CORE_NUM") is not None:
-          args += " -smp " + env.GetBuildValue ("QEMU_CORE_NUM")
+        # Hardcoded to 4 cores for now, changing this also needs to pair with the ARM_CORE_INFO data
+        # in SbsaQemuLib.c, otherwise the MP services protocol will be initialized with the wrong number
+        # of cores and cause issues with some tests that rely on it.
+        args += " -smp 4"
         args += " -global driver=cfi.pflash01,property=secure,value=on"
         args += " -drive if=pflash,format=raw,unit=0,file=" + \
             os.path.join(OutputPath_FV, "SECURE_FLASH0.fd")
