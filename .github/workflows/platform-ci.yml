@@ -16,6 +16,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: "platform-ci-${{ github.ref }}"
+  cancel-in-progress: true
+
 jobs:
 
   # A job to produce the environment constants for this repository, so that the build job can
