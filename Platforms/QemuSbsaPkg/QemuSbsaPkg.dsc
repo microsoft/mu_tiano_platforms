@@ -653,7 +653,7 @@
 
   # Size of the region used by UEFI in permanent memory (Reserved 64MB)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x04000000
-  gArmPlatformTokenSpaceGuid.PcdCoreCount|$(QEMU_CORE_NUM)
+  gArmPlatformTokenSpaceGuid.PcdCoreCount|4
 
   #
   # ARM PrimeCell
