@@ -156,6 +156,7 @@ jobs:
           working-directory: ${{ steps.short-path.outputs.short-path || github.workspace }}
 
       - name: Run ${{ matrix.platform }} ${{ matrix.target }} ${{ matrix.tool-chain}}
+        timeout-minutes: 15
         uses: ./.github/actions/build-platform
         with:
           command: 'flash'
