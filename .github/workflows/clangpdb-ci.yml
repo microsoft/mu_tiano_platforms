@@ -25,10 +25,15 @@ on:
     branches:
       - main
 
+concurrency:
+  group: clangpdb-package-ci-${{ github.ref }}
+
+  cancel-in-progress: true
+
 jobs:
   package-matrix:
     name: Gather Repository Packages
-    uses: microsoft/mu_devops/.github/workflows/PackageMatrix.yml@v18.0.4
+    uses: microsoft/mu_devops/.github/workflows/PackageMatrix.yml@v18.0.5
     with:
       ci-config: '.pytool/CISettings.py'
       python-version: "3.12"
@@ -44,7 +49,7 @@ jobs:
 
     needs: package-matrix
 
-    uses: microsoft/mu_devops/.github/workflows/PackageCi.yml@v18.0.4
+    uses: microsoft/mu_devops/.github/workflows/PackageCi.yml@v18.0.5
 
     with:
       runner: windows-latest
@@ -60,7 +65,7 @@ jobs:
 
     needs: package-matrix
 
-    uses: microsoft/mu_devops/.github/workflows/PackageCi.yml@v18.0.4
+    uses: microsoft/mu_devops/.github/workflows/PackageCi.yml@v18.0.5
 
     with:
       runner: ubuntu-latest
@@ -68,4 +73,25 @@ jobs:
       container: ghcr.io/microsoft/mu_devops/ubuntu-24-build:737aacc
       python-version: "3.12"
       package-config: ${{ needs.package-matrix.outputs.matrix }}
+
+
+  final:
+    name: Collapse Results
+    if: ${{ always() }}
+
+    needs: [ubuntu-ci, windows-ci]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check Matrix Jobs Results
+        run: |
+          echo "Ubuntu CI result: ${{ needs.ubuntu-ci.result }}"
+          echo "Windows CI result: ${{ needs.windows-ci.result }}"
+          
+          if [[ "${{ needs.ubuntu-ci.result }}" == "failure" || "${{ needs.windows-ci.result }}" == "failure" ]]; then
+            echo "One or more CI jobs failed"
+            exit 1
+          else
+            echo "All ubuntu and windows CI matrix jobs completed successfully"
+          fi
 
