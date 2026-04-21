@@ -1,0 +1,63 @@
+## @file
+# DeviceBootManager - Ms Device specific extensions to BdsDxe.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  EDK_RELEASE_VERSION             = 0x00020000
+  INF_VERSION                     = 0x00010017
+  BASE_NAME                       = DeviceBootManagerLibQemu
+  FILE_GUID                       = 700316FD-3D7C-4E21-8432-6340440D2190
+  VERSION_STRING                  = 1.0
+  MODULE_TYPE                     = DXE_DRIVER
+  UEFI_SPECIFICATION_VERSION      = 2.70
+  LIBRARY_CLASS                   = DeviceBootManagerLib|DXE_DRIVER
+  CONSTRUCTOR                     = DeviceBootManagerConstructor
+
+[Sources]
+  DeviceBootManagerLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MsCorePkg/MsCorePkg.dec
+  MsGraphicsPkg/MsGraphicsPkg.dec
+  PcBdsPkg/PcBdsPkg.dec
+  SecurityPkg/SecurityPkg.dec
+  ShellPkg/ShellPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  HobLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  DevicePathLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  MsPlatformDevicesLib
+  MsNetworkDependencyLib
+  MsBootOptionsLib
+  ConsoleMsgLib
+  MsBootPolicyLib
+  MsBootManagerSettingsLib
+  BootGraphicsLib
+  GraphicsConsoleHelperLib
+  Tcg2PhysicalPresenceLib
+
+[Guids]
+  gUefiShellFileGuid
+  gMsStartOfBdsNotifyGuid
+
+[Protocols]
+  gTpmPpProtocolGuid                ## CONSUMES
+
+[Pcd]
+  gPcBdsPkgTokenSpaceGuid.PcdShellFile
+  gPcBdsPkgTokenSpaceGuid.PcdEnableMemMapOutput
+  gPcBdsPkgTokenSpaceGuid.PcdEnableMemMapTypes
+  gPcBdsPkgTokenSpaceGuid.PcdEnableMemMapDumpOutput
+
+[Depex]
+  TRUE

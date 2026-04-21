@@ -41,6 +41,13 @@
   MSFT:*_*_X64_GENFW_FLAGS  = --keepexceptiontable
   GCC:*_*_X64_GENFW_FLAGS   = --keepexceptiontable
 
+!if $(TPM_ENABLE) == TRUE
+  #
+  # Enable TPM support
+  #
+  *_CLANGPDB_*_CC_FLAGS = -DTPM_ENABLE
+!endif
+
   #
   # Disable deprecated APIs.
   #

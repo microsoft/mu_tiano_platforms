@@ -473,9 +473,14 @@ INF  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
 !endif
 !endif
 
+!if $(TPM_ENABLE) == TRUE
+INF SecurityPkg/Applications/TpmShellApp/TpmShellApp.inf
+!endif
+
 #
 # MU Modules
 #
+
 INF  AdvLoggerPkg/AdvancedFileLogger/AdvancedFileLogger.inf
 INF  MsCorePkg/Universal/StatusCodeHandler/Serial/Dxe/SerialStatusCodeHandlerDxe.inf
 INF  MsCorePkg/MuCryptoDxe/MuCryptoDxe.inf
