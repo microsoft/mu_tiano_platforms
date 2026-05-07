@@ -639,7 +639,8 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdUserPhysicalPresence|FALSE
 
 !if $(TPM2_ENABLE) == TRUE
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x5a, 0xf2, 0x6b, 0x28, 0xc3, 0xc2, 0x8c, 0x40, 0xb3, 0xb4, 0x25, 0xe6, 0x75, 0x8b, 0x73, 0x17}
+  # For TPM over FFA, this should be gTpm2ServiceFfaGuid
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0xa4, 0x62, 0xb8, 0x17, 0x06, 0x18, 0xaf, 0x4f, 0x86, 0xb3, 0x08, 0x9a, 0x58, 0x35, 0x38, 0x61}
 !endif
 
 !if $(NETWORK_TLS_ENABLE) == TRUE
@@ -886,11 +887,12 @@
   #
 !if $(TPM2_ENABLE) == TRUE
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0x02
+  gEfiSecurityPkgTokenSpaceGuid.PcdTcg2HashAlgorithmBitmap|0x02
 !endif
 
 [PcdsDynamicHii]
 !if $(TPM2_ENABLE) == TRUE
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableRev|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x8|4|NV,BS
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableRev|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x8|5|NV,BS
 !endif
 !if $(TPM2_CONFIG_ENABLE) == TRUE
   gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x0|"1.3"|NV,BS

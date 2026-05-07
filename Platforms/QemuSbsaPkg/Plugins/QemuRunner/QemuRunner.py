@@ -53,7 +53,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             return
 
         tpm_cmd = "swtpm"
-        tpm_args = f"socket --tpmstate dir={"/".join(tpm_path.rsplit("/", 1)[:-1])} --ctrl type=unixio,path={tpm_path} --tpm2 --log level=20"
+        tpm_args = f"socket --tpmstate dir={"/".join(tpm_path.rsplit("/", 1)[:-1])} --ctrl type=unixio,path={tpm_path} --tpm2 --log level=1"
 
         # Start the TPM emulator in a separate thread
         ret = utility_functions.RunCmd(tpm_cmd, tpm_args)
