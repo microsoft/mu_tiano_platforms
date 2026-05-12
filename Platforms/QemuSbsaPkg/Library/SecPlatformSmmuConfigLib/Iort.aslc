@@ -1,0 +1,138 @@
+/** @file
+  I/O Remapping Table (Iort)
+
+  The IORT table provides the OS and SmmuDxe with an ACPI description for IO topology,
+  SMMU and GIC ITSs of Arm-based system.
+
+  Copyright (c) Microsoft Corporation.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include <Library/PcdLib.h>
+#include <IndustryStandard/IoRemappingTable.h>
+#include <IndustryStandard/SbsaQemuAcpi.h>
+
+#pragma pack (1)
+
+typedef struct _PLATFORM_ACPI_6_0_IO_REMAPPING_ITS_NODE {
+  EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE    Node;        // ITS Node
+  UINT32                                Identifiers; // ITS Node identifiers
+} PLATFORM_ACPI_6_0_IO_REMAPPING_ITS_NODE;
+
+typedef struct _PLATFORM_ACPI_6_0_IO_REMAPPING_SMMU3_NODE {
+  EFI_ACPI_6_0_IO_REMAPPING_SMMU3_NODE    SmmuNode;  // SMMUV3 Node
+  EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE      SmmuIdMap; // SMMUV3 ID Mapping
+} PLATFORM_ACPI_6_0_IO_REMAPPING_SMMU3_NODE;
+
+typedef struct _PLATFORM_ACPI_6_0_IO_REMAPPING_RC_NODE {
+  EFI_ACPI_6_0_IO_REMAPPING_RC_NODE     RcNode;  // Root Complex Node
+  EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE    RcIdMap; // Root Complex ID Mapping
+} PLATFORM_ACPI_6_0_IO_REMAPPING_RC_NODE;
+
+typedef struct _PLATFORM_IO_REMAPPING_STRUCTURE {
+  EFI_ACPI_6_0_IO_REMAPPING_TABLE              Iort;     // IORT table header
+  PLATFORM_ACPI_6_0_IO_REMAPPING_ITS_NODE      ItsNode;  // ITS Node platform wrapper
+  PLATFORM_ACPI_6_0_IO_REMAPPING_SMMU3_NODE    SmmuNode; // Smmu Node platform wrapper
+  PLATFORM_ACPI_6_0_IO_REMAPPING_RC_NODE       RcNode;   // Root Complex Node platform wrapper
+} PLATFORM_IO_REMAPPING_STRUCTURE;
+
+// Create SMMU Config Hob struct. Same as IORT we want to publish as it is platform dependent.
+PLATFORM_IO_REMAPPING_STRUCTURE IortData = {
+
+  // Initialize IORT Table Header
+  .Iort = {
+    SBSAQEMU_ACPI_HEADER(EFI_ACPI_6_0_IO_REMAPPING_TABLE_SIGNATURE,
+      PLATFORM_IO_REMAPPING_STRUCTURE,
+      EFI_ACPI_IO_REMAPPING_TABLE_REVISION_06), // Rev E for full RC node support
+    3,
+    sizeof(EFI_ACPI_6_0_IO_REMAPPING_TABLE), // NodeOffset
+    0
+  },
+
+  // Initialize SMMU3 Structure
+  .SmmuNode = {
+    {
+      {
+        EFI_ACPI_IORT_TYPE_SMMUv3,
+        sizeof(PLATFORM_ACPI_6_0_IO_REMAPPING_SMMU3_NODE),
+        2, // Revision
+        0, // Reserved
+        1, // NumIdMapping
+        OFFSET_OF(PLATFORM_ACPI_6_0_IO_REMAPPING_SMMU3_NODE, SmmuIdMap) // IdReference
+      },
+      0x60050000, // Base address
+      EFI_ACPI_IORT_SMMUv3_FLAG_COHAC_OVERRIDE, // Flags
+      0, // Reserved
+      0, // VATOS address
+      EFI_ACPI_IORT_SMMUv3_MODEL_GENERIC, // SMMUv3 Model
+      44, // Event (GSIV = SPI 12 + 32)
+      45, // Pri (GSIV = SPI 13 + 32)
+      46, // Gerror (GSIV = SPI 14 + 32)
+      47, // Sync (GSIV = SPI 15 + 32)
+      0,  // Proximity domain
+      0   // DevIDMappingIndex (0-based index)
+    },
+    {
+      0x0000, // InputBase
+      0xffff, // NumIds
+      0x0000, // OutputBase
+      OFFSET_OF(PLATFORM_IO_REMAPPING_STRUCTURE, ItsNode), // OutputReference
+      0 // Flags
+    }
+  },
+
+  // Initialize ITS Node
+  .ItsNode = {
+    // EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE
+    {
+      // EFI_ACPI_6_0_IO_REMAPPING_NODE
+      {
+        EFI_ACPI_IORT_TYPE_ITS_GROUP, // Type
+        sizeof(PLATFORM_ACPI_6_0_IO_REMAPPING_ITS_NODE), // Length
+        0, // Revision
+        0, // Identifier
+        0, // NumIdMappings
+        0, // IdReference
+      },
+      1, // ITS count
+    },
+    0 // GIC ITS Identifiers
+  },
+
+  // Initialize RC Node
+  .RcNode = {
+    {
+      {
+        EFI_ACPI_IORT_TYPE_ROOT_COMPLEX, // Type
+        sizeof(PLATFORM_ACPI_6_0_IO_REMAPPING_RC_NODE), // Length
+        4, // Revision (IORT Rev E.d requires revision 4 for RC nodes)
+        0, // Identifier (Reserved, must be 0)
+        1, // NumIdMappings
+        OFFSET_OF(PLATFORM_ACPI_6_0_IO_REMAPPING_RC_NODE,
+          RcIdMap) // IdReference
+      },
+      1, // CacheCoherent (Device is fully coherent)
+      0, // AllocationHints
+      0, // Reserved
+      1, // MemoryAccessFlags (CPM bit set)
+      EFI_ACPI_IORT_ROOT_COMPLEX_ATS_UNSUPPORTED, // AtsAttribute
+      0x0,  // PciSegmentNumber
+      64, // MemoryAddressSize (64-bit addressing)
+      0,  // PasidCapabilities (PASID not supported)
+      { 0 }, // Reserved1
+      0   // Flags
+    },
+    {
+      0x0000, // InputBase
+      0xffff, // NumIds
+      0x0000, // OutputBase
+      OFFSET_OF(PLATFORM_IO_REMAPPING_STRUCTURE, SmmuNode), // OutputReference
+      0, // Flags
+    }
+  }
+};
+
+#pragma pack ()
+
+VOID* CONST ReferenceAcpiTable = &IortData;

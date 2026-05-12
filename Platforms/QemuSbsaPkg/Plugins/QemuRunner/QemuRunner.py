@@ -53,7 +53,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             return
 
         tpm_cmd = "swtpm"
-        tpm_args = f"socket --tpmstate dir={"/".join(tpm_path.rsplit("/", 1)[:-1])} --ctrl type=unixio,path={tpm_path} --tpm2 --log level=20"
+        tpm_args = f"socket --tpmstate dir={"/".join(tpm_path.rsplit("/", 1)[:-1])} --ctrl type=unixio,path={tpm_path} --tpm2 --log level=1"
 
         # Start the TPM emulator in a separate thread
         ret = utility_functions.RunCmd(tpm_cmd, tpm_args)
@@ -87,6 +87,8 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         # Mount disk with either startup.nsh or OS image
         path_to_os = env.GetValue("PATH_TO_OS")
         if path_to_os is not None:
+            args += " -m 8192"
+
             file_extension = Path(path_to_os).suffix.lower().replace('"', '')
 
             storage_format = {
@@ -104,21 +106,21 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
                 args += f" -drive file=\"{path_to_os}\",format={storage_format},if=none,id=os_disk"
                 args += " -device ahci,id=ahci"
                 args += " -device ide-hd,drive=os_disk,bus=ahci.0"
-        elif os.path.isfile(VirtualDrive):
-            args += f" -drive file={VirtualDrive},if=virtio"
-        elif os.path.isdir(VirtualDrive):
-            args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
         else:
-            logging.critical("Virtual Drive Path Invalid")
-
-        # TODO: Set the memory size to be 2GB regardless. Not sure why 8GB does
-        # not work.
-        args += " -m 2048"
+            args += " -m 2048"
+            if os.path.isfile(VirtualDrive):
+                args += f" -drive file={VirtualDrive},if=virtio"
+            elif os.path.isdir(VirtualDrive):
+                args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
+            else:
+                logging.critical("Virtual Drive Path Invalid")
 
         args += " -machine sbsa-ref" #,accel=(tcg|kvm)"
         args += " -cpu max,sve=off,sme=off"
-        if env.GetBuildValue ("QEMU_CORE_NUM") is not None:
-          args += " -smp " + env.GetBuildValue ("QEMU_CORE_NUM")
+        # Hardcoded to 4 cores for now, changing this also needs to pair with the ARM_CORE_INFO data
+        # in SbsaQemuLib.c, otherwise the MP services protocol will be initialized with the wrong number
+        # of cores and cause issues with some tests that rely on it.
+        args += " -smp 4"
         args += " -global driver=cfi.pflash01,property=secure,value=on"
         args += " -drive if=pflash,format=raw,unit=0,file=" + \
             os.path.join(OutputPath_FV, "SECURE_FLASH0.fd")

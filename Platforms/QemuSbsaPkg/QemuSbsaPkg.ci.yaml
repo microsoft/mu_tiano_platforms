@@ -57,6 +57,7 @@
             "OemPkg/OemPkg.dec",
             "SetupDataPkg/SetupDataPkg.dec",
             "StandaloneMmPkg/StandaloneMmPkg.dec",
+            "AdvLoggerPkg/AdvLoggerPkg.dec",
             ""
         ],
         # For host based unit tests

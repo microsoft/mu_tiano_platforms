@@ -16,10 +16,11 @@ stuart_build -c Platforms\QemuQ35Pkg\PlatformBuild.py BLD_*_DXE_DBG_BRK=TRUE --F
 
 On Q35 this allows for debugging over a different port then the usual debug output
 because Q35 has a seperate serial port available to it. On SBSA the serial port
-will be shared with the logging output. As a result, on Q35, if `SERIAL_PORT=<PORT>`
-is not passed on the cmdline, a default serial port at 50001 will be created. On SBSA,
-no default port is set because it will prevent output from occuring on stdout, which
-makes even telling if an exception occurred difficult.
+will be shared with the logging output. On both platforms, if SERIAL_PORT=<PORT>
+is not passed on the cmdline, no default port is set. On Q35, this is to prevent
+unintended port conflicts in the pipeline. On SBSA, this is because a default port
+will prevent output from occuring on stdout, which makes even telling if an exception
+occurred difficult.
 
 Currently this will only enable the DXE debugger. The MM debugger will be added to Q35
 once it support supervised Standalone MM.

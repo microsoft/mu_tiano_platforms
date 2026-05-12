@@ -81,11 +81,11 @@ GetIdString (
   if (!gInitialized) {
     gInitialized = TRUE;
 
-    DEBUG ((DEBUG_ERROR, "%a: Entry\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Entry\n", __func__));
 
     Status = gBS->LocateProtocol (&gEfiSmbiosProtocolGuid, NULL, (VOID *)&Smbios);
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: Unable to locate SmBiosProtocol.  Code=%r\n", __FUNCTION__, Status));
+      DEBUG ((DEBUG_ERROR, "%a: Unable to locate SmBiosProtocol.  Code=%r\n", __func__, Status));
       goto Exit;
     }
 
@@ -96,7 +96,7 @@ GetIdString (
 
     Status = Smbios->GetNext (Smbios, &SmbiosHandle, &SmbiosType, &SmbiosRecord, NULL);
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: Unable to get type 1 SMBIOS record.  Code=%r\n", __FUNCTION__, Status));
+      DEBUG ((DEBUG_ERROR, "%a: Unable to get type 1 SMBIOS record.  Code=%r\n", __func__, Status));
       goto Exit;
     }
 
@@ -109,28 +109,28 @@ GetIdString (
     BiosString = GetBiosString (StringPtr, SmbiosType1->Manufacturer);
     Status     = AsciiStrCpyS (gManufacturer, sizeof (gManufacturer), BiosString);
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: Manufacturer error.  Code = %r\n", __FUNCTION__, Status));
+      DEBUG ((DEBUG_ERROR, "%a: Manufacturer error.  Code = %r\n", __func__, Status));
       goto Exit;
     }
 
     BiosString = GetBiosString (StringPtr, SmbiosType1->ProductName);
     Status     = AsciiStrCpyS (gProductName, sizeof (gProductName), BiosString);
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: ProductName error.  Code = %r\n", __FUNCTION__, Status));
+      DEBUG ((DEBUG_ERROR, "%a: ProductName error.  Code = %r\n", __func__, Status));
       goto Exit;
     }
 
     BiosString = GetBiosString (StringPtr, SmbiosType1->SerialNumber);
     Status     = AsciiStrCpyS (gSerialNumber, sizeof (gSerialNumber), BiosString);
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: SerialNumber error.  Code = %r\n", __FUNCTION__, Status));
+      DEBUG ((DEBUG_ERROR, "%a: SerialNumber error.  Code = %r\n", __func__, Status));
       goto Exit;
     }
 
-    DEBUG ((DEBUG_INFO, "%a: DfciDeviceId:\n", __FUNCTION__));
-    DEBUG ((DEBUG_INFO, "%a:     Manufacturer  = %a\n", __FUNCTION__, gManufacturer));
-    DEBUG ((DEBUG_INFO, "%a:     Product Name  = %a\n", __FUNCTION__, gProductName));
-    DEBUG ((DEBUG_INFO, "%a:     Serial Number = %a\n", __FUNCTION__, gSerialNumber));
+    DEBUG ((DEBUG_INFO, "%a: DfciDeviceId:\n", __func__));
+    DEBUG ((DEBUG_INFO, "%a:     Manufacturer  = %a\n", __func__, gManufacturer));
+    DEBUG ((DEBUG_INFO, "%a:     Product Name  = %a\n", __func__, gProductName));
+    DEBUG ((DEBUG_INFO, "%a:     Serial Number = %a\n", __func__, gSerialNumber));
   }
 
   if (DfciIdString == NULL) {
@@ -145,7 +145,7 @@ GetIdString (
   }
 
   if (*DfciIdString == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Unable to allocate storage for IdString(%a).\n", __FUNCTION__, IdString));
+    DEBUG ((DEBUG_ERROR, "%a: Unable to allocate storage for IdString(%a).\n", __func__, IdString));
     Status = EFI_OUT_OF_RESOURCES;
     goto Exit;
   }

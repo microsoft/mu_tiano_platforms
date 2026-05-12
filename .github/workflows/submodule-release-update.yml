@@ -33,13 +33,13 @@ jobs:
     steps:
       - name: Generate Token
         id: app-token
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ vars.MU_ACCESS_APP_ID }}
           private-key: ${{ secrets.MU_ACCESS_APP_PRIVATE_KEY }}
 
       - name: Update Submodules to Latest Release
-        uses: microsoft/mu_devops/.github/actions/submodule-release-updater@v18.0.0
+        uses: microsoft/mu_devops/.github/actions/submodule-release-updater@v18.0.6
         with:
           GH_PAT: ${{ steps.app-token.outputs.token }}
           GH_USER: "ProjectMuBot"

@@ -14,6 +14,7 @@ X86_ASSEMBLY_PATCH_LABEL  gPatchRebasedFlagAddr32;
 
 UINTN             mSmmRelocationOriginalAddress;
 volatile BOOLEAN  *mRebasedFlag;
+SPIN_LOCK         mSmmRelocationSemaphore;
 
 /**
 AP Semaphore operation in 32-bit mode while BSP runs in 64-bit mode.
@@ -22,6 +23,30 @@ VOID
 SmmRelocationSemaphoreComplete32 (
   VOID
   );
+
+/**
+  Acquire the SMM Relocation Semaphore.
+**/
+VOID
+EFIAPI
+AcquireSmmRelocationSemaphore (
+  VOID
+  )
+{
+  AcquireSpinLock (&mSmmRelocationSemaphore);
+}
+
+/**
+  Release the SMM Relocation Semaphore.
+**/
+VOID
+EFIAPI
+ReleaseSmmRelocationSemaphore (
+  VOID
+  )
+{
+  ReleaseSpinLock (&mSmmRelocationSemaphore);
+}
 
 /**
   Hook return address of SMM Save State so that semaphore code
@@ -47,7 +72,8 @@ SemaphoreHook (
     4
     );
 
-  CpuState                      = (SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
+  CpuState = (SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
+  AcquireSmmRelocationSemaphore ();
   mSmmRelocationOriginalAddress = HookReturnFromSmm (
                                     CpuState,
                                     (UINT64)(UINTN)&SmmRelocationSemaphoreComplete32,

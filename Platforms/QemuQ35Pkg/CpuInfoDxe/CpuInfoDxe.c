@@ -74,7 +74,7 @@ CpuInfoDxeEntryPoint (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  DEBUG ((DEBUG_INFO, "[%a] - Entry\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "[%a] - Entry\n", __func__));
   DEBUG ((DEBUG_INFO, "\tCPU Brand Name: %a\n", GetCpuBrandString ()));
   DEBUG ((DEBUG_INFO, "\tFamily Id: 0x%x\n", GetCpuIdFamilyEaxString ()));
   DEBUG ((DEBUG_INFO, "\tStepping: 0x%x\n", GetCpuSteppingId ()));

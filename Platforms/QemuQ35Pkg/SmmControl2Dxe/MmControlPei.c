@@ -210,7 +210,7 @@ MmControlPeiEntryPoint (
     DEBUG ((
       DEBUG_ERROR,
       "%a: this Q35 implementation lacks SMI\n",
-      __FUNCTION__
+      __func__
       ));
     goto FatalError;
   }
@@ -239,17 +239,17 @@ MmControlPeiEntryPoint (
     DEBUG ((
       DEBUG_ERROR,
       "%a: failed to lock down GBL_SMI_EN\n",
-      __FUNCTION__
+      __func__
       ));
     goto FatalError;
   }
 
   //
   // QEMU can inject SMIs in different ways, negotiate our preferences.
-  // Note: Negotiated features are not actually used for anything right now. But, the function is called
-  //       to test negotiation in case it is need in the future.
   //
-  NegotiateSmiFeatures ();
+  BOOLEAN  NegotiationSuccessful = NegotiateSmiFeatures ();
+
+  ASSERT (NegotiationSuccessful);
 
   //
   // We have no pointers to convert to virtual addresses. The handle itself
@@ -260,7 +260,7 @@ MmControlPeiEntryPoint (
     DEBUG ((
       DEBUG_ERROR,
       "%a: InstallMultipleProtocolInterfaces: %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     goto FatalError;

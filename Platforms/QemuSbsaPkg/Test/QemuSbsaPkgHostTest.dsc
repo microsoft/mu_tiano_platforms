@@ -48,7 +48,7 @@
   SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
-  FltUsedLib|MdePkg/Library/FltUsedLib/FltUsedLib.inf
+  FltUsedLib|MsCorePkg/Library/FltUsedLib/FltUsedLib.inf
   MuTelemetryHelperLib|MsWheaPkg/Library/MuTelemetryHelperLib/MuTelemetryHelperLib.inf
   XmlTreeLib|XmlSupportPkg/Library/XmlTreeLib/XmlTreeLib.inf
   XmlTreeQueryLib|XmlSupportPkg/Library/XmlTreeQueryLib/XmlTreeQueryLib.inf
@@ -173,11 +173,6 @@ MdeModulePkg/Universal/Variable/RuntimeDxe/RuntimeDxeUnitTest/VariableRuntimeDxe
     # SCT tests are noisy, so disable VERBOSE.
     gUnitTestFrameworkPkgTokenSpaceGuid.PcdUnitTestLogLevel|0x00000007
 }
-AdvLoggerPkg/Library/AdvancedLoggerLib/PeiCore/GoogleTest/AdvancedLoggerPeiCoreGoogleTest.inf {
-  <LibraryClasses>
-    AdvancedLoggerHdwPortLib|AdvLoggerPkg/Test/Mock/Library/GoogleTest/MockAdvancedLoggerHdwPortLib/MockAdvancedLoggerHdwPortLib.inf
-    PeiServicesLib|MdePkg/Test/Mock/Library/GoogleTest/MockPeiServicesLib/MockPeiServicesLib.inf
-}
 AdvLoggerPkg/Library/AdvancedLoggerLib/Pei/GoogleTest/AdvancedLoggerPeiLibGoogleTest.inf {
   <LibraryClasses>
     AdvancedLoggerHdwPortLib|AdvLoggerPkg/Test/Mock/Library/GoogleTest/MockAdvancedLoggerHdwPortLib/MockAdvancedLoggerHdwPortLib.inf
@@ -191,14 +186,6 @@ AdvLoggerPkg/Library/AdvancedLoggerLib/Dxe/GoogleTest/AdvancedLoggerDxeLibGoogle
   <LibraryClasses>
     AdvancedLoggerHdwPortLib|AdvLoggerPkg/Test/Mock/Library/GoogleTest/MockAdvancedLoggerHdwPortLib/MockAdvancedLoggerHdwPortLib.inf
     UefiBootServicesTableLib|MdePkg/Test/Mock/Library/GoogleTest/MockUefiBootServicesTableLib/MockUefiBootServicesTableLib.inf
-}
-AdvLoggerPkg/Library/AdvancedLoggerLib/DxeCore/GoogleTest/AdvancedLoggerDxeCoreGoogleTest.inf {
-  <LibraryClasses>
-    AdvancedLoggerHdwPortLib|AdvLoggerPkg/Test/Mock/Library/GoogleTest/MockAdvancedLoggerHdwPortLib/MockAdvancedLoggerHdwPortLib.inf
-}
-AdvLoggerPkg/Library/AdvancedLoggerLib/MmCore/GoogleTest/AdvancedLoggerMmCoreGoogleTest.inf {
-  <LibraryClasses>
-    AdvancedLoggerHdwPortLib|AdvLoggerPkg/Test/Mock/Library/GoogleTest/MockAdvancedLoggerHdwPortLib/MockAdvancedLoggerHdwPortLib.inf
 }
 MdeModulePkg/Bus/Pci/NvmExpressDxe/UnitTest/MediaSanitizeUnitTestHost.inf
 MdeModulePkg/Library/VariablePolicyLib/VariablePolicyUnitTest/VariablePolicyUnitTest.inf {

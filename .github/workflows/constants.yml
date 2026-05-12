@@ -1,0 +1,46 @@
+# A callable workflow to get the environment constants for this repository.
+#
+# The intent of this workflow is to provide a way to set constants for all workflows in this
+# repository in a single place, without the need to clone the repository just to read a file.
+#
+##
+# Copyright (c) Microsoft Corporation.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+on:
+  workflow_call:
+    outputs:
+      container-image:
+        description: 'Container image to use for Linux builds'
+        value: ${{ jobs.vars.outputs.container-image }}
+      python-version:
+        description: 'Version of Python to use when not in a container'
+        value: ${{ jobs.vars.outputs.python-version }}
+      qemu-core-count:
+        description: 'Number of CPU cores for QEMU.'
+        value: ${{ jobs.vars.outputs.qemu-core-count }}
+
+env:
+  CONTAINER_IMAGE: 'ghcr.io/microsoft/mu_devops/ubuntu-24-test:latest'
+  PYTHON_VERSION: '3.12'
+  QEMU_CORE_COUNT: '2'
+
+jobs:
+  vars:
+    name: Get Repository Constants
+
+    runs-on: ubuntu-latest
+    outputs:
+      container-image: ${{ steps.set-vars.outputs.container-image }}
+      python-version: ${{ steps.set-vars.outputs.python-version }}
+      qemu-core-count: ${{ steps.set-vars.outputs.qemu-core-count }}
+
+    steps:
+    - name: Set Environment Constants
+      id: set-vars
+      shell: bash
+      run: |
+        echo "container-image=${CONTAINER_IMAGE}" >> $GITHUB_OUTPUT
+        echo "python-version=${PYTHON_VERSION}" >> $GITHUB_OUTPUT
+        echo "qemu-core-count=${QEMU_CORE_COUNT}" >> $GITHUB_OUTPUT

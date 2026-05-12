@@ -46,15 +46,13 @@
   DEFINE CUSTOM_STACK_CHECK_LIB         = DYNAMIC
 
   PEI_CRYPTO_SERVICES = TINY_SHA
-  DXE_CRYPTO_SERVICES = STANDARD
-  RUNTIMEDXE_CRYPTO_SERVICES = STANDARD
+  DXE_CRYPTO_SERVICES = NONE
   SMM_CRYPTO_SERVICES = NONE
-  STANDALONEMM_CRYPTO_SERVICES = STANDARD
+  STANDALONEMM_CRYPTO_SERVICES = NONE
   STANDALONEMM_MMSUPV_CRYPTO_SERVICES = NONE
-  DXE_CRYPTO_ARCH = X64
-  RUNTIMEDXE_CRYPTO_ARCH = X64
+  DXE_CRYPTO_ARCH = NONE
   SMM_CRYPTO_ARCH = NONE
-  STANDALONEMM_CRYPTO_ARCH = X64
+  STANDALONEMM_CRYPTO_ARCH = NONE
   STANDALONEMM_MMSUPV_CRYPTO_ARCH = NONE
 
 ################################################################################
@@ -92,7 +90,7 @@
   RegisterFilterLib           |MdePkg/Library/RegisterFilterLibNull/RegisterFilterLibNull.inf
 
   # Math Libraries
-  FltUsedLib |MdePkg/Library/FltUsedLib/FltUsedLib.inf
+  FltUsedLib |MsCorePkg/Library/FltUsedLib/FltUsedLib.inf
   MathLib    |MsCorePkg/Library/MathLib/MathLib.inf
   SafeIntLib |MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
 
@@ -319,6 +317,7 @@
   HobPrintLib|MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
 
   XenHypercallLib|QemuQ35Pkg/Library/XenHypercallLib/XenHypercallLib.inf
+  AmdSysCallLib|UefiCpuPkg/Library/AmdSysCallLibNull/AmdSysCallLibNull.inf
 
 
 #########################################
@@ -385,6 +384,8 @@
   OemMfciLib                 |OemPkg/Library/OemMfciLib/OemMfciLibPei.inf
   ConfigKnobShimLib          |SetupDataPkg/Library/ConfigKnobShimLib/ConfigKnobShimPeiLib/ConfigKnobShimPeiLib.inf
   PolicyLib                  |PolicyServicePkg/Library/PeiPolicyLib/PeiPolicyLib.inf
+  BaseCryptLib               |CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
+  TlsLib                     |CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
   SmmRelocationLib           |QemuQ35Pkg/Library/SmmRelocationLib/SmmRelocationLib.inf
 !if $(TPM_ENABLE) == TRUE
   Tpm12DeviceLib             |SecurityPkg/Library/Tpm12DeviceLibDTpm/Tpm12DeviceLibDTpm.inf
@@ -420,6 +421,8 @@
   PciLib   |QemuQ35Pkg/Library/DxePciLibI440FxQ35/DxePciLibI440FxQ35.inf
 
   OemMfciLib |OemPkg/Library/OemMfciLib/OemMfciLibDxe.inf
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/DxeCryptLib.inf
+  TlsLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/DxeCryptLib.inf
 
 [LibraryClasses.common.DXE_CORE]
   HobLib                  |MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
@@ -438,6 +441,8 @@
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeRuntimeCapsuleLib.inf
   VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/RuntimeDxeCryptLib.inf
+  TlsLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/RuntimeDxeCryptLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_DRIVER]
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
@@ -499,7 +504,7 @@
   SmmCpuFeaturesLib|QemuQ35Pkg/Library/SmmCpuFeaturesLib/StandaloneMmCpuFeaturesLib.inf
   SmmCpuPlatformHookLib|QemuQ35Pkg/Library/SmmCpuPlatformHookLibQemu/SmmCpuPlatformHookLibQemu.inf
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/SmmCpuExceptionHandlerLib.inf
-  DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibStandaloneMm.inf
+  DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibBase.inf
   SortLib|MdeModulePkg/Library/BaseSortLib/BaseSortLib.inf
   SmmPolicyGateLib|MmSupervisorPkg/Library/SmmPolicyGateLib/SmmPolicyGateLib.inf
   HwResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
@@ -520,7 +525,7 @@
   HwResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   StandaloneMmDriverEntryPoint|MdePkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
   AdvLoggerAccessLib|AdvLoggerPkg/Library/AdvLoggerMmAccessLib/AdvLoggerMmAccessLib.inf
-  DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibStandaloneMm.inf
+  DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibBase.inf
   RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
   PciLib|QemuQ35Pkg/Library/DxePciLibI440FxQ35/DxePciLibI440FxQ35.inf
 
@@ -528,6 +533,8 @@
   IoLib|MmSupervisorPkg/Library/BaseIoLibIntrinsicSysCall/BaseIoLibIntrinsic.inf
   SysCallLib|MmSupervisorPkg/Library/SysCallLib/SysCallLib.inf
   CpuLib|MmSupervisorPkg/Library/BaseCpuLibSysCall/BaseCpuLib.inf
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/StandaloneMmCryptLib.inf
+  TlsLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/StandaloneMmCryptLib.inf
 
 !if $(PERF_TRACE_ENABLE) == TRUE
   PerformanceLib|MdeModulePkg/Library/SmmPerformanceLib/StandaloneMmPerformanceLib.inf
@@ -549,7 +556,7 @@
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Pei/AdvancedLoggerLib.inf
 !ifndef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|AdvLoggerPkg/Library/PeiDebugLibAdvancedLogger/PeiDebugLibAdvancedLogger.inf
-!endif 
+!endif
 
 [LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.UEFI_APPLICATION]
   AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Dxe/AdvancedLoggerLib.inf
@@ -579,14 +586,13 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportUefiDecompress|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol|TRUE
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|TRUE
   gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedLoggerLocator|TRUE
   gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedLoggerAutoWrapEnable|TRUE
 
-  gQemuPkgTokenSpaceGuid.PcdSmmSmramRequire|$(SMM_ENABLED)
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdStandaloneMmEnable|$(SMM_ENABLED)
+  gQemuPkgTokenSpaceGuid.PcdSmmSmramRequire|TRUE
+  gUefiQemuQ35PkgTokenSpaceGuid.PcdStandaloneMmEnable|TRUE
   gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugSupport|FALSE
 
   gQemuPkgTokenSpaceGuid.PcdEnableMemoryProtection|$(MEMORY_PROTECTION)
@@ -595,6 +601,8 @@
     gUefiCpuPkgTokenSpaceGuid.PcdSmmExceptionTestModeSupport|TRUE
     gMmSupervisorPkgTokenSpaceGuid.PcdMmSupervisorTestEnable|TRUE
   !endif
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMigrateVariableRuntimeCacheBufferAllocation|TRUE
 
 [PcdsPatchableInModule]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
@@ -684,16 +692,17 @@
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xB0000000
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber|$(QEMU_CORE_NUM)
 
-!if $(SMM_ENABLED) == FALSE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|TRUE
-!endif
-
   # Use profile index 1
   gOemPkgTokenSpaceGuid.PcdActiveProfileIndex|0x1
 
 [PcdsFixedAtBuild.common]
   # a PCD that controls the enumeration and connection of ConIn's. When true, ConIn is only connected once a console input is requests
   gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand|TRUE
+
+  # QEMU lacks a simulation for the INIT process.
+  # To address this, PcdFirstTimeWakeUpAPsBySipi set to FALSE to
+  # broadcast INIT-SIPI-SIPI for the first time.
+  gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi|FALSE
 
 # Enable SHELL to build instead of just taking the binary
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|16000
@@ -770,13 +779,8 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS|0x80
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0x20
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x510
-!if $(SMM_ENABLED) == FALSE
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0x200
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x200
-!else
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0x100
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x1C0
-!endif
 
   #
   # Network Pcds
@@ -886,13 +890,27 @@
 [Components]
   !include $(SHARED_CRYPTO_PATH)/Driver/Bin/CryptoDriver.inc.dsc
 
-QemuQ35Pkg/Library/PeiFvMeasurementExclusionLib/PeiFvMeasurementExclusionLib.inf
+  QemuQ35Pkg/Library/PeiFvMeasurementExclusionLib/PeiFvMeasurementExclusionLib.inf
 
-QemuQ35Pkg/Library/ResetSystemLib/BaseResetSystemLib.inf
-QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
-QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
+  QemuQ35Pkg/Library/ResetSystemLib/BaseResetSystemLib.inf
+  QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
+  QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
 
 [Components.X64]
+
+  $(ONE_CRYPTO_PATH)/$(TARGET)/X64/OneCryptoLoaders/OneCryptoLoaderDxe.inf {
+    <PcdsPatchableInModule>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8040004F
+  }
+  $(ONE_CRYPTO_PATH)/$(TARGET)/X64/OneCryptoLoaders/OneCryptoLoaderSupvMm.inf {
+    <PcdsPatchableInModule>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8040004F
+  }
+  $(ONE_CRYPTO_PATH)/$(TARGET)/X64/OneCryptoBin/OneCryptoBinSupvMm.inf {
+    <PcdsPatchableInModule>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8040004F
+  }
+
   #########################################
   # DXE Phase modules
   #########################################
@@ -1236,7 +1254,11 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
 ## Where-Object {(Select-String -InputObject $_ -Pattern "MODULE_TYPE\s*=\s*UEFI_APPLICATION")} | ^
 ## ForEach-Object {$path = $_.FullName -replace '\\','/'; Write-Output $path}
 !if $(BUILD_UNIT_TESTS) == TRUE
-
+  CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf {
+    <LibraryClasses>
+      BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/DxeCryptLib.inf
+      TlsLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/DxeCryptLib.inf
+  }
   AdvLoggerPkg/UnitTests/LineParser/LineParserTestApp.inf
   DfciPkg/UnitTests/DeviceIdTest/DeviceIdTestApp.inf
   # DfciPkg/UnitTests/DfciVarLockAudit/UEFI/DfciVarLockAuditTestApp.inf # DOESN'T PRODUCE OUTPUT
@@ -1301,6 +1323,7 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
       NULL|StandaloneMmPkg/Library/VariableMmDependency/VariableMmDependency.inf
   }
   StandaloneMmPkg/Drivers/MmCommunicationDxe/MmCommunicationDxe.inf
+  StandaloneMmPkg/Drivers/MmCommunicationNotifyDxe/MmCommunicationNotifyDxe.inf
 !else
   MmSupervisorPkg/Drivers/StandaloneMmIpl/PiSmmIpl.inf
 !endif
@@ -1333,12 +1356,6 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
       NULL|MdeModulePkg/Library/VarCheckPolicyLib/VarCheckPolicyLibStandaloneMm.inf
   }
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
-
-  #
-  # Variable driver stack (NO SMM)
-  #
-  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
-  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 
   #
   # TPM support

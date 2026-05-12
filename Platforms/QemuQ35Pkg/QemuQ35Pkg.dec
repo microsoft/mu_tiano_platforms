@@ -211,7 +211,7 @@
   ## The following setting controls how many megabytes we configure as TSEG on
   #  Q35, for SMRAM purposes. Permitted defaults are: 1, 2, 8. Other defaults
   #  cause undefined behavior. During boot, the PCD is updated by PlatformPei
-  #  to reflect the extended TSEG size, if one is advertized by QEMU.
+  #  to reflect the extended TSEG size, if one is advertized by QEMU (Default: 16Mb).
   #
   #  This PCD is only accessed if PcdSmmSmramRequire is TRUE (see below).
   gUefiQemuQ35PkgTokenSpaceGuid.PcdQ35TsegMbytes|8|UINT16|0x20

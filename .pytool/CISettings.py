@@ -142,7 +142,7 @@ class Settings(CiSetupSettingsManager, CiBuildSettingsManager, UpdateSettingsMan
             if "mu_" in submodule.url:
                 rs.append(RequiredSubmodule(submodule.path, False, ".pytool/CISettings.py"))
             else:
-                rs.append(RequiredSubmodule(submodule.path, True))
+                rs.append(RequiredSubmodule(submodule.path, False))
         return rs
 
     def GetName(self):

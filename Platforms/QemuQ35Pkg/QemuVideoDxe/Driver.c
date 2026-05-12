@@ -857,7 +857,7 @@ InitializeQemuVideo (
                   (VOID **)&PolicyProtocol
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "%a: Failed to locate policy protocol - %r!\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_INFO, "%a: Failed to locate policy protocol - %r!\n", __func__, Status));
     return Status;
   }
 
@@ -869,7 +869,7 @@ InitializeQemuVideo (
                                  &PolicySize
                                  );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_WARN, "%a: Failed to get GFX policy from database, configuration is not setup properly - %r! Default to disabled state.\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_WARN, "%a: Failed to get GFX policy from database, configuration is not setup properly - %r! Default to disabled state.\n", __func__, Status));
     mGfxPolicy[0].Power_State_Port = FALSE;
     // don't return a failed status in this case
     PolicySize = sizeof (mGfxPolicy);
@@ -880,7 +880,7 @@ InitializeQemuVideo (
     DEBUG ((
       DEBUG_ERROR,
       "%a: Located USB policy is not valid! Attributes: 0x%llx, has size: %x, expecting %x.\n",
-      __FUNCTION__,
+      __func__,
       PolicyAttribute,
       PolicySize,
       sizeof (mGfxPolicy)
@@ -889,7 +889,7 @@ InitializeQemuVideo (
   }
 
   if ((PolicyAttribute & POLICY_ATTRIBUTE_FINALIZED) == 0) {
-    DEBUG ((DEBUG_WARN, "%a: Applying platform default configuration (Attribute: %llx)!\n", __FUNCTION__, PolicyAttribute));
+    DEBUG ((DEBUG_WARN, "%a: Applying platform default configuration (Attribute: %llx)!\n", __func__, PolicyAttribute));
   }
 
   return Status;

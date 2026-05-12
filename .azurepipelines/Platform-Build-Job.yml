@@ -48,7 +48,7 @@ parameters:
   # BuildExtraTag:        Extra tags to be used as artifact identifier, this is especially useful when building the same packages with the tool chain and target
   # BuildExtraStep:       Extra steps the template will execute prior to Steps/BuildPlatform.yml
   # Run:                  Indicate whether the QEMU runner should launch, this will be overridden to defer the run if a combination of Window and ARM host system is met
-  # RunFlags:             Run flags to be used for launching QEMU, i.e., "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 TEST_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+  # RunFlags:             Run flags to be used for launching QEMU, i.e., "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
   # SelfHostAgent:        Optional: Indicate whether this matrix entry should be run on selfhosted agents
   # BuildArtifactsBinary: Artifacts to be published after building steps
   # BuildArtifactsOther:  Additional artifacts to be published after building steps
@@ -86,6 +86,14 @@ jobs:
           vmImage: ${{ parameters.vm_image }}
 
       steps:
+      # Redirect Hafnium submodule URLs from git.trustedfirmware.org to GitHub mirrors
+      - script: |
+          git config --global url."https://github.com/TF-Hafnium/hafnium-prebuilts".insteadOf "https://git.trustedfirmware.org/hafnium/prebuilts"
+          git config --global url."https://github.com/TF-Hafnium/hafnium-project-reference".insteadOf "https://git.trustedfirmware.org/hafnium/project/reference"
+          git config --global url."https://github.com/TF-Hafnium/hafnium-third_party-dtc".insteadOf "https://git.trustedfirmware.org/hafnium/third_party/dtc"
+          git config --global url."https://github.com/TF-Hafnium/hafnium-third_party-googletest".insteadOf "https://git.trustedfirmware.org/hafnium/third_party/googletest"
+        displayName: Redirect Submodule URLs
+
       # Potential Extra steps from specific build targets
       - ${{ item.Value.BuildExtraStep }}
 
