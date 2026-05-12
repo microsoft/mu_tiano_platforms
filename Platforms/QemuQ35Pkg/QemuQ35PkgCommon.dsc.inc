@@ -1310,20 +1310,9 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   #
   # SMM_CORE
   #
-  MmSupervisorPkg/Core/Init/MmSupervisorInit.inf
+  MmSupervisorPkg/Core/MmSupervisorInit.inf
   SeaPkg/MmiEntrySea/MmiEntrySea.inf
   MmSupervisorPkg/Drivers/MmSupervisedCpu/MmSupervisedCpu.inf
-  StandaloneMmPkg/Core/StandaloneMmCore.inf {
-    <LibraryClasses>
-      DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-      MemLib|StandaloneMmPkg/Library/StandaloneMmMemLib/StandaloneMmMemLib.inf
-      StandaloneMmCoreEntryPoint|MmSupervisorPkg/Library/StandaloneMmUserEntryPoint/StandaloneMmDriverEntryPoint.inf
-      SysCallLib|MmSupervisorPkg/Library/SysCallLib/SysCallLib.inf
-      BaseLib|MmSupervisorPkg/Library/BaseLibSysCall/BaseLib.inf
-      IoLib|MmSupervisorPkg/Library/BaseIoLibIntrinsicSysCall/BaseIoLibIntrinsic.inf
-      PciLib|QemuQ35Pkg/Library/DxePciLibI440FxQ35/DxePciLibI440FxQ35.inf
-      MemLib|MmSupervisorPkg/Library/MmSupervisorMemLib/MmSupervisorMemLibSyscall.inf
-  }
 
   #
   # Privileged drivers (DXE_SMM_DRIVER modules)

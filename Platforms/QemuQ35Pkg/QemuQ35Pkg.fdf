@@ -270,7 +270,7 @@ INF  PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
 INF  QemuQ35Pkg/ConfigKnobs/ConfigKnobs.inf
 INF  OemPkg/OemConfigPolicyCreatorPei/OemConfigPolicyCreatorPei.inf
 
-INF  DebuggerFeaturePkg/DebugConfigPei/DebugConfigPei.inf
+# INF  DebuggerFeaturePkg/DebugConfigPei/DebugConfigPei.inf
 
 !include $(SHARED_CRYPTO_PATH)/Driver/Bin/CryptoDriver.PEI.inc.fdf
 
@@ -455,15 +455,15 @@ INF  QemuQ35Pkg/SmmAccess/SmmAccess2Dxe.inf
 !else
   INF  MmSupervisorPkg/Drivers/StandaloneMmIpl/PiSmmIpl.inf
 !endif
-INF  MmSupervisorPkg/Core/Init/MmSupervisorInit.inf
+INF  MmSupervisorPkg/Core/MmSupervisorInit.inf
 FILE MM_CORE_STANDALONE = gMmSupervisorCoreGuid {
-  SECTION PE32 = D:\Repos\patina\target\x86_64-unknown-uefi\debug\example_mm_supervisor.efi
+  SECTION PE32 = D:\Repos\patina-dxe-core-qemu\target\x86_64-unknown-uefi\debug\q35_mm_supervisor.efi
   SECTION UI   = "MmSupervisorCore"
 }
 INF  MmSupervisorPkg/Drivers/MmSupervisedCpu/MmSupervisedCpu.inf
 # INF  StandaloneMmPkg/Core/StandaloneMmCore.inf
 FILE MM_CORE_STANDALONE = gMmSupervisorUserGuid {
-  SECTION PE32 = D:\Repos\patina\target\x86_64-unknown-uefi\debug\example_mm_user.efi
+  SECTION PE32 = D:\Repos\patina-dxe-core-qemu\target\x86_64-unknown-uefi\debug\q35_mm_user_core.efi
   SECTION UI   = "MmUserCore"
 }
 INF  UefiCpuPkg/CpuIo2Smm/CpuIo2StandaloneMm.inf
