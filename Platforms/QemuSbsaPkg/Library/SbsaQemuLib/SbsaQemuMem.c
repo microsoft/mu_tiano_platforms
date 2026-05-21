@@ -24,6 +24,15 @@
 // Number of Virtual Memory Map Descriptors
 #define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS  5
 
+#define RESOURCE_CAP  (EFI_RESOURCE_ATTRIBUTE_PRESENT | \
+                      EFI_RESOURCE_ATTRIBUTE_INITIALIZED | \
+                      EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE | \
+                      EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE | \
+                      EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE | \
+                      EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE | \
+                      EFI_RESOURCE_ATTRIBUTE_TESTED \
+                      )
+
 // MU_CHANGE START
 
 /**
@@ -174,19 +183,58 @@ InitializeMemoryConfiguration (
   }
 
   if (NewSize > PcdGet64 (PcdSystemMemorySize)) {
-    BuildResourceDescriptorV2 (
-      EFI_RESOURCE_SYSTEM_MEMORY,
-      (EFI_RESOURCE_ATTRIBUTE_PRESENT |
-       EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-       EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
-       EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
-       EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
-       EFI_RESOURCE_ATTRIBUTE_TESTED),
-      NewBase + PcdGet64 (PcdSystemMemorySize),
-      NewSize - PcdGet64 (PcdSystemMemorySize),
-      EFI_MEMORY_WB,
-      NULL
-      );
+    if ((PcdGet64 (PcdMmBufferBase) > PcdGet64 (PcdSystemMemoryBase)) && (PcdGet64 (PcdMmBufferBase) < NewBase + NewSize)) {
+      // Carve out the MM buffer from the available memory, it is added as a HOB elsewhere. This only matters when
+      // adding more memory as PcdSystemMemoryBase + PcdSystemMemorySize is less than PcdMmBufferBase.
+
+      // Memory between the end of PcdSystemMemorySize and the start of the MM buffer
+      if (PcdGet64 (PcdMmBufferBase) > NewBase + PcdGet64 (PcdSystemMemorySize)) {
+        BuildResourceDescriptorV2 (
+          EFI_RESOURCE_SYSTEM_MEMORY,
+          (EFI_RESOURCE_ATTRIBUTE_PRESENT |
+           EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+           EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+           EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+           EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
+           EFI_RESOURCE_ATTRIBUTE_TESTED),
+          NewBase + PcdGet64 (PcdSystemMemorySize),
+          PcdGet64 (PcdMmBufferBase) - (NewBase + PcdGet64 (PcdSystemMemorySize)),
+          EFI_MEMORY_WB,
+          NULL
+          );
+      }
+
+      // Memory after the MM buffer, if any remains
+      if (PcdGet64 (PcdMmBufferBase) + PcdGet64 (PcdMmBufferSize) < NewBase + NewSize) {
+        BuildResourceDescriptorV2 (
+          EFI_RESOURCE_SYSTEM_MEMORY,
+          (EFI_RESOURCE_ATTRIBUTE_PRESENT |
+           EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+           EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+           EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+           EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
+           EFI_RESOURCE_ATTRIBUTE_TESTED),
+          PcdGet64 (PcdMmBufferBase) + PcdGet64 (PcdMmBufferSize),
+          (NewBase + NewSize) - (PcdGet64 (PcdMmBufferBase) + PcdGet64 (PcdMmBufferSize)),
+          EFI_MEMORY_WB,
+          NULL
+          );
+      }
+    } else {
+      BuildResourceDescriptorV2 (
+        EFI_RESOURCE_SYSTEM_MEMORY,
+        (EFI_RESOURCE_ATTRIBUTE_PRESENT |
+         EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+         EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+         EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+         EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
+         EFI_RESOURCE_ATTRIBUTE_TESTED),
+        NewBase + PcdGet64 (PcdSystemMemorySize),
+        NewSize - PcdGet64 (PcdSystemMemorySize),
+        EFI_MEMORY_WB,
+        NULL
+        );
+    }
   } else {
     NewSize = PcdGet64 (PcdSystemMemorySize);
   }
@@ -264,12 +312,6 @@ ArmPlatformGetVirtualMemoryMap (
   }
 
   BuildMemoryAllocationHob (
-    PcdGet64 (PcdMmBufferBase),
-    PcdGet64 (PcdMmBufferSize),
-    EfiReservedMemoryType
-    );
-
-  BuildMemoryAllocationHob (
     PcdGet64 (PcdAdvancedLoggerBase),
     PcdGet32 (PcdAdvancedLoggerPages) * EFI_PAGE_SIZE,
     EfiRuntimeServicesData
@@ -327,7 +369,16 @@ ArmPlatformGetVirtualMemoryMap (
   VirtualMemoryTable[3].PhysicalBase = PcdGet64 (PcdMmBufferBase);
   VirtualMemoryTable[3].VirtualBase  = PcdGet64 (PcdMmBufferBase);
   VirtualMemoryTable[3].Length       = PcdGet64 (PcdMmBufferSize);
-  VirtualMemoryTable[3].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED;
+  VirtualMemoryTable[3].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
+
+  BuildResourceDescriptorV2 (
+    EFI_RESOURCE_MEMORY_RESERVED,
+    RESOURCE_CAP,
+    VirtualMemoryTable[3].PhysicalBase,
+    VirtualMemoryTable[3].Length,
+    EFI_MEMORY_WB,
+    NULL
+    );
 
   // End of Table
   ZeroMem (&VirtualMemoryTable[4], sizeof (ARM_MEMORY_REGION_DESCRIPTOR));
