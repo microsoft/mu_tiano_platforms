@@ -10,6 +10,9 @@
 if __name__ == "__main__":
     import os
     import argparse
+    import runpy
+    import shlex
+    import sys
     from pathlib import Path
 
     parser = argparse.ArgumentParser(description='Start Qemu with DFCI Options')
@@ -61,5 +64,6 @@ if __name__ == "__main__":
 
     args += " BLD_*_QEMU_CORE_NUM=4"
 
-    cmd = platformbuild + args
-    os.system(cmd)
+    cmd_args = shlex.split(platformbuild + args)
+    sys.argv = cmd_args
+    runpy.run_path(cmd_args[0], run_name="__main__")
