@@ -11,7 +11,6 @@
 #include <IndustryStandard/Pci.h>
 #include <IndustryStandard/Virtio095.h>
 
-#include <Guid/QemuRamfb.h>
 #include <Guid/SerialPortLibVendor.h>
 
 #include <Protocol/DevicePath.h>
@@ -150,16 +149,6 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL    End;
 } VENDOR_UART_DEVICE_PATH;
 #pragma pack ()
-//
-// QemuRamfb Device Path structure
-//
-#pragma pack (1)
-typedef struct {
-  VENDOR_DEVICE_PATH          Vendor;
-  ACPI_ADR_DEVICE_PATH        AcpiAdr;
-  EFI_DEVICE_PATH_PROTOCOL    End;
-} VENDOR_RAMFB_DEVICE_PATH;
-#pragma pack ()
 
 //
 // USB Keyboard Device Path structure
@@ -195,41 +184,6 @@ STATIC USB_KEYBOARD_DEVICE_PATH  gUsbKeyboardDevicePath = {
   gEndEntire
 };
 
-STATIC VENDOR_RAMFB_DEVICE_PATH  gQemuRamfbDevicePath = {
-  {
-    {
-      HARDWARE_DEVICE_PATH,
-      HW_VENDOR_DP,
-      {
-        (UINT8)(sizeof (VENDOR_DEVICE_PATH)),
-        (UINT8)((sizeof (VENDOR_DEVICE_PATH)) >> 8)
-      }
-    },
-    QEMU_RAMFB_GUID,
-  },
-  {
-    {
-      ACPI_DEVICE_PATH,
-      ACPI_ADR_DP,
-      {
-        (UINT8)(sizeof (ACPI_ADR_DEVICE_PATH)),
-        (UINT8)((sizeof (ACPI_ADR_DEVICE_PATH)) >> 8)
-      }
-    },
-    ACPI_DISPLAY_ADR (
-      1,                                       // DeviceIdScheme
-      0,                                       // HeadId
-      0,                                       // NonVgaOutput
-      1,                                       // BiosCanDetect
-      0,                                       // VendorInfo
-      ACPI_ADR_DISPLAY_TYPE_EXTERNAL_DIGITAL,  // Type
-      0,                                       // Port
-      0                                        // Index
-      ),
-  },
-  gEndEntire
-};
-
 typedef struct {
   ACPI_HID_DEVICE_PATH        PciRootBridge;
   PCI_DEVICE_PATH             PciDevice;
@@ -249,7 +203,7 @@ STATIC PREFERRED_VIDEO_DEVICE  gPreferredVideo = {
       },
     },
     0x00,
-    0x01
+    0x03
   },
   {
     {
@@ -281,10 +235,6 @@ BDS_CONSOLE_CONNECT_ENTRY  gPlatformConsoles[] = {
   {
     (EFI_DEVICE_PATH_PROTOCOL *)&gUsbKeyboardDevicePath,
     CONSOLE_IN
-  },
-  {
-    (EFI_DEVICE_PATH_PROTOCOL *)&gQemuRamfbDevicePath,
-    CONSOLE_OUT
   },
   {
     (EFI_DEVICE_PATH_PROTOCOL *)&gPreferredVideo,
@@ -1239,7 +1189,7 @@ IsVgaHandle (
       DEBUG ((DEBUG_INFO, "  PCI CLASS CODE    = 0x%x\n", Pci.Hdr.ClassCode[2]));
       DEBUG ((DEBUG_INFO, "  PCI SUBCLASS CODE = 0x%x\n", Pci.Hdr.ClassCode[1]));
 
-      if (IS_PCI_VGA (&Pci) || IS_PCI_OLD_VGA (&Pci)) {
+      if (IS_PCI_DISPLAY (&Pci) || IS_PCI_OLD_VGA (&Pci)) {
         DEBUG ((DEBUG_INFO, "  \nPCI VGA Device Found\n"));
         return TRUE;
       }
@@ -1279,7 +1229,7 @@ GetPlatformPreferredConsole (
   Status = gBS->LocateDevicePath (&gEfiPciIoProtocolGuid, &TempDevicePath, &Handle);
   if (!EFI_ERROR (Status) && IsDevicePathEnd (TempDevicePath) && IsVgaHandle (Handle)) {
   } else {
-    DEBUG ((DEBUG_ERROR, "%a - Unable to locate platform preferred console. Code=%r\n", __func__, Status));
+    DEBUG ((DEBUG_ERROR, "%a - Unable to locate platform preferred console. Code=%r %x\n", __func__, Status, Handle));
     Status = EFI_DEVICE_ERROR;
   }
 

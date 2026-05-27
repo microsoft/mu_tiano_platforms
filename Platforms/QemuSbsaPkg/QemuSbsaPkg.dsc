@@ -1047,7 +1047,7 @@
 
   # Produces FORM DISPLAY ENGINE protocol. Handles input, displays strings.
   MsGraphicsPkg/DisplayEngineDxe/DisplayEngineDxe.inf
-  QemuSbsaPkg/QemuVideoDxe/QemuVideoDxe.inf
+  QemuPkg/QemuVideoDxe/QemuVideoDxe.inf
   MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
   ArmPkg/Drivers/ArmPsciMpServicesDxe/ArmPsciMpServicesDxe.inf
   UefiTestingPkg/FunctionalSystemTests/MpManagement/Driver/MpManagement.inf

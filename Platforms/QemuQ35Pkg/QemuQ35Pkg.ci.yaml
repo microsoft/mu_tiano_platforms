@@ -114,7 +114,6 @@
             "pvscsi",
             "qemulog",
             "qemuq",
-            "ramfb",
             "secfv",
             "selawik",
             "stdvga",

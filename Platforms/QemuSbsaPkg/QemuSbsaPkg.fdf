@@ -295,7 +295,7 @@ READ_LOCK_STATUS   = TRUE
   INF MsGraphicsPkg/OnScreenKeyboardDxe/OnScreenKeyboardDxe.inf
   INF MsGraphicsPkg/MsUiTheme/Dxe/MsUiThemeProtocol.inf
   INF MsGraphicsPkg/DisplayEngineDxe/DisplayEngineDxe.inf
-  INF QemuSbsaPkg/QemuVideoDxe/QemuVideoDxe.inf
+  INF QemuPkg/QemuVideoDxe/QemuVideoDxe.inf
 
   #
   # Bds
