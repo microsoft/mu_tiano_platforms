@@ -1,0 +1,103 @@
+# A workflow to build and test the Q35 platform with TPM enabled.
+#
+##
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+name: "Q35 TPM"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: "q35-tpm-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+
+  vars:
+    name: Get Repository Constants
+    uses: OpenDevicePartnership/patina-devops/.github/workflows/qemu-constants.yml@main
+
+  build:
+    name: Build Q35 TPM ${{ matrix.target }}
+    needs: vars
+    runs-on: ubuntu-latest
+
+    container:
+      image: ${{ needs.vars.outputs.container-image }}
+      options: --security-opt seccomp=unconfined
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - config: 'Platforms/QemuQ35Pkg/PlatformBuild.py'
+            target: 'DEBUG'
+            platform: 'Q35'
+          - config: 'Platforms/QemuQ35Pkg/PlatformBuild.py'
+            target: 'RELEASE'
+            platform: 'Q35'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Configure Git
+        uses: ./.github/actions/configure-git
+
+      - name: Install dependencies
+        run: pip install -r pip-requirements.txt
+
+      - name: Install swtpm
+        run: |
+          apt-get update
+          apt-get install -y swtpm swtpm-tools
+
+      - name: Setup TPM state directory
+        run: mkdir -p /tmp/mytpm1
+
+      - name: Redirect Hafnium Submodule URLs
+        uses: ./.github/actions/redirect-hafnium-urls
+
+      - name: Prepare and Build Q35 TPM ${{ matrix.target }}
+        id: build-platform
+        uses: ./.github/actions/build-platform
+        with:
+          command: 'build'
+          platform-config: ${{ matrix.config }}
+          platform-name: ${{ matrix.platform }}
+          target: ${{ matrix.target }}
+          stuart-args: 'SHUTDOWN_AFTER_RUN=TRUE FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE QEMU_HEADLESS=TRUE BLD_*_TPM_ENABLE=TRUE TPM_DEV=/tmp/mytpm1/swtpm-sock'
+
+      - name: Run Q35 TPM ${{ matrix.target }}
+        timeout-minutes: 15
+        uses: ./.github/actions/build-platform
+        with:
+          command: 'flash'
+          platform-config: ${{ matrix.config }}
+          platform-name: ${{ matrix.platform }}
+          target: ${{ matrix.target }}
+          stuart-args: 'SHUTDOWN_AFTER_RUN=TRUE FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE QEMU_HEADLESS=TRUE BLD_*_TPM_ENABLE=TRUE TPM_DEV=/tmp/mytpm1/swtpm-sock'
+
+      - name: Publish Logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-logs-Q35-TPM-${{ matrix.target }}
+          path: ${{ steps.build-platform.outputs.log-path }}
+
+  finalize:
+    name: Finalize Q35 TPM
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Finish
+        run: echo "All Q35 TPM builds complete"
