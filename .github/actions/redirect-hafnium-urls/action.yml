@@ -1,0 +1,13 @@
+name: Redirect Hafnium URLs
+description: Redirect Hafnium submodule URLs to GitHub mirrors
+
+runs:
+  using: composite
+  steps:
+    - name: Redirect Submodule URLs
+      shell: bash
+      run: |
+        git config --global url."https://github.com/TF-Hafnium/hafnium-prebuilts".insteadOf "https://git.trustedfirmware.org/hafnium/prebuilts"
+        git config --global url."https://github.com/TF-Hafnium/hafnium-project-reference".insteadOf "https://git.trustedfirmware.org/hafnium/project/reference"
+        git config --global url."https://github.com/TF-Hafnium/hafnium-third_party-dtc".insteadOf "https://git.trustedfirmware.org/hafnium/third_party/dtc"
+        git config --global url."https://github.com/TF-Hafnium/hafnium-third_party-googletest".insteadOf "https://git.trustedfirmware.org/hafnium/third_party/googletest"
