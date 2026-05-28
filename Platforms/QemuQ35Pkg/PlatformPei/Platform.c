@@ -205,9 +205,9 @@ MemMapInitialization (
   AddIoMemoryBaseSizeHob (0xFED00000, SIZE_4KB);
 
   // Only generate this HOB if TPM is enabled
-  #ifdef TPM_ENABLE
+ #ifdef TPM_ENABLE
   AddIoMemoryBaseSizeHob (0xFED40000, SIZE_4KB);
-  #endif
+ #endif
 
   if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
     AddIoMemoryBaseSizeHob (ICH9_ROOT_COMPLEX_BASE, SIZE_16KB);
