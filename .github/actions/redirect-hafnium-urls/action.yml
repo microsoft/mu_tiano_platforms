@@ -1,0 +1,22 @@
+# A simple composite action to redirect Hafnium submodule
+# URLs from git.trustedfirmware.org to GitHub mirrors.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+name: Redirect Hafnium Submodule URLs
+description: >-
+  Redirects Hafnium submodule URLs from git.trustedfirmware.org to
+  GitHub mirrors.
+
+runs:
+  using: composite
+  steps:
+    - name: Redirect Hafnium submodule URLs
+      shell: bash
+      run: |
+        git config --global url."https://github.com/TF-Hafnium/hafnium-prebuilts".insteadOf "https://git.trustedfirmware.org/hafnium/prebuilts"
+        git config --global url."https://github.com/TF-Hafnium/hafnium-project-reference".insteadOf "https://git.trustedfirmware.org/hafnium/project/reference"
+        git config --global url."https://github.com/TF-Hafnium/hafnium-third_party-dtc".insteadOf "https://git.trustedfirmware.org/hafnium/third_party/dtc"
+        git config --global url."https://github.com/TF-Hafnium/hafnium-third_party-googletest".insteadOf "https://git.trustedfirmware.org/hafnium/third_party/googletest"

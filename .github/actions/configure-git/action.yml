@@ -1,0 +1,20 @@
+# A simple composite action to configure git for Patina QEMU workflows.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+name: Configure Git
+description: >-
+  Configures the git identity for GitHub Actions bot and marks all
+  directories as safe (needed when running inside containers).
+
+runs:
+  using: composite
+  steps:
+    - name: Configure Git identity
+      shell: bash
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global --add safe.directory '*'
