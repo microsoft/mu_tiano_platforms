@@ -74,6 +74,7 @@ jobs:
           platform-config: ${{ matrix.config }}
           platform-name: ${{ matrix.platform }}
           target: ${{ matrix.target }}
+          tool-chain: 'CLANGPDB'
           stuart-args: 'SHUTDOWN_AFTER_RUN=TRUE FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE QEMU_HEADLESS=TRUE BLD_*_TPM_ENABLE=TRUE TPM_DEV=/tmp/mytpm1/swtpm-sock'
 
       - name: Run Q35 TPM ${{ matrix.target }}
@@ -84,6 +85,7 @@ jobs:
           platform-config: ${{ matrix.config }}
           platform-name: ${{ matrix.platform }}
           target: ${{ matrix.target }}
+          tool-chain: 'CLANGPDB'
           stuart-args: 'SHUTDOWN_AFTER_RUN=TRUE FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE QEMU_HEADLESS=TRUE BLD_*_TPM_ENABLE=TRUE TPM_DEV=/tmp/mytpm1/swtpm-sock'
 
       - name: Publish Logs
