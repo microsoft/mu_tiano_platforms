@@ -7,11 +7,9 @@ path between the normal world and the secure world.
 Please note that TPM for SBSA is not supported by default and modifications to your QEMU are
 required to get TPM support. These changes are planned to be upstreamed in the future.
 
-For more details please message either Kun Qin <Kun.Qin@microsoft.com> or Raymond Diaz
-<raymond.diaz@microsoft.com> for more information.
-
 ## Table of Contents
 
+- [Requirements](#requirements)
 - [Build Configuration](#build-configuration)
 - [Platform Memory Layout](#platform-memory-layout)
 - [Architecture Overview](#architecture-overview)
@@ -24,6 +22,17 @@ For more details please message either Kun Qin <Kun.Qin@microsoft.com> or Raymon
 - [swtpm Setup](#swtpm-setup)
 - [Communication Flow](#communication-flow)
 - [PCDs Reference](#pcds-reference)
+
+## Requirements
+
+| Requirement | Notes |
+| ------------- | ------- |
+| **Host OS** | Linux (native) or **WSL** on Windows. Native Windows is not supported. |
+| **swtpm** | TPM 2.0 emulator. Install via your distro's package manager (e.g. `apt install swtpm swtpm-tools`). |
+| **QEMU** | Custom QEMU build with SBSA TPM support (not yet upstreamed — see note above). |
+| **Build host** | Same Linux/WSL environment used to run `stuart_build` and launch QEMU. |
+
+See [swtpm Setup](#swtpm-setup) for the full setup commands.
 
 ## Build Configuration
 
@@ -65,80 +74,36 @@ can locate it through the ACPI TPM2 table.
 
 ## Architecture Overview
 
-```text
-┌──────────────────────────────────────────────────────────────────────────┐
-│ UEFI Firmware (AARCH64)                                                  │
-│                                                                          │
-│  ┌─── SEC Phase ──────────────────────────────────────────────────────┐  │
-│  │                                                                    │  │
-│  │  Tpm2StartupLib                                                    │  │
-│  │    │ Tpm2RequestUseTpm() — request locality access via FF-A        │  │
-│  │    │ Tpm2Startup(TPM_SU_CLEAR) — initialize TPM, clear PCR banks   │  │
-│  │    │ Uses Tpm2DeviceSecLibFfa + ArmFfaSecLib                       │  │
-│  │    ▼                                                               │  │
-│  │  TPM ready for DXE phase                                           │  │
-│  └────────────────────────────────────────────────────────────────────┘  │
-│                                                                          │
-│  ┌─── DXE Phase ──────────────────────────────────────────────────────┐  │
-│  │                                                                    │  │
-│  │  Tcg2Dxe                                                           │  │
-│  │    │ Uses Tpm2DeviceLibRouter → Tpm2InstanceLibFfa (FF-A to MSSP)  │  │
-│  │    │ Registers hash algorithms via HashLibBaseCryptoRouter         │  │
-│  │    ▼                                                               │  │
-│  │  Installs EFI_TCG2_PROTOCOL                                        │  │
-│  │                                                                    │  │
-│  │  Tcg2AcpiFfa                                                       │  │
-│  │    │ Publishes TPM2 ACPI table and SSDT with TPM0 device node      │  │
-│  └────────────────────────────────────────────────────────────────────┘  │
-│                                                                          │
-│  ┌─── BDS Phase ──────────────────────────────────────────────────────┐  │
-│  │                                                                    │  │
-│  │  DeviceBootManagerAfterConsole                                     │  │
-│  │    │ Tcg2PhysicalPresenceLibProcessRequest (NULL)                  │  │
-│  │    │ Process any pending PP request before shell launch            │  │
-│  │    ▼                                                               │  │
-│  │  Creates TCG2_PHYSICAL_PRESENCE_VARIABLE if it doesn't exist       │  │
-│  └────────────────────────────────────────────────────────────────────┘  │
-│                                                                          │
-│  ┌─── UEFI Shell ─────────────────────────────────────────────────────┐  │
-│  │                                                                    │  │
-│  │  UEFI Shell / OS / TpmShellApp                                     │  │
-│  │    │ gBS->LocateProtocol(&gEfiTcg2ProtocolGuid)                    │  │
-│  │    │ Tcg2Protocol->GetCapability / SetActivePcrBanks / etc.        │  │
-│  └────┼───────────────────────────────────────────────────────────────┘  │
-│       ▼                                                                  │
-│  Tpm2DeviceLibFfa ─── Writes to Internal CRB @ 0x100_00200000            │
-│       │               then sends FF-A DirectReq2 to the TpmService       │
-│       │                                                                  │
-├───────┼──────────────────────────────────────────────────────────────────┤
-│ EL3 (SPMC / TF-A)  ─── routes FF-A message to partition 0x8002           │
-├───────┼──────────────────────────────────────────────────────────────────┤
-│       ▼                                                                  │
-│ SECURE WORLD (SEL1)                                                      │
-│                                                                          │
-│  MSSP (MsSecurePartition, id=0x8002)                                     │
-│       │                                                                  │
-│       ▼                                                                  │
-│  TpmServiceLib ─── State machine (IDLE → READY → COMPLETE → IDLE)        │
-│       │                                                                  │
-│       ▼                                                                  │
-│  TpmServiceStateTranslationLib ─── Translates CRB style communications   │
-│       │                            to the style supported by the TPM     │
-│       │                            i.e. FIFO for QEMU SBSA               │
-│       │  Library Responsibilities:                                       │
-│       │  1. Copy command from Internal CRB → local buffer                │
-│       │  2. Write command to External CRB @ 0x60120000                   │
-│       │  3. Trigger execution on external TPM through the CRB MMIO       │
-│       │  4. Read response from External CRB                              │
-│       │  5. Copy response back to Internal CRB                           │
-│       │                                                                  │
-├───────┼──────────────────────────────────────────────────────────────────┤
-│       ▼                                                                  │
-│  QEMU TPM device (MMIO @ 0x60120000)                                     │
-│       │                                                                  │
-│       ▼                                                                  │
-│  Unix socket ──────── swtpm process (--tpm2)                             │
-└──────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph SEC["SEC Phase"]
+        SecNode["<b>Tpm2StartupLib</b><br/>1. Tpm2RequestUseTpm()<br/>2. Tpm2Startup(TPM_SU_CLEAR)"]
+    end
+    subgraph DXE["DXE Phase"]
+        direction TB
+        HashDxe["<b>HashLibBaseCryptoRouterDxe + HashInstanceLib*</b><br/>1. Constructors register each enabled hash algorithm<br/>2. Filtered by PcdTpm2HashMask → PcdTcg2HashAlgorithmBitmap"]
+        Tcg2Dxe["<b>Tcg2Dxe</b><br/>1. Verify PcdTpmInstanceGuid is TPM 2.0<br/>2. Verify no TpmErrorHob is present<br/>3. Tpm2RequestUseTpm()<br/>4. Query TPM capabilities (Manufacturer, Firmware version, Max cmd/resp size)<br/>5. Get supported/active PCR banks filtered by HashAlgorithmBitmap<br/>6. Decide SupportedEventLogs (TCG_1_2 only if SHA1 active)<br/>7. SetupEventLog (allocate log areas, replay pre-DXE HOBs)<br/>8. Register events (ReadyToBoot, ExitBootServices, ExitBootServices Failed)<br/>9. Register protocol notifies (VariableWriteArch, ResetNotification)<br/>10. Install Tcg2Protocol"]
+        Tcg2AcpiFfa["<b>Tcg2AcpiFfa</b><br/>1. Publish TPM2 ACPI table<br/>2. Publish SSDT with TPM0 device node"]
+        HashDxe --> Tcg2Dxe --> Tcg2AcpiFfa
+    end
+    subgraph BDS["BDS Phase"]
+        BdsNode["<b>DeviceBootManagerAfterConsole</b><br/>1. Tcg2PhysicalPresenceLibProcessRequest(NULL)<br/>2. Process any pending PP request before shell launch<br/>3. Create TCG2_PHYSICAL_PRESENCE_VARIABLE if missing"]
+    end
+    subgraph SHELL["UEFI Shell"]
+        ShellNode["<b>UEFI Shell / OS / TpmShellApp</b><br/>1. gBS-&gt;LocateProtocol(&amp;gEfiTcg2ProtocolGuid)<br/>2. Tcg2Protocol-&gt;GetCapability / SetActivePcrBanks / etc."]
+    end
+    SEC --> DXE --> BDS --> SHELL
+    SHELL --> DevLib["<b>Tpm2DeviceLibFfa</b><br/>Writes to Internal CRB @ 0x100_00200000<br/>Sends FF-A DirectReq2 to the TpmService"]
+    DevLib --> Spmc["<b>EL3: SPMC / TF-A</b><br/>Routes FF-A message to partition 0x8002"]
+    subgraph SECURE["Secure World (S-EL1) — MSSP partition 0x8002"]
+        direction TB
+        TpmSvc["<b>TpmServiceLib</b><br/>State machine: IDLE → READY → COMPLETE → IDLE"]
+        TpmXlate["<b>TpmServiceStateTranslationLib</b><br/>Translates CRB-style communication to the style supported by the TPM<br/>(FIFO for QEMU SBSA)<br/>1. Copy command from Internal CRB → local buffer<br/>2. Write command to External CRB @ 0x60120000<br/>3. Trigger execution on external TPM via CRB MMIO<br/>4. Read response from External CRB<br/>5. Copy response back to Internal CRB"]
+        TpmSvc --> TpmXlate
+    end
+    Spmc --> SECURE
+    SECURE --> QemuDev["<b>QEMU TPM device</b><br/>MMIO @ 0x60120000"]
+    QemuDev --> Swtpm["<b>swtpm process (--tpm2)</b><br/>via Unix socket"]
 ```
 
 ## Secure Partitions
@@ -212,25 +177,15 @@ the normal world for NV variable access.
 
 ### CRB Register Layout (PTP CRB Interface)
 
-Each locality occupies 0x1000 bytes. The register layout per the TCG PC Client Platform
-TPM Profile (PTP) specification, defined in `TpmPtp.h`:
+Each locality occupies 0x1000 bytes. The CRB register layout is defined by the TCG
+PC Client Platform TPM Profile (PTP) specification (and mirrored in `TpmPtp.h`):
 
-| Offset | Register | Description |
-| -------- | ---------- | ------------- |
-| `0x00` | `LocalityState` | Current locality ownership |
-| `0x08` | `LocalityControl` | Request access, relinquish, seize |
-| `0x0C` | `LocalityStatus` | Granted / been seized status |
-| `0x30` | `InterfaceId` | CRB vs FIFO detection, version, VID/DID |
-| `0x40` | `CrbControlRequest` | `cmdReady` (BIT0), `goIdle` (BIT1) |
-| `0x44` | `CrbControlStatus` | `tpmIdle` (BIT0), `tpmSts` (BIT1) |
-| `0x48` | `CrbControlCancel` | Write 1 to cancel in-progress command |
-| `0x4C` | `CrbControlStart` | Write 1 to begin command execution |
-| `0x58` | `CrbControlCommandSize` | Command buffer size (typically `0xF80`) |
-| `0x5C` | `CrbControlCommandAddressLow` | Low 32 bits of command buffer address |
-| `0x60` | `CrbControlCommandAddressHigh` | High 32 bits of command buffer address |
-| `0x64` | `CrbControlResponseSize` | Response buffer size (typically `0xF80`) |
-| `0x68` | `CrbControlResponseAddress` | Low 64 bits of response buffer address |
-| `0x80` | `CrbDataBuffer[0xF80]` | 3968-byte shared command/response buffer |
+- [TCG PC Client Platform TPM Profile (PTP) Specification][ptp-spec] —
+  *Section 6 "Command Response Buffer Interface"* describes `LocalityState`,
+  `LocalityControl`, `InterfaceId`, `CrbControlRequest`, `CrbControlStart`,
+  `CrbControlCommand*`/`CrbControlResponse*`, and the shared `CrbDataBuffer`.
+
+[ptp-spec]: https://trustedcomputinggroup.org/resource/pc-client-platform-tpm-profile-ptp-specification/
 
 ### Internal CRB (`0x100_00200000`)
 
@@ -368,64 +323,29 @@ or responds with a YIELD.
 
 ## Hash Library Architecture
 
-Tcg2Dxe uses a pluggable hash library architecture based on `HashLibBaseCryptoRouter` and
-`HashInstanceLib` modules.
+Tcg2Dxe uses `HashLibBaseCryptoRouterDxe` with all hash instance libraries included.
 
 ### Registration Flow
 
-1. **Build time**: The DSC links hash instance libraries as NULL library classes into
-   Tcg2Dxe. Each instance has a constructor.
-
-   ```ini
-   # QemuSbsaPkg.dsc — Tcg2Dxe component overrides
-   SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf {
-     <LibraryClasses>
-       HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCryptoRouterDxe.inf
-       NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1.inf
-       NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSha256.inf
-       NULL|SecurityPkg/Library/HashInstanceLibSha384/HashInstanceLibSha384.inf
-       NULL|SecurityPkg/Library/HashInstanceLibSha512/HashInstanceLibSha512.inf
-       NULL|SecurityPkg/Library/HashInstanceLibSm3/HashInstanceLibSm3.inf
-   }
-   ```
-
-2. **Module load time**: The `HashLibBaseCryptoRouterDxeConstructor` runs first and resets
-   `PcdTcg2HashAlgorithmBitmap` to 0 for the current module.
-
-3. **Instance constructors**: Each `HashInstanceLib` constructor calls
-   `RegisterHashInterfaceLib()`, which checks the algorithm against `PcdTpm2HashMask`:
-
-   ```c
-   // In RegisterHashInterfaceLib():
-   HashMask = Tpm2GetHashMaskFromAlgo(&HashInterface->HashGuid);
-   Tpm2HashMask = PcdGet32(PcdTpm2HashMask);
-
-   // If PcdTpm2HashMask is non-zero and this algo's bit isn't set, REJECT
-   if ((Tpm2HashMask != 0) && ((HashMask & Tpm2HashMask) == 0)) {
-     return EFI_UNSUPPORTED;
-   }
-   ```
-
-4. **Tcg2Dxe DriverEntry**: Queries the TPM for supported/active PCR banks via
-   `Tpm2GetCapabilitySupportedAndActivePcrs()`, then intersects with the registered hash
-   bitmap:
-
-   ```c
-   mTcgDxeData.BsCap.HashAlgorithmBitmap = TpmHashAlgorithmBitmap
-                                          & PcdGet32(PcdTcg2HashAlgorithmBitmap);
-   mTcgDxeData.BsCap.ActivePcrBanks      = ActivePCRBanks
-                                          & PcdGet32(PcdTcg2HashAlgorithmBitmap);
-   ```
+1. `HashLibBaseCryptoRouterConstructor` resets `PcdTcg2HashAlgorithmBitmap` to 0.
+2. Each `HashInstanceLib` constructor calls `RegisterHashInterfaceLib()`.
+3. `RegisterHashInterfaceLib()` checks the algorithm against `PcdTpm2HashMask` (`0x02` =
+   SHA256 only). Algorithms not in the mask return `EFI_UNSUPPORTED`.
 
 ### Hash Algorithm Bitmask Values
 
-| Algorithm | Bit | Value |
-| ----------- | ----- | ------- |
-| SHA1 | BIT0 | `0x01` |
-| SHA256 | BIT1 | `0x02` |
-| SHA384 | BIT2 | `0x04` |
-| SHA512 | BIT3 | `0x08` |
-| SM3_256 | BIT4 | `0x10` |
+The bit positions used in `PcdTpm2HashMask`, `PcdTcg2HashAlgorithmBitmap`, and the
+`EFI_TCG2_BOOT_SERVICE_CAPABILITY.HashAlgorithmBitmap` field are defined by the EFI
+TCG2 protocol and the TCG algorithm registry:
+
+- [UEFI TCG2 Protocol Specification][tcg2-proto] — see `EFI_TCG2_BOOT_HASH_ALG_*`
+  (`SHA1` = BIT0, `SHA256` = BIT1, `SHA384` = BIT2, `SHA512` = BIT3, `SM3_256` = BIT4).
+- [TCG Algorithm Registry][tcg-algreg] — canonical list of TPM hash algorithm IDs.
+
+For this platform, `PcdTpm2HashMask = 0x02` enables SHA256 only.
+
+[tcg2-proto]: https://trustedcomputinggroup.org/resource/tcg-efi-protocol-specification/
+[tcg-algreg]: https://trustedcomputinggroup.org/resource/tcg-algorithm-registry/
 
 ### Filtering Chain
 
@@ -449,21 +369,23 @@ Final ActivePcrBanks / HashAlgorithmBitmap in EFI_TCG2_BOOT_SERVICE_CAPABILITY
 
 ### Library Selection
 
-When `TPM2_ENABLE=TRUE`, SBSA uses `DxeTcg2PhysicalPresenceMinimumLib`. This is a
-simplified implementation that:
+| `TPM2_ENABLE` | Library | Behavior |
+| --------------- | --------- | ---------- |
+| `FALSE` | `Tcg2PhysicalPresenceLibNull` | All functions stubbed |
+| `TRUE` | `DxeTcg2PhysicalPresenceMinimumLib` | Auto-confirms Clear; rejects all other operations |
+
+The MinimumLib implementation:
 
 - **Auto-confirms** TPM Clear operations without user prompting.
-- **Rejects** all other operations (SET_PCR_BANKS, LOG_ALL_DIGESTS, etc.) with
+- **Rejects** SET_PCR_BANKS, LOG_ALL_DIGESTS, and other operations with
   `TCG_PP_RETURN_TPM_OPERATION_RESPONSE_FAILURE`.
-
-When `TPM2_ENABLE=FALSE`, the null implementation at
-`QemuPkg/Library/Tcg2PhysicalPresenceLibNull/` is used, which stubs all functions.
+- Does **not** create or use `TCG2_PHYSICAL_PRESENCE_FLAGS_VARIABLE`.
 
 ### ProcessRequest in BDS
 
-`Tcg2PhysicalPresenceLibProcessRequest()` is called from
-`DeviceBootManagerAfterConsole()` in `DeviceBootManagerLibQemu`. This runs during BDS
-before the shell launches. It:
+`Tcg2PhysicalPresenceLibProcessRequest()` is invoked from the platform's
+`DeviceBootManagerLib` during `DeviceBootManagerAfterConsole()`, before the shell
+launches. It:
 
 1. Reads the `Tcg2PhysicalPresence` NV variable (creates it if missing).
 2. Executes any pending PP request stored in the variable.
@@ -563,18 +485,6 @@ The `QemuCommandBuilder.with_tpm()` method adds:
 -tpmdev emulator,id=tpm0,chardev=chrtpm
 ```
 
-### TPM Initialization (SEC Phase)
-
-When `TPM2_ENABLE=TRUE`, the SEC phase links the non-NULL instance of `Tpm2StartupLib` which calls:
-
-```c
-Tpm2RequestUseTpm();                    // Request locality access via FF-A
-Tpm2Startup(TPM_SU_CLEAR);             // Initialize TPM, clearing PCR banks
-```
-
-This must complete before DXE phase drivers can use the TPM. The SEC phase uses
-`Tpm2DeviceSecLibFfa` and `ArmFfaSecLib` for FF-A communication.
-
 ## Communication Flow
 
 Complete path from a shell application to swtpm:
@@ -587,8 +497,8 @@ TpmShellApp (UEFI Shell)
 Tcg2Dxe (EFI_TCG2_PROTOCOL)
   │ Validates bank mask against HashAlgorithmBitmap
   │ Calls Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction()
-  │   ↳ MinimumLib: rejects SET_PCR_BANKS → returns EFI_UNSUPPORTED
-  │   ↳ MinimumLib: NO_ACTION (already-active) → writes to NV variable → EFI_SUCCESS
+  │   ├── MinimumLib: rejects SET_PCR_BANKS → returns EFI_UNSUPPORTED
+  │   └── MinimumLib: NO_ACTION (already-active) → writes to NV variable → EFI_SUCCESS
   ▼
 Tpm2CommandLib (for direct TPM commands like GetCapability)
   │ Serializes TPM2_CC command structure into byte buffer
@@ -650,7 +560,7 @@ Response returned to caller
 | `PcdTpm2AcpiTableRev` | `4` | DynamicHii | ACPI TPM2 table revision |
 | `PcdUserPhysicalPresence` | `FALSE` | FixedAtBuild | No physical user presence assertion |
 
-### Always-Set PCDs
+### Memory Type PCDs
 
 | PCD | Value | Purpose |
 | ----- | ------- | --------- |
