@@ -63,31 +63,82 @@ The base address comes from the SecurityPkg package declaration default
 
 ## Architecture Overview
 
-```mermaid
-flowchart TD
-    subgraph PEI["PEI Phase"]
-        direction TB
-        ConfigPei["<b>Tcg2ConfigPei</b><br/>1. Detect TPM 1.2 vs 2.0 at 0xFED40000<br/>2. Set PcdTpmInstanceGuid"]
-        HashPei["<b>HashLibBaseCryptoRouterPei + HashInstanceLib*</b><br/>1. Constructors register each enabled hash algorithm<br/>2. Filtered by PcdTpm2HashMask → PcdTcg2HashAlgorithmBitmap"]
-        Tcg2Pei["<b>Tcg2Pei</b><br/>1. Tpm2RequestUseTpm()<br/>2. Tpm2Startup(TPM_SU_CLEAR)<br/>3. SyncPcrAllocationsAndPcrMask()<br/>4. Tpm2SelfTest()<br/>5. Measure firmware volumes (CRTM) into PCR[0-7]<br/>6. Install TpmInitializedPpi"]
-        ConfigPei --> HashPei --> Tcg2Pei
-    end
-    subgraph DXE["DXE Phase"]
-        direction TB
-        HashDxe["<b>HashLibBaseCryptoRouterDxe + HashInstanceLib*</b><br/>1. Constructors register each enabled hash algorithm<br/>2. Filtered by PcdTpm2HashMask → PcdTcg2HashAlgorithmBitmap"]
-        Tcg2Dxe["<b>Tcg2Dxe</b><br/>1. Verify PcdTpmInstanceGuid is TPM 2.0<br/>2. Verify no TpmErrorHob is present<br/>3. Tpm2RequestUseTpm()<br/>4. Query TPM capabilities (Manufacturer, Firmware version, Max cmd/resp size)<br/>5. Get supported/active PCR banks filtered by HashAlgorithmBitmap<br/>6. Decide SupportedEventLogs (TCG_1_2 only if SHA1 active)<br/>7. SetupEventLog (allocate log areas, replay pre-DXE HOBs)<br/>8. Register events (ReadyToBoot, ExitBootServices, ExitBootServices Failed)<br/>9. Register protocol notifies (VariableWriteArch, ResetNotification)<br/>10. Install Tcg2Protocol"]
-        HashDxe --> Tcg2Dxe
-    end
-    subgraph BDS["BDS Phase"]
-        BdsNode["<b>DeviceBootManagerAfterConsole</b><br/>1. Tcg2PhysicalPresenceLibProcessRequest(NULL)<br/>2. Process any pending PP request before shell launch<br/>3. Create TCG2_PHYSICAL_PRESENCE_VARIABLE if missing"]
-    end
-    subgraph SHELL["UEFI Shell"]
-        ShellNode["<b>UEFI Shell / OS / TpmShellApp</b><br/>1. gBS-&gt;LocateProtocol(&amp;gEfiTcg2ProtocolGuid)<br/>2. Tcg2Protocol-&gt;GetCapability / SetActivePcrBanks / etc."]
-    end
-    PEI --> DXE --> BDS --> SHELL
-    SHELL --> DevLib["<b>Tpm2DeviceLibDTpm</b><br/>Direct MMIO reads/writes to 0xFED40000"]
-    DevLib --> QemuDev["<b>QEMU TPM TIS device</b><br/>-device tpm-tis,tpmdev=tpm0"]
-    QemuDev --> Swtpm["<b>swtpm process (--tpm2)</b><br/>via Unix socket"]
+```text
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│ UEFI Firmware (x86_64)                                                           │
+│                                                                                  │
+│  ┌─── PEI Phase ──────────────────────────────────────────────────────────────┐  │
+│  │                                                                            │  │
+│  │  Tcg2ConfigPei                                                             │  │
+│  │    │ 1. Detect TPM 1.2 vs 2.0 at 0xFED40000                                │  │
+│  │    │ 2. Set PcdTpmInstanceGuid                                             │  │
+│  │    ▼                                                                       │  │
+│  │  HashLibBaseCryptoRouterPei + HashInstanceLib*                             │  │
+│  │    │ 1. Constructors register each enabled hash algorithm                  │  │
+│  │    │ 2. Filtered by PcdTpm2HashMask → PcdTcg2HashAlgorithmBitmap           │  │
+│  │    ▼                                                                       │  │
+│  │  Tcg2Pei                                                                   │  │
+│  │    │ 1. Tpm2RequestUseTpm()                                                │  │
+│  │    │ 2. Tpm2Startup(TPM_SU_CLEAR)                                          │  │
+│  │    │ 3. SyncPcrAllocationsAndPcrMask()                                     │  │
+│  │    │ 4. Tpm2SelfTest()                                                     │  │
+│  │    │ 5. Measure firmware volumes (CRTM) into PCR[0-7]                      │  │
+│  │    │ 6. Install TpmInitializedPpi                                          │  │
+│  └────┼───────────────────────────────────────────────────────────────────────┘  │
+│       ▼                                                                          │
+│  ┌─── DXE Phase ──────────────────────────────────────────────────────────────┐  │
+│  │                                                                            │  │
+│  │  HashLibBaseCryptoRouterDxe + HashInstanceLib*                             │  │
+│  │    │ 1. Constructors register each enabled hash algorithm                  │  │
+│  │    │ 2. Filtered by PcdTpm2HashMask → PcdTcg2HashAlgorithmBitmap           │  │
+│  │    ▼                                                                       │  │
+│  │  Tcg2Dxe                                                                   │  │
+│  │    │ 1. Verify PcdTpmInstanceGuid is TPM 2.0                               │  │
+│  │    │ 2. Verify no TpmErrorHob is present                                   │  │
+│  │    │ 3. Tpm2RequestUseTpm()                                                │  │
+│  │    │ 4. Query TPM capabilities                                             │  │
+│  │    │     ├── Manufacturer                                                  │  │
+│  │    │     ├── Firmware version                                              │  │
+│  │    │     └── Max cmd/resp size                                             │  │
+│  │    │ 5. Get supported/active PCR banks filtered by → HashAlgorithmBitmap   │  │
+│  │    │ 6. Decide SupportedEventLogs (TCG_1_2 only if SHA1 active)            │  │
+│  │    │ 7. SetupEventLog                                                      │  │
+│  │    │     ├── Allocate log area(s)                                          │  │
+│  │    │     └── Acquire and log pre-DXE HOB(s)                                │  │
+│  │    │ 8. Register events                                                    │  │
+│  │    │     ├── ReadyToBoot                                                   │  │
+│  │    │     ├── ExitBootServices                                              │  │
+│  │    │     └── ExitBootServices Failed                                       │  │
+│  │    │ 9. Register protocol notifies                                         │  │
+│  │    │     ├── VariableWriteArch (SecureBoot)                                │  │
+│  │    │     └── ResetNotification (TPM shutdown)                              │  │
+│  │    │ 10. Install Tcg2Protocol                                              │  │
+│  └────┼───────────────────────────────────────────────────────────────────────┘  │
+│       ▼                                                                          │
+│  ┌─── BDS Phase ──────────────────────────────────────────────────────────────┐  │
+│  │                                                                            │  │
+│  │  DeviceBootManagerAfterConsole                                             │  │
+│  │    │ 1. Tcg2PhysicalPresenceLibProcessRequest (NULL)                       │  │
+│  │    │ 2. Process any pending PP request before shell launch                 │  │
+│  │    │ 3. Create TCG2_PHYSICAL_PRESENCE_VARIABLE if it doesn't exist         │  │
+│  └────┼───────────────────────────────────────────────────────────────────────┘  │
+│       ▼                                                                          │
+│  ┌─── UEFI Shell ─────────────────────────────────────────────────────────────┐  │
+│  │                                                                            │  │
+│  │  UEFI Shell / OS / TpmShellApp                                             │  │
+│  │    │ 1. gBS->LocateProtocol(&gEfiTcg2ProtocolGuid)                         │  │
+│  │    │ 2. Tcg2Protocol->GetCapability / SetActivePcrBanks / etc.             │  │
+│  └────┼───────────────────────────────────────────────────────────────────────┘  │
+│       ▼                                                                          │
+│  Tpm2DeviceLibDTpm ─ direct MMIO reads/writes to 0xFED40000                      │
+│       │                                                                          │
+├───────┼──────────────────────────────────────────────────────────────────────────┤
+│       ▼                                                                          │
+│  QEMU TPM TIS device (-device tpm-tis,tpmdev=tpm0)                               │
+│       │                                                                          │
+│       ▼                                                                          │
+│  Unix socket ─ swtpm process (--tpm2)                                            │
+└──────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## TPM Device Library Stack

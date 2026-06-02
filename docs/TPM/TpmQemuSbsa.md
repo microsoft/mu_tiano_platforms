@@ -74,36 +74,97 @@ can locate it through the ACPI TPM2 table.
 
 ## Architecture Overview
 
-```mermaid
-flowchart TD
-    subgraph SEC["SEC Phase"]
-        SecNode["<b>Tpm2StartupLib</b><br/>1. Tpm2RequestUseTpm()<br/>2. Tpm2Startup(TPM_SU_CLEAR)"]
-    end
-    subgraph DXE["DXE Phase"]
-        direction TB
-        HashDxe["<b>HashLibBaseCryptoRouterDxe + HashInstanceLib*</b><br/>1. Constructors register each enabled hash algorithm<br/>2. Filtered by PcdTpm2HashMask → PcdTcg2HashAlgorithmBitmap"]
-        Tcg2Dxe["<b>Tcg2Dxe</b><br/>1. Verify PcdTpmInstanceGuid is TPM 2.0<br/>2. Verify no TpmErrorHob is present<br/>3. Tpm2RequestUseTpm()<br/>4. Query TPM capabilities (Manufacturer, Firmware version, Max cmd/resp size)<br/>5. Get supported/active PCR banks filtered by HashAlgorithmBitmap<br/>6. Decide SupportedEventLogs (TCG_1_2 only if SHA1 active)<br/>7. SetupEventLog (allocate log areas, replay pre-DXE HOBs)<br/>8. Register events (ReadyToBoot, ExitBootServices, ExitBootServices Failed)<br/>9. Register protocol notifies (VariableWriteArch, ResetNotification)<br/>10. Install Tcg2Protocol"]
-        Tcg2AcpiFfa["<b>Tcg2AcpiFfa</b><br/>1. Publish TPM2 ACPI table<br/>2. Publish SSDT with TPM0 device node"]
-        HashDxe --> Tcg2Dxe --> Tcg2AcpiFfa
-    end
-    subgraph BDS["BDS Phase"]
-        BdsNode["<b>DeviceBootManagerAfterConsole</b><br/>1. Tcg2PhysicalPresenceLibProcessRequest(NULL)<br/>2. Process any pending PP request before shell launch<br/>3. Create TCG2_PHYSICAL_PRESENCE_VARIABLE if missing"]
-    end
-    subgraph SHELL["UEFI Shell"]
-        ShellNode["<b>UEFI Shell / OS / TpmShellApp</b><br/>1. gBS-&gt;LocateProtocol(&amp;gEfiTcg2ProtocolGuid)<br/>2. Tcg2Protocol-&gt;GetCapability / SetActivePcrBanks / etc."]
-    end
-    SEC --> DXE --> BDS --> SHELL
-    SHELL --> DevLib["<b>Tpm2DeviceLibFfa</b><br/>Writes to Internal CRB @ 0x100_00200000<br/>Sends FF-A DirectReq2 to the TpmService"]
-    DevLib --> Spmc["<b>EL3: SPMC / TF-A</b><br/>Routes FF-A message to partition 0x8002"]
-    subgraph SECURE["Secure World (S-EL1) — MSSP partition 0x8002"]
-        direction TB
-        TpmSvc["<b>TpmServiceLib</b><br/>State machine: IDLE → READY → COMPLETE → IDLE"]
-        TpmXlate["<b>TpmServiceStateTranslationLib</b><br/>Translates CRB-style communication to the style supported by the TPM<br/>(FIFO for QEMU SBSA)<br/>1. Copy command from Internal CRB → local buffer<br/>2. Write command to External CRB @ 0x60120000<br/>3. Trigger execution on external TPM via CRB MMIO<br/>4. Read response from External CRB<br/>5. Copy response back to Internal CRB"]
-        TpmSvc --> TpmXlate
-    end
-    Spmc --> SECURE
-    SECURE --> QemuDev["<b>QEMU TPM device</b><br/>MMIO @ 0x60120000"]
-    QemuDev --> Swtpm["<b>swtpm process (--tpm2)</b><br/>via Unix socket"]
+```text
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│ UEFI Firmware (AARCH64)                                                          │
+│                                                                                  │
+│  ┌─── SEC Phase ──────────────────────────────────────────────────────────────┐  │
+│  │                                                                            │  │
+│  │  Tpm2StartupLib                                                            │  │
+│  │    │ 1. Tpm2RequestUseTpm()                                                │  │
+│  │    │ 2. Tpm2Startup(TPM_SU_CLEAR)                                          │  │
+│  └────┼───────────────────────────────────────────────────────────────────────┘  │
+│       ▼                                                                          │
+│  ┌─── DXE Phase ──────────────────────────────────────────────────────────────┐  │
+│  │                                                                            │  │
+│  │  HashLibBaseCryptoRouterDxe + HashInstanceLib*                             │  │
+│  │    │ 1. Constructors register each enabled hash algorithm                  │  │
+│  │    │ 2. Filtered by PcdTpm2HashMask → PcdTcg2HashAlgorithmBitmap           │  │
+│  │    ▼                                                                       │  │
+│  │  Tcg2Dxe                                                                   │  │
+│  │    │ 1. Verify PcdTpmInstanceGuid is TPM 2.0                               │  │
+│  │    │ 2. Verify no TpmErrorHob is present                                   │  │
+│  │    │ 3. Tpm2RequestUseTpm()                                                │  │
+│  │    │ 4. Query TPM capabilities                                             │  │
+│  │    │     ├── Manufacturer                                                  │  │
+│  │    │     ├── Firmware version                                              │  │
+│  │    │     └── Max cmd/resp size                                             │  │
+│  │    │ 5. Get supported/active PCR banks filtered by → HashAlgorithmBitmap   │  │
+│  │    │ 6. Decide SupportedEventLogs (TCG_1_2 only if SHA1 active)            │  │
+│  │    │ 7. SetupEventLog                                                      │  │
+│  │    │     ├── Allocate log area(s)                                          │  │
+│  │    │     └── Acquire and log pre-DXE HOB(s)                                │  │
+│  │    │ 8. Register events                                                    │  │
+│  │    │     ├── ReadyToBoot                                                   │  │
+│  │    │     ├── ExitBootServices                                              │  │
+│  │    │     └── ExitBootServices Failed                                       │  │
+│  │    │ 9. Register protocol notifies                                         │  │
+│  │    │     ├── VariableWriteArch (SecureBoot)                                │  │
+│  │    │     └── ResetNotification (TPM shutdown)                              │  │
+│  │    │ 10. Install Tcg2Protocol                                              │  │
+│  │    ▼                                                                       │  │
+│  │  Tcg2AcpiFfa                                                               │  │
+│  │    │ 1. Publish TPM2 ACPI table                                            │  │
+│  │    │ 2. Publish SSDT with TPM0 device node                                 │  │
+│  └────┼───────────────────────────────────────────────────────────────────────┘  │
+│       ▼                                                                          │
+│  ┌─── BDS Phase ──────────────────────────────────────────────────────────────┐  │
+│  │                                                                            │  │
+│  │  DeviceBootManagerAfterConsole                                             │  │
+│  │    │ 1. Tcg2PhysicalPresenceLibProcessRequest (NULL)                       │  │
+│  │    │ 2. Process any pending PP request before shell launch                 │  │
+│  │    │ 3. Create TCG2_PHYSICAL_PRESENCE_VARIABLE if it doesn't exist         │  │
+│  └────┼───────────────────────────────────────────────────────────────────────┘  │
+│       ▼                                                                          │
+│  ┌─── UEFI Shell ─────────────────────────────────────────────────────────────┐  │
+│  │                                                                            │  │
+│  │  UEFI Shell / OS / TpmShellApp                                             │  │
+│  │    │ 1. gBS->LocateProtocol(&gEfiTcg2ProtocolGuid)                         │  │
+│  │    │ 2. Tcg2Protocol->GetCapability / SetActivePcrBanks / etc.             │  │
+│  └────┼───────────────────────────────────────────────────────────────────────┘  │
+│       ▼                                                                          │
+│  Tpm2DeviceLibFfa ─ writes to Internal CRB @ 0x100_00200000                      │
+│       │             then sends FF-A DirectReq2 to the TpmService                 │
+│       │                                                                          │
+├───────┼──────────────────────────────────────────────────────────────────────────┤
+│ EL3 (SPMC / TF-A) ─ routes FF-A message to partition 0x8002                      │
+├───────┼──────────────────────────────────────────────────────────────────────────┤
+│       ▼                                                                          │
+│ SECURE WORLD (SEL1)                                                              │
+│                                                                                  │
+│  MSSP (MsSecurePartition, id=0x8002)                                             │
+│       │                                                                          │
+│       ▼                                                                          │
+│  TpmServiceLib ─ State machine (IDLE → READY → COMPLETE → IDLE)                  │
+│       │                                                                          │
+│       ▼                                                                          │
+│  TpmServiceStateTranslationLib ─ Translates CRB style communications             │
+│       │                          to the style supported by the TPM               │
+│       │                          i.e. FIFO for QEMU SBSA                         │
+│       │  Library Responsibilities:                                               │
+│       │  1. Copy command from Internal CRB → local buffer                        │
+│       │  2. Write command to External CRB @ 0x60120000                           │
+│       │  3. Trigger execution on external TPM through the CRB MMIO               │
+│       │  4. Read response from External CRB                                      │
+│       │  5. Copy response back to Internal CRB                                   │
+│       │                                                                          │
+├───────┼──────────────────────────────────────────────────────────────────────────┤
+│       ▼                                                                          │
+│  QEMU TPM device (MMIO @ 0x60120000)                                             │
+│       │                                                                          │
+│       ▼                                                                          │
+│  Unix socket ─ swtpm process (--tpm2)                                            │
+└──────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Secure Partitions
