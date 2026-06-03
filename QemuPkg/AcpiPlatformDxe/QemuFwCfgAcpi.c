@@ -722,7 +722,7 @@ ProcessCmdWritePointer (
 
   //
   // Because QEMU has now learned PointeeBlob->Base, we must mark PointeeBlob
-  // as unreleasable, for the case when the whole linker/loader script is
+  // as un-releasable, for the case when the whole linker/loader script is
   // handled successfully.
   //
   PointeeBlob->HostsOnlyTableData = FALSE;
@@ -1003,6 +1003,50 @@ Process2ndPassCmdAddPointer (
     Status = EFI_OUT_OF_RESOURCES;
     goto RollbackSeenPointer;
   }
+
+ #if defined (MDE_CPU_AARCH64)
+  //
+  // QEMU's 'virt' machine sets the FADT's ArmBootArch from its
+  // psci-conduit setting. When EL3 secure firmware (TF-A) is present
+  // (-machine virt,secure=on), QEMU disables its in-built PSCI and
+  // emits ArmBootArch = 0, even though TF-A does implement PSCI
+  // at EL3. Patch the FACP in place to advertise PSCI via SMC so the
+  // OS will issue PSCI calls.
+  //
+  // We deliberately use a fresh, non-const Fadt pointer derived from
+  // PointerValue (the table's absolute base, which is writable AcpiNVS
+  // memory allocated by ProcessCmdAllocate), rather than casting away
+  // const on the local 'Header'. Also, 'Header' may be uninitialized
+  // here when TableSize came from the FACS branch above; only
+  // PointerValue and TableSize are guaranteed valid in both paths.
+  //
+  {
+    EFI_ACPI_6_6_FIXED_ACPI_DESCRIPTION_TABLE  *Fadt;
+
+    Fadt = (EFI_ACPI_6_6_FIXED_ACPI_DESCRIPTION_TABLE *)(UINTN)PointerValue;
+    if ((Fadt->Header.Signature ==
+         EFI_ACPI_6_6_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) &&
+        (TableSize >=
+         OFFSET_OF (EFI_ACPI_6_6_FIXED_ACPI_DESCRIPTION_TABLE, ArmBootArch) +
+         sizeof (Fadt->ArmBootArch)) &&
+        ((Fadt->ArmBootArch & EFI_ACPI_6_6_ARM_PSCI_COMPLIANT) == 0))
+    {
+      DEBUG ((
+        DEBUG_INFO,
+        "%a: enabling PSCI in FADT (ArmBootArch 0x%x -> 0x%x)\n",
+        __func__,
+        Fadt->ArmBootArch,
+        Fadt->ArmBootArch | EFI_ACPI_6_6_ARM_PSCI_COMPLIANT
+        ));
+      Fadt->ArmBootArch    |= EFI_ACPI_6_6_ARM_PSCI_COMPLIANT;
+      Fadt->Header.Checksum = 0;
+      Fadt->Header.Checksum = CalculateCheckSum8 (
+                                (UINT8 *)Fadt,
+                                TableSize
+                                );
+    }
+  }
+ #endif
 
   Status = AcpiProtocol->InstallAcpiTable (
                            AcpiProtocol,

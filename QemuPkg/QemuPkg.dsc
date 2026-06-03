@@ -149,6 +149,7 @@
   QemuPkg/Library/QemuFwCfgLib/QemuFwCfgLibNull.inf
   QemuPkg/Library/QemuPreUefiEventLogLibNull/QemuPreUefiEventLogLibNull.inf
   QemuPkg/Library/XenPlatformLib/XenPlatformLib.inf
+  QemuPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
   QemuPkg/FrontPageButtons/FrontPageButtons.inf
   QemuPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
   QemuPkg/QemuVideoDxe/QemuVideoDxe.inf
