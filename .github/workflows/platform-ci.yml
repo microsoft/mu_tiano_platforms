@@ -26,7 +26,7 @@ jobs:
 
   # Builds the platform(s) in this repository as defined by the matrix.
   build:
-    name: ${{ matrix.platform }} ${{ matrix.architecture }} ${{ matrix.target }} ${{ matrix.tool-chain }} (${{ matrix.os }})
+    name: ${{ matrix.platform }} ${{ matrix.architecture }} ${{ matrix.target }} ${{ matrix.tool-chain }} (${{ matrix.os }}) ${{ matrix.variant }}
 
     needs: 
       - vars
@@ -49,6 +49,7 @@ jobs:
         container: ['', '${{ needs.vars.outputs.container-image}}']
         platform: [Q35, SBSA]
         architecture: ['', 'IA32,X64']
+        variant: [DEF, TPM]
 
         exclude:
           # Exclude container builds on Windows
@@ -83,6 +84,15 @@ jobs:
             target: RELEASE
           # Exclude SBSA CLANG builds due to ldr assembly issue
           - tool-chain: CLANGPDB
+            platform: SBSA
+          ###########################
+          # TPM variant constraints #
+          ###########################
+          # Exclude Windows, swtpm requires Unix sockets
+          - variant: TPM
+            os: windows-latest
+          # Exclude SBSA, no TPM support by default
+          - variant: TPM
             platform: SBSA
 
     steps:
@@ -141,6 +151,16 @@ jobs:
       - name: Install dependencies
         run: pip install -r pip-requirements.txt
 
+      # Install swtpm and prepare its state dir for TPM-enabled runs. Exposes
+      # TPM_ARGS for the build/run steps below.
+      - name: Setup swtpm
+        if: matrix.variant == 'TPM'
+        run: |
+          apt-get update
+          apt-get install -y swtpm swtpm-tools
+          mkdir -p /tmp/mytpm1
+          echo "TPM_ARGS=BLD_*_TPM_ENABLE=TRUE TPM_DEV=/tmp/mytpm1/swtpm-sock" >> $GITHUB_ENV
+
       # Run the build-platform action, which calls stuart_setup, stuart_update, and stuart_build
       - name: Prepare and Build ${{ matrix.platform }} ${{ matrix.target }} ${{ matrix.tool-chain}}
         id: build-platform
@@ -152,7 +172,7 @@ jobs:
           architecture: ${{ matrix.architecture }}
           target: ${{ matrix.target }}
           tool-chain: ${{ matrix.tool-chain }}
-          stuart-args: 'SHUTDOWN_AFTER_RUN=TRUE FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=${{ needs.vars.outputs.qemu-core-count }}'
+          stuart-args: 'SHUTDOWN_AFTER_RUN=TRUE FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=${{ needs.vars.outputs.qemu-core-count }} ${{ env.TPM_ARGS }}'
           working-directory: ${{ steps.short-path.outputs.short-path || github.workspace }}
 
       - name: Run ${{ matrix.platform }} ${{ matrix.target }} ${{ matrix.tool-chain}}
@@ -165,12 +185,12 @@ jobs:
           architecture: ${{ matrix.architecture }}
           target: ${{ matrix.target }}
           tool-chain: ${{ matrix.tool-chain }}
-          stuart-args: 'SHUTDOWN_AFTER_RUN=TRUE FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=${{ needs.vars.outputs.qemu-core-count }}'
+          stuart-args: 'SHUTDOWN_AFTER_RUN=TRUE FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=${{ needs.vars.outputs.qemu-core-count }} ${{ env.TPM_ARGS }}'
           working-directory: ${{ steps.short-path.outputs.short-path || github.workspace }}
 
       - name: Publish Logs
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: build-logs-${{ matrix.platform }}-${{ matrix.architecture }}-${{ matrix.target }}-${{ matrix.tool-chain }}-${{ matrix.os }}
+          name: build-logs-${{ matrix.platform }}-${{ matrix.architecture }}-${{ matrix.target }}-${{ matrix.tool-chain }}-${{ matrix.os }}-${{ matrix.variant }}
           path: ${{ steps.build-platform.outputs.log-path }}
