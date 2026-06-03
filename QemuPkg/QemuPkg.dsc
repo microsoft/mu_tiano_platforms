@@ -30,6 +30,7 @@
   HiiLib                       |MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
   StackCheckLib                |MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
   FrameBufferBltLib            |MdeModulePkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
+  QemuFwCfgLib                 |QemuPkg/Library/QemuFwCfgLib/QemuFwCfgLibNull.inf
 
   # Services tables/Entry points
   UefiBootServicesTableLib    |MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
@@ -119,6 +120,14 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x0
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0
+
+[Components.AARCH64]
+  QemuPkg/Library/QemuFwCfgLib/QemuFwCfgLibMmio.inf
+
+[Components.IA32, Components.X64]
+  QemuPkg/Library/QemuFwCfgLib/QemuFwCfgDxeLib.inf
+  QemuPkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
+  QemuPkg/Library/QemuFwCfgLib/QemuFwCfgSecLib.inf
 
 [Components]
   QemuPkg/Library/BaseFwCfgInputChannelLib/BaseFwCfgInputChannelLib.inf
