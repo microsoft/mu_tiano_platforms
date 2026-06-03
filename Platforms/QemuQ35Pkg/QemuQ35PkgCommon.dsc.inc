@@ -278,7 +278,7 @@
   JsonLiteParserLib |MsCorePkg/Library/JsonLiteParser/JsonLiteParser.inf
 
   # Qemu specific libraries
-  QemuFwCfgLib             |QemuQ35Pkg/Library/QemuFwCfgLib/QemuFwCfgDxeLib.inf
+  QemuFwCfgLib             |QemuPkg/Library/QemuFwCfgLib/QemuFwCfgDxeLib.inf
   QemuFwCfgSimpleParserLib |QemuQ35Pkg/Library/QemuFwCfgSimpleParserLib/QemuFwCfgSimpleParserLib.inf
   CcExitLib                |UefiCpuPkg/Library/CcExitLibNull/CcExitLibNull.inf
 
@@ -324,7 +324,7 @@
 #########################################
 [LibraryClasses.common.SEC]
   TimerLib                   |QemuQ35Pkg/Library/AcpiTimerLib/BaseRomAcpiTimerLib.inf
-  QemuFwCfgLib               |QemuQ35Pkg/Library/QemuFwCfgLib/QemuFwCfgSecLib.inf
+  QemuFwCfgLib               |QemuPkg/Library/QemuFwCfgLib/QemuFwCfgSecLib.inf
   HobLib                     |MdePkg/Library/PeiHobLib/PeiHobLib.inf
   PeiServicesLib             |MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   PeiServicesTablePointerLib |MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
@@ -378,7 +378,7 @@
   CpuExceptionHandlerLib     |UefiCpuPkg/Library/CpuExceptionHandlerLib/PeiCpuExceptionHandlerLib.inf
   MpInitLib                  |UefiCpuPkg/Library/MpInitLib/PeiMpInitLib.inf
   PcdLib                     |MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
-  QemuFwCfgLib               |QemuQ35Pkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
+  QemuFwCfgLib               |QemuPkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
   PcdDatabaseLoaderLib       |MdeModulePkg/Library/PcdDatabaseLoaderLib/Pei/PcdDatabaseLoaderLibPei.inf
   OemMfciLib                 |OemPkg/Library/OemMfciLib/OemMfciLibPei.inf
   ConfigKnobShimLib          |SetupDataPkg/Library/ConfigKnobShimLib/ConfigKnobShimPeiLib/ConfigKnobShimPeiLib.inf

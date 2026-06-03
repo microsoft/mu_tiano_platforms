@@ -12,11 +12,11 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = QemuFwCfgPeiLib
-  FILE_GUID                      = ddd4f5f0-5304-42a8-9efa-d14bf11a3533
+  BASE_NAME                      = QemuFwCfgDxeLib
+  FILE_GUID                      = 80474090-55e7-4c28-b25c-9f236ba41f28
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = QemuFwCfgLib|PEIM
+  LIBRARY_CLASS                  = QemuFwCfgLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_DRIVER
 
   CONSTRUCTOR                    = QemuFwCfgInitialize
 
@@ -29,12 +29,12 @@
 [Sources]
   QemuFwCfgLibInternal.h
   QemuFwCfgLib.c
-  QemuFwCfgPei.c
+  QemuFwCfgDxe.c
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   QemuPkg/QemuPkg.dec
-  QemuQ35Pkg/QemuQ35Pkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -44,3 +44,8 @@
   MemoryAllocationLib
   MemEncryptSevLib
 
+[Protocols]
+  gEdkiiIoMmuProtocolGuid                         ## SOMETIMES_CONSUMES
+
+[Depex]
+  gEdkiiIoMmuProtocolGuid OR gIoMmuAbsentProtocolGuid
