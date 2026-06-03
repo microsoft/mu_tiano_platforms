@@ -128,6 +128,7 @@
   QemuPkg/Library/DfciDeviceIdSupportLib/DfciDeviceIdSupportLib.inf
   QemuPkg/Library/DfciUiSupportLib/DfciUiSupportLib.inf
   QemuPkg/Library/MsBootOptionsLibQemu/MsBootOptionsLib.inf
+  QemuPkg/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf
   QemuPkg/Library/PlatformBmPrintScLib/PlatformBmPrintScLib.inf
   QemuPkg/Library/PlatformSecureLib/PlatformSecureLib.inf
   QemuPkg/Library/PlatformThemeLib/PlatformThemeLib.inf

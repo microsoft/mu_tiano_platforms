@@ -35,7 +35,7 @@
                                      behind any PCI bridge hanging off this
                                      root bus.
 
-                                     The caller is repsonsible for ensuring
+                                     The caller is responsible for ensuring
                                      that RootBusNumber <= MaxSubBusNumber. If
                                      RootBusNumber equals MaxSubBusNumber, then
                                      the root bus has no room for subordinate

@@ -25,10 +25,6 @@
   #                  Virtualization (SEV) guests.
   MemEncryptSevLib|Include/Library/MemEncryptSevLib.h
 
-  ##  @libraryclass  Provide common utility functions to PciHostBridgeLib
-  #                  instances in ArmVirtPkg and OvmfPkg.
-  PciHostBridgeUtilityLib|Include/Library/PciHostBridgeUtilityLib.h
-
   ##  @libraryclass  Parse the contents of named fw_cfg files as simple
   #                  (scalar) data types.
   QemuFwCfgSimpleParserLib|Include/Library/QemuFwCfgSimpleParserLib.h
