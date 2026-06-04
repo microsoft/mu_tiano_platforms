@@ -46,14 +46,16 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
     @staticmethod
     def RunThread(env):
-        ''' Runs TPM in a separate thread '''
-        tpm_path = env.GetValue("TPM_DEV")
-        if tpm_path is None:
-            logging.critical("TPM Path Invalid")
+        """Runs TPM in a separate thread"""
+        sw_tpm_enable = env.GetValue("TPM_DEV", "FALSE")
+        if str(sw_tpm_enable).upper() == "FALSE":
+            logging.critical("SWTPM Disabled")
             return
 
+        tpm_dir = env.GetValue("BUILD_OUTPUT_BASE")
+        tpm_sock = os.path.join(tpm_dir, "swtpm-sock")
         tpm_cmd = "swtpm"
-        tpm_args = f"socket --tpmstate dir={"/".join(tpm_path.rsplit("/", 1)[:-1])} --ctrl type=unixio,path={tpm_path} --tpm2 --log level=1"
+        tpm_args = f"socket --tpmstate dir={tpm_dir} --ctrl type=unixio,path={tpm_sock} --tpm2 --log level=1"
 
         # Start the TPM emulator in a separate thread
         ret = utility_functions.RunCmd(tpm_cmd, tpm_args)
@@ -129,10 +131,12 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         args += " -drive if=pflash,format=raw,unit=1,file=" + \
                 code_fd + ",readonly=on"
 
-        tpm_dev = env.GetValue("TPM_DEV")
+        tpm_dev = env.GetValue("TPM_DEV", "FALSE")
         thread = None
-        if tpm_dev is not None:
-            args += f" -chardev socket,id=chrtpm,path={tpm_dev}"
+        if str(tpm_dev).upper() == "TRUE":
+            tpm_dir = env.GetValue("BUILD_OUTPUT_BASE")
+            tpm_sock = os.path.join(tpm_dir, "swtpm-sock")
+            args += f" -chardev socket,id=chrtpm,path={tpm_sock}"
             args += " -tpmdev emulator,id=tpm0,chardev=chrtpm"
 
             # also spawn the TPM emulator on a different thread

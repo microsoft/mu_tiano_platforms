@@ -50,13 +50,15 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
     @staticmethod
     def RunThread(env):
         """Runs TPM in a separate thread"""
-        tpm_path = env.GetValue("TPM_DEV")
-        if tpm_path is None:
-            logging.critical("TPM Path Invalid")
+        sw_tpm_enable = env.GetValue("TPM_DEV", "FALSE")
+        if str(sw_tpm_enable).upper() == "FALSE":
+            logging.critical("SWTPM Disabled")
             return
 
+        tpm_dir = env.GetValue("BUILD_OUTPUT_BASE")
+        tpm_sock = os.path.join(tpm_dir, "swtpm-sock")
         tpm_cmd = "swtpm"
-        tpm_args = f"socket --tpmstate dir={'/'.join(tpm_path.rsplit('/', 1)[:-1])} --ctrl type=unixio,path={tpm_path} --tpm2 --log level=20"
+        tpm_args = f"socket --tpmstate dir={tpm_dir} --ctrl type=unixio,path={tpm_sock} --tpm2 --log level=1"
 
         # Start the TPM emulator in a separate thread
         ret = utility_functions.RunCmd(tpm_cmd, tpm_args)
@@ -217,12 +219,18 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         args += f" -smbios type=1,manufacturer=Palindrome,product=\"QEMU Q35\",family=QEMU,version=\"{'.'.join(qemu_version)}\",serial=42-42-42-42,uuid=9de555c0-05d7-4aa1-84ab-bb511e3a8bef"
         args += f" -smbios type=3,manufacturer=Palindrome,serial=40-41-42-43{boot_selection}"
 
-        # TPM in Linux
-        tpm_dev = env.GetValue("TPM_DEV")
-        if tpm_dev is not None:
-            args += f" -chardev socket,id=chrtpm,path={tpm_dev}"
+        tpm_dev = env.GetValue("TPM_DEV", "FALSE")
+        thread = None
+        if str(tpm_dev).upper() == "TRUE":
+            tpm_dir = env.GetValue("BUILD_OUTPUT_BASE")
+            tpm_sock = os.path.join(tpm_dir, "swtpm-sock")
+            args += f" -chardev socket,id=chrtpm,path={tpm_sock}"
             args += " -tpmdev emulator,id=tpm0,chardev=chrtpm"
             args += " -device tpm-tis,tpmdev=tpm0"
+
+            logging.critical("Starting TPM emulator in a different thread.")
+            thread = threading.Thread(target=QemuRunner.RunThread, args=(env,))
+            thread.start()
 
         if (env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
             args += " -display none"  # no graphics
@@ -254,12 +262,6 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             except Exception:
                 std_handle = None
 
-        thread = None
-        if tpm_dev:
-            # also spawn the TPM emulator on a different thread
-            logging.critical("Starting TPM emulator in a different thread.")
-            thread = threading.Thread(target=QemuRunner.RunThread, args=(env,))
-            thread.start()
 
         # Run QEMU
         try:
