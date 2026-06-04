@@ -36,13 +36,13 @@ See [swtpm Setup](#swtpm-setup) for the full setup commands.
 
 ## Build Configuration
 
-The TPM is disabled by default. To enable it, pass the build define and provide the swtpm
-socket path or provide it in a BuildConfig.conf file placed at the root level of the repo:
+The TPM is disabled by default. To enable it, set `BLD_*_TPM2_ENABLE=TRUE` and `TPM_DEV=TRUE`
+on the command line or in a BuildConfig.conf file placed at the root level of the repo:
 
 ```bash
 stuart_build -c Platforms/QemuSbsaPkg/PlatformBuild.py --FlashRom \
   BLD_*_TPM2_ENABLE=TRUE \
-  TPM_DEV=/tmp/mytpm1/swtpm-sock
+  TPM_DEV=TRUE
 ```
 
 The following defines control TPM behavior in `QemuSbsaPkg.dsc`:
@@ -274,7 +274,7 @@ The external CRB connects to the `swtpm` process through QEMU's chardev/tpmdev
 infrastructure:
 
 ```text
-QEMU args: -chardev socket,id=chrtpm,path=/tmp/mytpm1/swtpm-sock
+QEMU args: -chardev socket,id=chrtpm,path={BUILD_OUTPUT_BASE}/swtpm-sock
            -tpmdev emulator,id=tpm0,chardev=chrtpm
 ```
 
@@ -518,19 +518,23 @@ swtpm socket \
 
 ### Automatic Setup (QemuRunner)
 
-When the `TPM_DEV` environment variable is set, `QemuRunner.py` automatically starts
-swtpm in a background thread before launching QEMU:
+When `TPM_DEV=TRUE`, `QemuRunner.py` automatically starts swtpm in a background thread
+before launching QEMU. The swtpm state directory is set to `BUILD_OUTPUT_BASE` and the
+Unix socket is placed at `{BUILD_OUTPUT_BASE}/swtpm-sock`:
 
 ```python
 # Platforms/QemuSbsaPkg/Plugins/QemuRunner/QemuRunner.py
 @staticmethod
 def RunThread(env):
-    tpm_path = env.GetValue("TPM_DEV")
-    tpm_cmd = "swtpm"
-    tpm_args = (
-        f"socket --tpmstate dir={'/'.join(tpm_path.rsplit('/', 1)[:-1])} "
-        f"--ctrl type=unixio,path={tpm_path} --tpm2 --log level=20"
-    )
+    sw_tpm_enable = env.GetValue("TPM_DEV", "FALSE")
+    if str(sw_tpm_enable).upper() == "FALSE":
+        logging.critical("SWTPM Disabled")
+        return
+
+    tpm_dir  = env.GetValue("BUILD_OUTPUT_BASE")
+    tpm_sock = os.path.join(tpm_dir, "swtpm-sock")
+    tpm_cmd  = "swtpm"
+    tpm_args = f"socket --tpmstate dir={tpm_dir} --ctrl type=unixio,path={tpm_sock} --tpm2 --log level=1"
     utility_functions.RunCmd(tpm_cmd, tpm_args)
 ```
 
@@ -539,10 +543,11 @@ prompted to press Ctrl+C to terminate swtpm at shutdown.
 
 ### QEMU Arguments
 
-The `QemuCommandBuilder.with_tpm()` method adds:
+When `TPM_DEV=TRUE`, `QemuRunner.py` adds the following to the QEMU command line
+(with the socket path under `BUILD_OUTPUT_BASE`):
 
 ```text
--chardev socket,id=chrtpm,path=/tmp/mytpm1/swtpm-sock
+-chardev socket,id=chrtpm,path={BUILD_OUTPUT_BASE}/swtpm-sock
 -tpmdev emulator,id=tpm0,chardev=chrtpm
 ```
 
