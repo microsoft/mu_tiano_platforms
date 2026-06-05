@@ -53,15 +53,15 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiLib
+  PolicyLib
 
 [Guids]
-  gPolicyDataGFXGuid                            # CONSUMES
+  gPolicyDataGFXGuid                # CONSUMES
 
 [Protocols]
-  gPolicyProtocolGuid                           ## CONSUMES
-  gEfiGraphicsOutputProtocolGuid                # PROTOCOL BY_START
-  gEfiDevicePathProtocolGuid                    # PROTOCOL BY_START
-  gEfiPciIoProtocolGuid                         # PROTOCOL TO_START
+  gEfiGraphicsOutputProtocolGuid    # PROTOCOL BY_START
+  gEfiDevicePathProtocolGuid        # PROTOCOL BY_START
+  gEfiPciIoProtocolGuid             # PROTOCOL TO_START
 
 [Pcd]
   gQemuPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
@@ -71,4 +71,4 @@
   gMsGraphicsPkgTokenSpaceGuid.PcdMsGopOverrideProtocolGuid   # MU_CHANGE use MsGopOverrideProtocolGuid
 
 [Depex]
-  gPolicyProtocolGuid
+  TRUE

@@ -37,7 +37,7 @@
   PolicyLib
 
 [Guids]
-  gPolicyDataGFXGuid            ## CONSUMES
+  gPolicyDataGFXGuid            ## PRODUCES
 
 [Pcd]
   gSetupDataPkgTokenSpaceGuid.PcdConfigurationPolicyGuid   ## CONSUMES in autogen header

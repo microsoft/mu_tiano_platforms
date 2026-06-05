@@ -19,7 +19,7 @@
     </Struct>
   </Structs>
 
-  <Knobs namespace="{0DB28DE9-CA7B-42AC-A83F-73F13A64DC40}">
+  <Knobs namespace="{5E6A1994-E683-4D8C-9DC1-F1F63490FC60}">
 
     <Knob type="SecondDummyStruct" name="DummyStruct1" default ="{{{{DUMMY2,DUMMY1,DUMMY0,DUMMY1,DUMMY0}},{{DUMMY0,DUMMY1,DUMMY2,DUMMY0,DUMMY1}}},2}" />
     <Knob type="SecondDummyStruct" name="DummyStruct2" default ="{{{{DUMMY1,DUMMY1,DUMMY0,DUMMY1,DUMMY1}},{{DUMMY0,DUMMY1,DUMMY2,DUMMY1,DUMMY1}}},1}" />
