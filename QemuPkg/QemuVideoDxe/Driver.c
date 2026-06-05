@@ -973,7 +973,7 @@ InitializeQemuVideo (
 
   PolicySize = sizeof (mGfxPolicy);
   Status     = PolicyProtocol->GetPolicy (
-                                 &gSbsaPolicyDataGFXGuid,
+                                 &gPolicyDataGFXGuid,
                                  &PolicyAttribute,
                                  mGfxPolicy,
                                  &PolicySize

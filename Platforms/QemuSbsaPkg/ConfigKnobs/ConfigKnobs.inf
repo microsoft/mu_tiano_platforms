@@ -25,6 +25,7 @@
   PolicyServicePkg/PolicyServicePkg.dec
   QemuSbsaPkg/QemuSbsaPkg.dec
   OemPkg/OemPkg.dec
+  QemuPkg/QemuPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -36,7 +37,7 @@
   PolicyLib
 
 [Guids]
-  gSbsaPolicyDataGFXGuid            ## CONSUMES
+  gPolicyDataGFXGuid            ## CONSUMES
 
 [Pcd]
   gSetupDataPkgTokenSpaceGuid.PcdConfigurationPolicyGuid   ## CONSUMES in autogen header
