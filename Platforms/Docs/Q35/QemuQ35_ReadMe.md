@@ -148,7 +148,7 @@ detection. The settings are split between MM and DXE environments for modularity
 
 | Modules | Link to Documentation |
 | --- | --- |
-| **QemuVideoDxe** | [QEMU Cirrus Video Controller](../../QemuQ35Pkg/QemuVideoDxe/ReadMe.md) |
+| **QemuVideoDxe** | [QEMU Video Controller](../../../QemuPkg/QemuVideoDxe/ReadMe.md) |
 
 ### Libraries
 

@@ -1,6 +1,6 @@
 ## @file
 #  This driver is a sample implementation of the Graphics Output Protocol for
-#  the QEMU (Cirrus Logic 5446) video controller.
+#  the QEMU video controller.
 #
 #  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 #

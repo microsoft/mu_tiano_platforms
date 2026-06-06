@@ -140,7 +140,7 @@ index e3195d5449..84bc7d9adb 100644
 
 | Modules | Link to Documentation |
 | --- | --- |
-| **QemuVideoDxe** | [QEMU Cirrus Video Controller](../../QemuSbsaPkg/QemuVideoDxe/ReadMe.md) |
+| **QemuVideoDxe** | [QEMU Video Controller](../../../QemuPkg/QemuVideoDxe/ReadMe.md) |
 
 ### Libraries
 

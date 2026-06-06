@@ -227,7 +227,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         if (env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
             args += " -display none"  # no graphics
         else:
-            args += " -vga cirrus" #std is what the default is
+            args += " -device bochs-display,addr=0x03 -vga none"
 
         # Check for gdb server setting
         gdb_port = env.GetValue("GDB_SERVER")
