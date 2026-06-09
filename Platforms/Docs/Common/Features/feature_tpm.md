@@ -12,15 +12,16 @@ sudo apt-get install swtpm
 
 To run using this TPM, build and run with the following options. `SWTPM_ENABLE`
 enables the swtpm emulator that is started automatically by `QemuRunner.py`.
+`SWTPM_ENABLE` is `TRUE` by default.
 
 for the Q35 platform:
 ```bash
-stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py --flashrom TOOL_CHAIN_TAG=GCC5 BLD_*_TPM_ENABLE=TRUE SWTPM_ENABLE=TRUE
+stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py --flashrom TOOL_CHAIN_TAG=GCC5 BLD_*_TPM_ENABLE=TRUE
 ```
 
 for the SBSA platform:
 ```bash
-stuart_build -c Platforms/QemuSbsaPkg/PlatformBuild.py --flashrom TOOL_CHAIN_TAG=GCC5 BLD_*_TPM2_ENABLE=TRUE SWTPM_ENABLE=TRUE
+stuart_build -c Platforms/QemuSbsaPkg/PlatformBuild.py --flashrom TOOL_CHAIN_TAG=GCC5 BLD_*_TPM2_ENABLE=TRUE
 ```
 
 In the window running swtpm, there should be output from the TPM communication.

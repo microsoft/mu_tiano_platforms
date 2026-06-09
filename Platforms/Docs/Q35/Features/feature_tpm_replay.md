@@ -22,7 +22,7 @@ Or, as a `stuart_build` argument:
 
 ```bash
 > stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py --flashrom TOOL_CHAIN_TAG=GCC5 BLD_*_TPM_ENABLE=TRUE \
-               BLD_*_TPM_REPLAY_ENABLED=TRUE SWTPM_ENABLE=TRUE
+               BLD_*_TPM_REPLAY_ENABLED=TRUE
 ```
 
 Note that the TPM driver stack is also disabled by default in QEMU firmware. It requires a TPM emulator and currently

@@ -29,13 +29,12 @@ See [swtpm Setup](#swtpm-setup) for the full setup commands.
 
 ## Build Configuration
 
-The TPM is disabled by default. To enable it, set `BLD_*_TPM_ENABLE=TRUE` and `SWTPM_ENABLE=TRUE`
-on the command line or in a BuildConfig.conf file placed at the root level of the repo:
+The TPM is disabled by default. To enable it, set `BLD_*_TPM_ENABLE=TRUE` on the command line or in a
+BuildConfig.conf file placed at the root level of the repo:
 
 ```bash
 stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py --FlashRom \
   BLD_*_TPM_ENABLE=TRUE \
-  SWTPM_ENABLE=TRUE
 ```
 
 The following defines control TPM behavior in `QemuQ35Pkg.dsc`:
@@ -337,8 +336,9 @@ def RunSwTpmThread(tpm_dir, tpm_sock):
     tpm_args = f"socket --tpmstate dir={tpm_dir} --ctrl type=unixio,path={tpm_sock} --tpm2 --log level=1"
 ```
 
-The thread is launched before QEMU starts and joined after QEMU exits. The user is
-prompted to press Ctrl+C to terminate swtpm at shutdown.
+The thread is launched before QEMU starts and joined after QEMU exits. Note that the SWTPM
+is enabled by default. You can disable it by setting `SWTPM_ENABLE=FALSE` from the command
+line or in the BuildConfig.conf file.
 
 ### QEMU Arguments
 
