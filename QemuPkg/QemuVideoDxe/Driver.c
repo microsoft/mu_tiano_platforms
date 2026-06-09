@@ -974,7 +974,7 @@ InitializeQemuVideo (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS       Status;
+  EFI_STATUS  Status;
 
   mMsGopOverrideProtocolGuid = PcdGetPtr (PcdMsGopOverrideProtocolGuid); // MU_CHANGE use MsGopOverrideProtocolGuid
 
