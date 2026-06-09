@@ -29,13 +29,13 @@ See [swtpm Setup](#swtpm-setup) for the full setup commands.
 
 ## Build Configuration
 
-The TPM is disabled by default. To enable it, set `BLD_*_TPM_ENABLE=TRUE` and `TPM_DEV=TRUE`
+The TPM is disabled by default. To enable it, set `BLD_*_TPM_ENABLE=TRUE` and `SWTPM_ENABLE=TRUE`
 on the command line or in a BuildConfig.conf file placed at the root level of the repo:
 
 ```bash
 stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py --FlashRom \
   BLD_*_TPM_ENABLE=TRUE \
-  TPM_DEV=TRUE
+  SWTPM_ENABLE=TRUE
 ```
 
 The following defines control TPM behavior in `QemuQ35Pkg.dsc`:
@@ -324,24 +324,17 @@ swtpm socket \
 
 ### Automatic Setup (QemuRunner)
 
-When `TPM_DEV=TRUE`, `QemuRunner.py` automatically starts swtpm in a background thread
+When `SWTPM_ENABLE=TRUE`, `QemuRunner.py` automatically starts swtpm in a background thread
 before launching QEMU. The swtpm state directory is set to `BUILD_OUTPUT_BASE` and the
 Unix socket is placed at `{BUILD_OUTPUT_BASE}/swtpm-sock`:
 
 ```python
 # Platforms/QemuQ35Pkg/Plugins/QemuRunner/QemuRunner.py
 @staticmethod
-def RunThread(env):
-    sw_tpm_enable = env.GetValue("TPM_DEV", "FALSE")
-    if str(sw_tpm_enable).upper() == "FALSE":
-        logging.critical("SWTPM Disabled")
-        return
-
-    tpm_dir = env.GetValue("BUILD_OUTPUT_BASE")
-    tpm_sock = os.path.join(tpm_dir, "swtpm-sock")
+def RunSwTpmThread(tpm_dir, tpm_sock):
+    """Runs TPM in a separate thread"""
     tpm_cmd = "swtpm"
     tpm_args = f"socket --tpmstate dir={tpm_dir} --ctrl type=unixio,path={tpm_sock} --tpm2 --log level=1"
-    utility_functions.RunCmd(tpm_cmd, tpm_args)
 ```
 
 The thread is launched before QEMU starts and joined after QEMU exits. The user is
@@ -349,8 +342,8 @@ prompted to press Ctrl+C to terminate swtpm at shutdown.
 
 ### QEMU Arguments
 
-When `TPM_DEV=TRUE`, `QemuRunner.py` adds the following three arguments to the QEMU
-command line for Q35 (with the socket path under `BUILD_OUTPUT_BASE`):
+When `SWTPM_ENABLE=TRUE`, `QemuRunner.py` adds the following to the QEMU command line
+(with the socket path under `BUILD_OUTPUT_BASE`):
 
 ```text
 -chardev socket,id=chrtpm,path={BUILD_OUTPUT_BASE}/swtpm-sock

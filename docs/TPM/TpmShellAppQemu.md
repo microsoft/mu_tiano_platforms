@@ -36,7 +36,7 @@ On SBSA, the TpmShellApp is placed directly in the firmware volume, which is map
 ```bash
 stuart_build -c Platforms/QemuSbsaPkg/PlatformBuild.py --FlashRom \
   BLD_*_TPM2_ENABLE=TRUE \
-  TPM_DEV=/tmp/mytpm1/swtpm-sock
+  SWTPM_ENABLE=TRUE
 ```
 
 At the UEFI shell, run:
@@ -65,7 +65,7 @@ binaries are copied to the virtual drive:
 ```bash
 stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py --FlashRom \
   BLD_*_TPM_ENABLE=TRUE \
-  TPM_DEV=/tmp/mytpm1/swtpm-sock \
+  SWTPM_ENABLE=TRUE \
   FILE_REGEX=TpmShellApp.efi
 ```
 

@@ -45,22 +45,15 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
 
     @staticmethod
-    def RunThread(env):
-        """Runs TPM in a separate thread"""
-        sw_tpm_enable = env.GetValue("TPM_DEV", "FALSE")
-        if str(sw_tpm_enable).upper() == "FALSE":
-            logging.critical("SWTPM Disabled")
-            return
-
-        tpm_dir = env.GetValue("BUILD_OUTPUT_BASE")
-        tpm_sock = os.path.join(tpm_dir, "swtpm-sock")
+    def RunSwTpmThread(tpm_dir, tpm_sock):
+        """Runs SWTPM in a separate thread"""
         tpm_cmd = "swtpm"
         tpm_args = f"socket --tpmstate dir={tpm_dir} --ctrl type=unixio,path={tpm_sock} --tpm2 --log level=1"
 
         # Start the TPM emulator in a separate thread
         ret = utility_functions.RunCmd(tpm_cmd, tpm_args)
         if ret != 0:
-            logging.critical("Failed to start TPM emulator.")
+            logging.critical("Failed to start SWTPM emulator.")
             return
 
 
@@ -131,18 +124,17 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         args += " -drive if=pflash,format=raw,unit=1,file=" + \
                 code_fd + ",readonly=on"
 
-        tpm_dev = env.GetValue("TPM_DEV", "FALSE")
-        thread = None
-        if str(tpm_dev).upper() == "TRUE":
+        sw_tpm_thread = None
+        sw_tpm_enable = env.GetValue("SWTPM_ENABLE", "FALSE")
+        if str(sw_tpm_enable).upper() == "TRUE":
             tpm_dir = env.GetValue("BUILD_OUTPUT_BASE")
             tpm_sock = os.path.join(tpm_dir, "swtpm-sock")
             args += f" -chardev socket,id=chrtpm,path={tpm_sock}"
             args += " -tpmdev emulator,id=tpm0,chardev=chrtpm"
 
-            # also spawn the TPM emulator on a different thread
-            logging.critical("Starting TPM emulator in a different thread.")
-            thread = threading.Thread(target=QemuRunner.RunThread, args=(env,))
-            thread.start()
+            logging.info("Starting TPM emulator in a different thread.")
+            sw_tpm_thread = threading.Thread(target=QemuRunner.RunSwTpmThread, args=(tpm_dir, tpm_sock))
+            sw_tpm_thread.start()
 
         # Add XHCI USB controller and mouse
         args += " -device qemu-xhci,id=usb"
@@ -210,8 +202,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             # Linux version of QEMU will mess with the print if its run failed, let's just restore it anyway
             utility_functions.RunCmd('stty', 'sane', capture=False)
 
-        if thread is not None:
-            logging.critical("Terminate TPM emulator by using Crtl + C now!")
-            thread.join()
+        if sw_tpm_thread is not None:
+            sw_tpm_thread.join()
 
         return ret

@@ -10,27 +10,17 @@ Swtpm can be installed from the linux package managers.
 sudo apt-get install swtpm
 ```
 
-To start the TPM emulator, invoke swtpm with a state file location and character
-device.
+To run using this TPM, build and run with the following options. `SWTPM_ENABLE`
+enables the swtpm emulator that is started automatically by `QemuRunner.py`.
 
+for the Q35 platform:
 ```bash
-mkdir /tmp/mytpm1
-swtpm socket --tpmstate dir=/tmp/mytpm1 \
-  --ctrl type=unixio,path=/tmp/mytpm1/swtpm-sock \
-  --tpm2 \
-  --log level=20
+stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py --flashrom TOOL_CHAIN_TAG=GCC5 BLD_*_TPM_ENABLE=TRUE SWTPM_ENABLE=TRUE
 ```
 
-To run Q35 using this TPM, build and run with the following options. `TPM_DEV` should
-point to the path of the character device from the above swtpm command.
-
+for the SBSA platform:
 ```bash
-stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py --flashrom TOOL_CHAIN_TAG=GCC5 BLD_*_TPM_ENABLE=TRUE TPM_DEV=/tmp/mytpm1/swtpm-sock
-```
-
-or for SBSA platform:
-```bash
-stuart_build -c Platforms/QemuSbsaPkg/PlatformBuild.py --flashrom TOOL_CHAIN_TAG=GCC5 BLD_*_TPM2_ENABLE=TRUE TPM_DEV=/tmp/mytpm1/swtpm-sock
+stuart_build -c Platforms/QemuSbsaPkg/PlatformBuild.py --flashrom TOOL_CHAIN_TAG=GCC5 BLD_*_TPM2_ENABLE=TRUE SWTPM_ENABLE=TRUE
 ```
 
 In the window running swtpm, there should be output from the TPM communication.
