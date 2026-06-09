@@ -151,15 +151,19 @@ jobs:
       - name: Install dependencies
         run: pip install -r pip-requirements.txt
 
-      # Install swtpm and prepare its state dir for TPM-enabled runs. Exposes
-      # TPM_ARGS for the build/run steps below.
+      # Install swtpm on all Linux runners. QemuRunner.py launches swtpm by
+      # default (SWTPM_ENABLE=TRUE) on Linux.
       - name: Setup swtpm
-        if: matrix.variant == 'TPM'
+        if: runner.os == 'Linux'
         run: |
           apt-get update
           apt-get install -y swtpm swtpm-tools
-          mkdir -p /tmp/mytpm1
-          echo "TPM_ARGS=BLD_*_TPM_ENABLE=TRUE TPM_DEV=/tmp/mytpm1/swtpm-sock" >> $GITHUB_ENV
+
+      # Expose TPM_ARGS for the build/run steps below on TPM-enabled runs.
+      - name: Set TPM build args
+        if: matrix.variant == 'TPM'
+        run: |
+          echo "TPM_ARGS=BLD_*_TPM_ENABLE=TRUE" >> $GITHUB_ENV
 
       # Run the build-platform action, which calls stuart_setup, stuart_update, and stuart_build
       - name: Prepare and Build ${{ matrix.platform }} ${{ matrix.target }} ${{ matrix.tool-chain}}
