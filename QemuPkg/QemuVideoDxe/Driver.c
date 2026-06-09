@@ -11,6 +11,7 @@
 #include "Qemu.h"
 #include <IndustryStandard/Acpi.h>
 #include <PolicyDataStructGFX.h>
+#include <Protocol/Policy.h>
 #include <Library/PolicyLib.h>
 
 EFI_DRIVER_BINDING_PROTOCOL  gQemuVideoDriverBinding = {
@@ -188,6 +189,8 @@ QemuVideoControllerDriverStart (
   QEMU_VIDEO_CARD           *Card;
   EFI_PCI_IO_PROTOCOL       *ChildPciIo;
   UINT64                    SupportedVgaIo;
+  UINT16                    PolicySize;
+  UINT64                    PolicyAttribute;
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
@@ -282,6 +285,33 @@ QemuVideoControllerDriverStart (
   if ((SupportedVgaIo == 0) && IS_PCI_VGA (&Pci)) {
     Status = EFI_UNSUPPORTED;
     goto ClosePciIo;
+  }
+
+  PolicySize = sizeof (mGfxPolicy);
+  Status     = GetPolicy (&gPolicyDataGFXGuid, &PolicyAttribute, mGfxPolicy, &PolicySize);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_WARN, "%a: Failed to get GFX policy from database, configuration is not setup properly - %r! Default to disabled state.\n", __func__, Status));
+    mGfxPolicy[0].Power_State_Port = FALSE;
+    // don't return a failed status in this case
+    PolicySize = sizeof (mGfxPolicy);
+    Status     = EFI_SUCCESS;
+  }
+
+  if (PolicySize != sizeof (mGfxPolicy)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Located USB policy is not valid! Attributes: 0x%llx, has size: %x, expecting %x.\n",
+      __func__,
+      PolicyAttribute,
+      PolicySize,
+      sizeof (mGfxPolicy)
+      ));
+    Status = EFI_COMPROMISED_DATA;
+    goto ClosePciIo;
+  }
+
+  if ((PolicyAttribute & POLICY_ATTRIBUTE_FINALIZED) == 0) {
+    DEBUG ((DEBUG_WARN, "%a: Applying platform default configuration (Attribute: %llx)!\n", __func__, PolicyAttribute));
   }
 
   // This VGA corresponds to the 0th GFX port, so check it out.
@@ -937,43 +967,6 @@ InitializeBochsGraphicsMode (
   ClearScreen (Private);
 }
 
-/**
-  Callback for a policy notification event.
-
-  @param[in]  PolicyGuid        The GUID of the policy being notified.
-  @param[in]  EventTypes        The events that occurred for the notification.
-  @param[in]  CallbackHandle    The handle for the callback being invoked.
-**/
-VOID
-EFIAPI
-PolicyCallbackRoutine (
-  IN CONST EFI_GUID *PolicyGuid,
-  IN UINT32 EventTypes,
-  IN VOID *CallbackHandle
-  )
-{
-  EFI_STATUS  Status;
-  UINT16      PolicySize;
-  UINT64      PolicyAttribute;
-
-  if ((EventTypes & POLICY_ATTRIBUTE_FINALIZED) == 0) {
-    // This is not for us, pass...
-    return;
-  }
-
-  DEBUG ((DEBUG_INFO, "%a: Policy finalized - %g\n", __func__, PolicyGuid));
-
-  PolicySize = sizeof (mGfxPolicy);
-  Status = GetPolicy (
-    PolicyGuid,
-    &PolicyAttribute,
-    mGfxPolicy,
-    &PolicySize
-    );
-  ASSERT_EFI_ERROR (Status);
-  ASSERT (PolicySize == sizeof (mGfxPolicy));
-}
-
 EFI_STATUS
 EFIAPI
 InitializeQemuVideo (
@@ -982,9 +975,6 @@ InitializeQemuVideo (
   )
 {
   EFI_STATUS       Status;
-  UINT16           PolicySize;
-  UINT64           PolicyAttribute;
-  EFI_HANDLE       Handle;
 
   mMsGopOverrideProtocolGuid = PcdGetPtr (PcdMsGopOverrideProtocolGuid); // MU_CHANGE use MsGopOverrideProtocolGuid
 
@@ -997,46 +987,6 @@ InitializeQemuVideo (
              &gQemuVideoComponentName2
              );
   ASSERT_EFI_ERROR (Status);
-
-  PolicySize = sizeof (mGfxPolicy);
-  Status     = GetPolicy (
-                  &gPolicyDataGFXGuid,
-                  &PolicyAttribute,
-                  mGfxPolicy,
-                  &PolicySize
-                  );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_WARN, "%a: Failed to get GFX policy from database, configuration is not setup properly - %r! Default to disabled state.\n", __func__, Status));
-    mGfxPolicy[0].Power_State_Port = FALSE;
-    // don't return a failed status in this case
-    PolicySize = sizeof (mGfxPolicy);
-    Status     = EFI_SUCCESS;
-  }
-
-  if (PolicySize != sizeof (mGfxPolicy)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: Located USB policy is not valid! Attributes: 0x%llx, has size: %x, expecting %x.\n",
-      __func__,
-      PolicyAttribute,
-      PolicySize,
-      sizeof (mGfxPolicy)
-      ));
-    return EFI_COMPROMISED_DATA;
-  }
-
-  if ((PolicyAttribute & POLICY_ATTRIBUTE_FINALIZED) == 0) {
-    DEBUG ((DEBUG_WARN, "%a: Applying platform default configuration (Attribute: %llx)!\n", __func__, PolicyAttribute));
-    // Register the policy callback if it is not finalized
-    Handle = NULL;
-    RegisterPolicyNotify (
-      &gPolicyDataGFXGuid,
-      POLICY_ATTRIBUTE_FINALIZED,
-      0,
-      PolicyCallbackRoutine,
-      &Handle
-    );
-  }
 
   return Status;
 }
