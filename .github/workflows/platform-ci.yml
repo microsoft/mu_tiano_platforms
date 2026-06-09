@@ -158,7 +158,7 @@ jobs:
         run: |
           apt-get update
           apt-get install -y swtpm swtpm-tools
-          echo "TPM_ARGS=BLD_*_TPM_ENABLE=TRUE SWTPM_ENABLE=TRUE" >> $GITHUB_ENV
+          echo "TPM_ARGS=BLD_*_TPM_ENABLE=TRUE" >> $GITHUB_ENV
 
       # Run the build-platform action, which calls stuart_setup, stuart_update, and stuart_build
       - name: Prepare and Build ${{ matrix.platform }} ${{ matrix.target }} ${{ matrix.tool-chain}}

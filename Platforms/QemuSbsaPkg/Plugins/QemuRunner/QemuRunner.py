@@ -125,7 +125,9 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
                 code_fd + ",readonly=on"
 
         sw_tpm_thread = None
-        sw_tpm_enable = env.GetValue("SWTPM_ENABLE", "FALSE")
+        sw_tpm_enable = env.GetValue("SWTPM_ENABLE", "TRUE")
+        if os.name == 'nt':
+            sw_tpm_enable = "FALSE"
         if str(sw_tpm_enable).upper() == "TRUE":
             tpm_dir = env.GetValue("BUILD_OUTPUT_BASE")
             tpm_sock = os.path.join(tpm_dir, "swtpm-sock")
