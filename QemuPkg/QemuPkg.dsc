@@ -29,6 +29,7 @@
   PeiServicesLib               |MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   HiiLib                       |MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
   StackCheckLib                |MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
+  FrameBufferBltLib            |MdeModulePkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
 
   # Services tables/Entry points
   UefiBootServicesTableLib    |MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
