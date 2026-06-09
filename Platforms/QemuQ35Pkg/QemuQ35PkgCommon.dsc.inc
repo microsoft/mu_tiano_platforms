@@ -604,8 +604,6 @@
     gMmSupervisorPkgTokenSpaceGuid.PcdMmSupervisorTestEnable|TRUE
   !endif
 
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMigrateVariableRuntimeCacheBufferAllocation|TRUE
-
 [PcdsPatchableInModule]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
 
