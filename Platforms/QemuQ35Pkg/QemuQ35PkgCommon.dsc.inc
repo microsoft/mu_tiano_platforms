@@ -421,6 +421,7 @@
   OemMfciLib |OemPkg/Library/OemMfciLib/OemMfciLibDxe.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/DxeCryptLib.inf
   TlsLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/DxeCryptLib.inf
+  PolicyLib|PolicyServicePkg/Library/DxePolicyLib/DxePolicyLib.inf
 
 [LibraryClasses.common.DXE_CORE]
   HobLib                  |MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
@@ -458,7 +459,6 @@
   UpdateFacsHardwareSignatureLib|OemPkg/Library/UpdateFacsHardwareSignatureLib/UpdateFacsHardwareSignatureLib.inf
   PcdDatabaseLoaderLib|MdeModulePkg/Library/PcdDatabaseLoaderLib/Dxe/PcdDatabaseLoaderLibDxe.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeCapsuleLib.inf
-  PolicyLib|PolicyServicePkg/Library/DxePolicyLib/DxePolicyLib.inf
 !if $(TPM_ENABLE) == TRUE
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg2.inf
 !endif
@@ -1078,10 +1078,7 @@
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
   AdvLoggerPkg/Application/AdvancedLogDumper/AdvancedLogDumper.inf
 
-  QemuQ35Pkg/QemuVideoDxe/QemuVideoDxe.inf
-
-
-  QemuQ35Pkg/QemuRamfbDxe/QemuRamfbDxe.inf
+  QemuPkg/QemuVideoDxe/QemuVideoDxe.inf
 
   #
   # ISA Support

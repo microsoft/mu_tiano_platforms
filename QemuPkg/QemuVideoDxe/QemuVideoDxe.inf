@@ -1,6 +1,6 @@
 ## @file
 #  This driver is a sample implementation of the Graphics Output Protocol for
-#  the QEMU (Cirrus Logic 5446) video controller.
+#  the QEMU video controller.
 #
 #  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 #
@@ -38,7 +38,7 @@
   MdeModulePkg/MdeModulePkg.dec
   MsGraphicsPkg/MsGraphicsPkg.dec # MU_CHANGE use MsGopOverrideProtocolGuid
   PolicyServicePkg/PolicyServicePkg.dec
-  QemuSbsaPkg/QemuSbsaPkg.dec
+  QemuPkg/QemuPkg.dec
 
 [LibraryClasses]
   BaseMemoryLib
@@ -53,23 +53,22 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiLib
+  PolicyLib
 
 [Guids]
-  gSbsaPolicyDataGFXGuid                            # CONSUMES
+  gPolicyDataGFXGuid                # CONSUMES
 
 [Protocols]
-  gPolicyProtocolGuid                           ## CONSUMES
-  gEfiGraphicsOutputProtocolGuid                # PROTOCOL BY_START
-  gEfiDevicePathProtocolGuid                    # PROTOCOL BY_START
-  gEfiPciIoProtocolGuid                         # PROTOCOL TO_START
+  gEfiGraphicsOutputProtocolGuid    # PROTOCOL BY_START
+  gEfiDevicePathProtocolGuid        # PROTOCOL BY_START
+  gEfiPciIoProtocolGuid             # PROTOCOL TO_START
 
 [Pcd]
-  gQemuSbsaPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
-  gQemuSbsaPkgTokenSpaceGuid.PcdVideoResolutionSource
+  gQemuPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+  gQemuPkgTokenSpaceGuid.PcdVideoResolutionSource
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
   gMsGraphicsPkgTokenSpaceGuid.PcdMsGopOverrideProtocolGuid   # MU_CHANGE use MsGopOverrideProtocolGuid
 
 [Depex]
-  gPolicyProtocolGuid AND   ## Policy Service
-  gSbsaPolicyDataGFXGuid    ## GFX Silicon Policy
+  TRUE

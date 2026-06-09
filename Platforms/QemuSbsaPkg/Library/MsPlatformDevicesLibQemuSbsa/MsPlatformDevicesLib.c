@@ -149,16 +149,6 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL    End;
 } VENDOR_UART_DEVICE_PATH;
 #pragma pack ()
-//
-// QemuRamfb Device Path structure
-//
-#pragma pack (1)
-typedef struct {
-  VENDOR_DEVICE_PATH          Vendor;
-  ACPI_ADR_DEVICE_PATH        AcpiAdr;
-  EFI_DEVICE_PATH_PROTOCOL    End;
-} VENDOR_RAMFB_DEVICE_PATH;
-#pragma pack ()
 
 //
 // USB Keyboard Device Path structure

@@ -29,6 +29,7 @@
   PeiServicesLib               |MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   HiiLib                       |MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
   StackCheckLib                |MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
+  FrameBufferBltLib            |MdeModulePkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
 
   # Services tables/Entry points
   UefiBootServicesTableLib    |MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
@@ -39,6 +40,7 @@
   DxeServicesTableLib         |MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   UefiHiiServicesLib          |MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
   RegisterFilterLib           |MdePkg/Library/RegisterFilterLibNull/RegisterFilterLibNull.inf
+  PolicyLib                   |PolicyServicePkg/Library/DxePolicyLib/DxePolicyLib.inf
 
   # Math Libraries
   FltUsedLib |MsCorePkg/Library/FltUsedLib/FltUsedLib.inf
@@ -138,6 +140,7 @@
   QemuPkg/Library/XenPlatformLib/XenPlatformLib.inf
   QemuPkg/FrontPageButtons/FrontPageButtons.inf
   QemuPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
+  QemuPkg/QemuVideoDxe/QemuVideoDxe.inf
   QemuPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
   QemuPkg/Virtio10Dxe/Virtio10.inf
   QemuPkg/VirtioBlkDxe/VirtioBlk.inf
