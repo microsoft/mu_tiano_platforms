@@ -40,6 +40,7 @@
   DxeServicesTableLib         |MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   UefiHiiServicesLib          |MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
   RegisterFilterLib           |MdePkg/Library/RegisterFilterLibNull/RegisterFilterLibNull.inf
+  PolicyLib                   |PolicyServicePkg/Library/DxePolicyLib/DxePolicyLib.inf
 
   # Math Libraries
   FltUsedLib |MsCorePkg/Library/FltUsedLib/FltUsedLib.inf
