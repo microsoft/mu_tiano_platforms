@@ -191,6 +191,7 @@ MemMapInitialization (
   // 0xFED00400    gap                          111 KB
   // 0xFED1C000    gap (PIIX4) / RCRB (ICH9)     16 KB
   // 0xFED20000    gap                          896 KB
+  // 0xFED40000    TPM - Locality0                4 KB
   // 0xFEE00000    LAPIC                          1 MB
   //
   PciSize = 0xFC000000 - PciBase;
@@ -202,6 +203,12 @@ MemMapInitialization (
 
   AddIoMemoryBaseSizeHob (0xFEC00000, SIZE_4KB);
   AddIoMemoryBaseSizeHob (0xFED00000, SIZE_4KB);
+
+  // Only generate this HOB if TPM is enabled
+ #ifdef TPM_ENABLE
+  AddIoMemoryBaseSizeHob (0xFED40000, SIZE_4KB);
+ #endif
+
   if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
     AddIoMemoryBaseSizeHob (ICH9_ROOT_COMPLEX_BASE, SIZE_16KB);
     //

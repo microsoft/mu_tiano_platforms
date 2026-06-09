@@ -473,6 +473,10 @@ INF  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
 !endif
 !endif
 
+!if $(TPM_ENABLE) == TRUE
+INF SecurityPkg/Applications/TpmShellApp/TpmShellApp.inf
+!endif
+
 #
 # MU Modules
 #
