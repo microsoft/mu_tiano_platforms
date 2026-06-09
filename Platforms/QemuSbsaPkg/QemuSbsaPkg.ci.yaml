@@ -101,6 +101,8 @@
         "AuditOnly": False,           # Fails right now with over 270 errors
         "IgnoreFiles": [],           # use gitignore syntax to ignore errors in matching files
         "ExtendWords": [
+            "acpitable",
+            "periph",
             "setjump",
             "plong",
             "lparam",
@@ -135,9 +137,6 @@
             "mstrict",
             "Intune",
             "BOCHS",
-            "dispi",
-            "noclearmem",
-            "unblank",
             "dmaivrs",
             "nxcompat",
             "standalonemm",
