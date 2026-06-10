@@ -2,13 +2,13 @@
 
 Platform-specific guidance for running
 [TpmShellApp](https://github.com/microsoft/mu_basecore/blob/release/202511/SecurityPkg/Applications/TpmShellApp/TpmShellApp.md)
-on the QEMU Q35 and SBSA platforms.
+on the QEMU Q35 and ArmVirt platforms.
 
 ## Table of Contents
 
 - [FDF Placement](#fdf-placement)
 - [Protocol Availability](#protocol-availability)
-- [Running on QEMU SBSA](#running-on-qemu-sbsa)
+- [Running on QEMU ArmVirt](#running-on-qemu-armvirt)
 - [Running on QEMU Q35](#running-on-qemu-q35)
 - [Hash Algorithm Configuration](#hash-algorithm-configuration)
 - [Expected Behavior with MinimumLib](#expected-behavior-with-minimumlib)
@@ -17,7 +17,7 @@ on the QEMU Q35 and SBSA platforms.
 
 ## FDF Placement
 
-On SBSA, add the INF to `FV.FvMain`. On Q35, add it to `FV.DXEFV`:
+On ArmVirt, add the INF to `FV.FvMain`. On Q35, add it to `FV.DXEFV`:
 
 ```ini
 INF SecurityPkg/Applications/TpmShellApp/TpmShellApp.inf
@@ -26,15 +26,15 @@ INF SecurityPkg/Applications/TpmShellApp/TpmShellApp.inf
 ## Protocol Availability
 
 The `EFI_TCG2_PROTOCOL` is installed by `Tcg2Dxe.efi`, which only loads when
-`TPM_ENABLE=TRUE` (Q35) or `TPM2_ENABLE=TRUE` (SBSA).
+`TPM_ENABLE=TRUE` (Q35) or `TPM2_ENABLE=TRUE` (ArmVirt).
 
-## Running on QEMU SBSA
+## Running on QEMU ArmVirt
 
-On SBSA, the TpmShellApp is placed directly in the firmware volume, which is mapped as an
+On ArmVirt, the TpmShellApp is placed directly in the firmware volume, which is mapped as an
 `FSx:` device in the UEFI shell. Build with:
 
 ```bash
-stuart_build -c Platforms/QemuSbsaPkg/PlatformBuild.py --FlashRom \
+stuart_build -c Platforms/QemuArmVirtPkg/PlatformBuild.py --FlashRom \
   BLD_*_TPM2_ENABLE=TRUE \
 ```
 

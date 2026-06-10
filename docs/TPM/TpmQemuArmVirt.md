@@ -1,11 +1,8 @@
-# TPM on QEMU SBSA
+# TPM on QEMU Arm Virt
 
-This document describes the TPM 2.0 architecture for the QEMU SBSA platform. SBSA uses
+This document describes the TPM 2.0 architecture for the QEMU Arm Virt platform. Arm Virt uses
 a dual-CRB design with an FF-A (Firmware Framework for Arm A-Profile) mediated communication
 path between the normal world and the secure world.
-
-Please note that TPM for SBSA is not supported by default and modifications to your QEMU are
-required to get TPM support. These changes are planned to be upstreamed in the future.
 
 ## Table of Contents
 
@@ -29,7 +26,7 @@ required to get TPM support. These changes are planned to be upstreamed in the f
 | ------------- | ------- |
 | **Host OS** | Linux (native) or **WSL** on Windows. Native Windows is not supported. |
 | **swtpm** | TPM 2.0 emulator. Install via your distro's package manager (e.g. `apt install swtpm swtpm-tools`). |
-| **QEMU** | Custom QEMU build with SBSA TPM support (not yet upstreamed — see note above). |
+| **QEMU** | QEMU v10.0 or later. |
 | **Build host** | Same Linux/WSL environment used to run `stuart_build` and launch QEMU. |
 
 See [swtpm Setup](#swtpm-setup) for the full setup commands.
@@ -40,11 +37,11 @@ The TPM is disabled by default. To enable it, set `BLD_*_TPM2_ENABLE=TRUE` on th
 BuildConfig.conf file placed at the root level of the repo:
 
 ```bash
-stuart_build -c Platforms/QemuSbsaPkg/PlatformBuild.py --FlashRom \
+stuart_build -c Platforms/QemuArmVirtPkg/PlatformBuild.py --FlashRom \
   BLD_*_TPM2_ENABLE=TRUE \
 ```
 
-The following defines control TPM behavior in `QemuSbsaPkg.dsc`:
+The following defines control TPM behavior in `QemuArmVirtPkg.dsc`:
 
 | Define | Default | Purpose |
 | -------- | --------- | --------- |
@@ -56,19 +53,19 @@ via build options, allowing C code to use `#ifdef TPM2_ENABLE` guards.
 
 ## Platform Memory Layout
 
-The SBSA platform defines two distinct TPM memory regions:
+The Arm Virt platform defines two distinct TPM memory regions:
 
 | Region | Address | Size | Visibility |
 | -------- | --------- | ------ | ------------ |
-| Internal CRB | `0x100_00200000` | 0x10 pages | Normal world + Secure world |
-| External CRB | `0x000_60120000` | 0x10 pages | Secure world only |
+| Internal CRB | `0x40200000` | 0x10 pages | Normal world + Secure world |
+| External CRB | `0x0c000000` | 0x10 pages | Secure world only |
 
 The Internal CRB address is published via PCDs:
 
-- `PcdTpmBaseAddress` = `0x10000200000`
-- `PcdTpmMaxAddress` = `0x10000204FFF` (5 localities × 0x1000)
+- `PcdTpmBaseAddress` = `0x40200000`
+- `PcdTpmMaxAddress` = `0x40204FFF` (5 localities × 0x1000)
 
-The Internal CRB is marked as `EfiACPIMemoryNVS` via a HOB in `SbsaQemuMem.c` so the OS
+The Internal CRB is marked as `EfiACPIMemoryNVS` via a HOB in `ArmPlatformLibQemu.inf` so the OS
 can locate it through the ACPI TPM2 table.
 
 ## Architecture Overview
@@ -132,7 +129,7 @@ can locate it through the ACPI TPM2 table.
 │  │    │ 2. Tcg2Protocol->GetCapability / SetActivePcrBanks / etc.             │  │
 │  └────┼───────────────────────────────────────────────────────────────────────┘  │
 │       ▼                                                                          │
-│  Tpm2DeviceLibFfa ─ writes to Internal CRB @ 0x100_00200000                      │
+│  Tpm2DeviceLibFfa ─ writes to Internal CRB @ 0x40200000                          │
 │       │             then sends FF-A DirectReq2 to the TpmService                 │
 │       │                                                                          │
 ├───────┼──────────────────────────────────────────────────────────────────────────┤
@@ -149,17 +146,17 @@ can locate it through the ACPI TPM2 table.
 │       ▼                                                                          │
 │  TpmServiceStateTranslationLib ─ Translates CRB style communications             │
 │       │                          to the style supported by the TPM               │
-│       │                          i.e. FIFO for QEMU SBSA                         │
+│       │                          i.e. FIFO for QEMU Arm Virt                     │
 │       │  Library Responsibilities:                                               │
 │       │  1. Copy command from Internal CRB → local buffer                        │
-│       │  2. Write command to External CRB @ 0x60120000                           │
+│       │  2. Write command to External CRB @ 0x0c000000                           │
 │       │  3. Trigger execution on external TPM through the CRB MMIO               │
 │       │  4. Read response from External CRB                                      │
 │       │  5. Copy response back to Internal CRB                                   │
 │       │                                                                          │
 ├───────┼──────────────────────────────────────────────────────────────────────────┤
 │       ▼                                                                          │
-│  QEMU TPM device (MMIO @ 0x60120000)                                             │
+│  QEMU TPM device (MMIO @ 0x0c000000)                                             │
 │       │                                                                          │
 │       ▼                                                                          │
 │  Unix socket ─ swtpm process (--tpm2)                                            │
@@ -172,14 +169,14 @@ Two FF-A Secure Partitions are involved in TPM operations.
 
 ### MSSP — Microsoft Secure Services Partition (id=0x8002)
 
-Configured in `Platforms/QemuSbsaPkg/fdts/qemu_sbsa_mssp_rust_config.dts`:
+Configured in `Platforms/QemuArmVirtPkg/fdts/qemu_virt_mssp_rust_config.dts`:
 
 | Property | Value |
 | ---------- | ------- |
 | Partition ID | `0x8002` |
 | Exception Level | SEL1 |
 | Execution State | AARCH64 |
-| Load Address | `0x20800000` |
+| Load Address | `0x0e700000` |
 | Image Size | 4 MiB |
 | Boot Order | 2 |
 
@@ -188,12 +185,12 @@ The MSSP hosts the TPM service and is granted access to both CRB regions:
 ```dts
 device-regions {
     internal_tpm_crb {
-        base-address = <0x100 0x00200000>;
+        base-address = <0x40200000>;
         pages-count = <0x10>;
         attributes = <SECURE_RW>;
     };
     external_tpm_crb {
-        base-address = <0x000 0x60120000>;
+        base-address = <0x0c000000>;
         pages-count = <0x10>;
         attributes = <SECURE_RW>;
     };
@@ -214,18 +211,18 @@ Key libraries running inside the MSSP:
   [TPM Service Command Response Buffer Interface Over FF-A](https://developer.arm.com/documentation/den0138/latest/)
 - **TpmServiceStateTranslationLib** — translates between the Internal CRB (CRB interface)
   and the External CRB (which may be CRB or FIFO depending on QEMU configuration). On
-  QEMU SBSA the external interface is FIFO.
+  QEMU Arm Virt the external interface is FIFO.
 
 ### StMM — Standalone MM Partition (id=0x8001)
 
-Configured in `Platforms/QemuSbsaPkg/fdts/qemu_sbsa_stmm_config.dts`:
+Configured in `Platforms/QemuArmVirtPkg/fdts/qemu_virt_stmm_config.dts`:
 
 | Property | Value |
 | ---------- | ------- |
 | Partition ID | `0x8001` |
 | Exception Level | SEL0 |
 | Execution State | AARCH64 |
-| Load Address | `0x20002000` |
+| Load Address | `0x0e400000` |
 | Image Size | 3 MiB |
 | Boot Order | 0 |
 
@@ -247,7 +244,7 @@ PC Client Platform TPM Profile (PTP) specification (and mirrored in `TpmPtp.h`):
 
 [ptp-spec]: https://trustedcomputinggroup.org/resource/pc-client-platform-tpm-profile-ptp-specification/
 
-### Internal CRB (`0x100_00200000`)
+### Internal CRB (`0x40200000`)
 
 This is the CRB visible to normal-world firmware (DXE drivers and UEFI applications).
 `Tpm2DeviceLibFfa` writes TPM commands into this CRB's data buffer and reads responses
@@ -261,10 +258,10 @@ goIdle) and then sends FF-A messages to notify the secure partition. The secure 
 reads the command data from the Internal CRB, proxies it to the External CRB, and writes
 the response back.
 
-### External CRB (`0x60120000`)
+### External CRB (`0x0c000000`)
 
 This is the QEMU-emulated TPM device MMIO region. It is **only accessible from the secure
-world** i.e. the TPM Service within the MSSP secure partition. On QEMU SBSA, this region
+world** i.e. the TPM Service within the MSSP secure partition. On QEMU ArmVirt, this region
 presents a FIFO interface (**not CRB**), which the `TpmServiceStateTranslationLib` handles by
 detecting the interface type at initialization and using the appropriate FIFO
 command/response protocol (burst-count reads, data register writes).
@@ -275,12 +272,8 @@ infrastructure:
 ```text
 QEMU args: -chardev socket,id=chrtpm,path={BUILD_OUTPUT_BASE}/swtpm-sock
            -tpmdev emulator,id=tpm0,chardev=chrtpm
+           -device tpm-tis-device,tpmdev=tpm0
 ```
-
-> **Note**: Unlike Q35, SBSA does **not** add a `-device tpm-tis-device,tpmdev=tpm0`
-> argument. As mentioned, QEMU does not support TPM for SBSA directly. Local changes
-> are required to get TPM support for SBSA. See QemuCommandBuilder.py and QemuRunner.py
-> for details on the swtpm commands.
 
 ## FF-A Communication Protocol
 
@@ -522,7 +515,7 @@ before launching QEMU. The swtpm state directory is set to `BUILD_OUTPUT_BASE` a
 Unix socket is placed at `{BUILD_OUTPUT_BASE}/swtpm-sock`:
 
 ```python
-# Platforms/QemuSbsaPkg/Plugins/QemuRunner/QemuRunner.py
+# Platforms/QemuArmVirtPkg/Plugins/QemuRunner/QemuRunner.py
 @staticmethod
 def RunSwTpmThread(tpm_dir, tpm_sock):
     """Runs SWTPM in a separate thread"""
@@ -584,14 +577,14 @@ Tpm2DeviceLibFfa — FfaTpm2SubmitCommand()
   │     TpmServiceLib: state READY → execute
   │     TpmServiceStateTranslationLib:
   │       1. Read command from Internal CRB data buffer
-  │       2. CopyCommandData() → write to External CRB @ 0x60120000 (FIFO)
+  │       2. CopyCommandData() → write to External CRB @ 0x0c000000 (FIFO)
   │       3. StartCommand() → trigger TPM execution
   │       4. CopyResponseData() → read response from External CRB
   │       5. Write response to Internal CRB data buffer
   │
   │                    ════ QEMU MMIO ════
   │
-  │     QEMU TPM device @ 0x60120000
+  │     QEMU TPM device @ 0x0c000000
   │       └── Unix socket ──── swtpm process
   │
   │                    ════ WORLD SWITCH BACK ════
@@ -612,8 +605,8 @@ Response returned to caller
 
 | PCD | Value | Type | Purpose |
 | ----- | ------- | ------ | --------- |
-| `PcdTpmBaseAddress` | `0x10000200000` | FixedAtBuild | Internal CRB base address |
-| `PcdTpmMaxAddress` | `0x10000204FFF` | FixedAtBuild | Internal CRB end address (5 localities) |
+| `PcdTpmBaseAddress` | `0x40200000` | FixedAtBuild | Internal CRB base address |
+| `PcdTpmMaxAddress` | `0x40204FFF` | FixedAtBuild | Internal CRB end address (5 localities) |
 | `PcdTpm2HashMask` | `0x02` | DynamicDefault | Hash algorithm filter (SHA256 only) |
 | `PcdTpmInstanceGuid` | `gEfiTpmDeviceInstanceTpm20DtpmGuid` | FixedAtBuild | Selects discrete TPM 2.0 device type |
 | `PcdTpm2AcpiTableRev` | `4` | DynamicHii | ACPI TPM2 table revision |

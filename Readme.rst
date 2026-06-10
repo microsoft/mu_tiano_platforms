@@ -16,7 +16,7 @@ Platform and Toolchain        Status
 ============================= =================
 `Q35 Visual Studio`_          |Q35VsBuild|
 `Q35 GCC5`_                   |Q35GccBuild|
-`SBSA GCC5`_                  |SBSAGccBuild|
+`ArmVirt GCC5`_               |ArmVirtGccBuild|
 ============================= =================
 
 .. |Latest Mu Tiano Platform Release Version (latest SemVer)| image:: https://img.shields.io/github/v/release/microsoft/mu_tiano_platforms?label=Latest%20Release
@@ -59,18 +59,18 @@ Current Platforms Supported
 
   - Intel Q35 chipset with ICH9 south bridge
 
-- `QemuSbsaPkg`_
+- `QemuArmVirtPkg`_
 
-  - `QemuSbsaPkg Detailed Info`_
+  - `QemuArmVirtPkg Detailed Info`_
 
-  - ARM Server Base System Architecture
+  - ARM Virtual Machine
 
 .. _`Project Mu`: https://microsoft.github.io/mu
 .. _`QEMU`: https://www.qemu.org/
 .. _`QemuQ35Pkg`: https://github.com/microsoft/mu_tiano_platforms/tree/main/Platforms/QemuQ35Pkg
 .. _`QemuQ35Pkg Detailed Info`: https://github.com/microsoft/mu_tiano_platforms/blob/main/Platforms/Docs/Q35/QemuQ35_ReadMe.md
-.. _`QemuSbsaPkg`: https://github.com/microsoft/mu_tiano_platforms/tree/main/Platforms/QemuSbsaPkg
-.. _`QemuSbsaPkg Detailed Info`: https://github.com/microsoft/mu_tiano_platforms/blob/main/Platforms/Docs/SBSA/QemuSbsa_ReadMe.md
+.. _`QemuArmVirtPkg`: https://github.com/microsoft/mu_tiano_platforms/tree/main/Platforms/QemuArmVirtPkg
+.. _`QemuArmVirtPkg Detailed Info`: https://github.com/microsoft/mu_tiano_platforms/blob/main/Platforms/Docs/ArmVirt/QemuArmVirt_ReadMe.md
 
 Getting Started
 ===============
@@ -260,5 +260,5 @@ POSSIBILITY OF SUCH DAMAGE.
 .. _`Q35 GCC5`:   https://dev.azure.com/projectmu/mu/_build/latest?definitionId=60&&branchName=main
 .. |Q35GccBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20Q35%20Plat%20CI%20GCC5?branchName=main
 
-.. _`SBSA GCC5`:   https://dev.azure.com/projectmu/mu/_build/latest?definitionId=138&&branchName=main
-.. |SBSAGccBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20SBSA%20Plat%20CI%20GCC5?branchName=main
+.. _`ArmVirt GCC5`:   https://dev.azure.com/projectmu/mu/_build/latest?definitionId=138&&branchName=main
+.. |ArmVirtGccBuild| image:: https://dev.azure.com/projectmu/mu/_apis/build/status/CI/Mu%20Tiano%20Platforms/Mu%20Tiano%20Platforms%20ArmVirt%20Plat%20CI%20GCC5?branchName=main

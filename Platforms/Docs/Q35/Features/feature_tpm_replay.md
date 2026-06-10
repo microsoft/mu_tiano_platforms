@@ -154,7 +154,7 @@ This option allows a new log to be passed to QEMU from the host machine easily w
 An additional argument to QEMU can be passed in the runner plugin.
 
 - [QemuQ35Pkg QemuRunner.py](https://github.com/microsoft/mu_tiano_platforms/blob/HEAD/Platforms/QemuQ35Pkg/Plugins/QemuRunner/QemuRunner.py)
-- [QemuSbsaPkg QemuRunner.py](https://github.com/microsoft/mu_tiano_platforms/blob/HEAD/Platforms/QemuSbsaPkg/Plugins/QemuRunner/QemuRunner.py)
+- [QemuArmVirtPkg QemuRunner.py](https://github.com/microsoft/mu_tiano_platforms/blob/HEAD/Platforms/QemuArmVirtPkg/Plugins/QemuRunner/QemuRunner.py)
 
 The `args` variable can be updated with the fw_cfg item:
 

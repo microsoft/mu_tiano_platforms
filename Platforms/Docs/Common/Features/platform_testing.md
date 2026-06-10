@@ -37,5 +37,5 @@ cobertura files to provide PR checks and general code coverage statistics for th
 
 If you have `reportgenerator` installed, you can additionally set `REPORTTYPES` to any report type that
 `reportgenerator` can generate, and those reports will be generated at
-`Build/QemuSbsaPkg/HostTest/NOOPT_<TOOL_CHAIN>/Coverage/*`. This parameter supports a comma separated list such as
+`Build/QemuArmVirtPkg/HostTest/NOOPT_<TOOL_CHAIN>/Coverage/*`. This parameter supports a comma separated list such as
 `REPORTTYPES=HtmlSummary,JsonSummary`.
