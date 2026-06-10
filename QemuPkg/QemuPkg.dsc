@@ -121,6 +121,13 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0
 
+  #
+  # SMBIOS support
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0304
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0
+  gQemuPkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
+
 [Components.AARCH64]
   QemuPkg/Library/QemuFwCfgLib/QemuFwCfgLibMmio.inf
 
@@ -148,6 +155,7 @@
   QemuPkg/Library/VirtioLib/VirtioLib.inf
   QemuPkg/Library/QemuFwCfgLib/QemuFwCfgLibNull.inf
   QemuPkg/Library/QemuPreUefiEventLogLibNull/QemuPreUefiEventLogLibNull.inf
+  QemuPkg/Library/SmbiosVersionLib/DetectSmbiosVersionLib.inf
   QemuPkg/Library/XenPlatformLib/XenPlatformLib.inf
   QemuPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
   QemuPkg/FrontPageButtons/FrontPageButtons.inf

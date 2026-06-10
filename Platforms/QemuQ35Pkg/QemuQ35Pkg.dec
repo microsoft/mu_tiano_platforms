@@ -177,8 +177,6 @@
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10
 
 [PcdsDynamic, PcdsDynamicEx]
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE|BOOLEAN|0x21
-
   ## The IO port aperture shared by all PCI root bridges.
   #
   gUefiQemuQ35PkgTokenSpaceGuid.PcdPciIoBase|0x0|UINT64|0x22

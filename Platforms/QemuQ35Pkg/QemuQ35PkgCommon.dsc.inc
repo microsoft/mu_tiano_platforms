@@ -835,7 +835,7 @@
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0208
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
+  gQemuPkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
 
   # UefiCpuPkg PCDs related to initial AP bringup and general AP management.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuBootLogicalProcessorNumber|0
@@ -1092,7 +1092,7 @@
   #
   MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf {
     <LibraryClasses>
-      NULL|QemuQ35Pkg/Library/SmbiosVersionLib/DetectSmbiosVersionLib.inf
+      NULL|QemuPkg/Library/SmbiosVersionLib/DetectSmbiosVersionLib.inf
   }
   QemuQ35Pkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
 
