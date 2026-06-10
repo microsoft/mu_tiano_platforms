@@ -89,6 +89,8 @@
   #    2 - set by GOP Driver.
   gQemuPkgTokenSpaceGuid.PcdVideoResolutionSource|0|UINT8|0x64
 
+  gQemuPkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE|BOOLEAN|0x65
+
 [PcdsFeatureFlag]
   gQemuPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE|BOOLEAN|0x20
   gQemuPkgTokenSpaceGuid.PcdQemuBootOrderMmioTranslation|FALSE|BOOLEAN|0x21
