@@ -168,6 +168,8 @@
   QemuPkg/VirtioRngDxe/VirtioRng.inf
   QemuPkg/VirtioNetDxe/VirtioNet.inf
   QemuPkg/SataControllerDxe/SataControllerDxe.inf
+  QemuPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
+  QemuPkg/SmbiosPlatformDxe/XenSmbiosPlatformDxe.inf
   QemuPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
   QemuPkg/Tcg/Tcg2Config/Tcg12ConfigPei.inf
   QemuPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
