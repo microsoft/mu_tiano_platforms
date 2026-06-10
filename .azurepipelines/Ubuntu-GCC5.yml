@@ -54,8 +54,8 @@ extends:
         Pkgs: 'QemuQ35Pkg'
         Targets: 'NO-TARGET'
         ArchList: IA32,X64
-      TARGET_SBSA:
-        Pkgs: 'QemuSbsaPkg'
+      TARGET_ARMVIRT:
+        Pkgs: 'QemuArmVirtPkg'
         Targets: 'NO-TARGET'
         ArchList: AARCH64
       TARGET_QEMU_ARM:
@@ -68,8 +68,8 @@ extends:
         Targets: 'NO-TARGET'
         ArchList: IA32,X64
         SelfHostAgent: true
-      TARGET_SBSA_ARM:
-        Pkgs: 'QemuSbsaPkg'
+      TARGET_ARMVIRT_ARM:
+        Pkgs: 'QemuArmVirtPkg'
         Targets: 'NO-TARGET'
         ArchList: AARCH64
         SelfHostAgent: true

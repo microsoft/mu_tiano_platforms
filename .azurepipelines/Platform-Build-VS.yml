@@ -69,9 +69,9 @@ jobs:
         BuildArtifactsOther: "**/Coverage/**"
         Run: false
 
-      QemuSbsa_CODE_COVERAGE:
-        BuildPackage: QemuSbsaPkg
-        BuildFile: "Platforms/QemuSbsaPkg/Test/PlatformTest.py"
+      QemuArmVirt_CODE_COVERAGE:
+        BuildPackage: QemuArmVirtPkg
+        BuildFile: "Platforms/QemuArmVirtPkg/Test/PlatformTest.py"
         BuildFlags: "CODE_COVERAGE=TRUE CC_FULL=TRUE CC_FLATTEN=TRUE REPORTTYPES=Cobertura,HtmlSummary,JsonSummary"
         BuildTarget: "NOOPT"
         BuildExtraTag: "UNIT_TESTS"
