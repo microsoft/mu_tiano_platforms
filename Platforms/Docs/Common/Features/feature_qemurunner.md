@@ -7,7 +7,7 @@ and then parse the results once QEMU has finished.
 
 ## Configuration
 
-The plugin has numerous configuration options to support the SBSA and Q35 Platforms.  These can be set
+The plugin has numerous configuration options to support the Arm Virt and Q35 Platforms.  These can be set
 when calling `stuart_build` or `platform_build` by adding `<name>=<value>` to the command line.
 
 **Example** setting up unit test to run automatically

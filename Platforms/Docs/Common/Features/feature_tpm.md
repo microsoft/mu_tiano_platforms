@@ -19,9 +19,9 @@ for the Q35 platform:
 stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py --flashrom TOOL_CHAIN_TAG=GCC5 BLD_*_TPM_ENABLE=TRUE
 ```
 
-for the SBSA platform:
+for the Arm Virt platform:
 ```bash
-stuart_build -c Platforms/QemuSbsaPkg/PlatformBuild.py --flashrom TOOL_CHAIN_TAG=GCC5 BLD_*_TPM2_ENABLE=TRUE
+stuart_build -c Platforms/QemuArmVirtPkg/PlatformBuild.py --flashrom TOOL_CHAIN_TAG=GCC5 BLD_*_TPM2_ENABLE=TRUE
 ```
 
 In the window running swtpm, there should be output from the TPM communication.

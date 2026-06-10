@@ -1,6 +1,6 @@
 # Building
 
-Steps to setup your environment, compile, and run QemuQ35Pkg and QemuSbsaPkg.
+Steps to setup your environment, compile, and run QemuQ35Pkg and QemuArmVirtPkg.
 
 ## Developer environment
 
@@ -50,13 +50,15 @@ On most Linux distros this requires an extra step for mono and nuget support.
     ```
 
     - `TOOL_CHAIN_TAG` being the toolchain you want to build with, currently `VS2019`, `VS2022`, and `GCC5` are
-      supported values. Q35 can be built with `GCC5`, `VS2019`, and `VS2022` toolchains. SBSA can be built with
+      supported values. Q35 can be built with `GCC5`, `VS2019`, and `VS2022` toolchains. ArmVirt can be built with
       `GCC5`.
     - NOTE: Building with GCC5 targeting AARCH64 requires the setup to export `GCC5_AARCH64_PREFIX`.
       `GCC5_AARCH64_PREFIX` should contain the path and the prefix to the gcc/objcopy tools, and needs to
       match the tool chain that is being used by the platform. The below example is for the gcc-aarch64-linux-gnu
       tool chain, but other tool chains can be used.
       As an example, `export GCC5_AARCH64_PREFIX=/usr/bin/aarch64-linux-gnu-`
+    - NOTE: Since mu release 202511, the toolchain `GCC` is also supported for building both Q35 and ArmVirt.
+      Accordingly, `GCC5_AARCH64_PREFIX` should be replaced with `GCC_AARCH64_PREFIX` when building for ArmVirt.
 
 5. Initialize & Update Dependencies - only as needed when ext_deps change
 
