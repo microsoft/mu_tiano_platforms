@@ -1094,7 +1094,7 @@
     <LibraryClasses>
       NULL|QemuPkg/Library/SmbiosVersionLib/DetectSmbiosVersionLib.inf
   }
-  QemuQ35Pkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
+  QemuPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
 
   #
   # ACPI Support

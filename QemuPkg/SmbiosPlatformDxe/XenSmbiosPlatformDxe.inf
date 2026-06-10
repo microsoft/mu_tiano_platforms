@@ -40,7 +40,7 @@
   MdePkg/MdePkg.dec
 
 [Packages.IA32, Packages.X64]
-  QemuQ35Pkg/QemuQ35Pkg.dec
+  QemuPkg/QemuPkg.dec
 
 [LibraryClasses]
   DebugLib

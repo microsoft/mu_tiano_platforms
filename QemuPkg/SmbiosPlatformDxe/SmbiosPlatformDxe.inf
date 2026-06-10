@@ -33,7 +33,6 @@
 [Packages]
   MdePkg/MdePkg.dec
   QemuPkg/QemuPkg.dec
-  QemuQ35Pkg/QemuQ35Pkg.dec
 
 [LibraryClasses]
   DebugLib
@@ -45,7 +44,7 @@
 
 [Pcd]
   gQemuPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdQemuSmbiosValidated
+  gQemuPkgTokenSpaceGuid.PcdQemuSmbiosValidated
 
 [Protocols]
   gEfiSmbiosProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
