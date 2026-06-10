@@ -193,7 +193,7 @@
 
   # Memory Libraries
   BaseMemoryLib                  |MdePkg/Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
-  MemEncryptSevLib               |QemuQ35Pkg/Library/MemEncryptSevLibNull/MemEncryptSevLibNull.inf
+  MemEncryptSevLib               |QemuPkg/Library/MemEncryptSevLibNull/MemEncryptSevLibNull.inf
   MemoryTypeInfoSecVarCheckLib   |MdeModulePkg/Library/MemoryTypeInfoSecVarCheckLib/MemoryTypeInfoSecVarCheckLib.inf # MU_CHANGE TCBZ1086
   MemoryTypeInformationChangeLib |MdeModulePkg/Library/MemoryTypeInformationChangeLibNull/MemoryTypeInformationChangeLibNull.inf
   MtrrLib                        |UefiCpuPkg/Library/MtrrLib/MtrrLib.inf # Memory Type Range Register (https://en.wikipedia.org/wiki/Memory_type_range_register)

@@ -44,6 +44,10 @@
   #                  instances in ArmVirtPkg and OvmfPkg.
   PciHostBridgeUtilityLib|Include/Library/PciHostBridgeUtilityLib.h
 
+  ##  @libraryclass  Declares helper functions for Secure Encrypted
+  #                  Virtualization (SEV) guests.
+  MemEncryptSevLib|Include/Library/MemEncryptSevLib.h
+
 [Guids]
   gQemuPkgTokenSpaceGuid              = {0xe3e3cd6f, 0x384b, 0x476b, {0x81, 0xa2, 0x39, 0x44, 0xd9, 0xaf, 0xd8, 0xc3}}
   gEfiXenInfoGuid                     = {0xd3b46f3b, 0xd441, 0x1244, {0x9a, 0x12, 0x0, 0x12, 0x27, 0x3f, 0xc1, 0x4d}}
