@@ -21,10 +21,6 @@
   ##  @libraryclass  Verify blobs read from the VMM
   BlobVerifierLib|Include/Library/BlobVerifierLib.h
 
-  ##  @libraryclass  Declares helper functions for Secure Encrypted
-  #                  Virtualization (SEV) guests.
-  MemEncryptSevLib|Include/Library/MemEncryptSevLib.h
-
   ##  @libraryclass  Parse the contents of named fw_cfg files as simple
   #                  (scalar) data types.
   QemuFwCfgSimpleParserLib|Include/Library/QemuFwCfgSimpleParserLib.h
