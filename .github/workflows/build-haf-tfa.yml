@@ -15,7 +15,7 @@ on:
     branches:
       - '**'  # Matches all branches
     paths:
-      - 'Platforms/QemuSbsaPkg/**'
+      - 'Platforms/QemuArmVirtPkg/**'
       - 'Silicon/Arm/**'
   workflow_dispatch:
 
@@ -58,13 +58,13 @@ jobs:
           git config --global url."https://github.com/TF-Hafnium/hafnium-third_party-googletest".insteadOf "https://git.trustedfirmware.org/hafnium/third_party/googletest"
 
       - name: Stuart Setup
-        run: python Platforms/QemuSbsaPkg/PlatformBuild.py --setup
+        run: python Platforms/QemuArmVirtPkg/PlatformBuild.py --setup
 
       - name: Stuart Update
-        run: python Platforms/QemuSbsaPkg/PlatformBuild.py --update
+        run: python Platforms/QemuArmVirtPkg/PlatformBuild.py --update
 
       - name: Stuart Build
-        run: python Platforms/QemuSbsaPkg/PlatformBuild.py HAF_TFA_BUILD=TRUE
+        run: python Platforms/QemuArmVirtPkg/PlatformBuild.py HAF_TFA_BUILD=TRUE
 
       - name: Install archive tools
         if: github.event_name == 'release'
@@ -77,7 +77,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          BIN_DIR="Build/QemuSbsaPkg/DEBUG_GCC5/HafTfaBins"
+          BIN_DIR="Build/QemuArmVirtPkg/DEBUG_GCC5/HafTfaBins"
           echo "Packaging binaries from ${BIN_DIR}"
           if [ ! -d "$BIN_DIR" ]; then
             echo "Binary directory not found: $BIN_DIR" >&2

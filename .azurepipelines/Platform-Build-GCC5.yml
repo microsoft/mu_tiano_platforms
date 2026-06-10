@@ -60,9 +60,9 @@ jobs:
           **/*/*TestApp.efi
         BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuSbsa_DEBUG_ARM:
-        BuildPackage: QemuSbsaPkg
-        BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+      QemuArmVirt_DEBUG_ARM:
+        BuildPackage: QemuArmVirtPkg
+        BuildFile: "Platforms/QemuArmVirtPkg/PlatformBuild.py"
         BuildFlags: ""
         BuildTarget: "DEBUG"
         BuildExtraTag: "ON_AARCH64"
@@ -76,9 +76,9 @@ jobs:
           **/SECURE_FLASH0.fd
         BuildArtifactsOther: "**/unit_test_results/*"
 
-      QemuSbsa_RELEASE_ARM:
-        BuildPackage: QemuSbsaPkg
-        BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+      QemuArmVirt_RELEASE_ARM:
+        BuildPackage: QemuArmVirtPkg
+        BuildFile: "Platforms/QemuArmVirtPkg/PlatformBuild.py"
         BuildFlags: ""
         BuildTarget: "RELEASE"
         BuildExtraTag: "ON_AARCH64"
