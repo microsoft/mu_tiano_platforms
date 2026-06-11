@@ -8,10 +8,10 @@ scope: qemuarmvirt
 id: haf-tfa-bin
 type: web
 name: HAF_TFA_BUILD
-source: https://github.com/microsoft/mu_tiano_platforms/releases/download/v12.0.1/haf-tfa-firmware-v12.0.1.zip
+source: https://github.com/microsoft/mu_tiano_platforms/releases/download/v14.0.0/haf-tfa-firmware-v14.0.0.zip
 
-version: v12.0.1
-sha256: 32325a79ab76ab704f84337f0620de60dd4b7dc3d857988a81f85a37ad33f91f
+version: v14.0.0
+sha256: cb138bd733422dcd356b58179db9a508ee87f71959f91b41ecd56bbe191748b1
 internal_path: /
 compression_type: zip
 flags:
