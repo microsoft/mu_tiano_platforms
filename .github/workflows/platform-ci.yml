@@ -45,36 +45,36 @@ jobs:
       matrix:
         target: [DEBUG, RELEASE]
         tool-chain: [CLANGPDB, VS2022, GCC5]
-        os: [windows-latest, ubuntu-latest]
+        os: [windows-2022, ubuntu-latest]
         container: ['', '${{ needs.vars.outputs.container-image}}']
-        platform: [Q35, SBSA]
+        platform: [Q35, ARMVIRT]
         architecture: ['', 'IA32,X64']
         variant: [DEF, TPM]
 
         exclude:
           # Exclude container builds on Windows
-          - os: windows-latest
+          - os: windows-2022
             container: ${{ needs.vars.outputs.container-image }}
           # Exclude non-container builds on Ubuntu
           - os: ubuntu-latest
             container: ''
-          # Exclude SBSA X64 builds since they are not supported
-          - platform: SBSA
+          # Exclude ARMVIRT X64 builds since they are not supported
+          - platform: ARMVIRT
             architecture: X64
-          # Exclude SBSA IA32,X64 builds since they are not supported
-          - platform: SBSA
+          # Exclude ARMVIRT IA32,X64 builds since they are not supported
+          - platform: ARMVIRT
             architecture: "IA32,X64"
           #########################################
           # Temporary Filters until only CLANGPDB #
           #########################################
           # Exclude GCC5 builds on Windows
-          - os: windows-latest
+          - os: windows-2022
             tool-chain: GCC5
           # Exclude VS builds on Ubuntu
           - os: ubuntu-latest
             tool-chain: VS2022
-          # Exclude VS SBSA builds
-          - platform: SBSA
+          # Exclude VS ARMVIRT builds
+          - platform: ARMVIRT
             tool-chain: VS2022
           ##############################
           # Temporary Filters for Bugs #
@@ -82,18 +82,18 @@ jobs:
           # Exclude CLANGPDB RELEASE builds due to PEI bug
           - tool-chain: CLANGPDB
             target: RELEASE
-          # Exclude SBSA CLANG builds due to ldr assembly issue
+          # Exclude ARMVIRT CLANG builds due to ldr assembly issue
           - tool-chain: CLANGPDB
-            platform: SBSA
+            platform: ARMVIRT
           ###########################
           # TPM variant constraints #
           ###########################
           # Exclude Windows, swtpm requires Unix sockets
           - variant: TPM
-            os: windows-latest
-          # Exclude SBSA, no TPM support by default
+            os: windows-2022
+          # Exclude ARMVIRT, no TPM support by default
           - variant: TPM
-            platform: SBSA
+            platform: ARMVIRT
 
     steps:
       # Checkout the repository to the runner or container
@@ -108,8 +108,8 @@ jobs:
             Q35)
               CONFIG_PATH="Platforms/QemuQ35Pkg/PlatformBuild.py"
               ;;
-            SBSA)
-              CONFIG_PATH="Platforms/QemuSbsaPkg/PlatformBuild.py"
+            ARMVIRT)
+              CONFIG_PATH="Platforms/QemuArmVirtPkg/PlatformBuild.py"
               ;;
             *)
               echo "Unknown platform: ${{ matrix.platform }}"

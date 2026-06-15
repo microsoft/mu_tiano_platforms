@@ -193,7 +193,7 @@
 
   # Memory Libraries
   BaseMemoryLib                  |MdePkg/Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
-  MemEncryptSevLib               |QemuQ35Pkg/Library/MemEncryptSevLibNull/MemEncryptSevLibNull.inf
+  MemEncryptSevLib               |QemuPkg/Library/MemEncryptSevLibNull/MemEncryptSevLibNull.inf
   MemoryTypeInfoSecVarCheckLib   |MdeModulePkg/Library/MemoryTypeInfoSecVarCheckLib/MemoryTypeInfoSecVarCheckLib.inf # MU_CHANGE TCBZ1086
   MemoryTypeInformationChangeLib |MdeModulePkg/Library/MemoryTypeInformationChangeLibNull/MemoryTypeInformationChangeLibNull.inf
   MtrrLib                        |UefiCpuPkg/Library/MtrrLib/MtrrLib.inf # Memory Type Range Register (https://en.wikipedia.org/wiki/Memory_type_range_register)
@@ -278,7 +278,7 @@
   JsonLiteParserLib |MsCorePkg/Library/JsonLiteParser/JsonLiteParser.inf
 
   # Qemu specific libraries
-  QemuFwCfgLib             |QemuQ35Pkg/Library/QemuFwCfgLib/QemuFwCfgDxeLib.inf
+  QemuFwCfgLib             |QemuPkg/Library/QemuFwCfgLib/QemuFwCfgDxeLib.inf
   QemuFwCfgSimpleParserLib |QemuQ35Pkg/Library/QemuFwCfgSimpleParserLib/QemuFwCfgSimpleParserLib.inf
   CcExitLib                |UefiCpuPkg/Library/CcExitLibNull/CcExitLibNull.inf
 
@@ -324,7 +324,7 @@
 #########################################
 [LibraryClasses.common.SEC]
   TimerLib                   |QemuQ35Pkg/Library/AcpiTimerLib/BaseRomAcpiTimerLib.inf
-  QemuFwCfgLib               |QemuQ35Pkg/Library/QemuFwCfgLib/QemuFwCfgSecLib.inf
+  QemuFwCfgLib               |QemuPkg/Library/QemuFwCfgLib/QemuFwCfgSecLib.inf
   HobLib                     |MdePkg/Library/PeiHobLib/PeiHobLib.inf
   PeiServicesLib             |MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   PeiServicesTablePointerLib |MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
@@ -378,7 +378,7 @@
   CpuExceptionHandlerLib     |UefiCpuPkg/Library/CpuExceptionHandlerLib/PeiCpuExceptionHandlerLib.inf
   MpInitLib                  |UefiCpuPkg/Library/MpInitLib/PeiMpInitLib.inf
   PcdLib                     |MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
-  QemuFwCfgLib               |QemuQ35Pkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
+  QemuFwCfgLib               |QemuPkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
   PcdDatabaseLoaderLib       |MdeModulePkg/Library/PcdDatabaseLoaderLib/Pei/PcdDatabaseLoaderLibPei.inf
   OemMfciLib                 |OemPkg/Library/OemMfciLib/OemMfciLibPei.inf
   ConfigKnobShimLib          |SetupDataPkg/Library/ConfigKnobShimLib/ConfigKnobShimPeiLib/ConfigKnobShimPeiLib.inf
@@ -835,7 +835,7 @@
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0208
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
+  gQemuPkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
 
   # UefiCpuPkg PCDs related to initial AP bringup and general AP management.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuBootLogicalProcessorNumber|0
@@ -1013,7 +1013,7 @@
   MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf {
     <LibraryClasses>
       PciHostBridgeLib|QemuQ35Pkg/Library/PciHostBridgeLib/PciHostBridgeLib.inf
-      PciHostBridgeUtilityLib|QemuQ35Pkg/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf
+      PciHostBridgeUtilityLib|QemuPkg/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf
       NULL|QemuQ35Pkg/Library/PlatformHasIoMmuLib/PlatformHasIoMmuLib.inf
   }
   MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf {
@@ -1092,15 +1092,15 @@
   #
   MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf {
     <LibraryClasses>
-      NULL|QemuQ35Pkg/Library/SmbiosVersionLib/DetectSmbiosVersionLib.inf
+      NULL|QemuPkg/Library/SmbiosVersionLib/DetectSmbiosVersionLib.inf
   }
-  QemuQ35Pkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
+  QemuPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
 
   #
   # ACPI Support
   #
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
-  QemuQ35Pkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
+  QemuPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
   MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
 
   #
