@@ -98,7 +98,7 @@ jobs:
     steps:
       # Checkout the repository to the runner or container
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       
       - name: Set platform config path
         id: set-config
