@@ -63,8 +63,25 @@ jobs:
       - name: Stuart Update
         run: python Platforms/QemuArmVirtPkg/PlatformBuild.py --update
 
-      - name: Stuart Build
-        run: python Platforms/QemuArmVirtPkg/PlatformBuild.py HAF_TFA_BUILD=TRUE
+      - name: Stuart Build (DEF)
+        run: python Platforms/QemuArmVirtPkg/PlatformBuild.py --clean HAF_TFA_BUILD=TRUE BLD_*_TPM2_ENABLE=FALSE
+
+      - name: Stage DEF HAF/TF-A binaries
+        if: github.event_name == 'release'
+        run: |
+          mkdir -p "${RUNNER_TEMP}/haf-tfa-firmware/DEF"
+          cp -a Build/QemuArmVirtPkg/DEBUG_GCC5/HafTfaBins/. "${RUNNER_TEMP}/haf-tfa-firmware/DEF"/
+          ls "${RUNNER_TEMP}/haf-tfa-firmware/DEF"
+
+      - name: Stuart Build (TPM)
+        run: python Platforms/QemuArmVirtPkg/PlatformBuild.py --clean HAF_TFA_BUILD=TRUE BLD_*_TPM2_ENABLE=TRUE
+
+      - name: Stage TPM HAF/TF-A binaries
+        if: github.event_name == 'release'
+        run: |
+          mkdir -p "${RUNNER_TEMP}/haf-tfa-firmware/TPM"
+          cp -a Build/QemuArmVirtPkg/DEBUG_GCC5/HafTfaBins/. "${RUNNER_TEMP}/haf-tfa-firmware/TPM"/
+          ls "${RUNNER_TEMP}/haf-tfa-firmware/TPM"
 
       - name: Install archive tools
         if: github.event_name == 'release'
@@ -72,22 +89,13 @@ jobs:
           apt-get update -y
           apt-get install -y zip tar gh
 
-      - name: Create per-target archives
+      - name: Create combined archives
         if: github.event_name == 'release'
-        shell: bash
         run: |
-          set -euo pipefail
-          BIN_DIR="Build/QemuArmVirtPkg/DEBUG_GCC5/HafTfaBins"
-          echo "Packaging binaries from ${BIN_DIR}"
-          if [ ! -d "$BIN_DIR" ]; then
-            echo "Binary directory not found: $BIN_DIR" >&2
-            exit 1
-          fi
           ZIP_PATH="${RUNNER_TEMP}/haf-tfa-firmware-${{ github.event.release.tag_name }}.zip"
           TAR_PATH="${RUNNER_TEMP}/haf-tfa-firmware-${{ github.event.release.tag_name }}.tar.gz"
-          (cd "$BIN_DIR" && zip -r "$ZIP_PATH" .)
-          (cd "$BIN_DIR" && tar -czf "$TAR_PATH" .)
-          echo "Created archives:"
+          (cd "${RUNNER_TEMP}/haf-tfa-firmware" && zip -r "$ZIP_PATH" DEF TPM)
+          (cd "${RUNNER_TEMP}/haf-tfa-firmware" && tar -czf "$TAR_PATH" DEF TPM)
           ls -lh "$ZIP_PATH" "$TAR_PATH"
 
       - name: Upload Release Assets

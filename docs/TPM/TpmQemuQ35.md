@@ -29,19 +29,19 @@ See [swtpm Setup](#swtpm-setup) for the full setup commands.
 
 ## Build Configuration
 
-The TPM is disabled by default. To enable it, set `BLD_*_TPM_ENABLE=TRUE` on the command line or in a
+The TPM is disabled by default. To enable it, set `BLD_*_TPM2_ENABLE=TRUE` on the command line or in a
 BuildConfig.conf file placed at the root level of the repo:
 
 ```bash
 stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py --FlashRom \
-  BLD_*_TPM_ENABLE=TRUE \
+  BLD_*_TPM2_ENABLE=TRUE \
 ```
 
 The following defines control TPM behavior in `QemuQ35Pkg.dsc`:
 
 | Define | Default | Purpose |
 | -------- | --------- | --------- |
-| `TPM_ENABLE` | `FALSE` | Master switch. Guards all TPM drivers, libraries, and PCDs. |
+| `TPM2_ENABLE` | `FALSE` | Master switch. Guards all TPM drivers, libraries, and PCDs. |
 | `TPM_CONFIG_ENABLE` | `FALSE` | Enables `Tcg2ConfigDxe` HII configuration UI. |
 | `TPM_REPLAY_ENABLED` | `FALSE` | Enables TPM Replay overrides (uses `TpmTestingPkg` variants of Tcg2Dxe and DxeTpm2MeasureBootLib). |
 
@@ -266,7 +266,7 @@ Final ActivePcrBanks / HashAlgorithmBitmap in EFI_TCG2_BOOT_SERVICE_CAPABILITY
 
 ### Library Selection
 
-| `TPM_ENABLE` | Library | Behavior |
+| `TPM2_ENABLE` | Library | Behavior |
 | -------------- | --------- | ---------- |
 | `FALSE` | `Tcg2PhysicalPresenceLibNull` | All functions stubbed |
 | `TRUE` | `DxeTcg2PhysicalPresenceMinimumLib` | Auto-confirms Clear; rejects all other operations |
@@ -393,7 +393,7 @@ QEMU tpm-tis device ──── Unix socket ──── swtpm process
 
 ## PCDs Reference
 
-### Required PCDs (set when TPM_ENABLE=TRUE)
+### Required PCDs (set when TPM2_ENABLE=TRUE)
 
 | PCD | Value | Type | Purpose |
 | ----- | ------- | ------ | --------- |

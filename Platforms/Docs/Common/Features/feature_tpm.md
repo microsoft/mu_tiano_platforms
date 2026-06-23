@@ -16,7 +16,7 @@ enables the swtpm emulator that is started automatically by `QemuRunner.py`.
 
 for the Q35 platform:
 ```bash
-stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py --flashrom TOOL_CHAIN_TAG=GCC5 BLD_*_TPM_ENABLE=TRUE
+stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py --flashrom TOOL_CHAIN_TAG=GCC5 BLD_*_TPM2_ENABLE=TRUE
 ```
 
 for the Arm Virt platform:

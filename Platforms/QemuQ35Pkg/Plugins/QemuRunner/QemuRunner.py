@@ -63,7 +63,14 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             "--tpm2",
             "--log", "level=1",
         ]
-        return subprocess.Popen(cmd)
+        try:
+            return subprocess.Popen(cmd)
+        except FileNotFoundError as error:
+            raise FileNotFoundError(
+                "swtpm executable not found on PATH. Install it (e.g. "
+                "'sudo apt install swtpm' on Debian/Ubuntu, 'sudo dnf install "
+                "swtpm' on Fedora) or disable SWTPM by setting SWTPM_ENABLE=FALSE."
+            ) from error
 
     @staticmethod
     def StopSwTpm(swtpm_proc):
