@@ -27,13 +27,15 @@
 !include QemuQ35Pkg/QemuQ35PkgCommon.dsc.inc
 
 [LibraryClasses.common.PEIM]
-  MmPlatformHobProducerLib|QemuQ35Pkg/Library/MmPlatformHobProducerLib/MmPlatformHobProducerLib.inf
+MmPlatformHobProducerLib|StandaloneMmPkg/Library/MmPlatformHobProducerLibNull/MmPlatformHobProducerLibNull.inf
+# MmPlatformHobProducerLib|QemuQ35Pkg/Library/MmPlatformHobProducerLib/MmPlatformHobProducerLib.inf
 
 [Components.X64]
 !include QemuQ35Pkg/QemuQ35PkgCommonPei.dsc.inc
 
 !if $(PEI_MM_IPL_ENABLED) == TRUE
   StandaloneMmPkg/Drivers/StandaloneMmIplPei/StandaloneMmIplPei.inf
+  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmIplPei.inf
 !endif
 
 ################################################################################
