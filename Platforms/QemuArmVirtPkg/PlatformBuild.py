@@ -840,27 +840,21 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         return 0
 
     def PlatformPostBuild(self):
-        # Allow developers to point the mssp-rust SP at a locally-built .bin
-        # by setting MSSP_RUST_BIN_OVERRIDE.
-        override = (self.env.GetValue("MSSP_RUST_BIN_OVERRIDE") or "").strip()
         tpm2_enable = (self.env.GetBuildValue("TPM2_ENABLE") or "FALSE").upper() == "TRUE"
 
-        if override:
-            mssp_bin_path = os.path.abspath(os.path.expanduser(override))
-            logging.info(f"MSSP_RUST_BIN_OVERRIDE set; using local SP binary '{mssp_bin_path}'")
+        if tpm2_enable:
+            mssp_bin_name = "msft-sp-virt-tpm.bin"
         else:
-            if tpm2_enable:
-                mssp_bin_name = "msft-sp-virt-tpm.bin"
-            else:
-                mssp_bin_name = "msft-sp-virt.bin"
-            mssp_bin_path = os.path.join(self.env.GetValue("SECURE_PARTITION_BINARIES"), mssp_bin_name)
-            logging.info(f"TPM2_ENABLE={tpm2_enable}; using prebuilt SP binary '{mssp_bin_path}'")
+            mssp_bin_name = "msft-sp-virt.bin"
+        mssp_bin_path = os.path.join(self.env.GetValue("SECURE_PARTITION_BINARIES"), mssp_bin_name)
+        logging.info(f"TPM2_ENABLE={str(tpm2_enable).upper()}; prebuilt SP binary '{mssp_bin_path}'")
 
         # Set Default BIN and DTS paths if not on command prompt
-        self.env.SetValue( "MSSP_RUST_BIN_FILE", mssp_bin_path, "Path for mssp-rust sp binary file")
-        self.env.SetValue( "MSSP_RUST_DTS_FILE",
-                           str(Path(__file__).parent / "fdts/qemu_virt_mssp_rust_config.dts"),
-                           "Path for mssp-rust sp DTS file")
+        self.env.SetValue("MSSP_RUST_BIN_FILE", mssp_bin_path, "Path for mssp-rust sp binary file")
+        self.env.SetValue("MSSP_RUST_DTS_FILE", str(Path(__file__).parent / "fdts/qemu_virt_mssp_rust_config.dts"),
+                          "Path for mssp-rust sp DTS file")
+        logging.info(f"MSSP_RUST_BIN_FILE set to '{self.env.GetValue('MSSP_RUST_BIN_FILE')}'")
+        logging.info(f"MSSP_RUST_DTS_FILE set to '{self.env.GetValue('MSSP_RUST_DTS_FILE')}'")
 
         if self.env.GetValue("HAF_TFA_BUILD") == "TRUE":
             ret = self.HafTfaBuild()

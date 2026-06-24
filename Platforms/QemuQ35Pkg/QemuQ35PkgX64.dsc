@@ -45,7 +45,8 @@
   #
   # Enable TPM support
   #
-  *_CLANGPDB_*_CC_FLAGS = -DTPM2_ENABLE
+  MSFT:*_*_*_CC_FLAGS = /DTPM2_ENABLE
+  GCC:*_*_*_CC_FLAGS  = -DTPM2_ENABLE
 !endif
 
   #
