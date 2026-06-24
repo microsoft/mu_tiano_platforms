@@ -29,6 +29,8 @@
   PeiServicesLib               |MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   HiiLib                       |MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
   StackCheckLib                |MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
+  FrameBufferBltLib            |MdeModulePkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
+  QemuFwCfgLib                 |QemuPkg/Library/QemuFwCfgLib/QemuFwCfgLibNull.inf
 
   # Services tables/Entry points
   UefiBootServicesTableLib    |MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
@@ -39,6 +41,7 @@
   DxeServicesTableLib         |MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   UefiHiiServicesLib          |MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
   RegisterFilterLib           |MdePkg/Library/RegisterFilterLibNull/RegisterFilterLibNull.inf
+  PolicyLib                   |PolicyServicePkg/Library/DxePolicyLib/DxePolicyLib.inf
 
   # Math Libraries
   FltUsedLib |MsCorePkg/Library/FltUsedLib/FltUsedLib.inf
@@ -118,6 +121,21 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0
 
+  #
+  # SMBIOS support
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0304
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0
+  gQemuPkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
+
+[Components.AARCH64]
+  QemuPkg/Library/QemuFwCfgLib/QemuFwCfgLibMmio.inf
+
+[Components.IA32, Components.X64]
+  QemuPkg/Library/QemuFwCfgLib/QemuFwCfgDxeLib.inf
+  QemuPkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
+  QemuPkg/Library/QemuFwCfgLib/QemuFwCfgSecLib.inf
+
 [Components]
   QemuPkg/Library/BaseFwCfgInputChannelLib/BaseFwCfgInputChannelLib.inf
   QemuPkg/Library/BasePciCapLib/BasePciCapLib.inf
@@ -125,7 +143,9 @@
   QemuPkg/Library/ConfigSystemModeLibQemu/ConfigSystemModeLib.inf
   QemuPkg/Library/DfciDeviceIdSupportLib/DfciDeviceIdSupportLib.inf
   QemuPkg/Library/DfciUiSupportLib/DfciUiSupportLib.inf
+  QemuPkg/Library/MemEncryptSevLibNull/MemEncryptSevLibNull.inf
   QemuPkg/Library/MsBootOptionsLibQemu/MsBootOptionsLib.inf
+  QemuPkg/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf
   QemuPkg/Library/PlatformBmPrintScLib/PlatformBmPrintScLib.inf
   QemuPkg/Library/PlatformSecureLib/PlatformSecureLib.inf
   QemuPkg/Library/PlatformThemeLib/PlatformThemeLib.inf
@@ -135,9 +155,12 @@
   QemuPkg/Library/VirtioLib/VirtioLib.inf
   QemuPkg/Library/QemuFwCfgLib/QemuFwCfgLibNull.inf
   QemuPkg/Library/QemuPreUefiEventLogLibNull/QemuPreUefiEventLogLibNull.inf
+  QemuPkg/Library/SmbiosVersionLib/DetectSmbiosVersionLib.inf
   QemuPkg/Library/XenPlatformLib/XenPlatformLib.inf
+  QemuPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
   QemuPkg/FrontPageButtons/FrontPageButtons.inf
   QemuPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
+  QemuPkg/QemuVideoDxe/QemuVideoDxe.inf
   QemuPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
   QemuPkg/Virtio10Dxe/Virtio10.inf
   QemuPkg/VirtioBlkDxe/VirtioBlk.inf
@@ -145,6 +168,8 @@
   QemuPkg/VirtioRngDxe/VirtioRng.inf
   QemuPkg/VirtioNetDxe/VirtioNet.inf
   QemuPkg/SataControllerDxe/SataControllerDxe.inf
+  QemuPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
+  QemuPkg/SmbiosPlatformDxe/XenSmbiosPlatformDxe.inf
   QemuPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
   QemuPkg/Tcg/Tcg2Config/Tcg12ConfigPei.inf
   QemuPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf

@@ -1,0 +1,68 @@
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+// Copyright 2022 Google LLC
+// Author: Ard Biesheuvel <ardb@google.com>
+
+  .set      TT_TYPE_BLOCK, 0x1
+  .set      TT_TYPE_PAGE,  0x3
+  .set      TT_TYPE_TABLE, 0x3
+
+  .set      TT_AF, 0x1 << 10
+  .set      TT_NG, 0x1 << 11
+  .set      TT_RO, 0x2 << 6
+  .set      TT_XN, 0x3 << 53
+
+  .set      TT_MT_DEV, 0x0 << 2                 // MAIR #0
+  .set      TT_MT_MEM, (0x3 << 2) | (0x3 << 8)  // MAIR #3
+  .set      TT_MT_MEM_LPA2, (0x3 << 2)          // MAIR #3
+
+  .set      PAGE_XIP,  TT_TYPE_PAGE  | TT_AF | TT_RO | TT_NG
+  .set      BLOCK_XIP, TT_TYPE_BLOCK | TT_AF | TT_RO | TT_NG
+  .set      BLOCK_DEV, TT_TYPE_BLOCK | TT_AF | TT_XN | TT_NG
+  .set      BLOCK_MEM, TT_TYPE_BLOCK | TT_AF | TT_XN | TT_NG
+
+  .section  ".rodata.idmap", "a"
+  .align    12
+
+   .macro   make_idmap, name, root_levels, mt
+  .globl    \name
+\name:
+  .rept     \root_levels
+  .quad     1f + TT_TYPE_TABLE
+  .fill     511, 8, 0x0
+1:
+  .endr
+
+  .quad     20f + TT_TYPE_TABLE                 // 1 GB of flash and device mappings
+  .quad     21f + TT_TYPE_TABLE                 // up to 1 GB of DRAM
+  .fill     510, 8, 0x0                         // 510 GB of remaining VA space
+
+20:         /* level 2 */
+  // The original code had 2 MB of flash and 126 MB of unused flash
+  // but patina-qemu configuration uses 64 MB of secure flash +
+  // 64 MB of non-secure flash. Adjust the ID map accordingly.
+  .fill     32, 8, 0x0                          // [0x00000000, 0x04000000) unmapped (NOR0 secure flash + reserved)
+  .set      idx, 32
+  .rept     32
+  .quad     BLOCK_XIP | \mt | (idx << 21)       // 64 MB R-X NOR1 flash @ [0x04000000, 0x08000000)
+  .set      idx, idx + 1
+  .endr
+  .set      idx, 64
+  .rept     448
+  .quad     BLOCK_DEV | TT_MT_DEV | (idx << 21) // 896 MB of RW- device mappings
+  .set      idx, idx + 1
+  .endr
+
+21:         /* level 2 */
+  .set      idx, 0x40000000 >> 21
+  .rept     64
+  .quad     BLOCK_MEM | \mt | (idx << 21)       // 128 MB of RW- memory mappings
+  .set      idx, idx + 1
+  .endr
+  .fill     448, 8, 0x0
+
+  .endm
+
+  make_idmap  idmap,      root_levels=1, mt=TT_MT_MEM
+  make_idmap  idmap_lpa2, root_levels=2, mt=TT_MT_MEM_LPA2
+
+AARCH64_BTI_NOTE()

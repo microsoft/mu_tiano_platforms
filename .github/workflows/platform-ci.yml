@@ -26,7 +26,7 @@ jobs:
 
   # Builds the platform(s) in this repository as defined by the matrix.
   build:
-    name: ${{ matrix.platform }} ${{ matrix.architecture }} ${{ matrix.target }} ${{ matrix.tool-chain }} (${{ matrix.os }})
+    name: ${{ matrix.platform }} ${{ matrix.architecture }} ${{ matrix.target }} ${{ matrix.tool-chain }} (${{ matrix.os }}) ${{ matrix.variant }}
 
     needs: 
       - vars
@@ -45,35 +45,36 @@ jobs:
       matrix:
         target: [DEBUG, RELEASE]
         tool-chain: [CLANGPDB, VS2022, GCC5]
-        os: [windows-latest, ubuntu-latest]
+        os: [windows-2022, ubuntu-latest]
         container: ['', '${{ needs.vars.outputs.container-image}}']
-        platform: [Q35, SBSA]
+        platform: [Q35, ARMVIRT]
         architecture: ['', 'IA32,X64']
+        variant: [DEF, TPM]
 
         exclude:
           # Exclude container builds on Windows
-          - os: windows-latest
+          - os: windows-2022
             container: ${{ needs.vars.outputs.container-image }}
           # Exclude non-container builds on Ubuntu
           - os: ubuntu-latest
             container: ''
-          # Exclude SBSA X64 builds since they are not supported
-          - platform: SBSA
+          # Exclude ARMVIRT X64 builds since they are not supported
+          - platform: ARMVIRT
             architecture: X64
-          # Exclude SBSA IA32,X64 builds since they are not supported
-          - platform: SBSA
+          # Exclude ARMVIRT IA32,X64 builds since they are not supported
+          - platform: ARMVIRT
             architecture: "IA32,X64"
           #########################################
           # Temporary Filters until only CLANGPDB #
           #########################################
           # Exclude GCC5 builds on Windows
-          - os: windows-latest
+          - os: windows-2022
             tool-chain: GCC5
           # Exclude VS builds on Ubuntu
           - os: ubuntu-latest
             tool-chain: VS2022
-          # Exclude VS SBSA builds
-          - platform: SBSA
+          # Exclude VS ARMVIRT builds
+          - platform: ARMVIRT
             tool-chain: VS2022
           ##############################
           # Temporary Filters for Bugs #
@@ -81,9 +82,18 @@ jobs:
           # Exclude CLANGPDB RELEASE builds due to PEI bug
           - tool-chain: CLANGPDB
             target: RELEASE
-          # Exclude SBSA CLANG builds due to ldr assembly issue
+          # Exclude ARMVIRT CLANG builds due to ldr assembly issue
           - tool-chain: CLANGPDB
-            platform: SBSA
+            platform: ARMVIRT
+          ###########################
+          # TPM variant constraints #
+          ###########################
+          # Exclude Windows, swtpm requires Unix sockets
+          - variant: TPM
+            os: windows-2022
+          # Exclude ARMVIRT, no TPM support by default
+          - variant: TPM
+            platform: ARMVIRT
 
     steps:
       # Checkout the repository to the runner or container
@@ -98,8 +108,8 @@ jobs:
             Q35)
               CONFIG_PATH="Platforms/QemuQ35Pkg/PlatformBuild.py"
               ;;
-            SBSA)
-              CONFIG_PATH="Platforms/QemuSbsaPkg/PlatformBuild.py"
+            ARMVIRT)
+              CONFIG_PATH="Platforms/QemuArmVirtPkg/PlatformBuild.py"
               ;;
             *)
               echo "Unknown platform: ${{ matrix.platform }}"
@@ -141,6 +151,20 @@ jobs:
       - name: Install dependencies
         run: pip install -r pip-requirements.txt
 
+      # Install swtpm on all Linux runners. QemuRunner.py launches swtpm by
+      # default (SWTPM_ENABLE=TRUE) on Linux.
+      - name: Setup swtpm
+        if: runner.os == 'Linux'
+        run: |
+          apt-get update
+          apt-get install -y swtpm swtpm-tools
+
+      # Expose TPM_ARGS for the build/run steps below on TPM-enabled runs.
+      - name: Set TPM build args
+        if: matrix.variant == 'TPM'
+        run: |
+          echo "TPM_ARGS=BLD_*_TPM_ENABLE=TRUE" >> $GITHUB_ENV
+
       # Run the build-platform action, which calls stuart_setup, stuart_update, and stuart_build
       - name: Prepare and Build ${{ matrix.platform }} ${{ matrix.target }} ${{ matrix.tool-chain}}
         id: build-platform
@@ -152,7 +176,7 @@ jobs:
           architecture: ${{ matrix.architecture }}
           target: ${{ matrix.target }}
           tool-chain: ${{ matrix.tool-chain }}
-          stuart-args: 'SHUTDOWN_AFTER_RUN=TRUE FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=${{ needs.vars.outputs.qemu-core-count }}'
+          stuart-args: 'SHUTDOWN_AFTER_RUN=TRUE FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=${{ needs.vars.outputs.qemu-core-count }} ${{ env.TPM_ARGS }}'
           working-directory: ${{ steps.short-path.outputs.short-path || github.workspace }}
 
       - name: Run ${{ matrix.platform }} ${{ matrix.target }} ${{ matrix.tool-chain}}
@@ -165,12 +189,12 @@ jobs:
           architecture: ${{ matrix.architecture }}
           target: ${{ matrix.target }}
           tool-chain: ${{ matrix.tool-chain }}
-          stuart-args: 'SHUTDOWN_AFTER_RUN=TRUE FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=${{ needs.vars.outputs.qemu-core-count }}'
+          stuart-args: 'SHUTDOWN_AFTER_RUN=TRUE FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=${{ needs.vars.outputs.qemu-core-count }} ${{ env.TPM_ARGS }}'
           working-directory: ${{ steps.short-path.outputs.short-path || github.workspace }}
 
       - name: Publish Logs
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: build-logs-${{ matrix.platform }}-${{ matrix.architecture }}-${{ matrix.target }}-${{ matrix.tool-chain }}-${{ matrix.os }}
+          name: build-logs-${{ matrix.platform }}-${{ matrix.architecture }}-${{ matrix.target }}-${{ matrix.tool-chain }}-${{ matrix.os }}-${{ matrix.variant }}
           path: ${{ steps.build-platform.outputs.log-path }}

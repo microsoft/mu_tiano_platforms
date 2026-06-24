@@ -40,11 +40,23 @@
   #
   QemuFwCfgLib|Include/Library/QemuFwCfgLib.h
 
+  ##  @libraryclass  Provide common utility functions to PciHostBridgeLib
+  #                  instances in ArmVirtPkg and OvmfPkg.
+  PciHostBridgeUtilityLib|Include/Library/PciHostBridgeUtilityLib.h
+
+  ##  @libraryclass  Declares helper functions for Secure Encrypted
+  #                  Virtualization (SEV) guests.
+  MemEncryptSevLib|Include/Library/MemEncryptSevLib.h
+
 [Guids]
   gQemuPkgTokenSpaceGuid              = {0xe3e3cd6f, 0x384b, 0x476b, {0x81, 0xa2, 0x39, 0x44, 0xd9, 0xaf, 0xd8, 0xc3}}
   gEfiXenInfoGuid                     = {0xd3b46f3b, 0xd441, 0x1244, {0x9a, 0x12, 0x0, 0x12, 0x27, 0x3f, 0xc1, 0x4d}}
   gRootBridgesConnectedEventGroupGuid = {0x24a2d66f, 0xeedd, 0x4086, {0x90, 0x42, 0xf2, 0x6e, 0x47, 0x97, 0xee, 0x69}}
-   gVirtioMmioTransportGuid           = {0x837dca9e, 0xe874, 0x4d82, {0xb2, 0x9a, 0x23, 0xfe, 0x0e, 0x23, 0xd1, 0xe2}}
+  gVirtioMmioTransportGuid            = {0x837dca9e, 0xe874, 0x4d82, {0xb2, 0x9a, 0x23, 0xfe, 0x0e, 0x23, 0xd1, 0xe2}}
+
+  ## Policy GUID for GFX policy data
+  #
+  gPolicyDataGFXGuid =  { 0x3a1523c2, 0xbd10, 0x4a5d, { 0xa9, 0x86, 0x40, 0x5b, 0x85, 0x2f, 0xcb, 0xfc } }
 
 [PcdsFixedAtBuild]
 
@@ -77,6 +89,8 @@
   #    2 - set by GOP Driver.
   gQemuPkgTokenSpaceGuid.PcdVideoResolutionSource|0|UINT8|0x64
 
+  gQemuPkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE|BOOLEAN|0x65
+
 [PcdsFeatureFlag]
   gQemuPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE|BOOLEAN|0x20
   gQemuPkgTokenSpaceGuid.PcdQemuBootOrderMmioTranslation|FALSE|BOOLEAN|0x21
@@ -103,3 +117,4 @@
 
 [Protocols]
   gVirtioDeviceProtocolGuid = {0xfa920010, 0x6785, 0x4941, {0xb6, 0xec, 0x49, 0x8c, 0x57, 0x9f, 0x16, 0x0a}}
+  gIoMmuAbsentProtocolGuid  = {0xf8775d50, 0x8abd, 0x4adf, {0x92, 0xac, 0x85, 0x3e, 0x51, 0xf6, 0xc8, 0xdc}}

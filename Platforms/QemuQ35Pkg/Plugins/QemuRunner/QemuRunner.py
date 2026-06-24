@@ -12,6 +12,8 @@ import datetime
 import re
 import io
 import shutil
+import subprocess
+import time
 from pathlib import Path
 from edk2toolext.environment.plugintypes import uefi_helper_plugin
 from edk2toollib import utility_functions
@@ -45,6 +47,35 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
         return ver_str.split('.')
 
+
+    @staticmethod
+    def StartSwTpm(tpm_dir, tpm_sock):
+        """Starts the swtpm emulator and returns its Popen handle.
+
+        swtpm is a long-lived daemon, so it is launched directly with Popen
+        (rather than a blocking helper run in a thread) to keep a handle for
+        explicit teardown.
+        """
+        cmd = [
+            "swtpm", "socket",
+            "--tpmstate", f"dir={tpm_dir}",
+            "--ctrl", f"type=unixio,path={tpm_sock}",
+            "--tpm2",
+            "--log", "level=1",
+        ]
+        return subprocess.Popen(cmd)
+
+    @staticmethod
+    def StopSwTpm(swtpm_proc):
+        """Terminates the swtpm subprocess if it is still running."""
+        if swtpm_proc is None or swtpm_proc.poll() is not None:
+            return
+        swtpm_proc.terminate()
+        try:
+            swtpm_proc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            logging.warning("swtpm did not exit after terminate. Killing it.")
+            swtpm_proc.kill()
 
     @staticmethod
     def Runner(env):
@@ -199,17 +230,38 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         args += f" -smbios type=1,manufacturer=Palindrome,product=\"QEMU Q35\",family=QEMU,version=\"{'.'.join(qemu_version)}\",serial=42-42-42-42,uuid=9de555c0-05d7-4aa1-84ab-bb511e3a8bef"
         args += f" -smbios type=3,manufacturer=Palindrome,serial=40-41-42-43{boot_selection}"
 
-        # TPM in Linux
-        tpm_dev = env.GetValue("TPM_DEV")
-        if tpm_dev is not None:
-            args += f" -chardev socket,id=chrtpm,path={tpm_dev}"
+        swtpm_proc = None
+        sw_tpm_enable = env.GetValue("SWTPM_ENABLE", "TRUE")
+        if os.name == 'nt':
+            sw_tpm_enable = "FALSE"
+        if str(sw_tpm_enable).upper() == "TRUE":
+            tpm_dir = env.GetValue("BUILD_OUTPUT_BASE")
+            tpm_sock = os.path.join(tpm_dir, "swtpm-sock")
+            args += f" -chardev socket,id=chrtpm,path={tpm_sock}"
             args += " -tpmdev emulator,id=tpm0,chardev=chrtpm"
             args += " -device tpm-tis,tpmdev=tpm0"
+
+            logging.info("Starting swtpm emulator.")
+            swtpm_proc = QemuRunner.StartSwTpm(tpm_dir, tpm_sock)
+
+            # Wait for swtpm to create the control socket before launching QEMU.
+            # Otherwise QEMU may try to connect before the socket exists and fail.
+            tpm_sock_timeout = 30
+            tpm_sock_poll_start = time.monotonic()
+            while not os.path.exists(tpm_sock):
+                if swtpm_proc.poll() is not None:
+                    logging.critical("swtpm exited before creating its socket.")
+                    return -1
+                if time.monotonic() - tpm_sock_poll_start > tpm_sock_timeout:
+                    logging.critical(f"Timed out waiting for swtpm socket at {tpm_sock}.")
+                    QemuRunner.StopSwTpm(swtpm_proc)
+                    return -1
+                time.sleep(0.1)
 
         if (env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
             args += " -display none"  # no graphics
         else:
-            args += " -vga cirrus" #std is what the default is
+            args += " -device bochs-display,addr=0x03 -vga none"
 
         # Check for gdb server setting
         gdb_port = env.GetValue("GDB_SERVER")
@@ -236,12 +288,15 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             except Exception:
                 std_handle = None
 
+
         # Run QEMU
         try:
             ret = utility_functions.RunCmd(executable, args)
         except KeyboardInterrupt:
             logging.critical("QEMU run interrupted by user (ctrl+c).")
             ret = -1
+        finally:
+            QemuRunner.StopSwTpm(swtpm_proc)
 
         ## TODO: restore the customized RunCmd once unit tests with asserts are figured out
         if ret == 0xc0000005:
