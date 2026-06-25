@@ -70,7 +70,7 @@ QemuQ35Pkg/ResetVector/ResetVector.inf
 
   UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 
-!if $(TPM_ENABLE) == TRUE
+!if $(TPM2_ENABLE) == TRUE
   QemuPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
   SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf {
     <LibraryClasses>

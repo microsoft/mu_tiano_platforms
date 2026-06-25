@@ -30,8 +30,8 @@
 !ifndef DXE_DBG_BRK
   DEFINE DXE_DBG_BRK = FALSE
 !endif
-!ifndef TPM_ENABLE
-  DEFINE TPM_ENABLE                     = FALSE
+!ifndef TPM2_ENABLE
+  DEFINE TPM2_ENABLE                    = FALSE
 !endif
   DEFINE TPM_CONFIG_ENABLE              = FALSE
   DEFINE OPT_INTO_MFCI_PRE_PRODUCTION   = TRUE
@@ -243,7 +243,7 @@
   TpmMeasurementLib       |MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
   Tcg2PhysicalPresenceLib |QemuPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2PhysicalPresenceLib.inf
   Tpm2HelpLib             |SecurityPkg/Library/Tpm2HelpLib/Tpm2HelpLib.inf
-!if $(TPM_ENABLE) == TRUE
+!if $(TPM2_ENABLE) == TRUE
   Tcg2PhysicalPresenceLib |SecurityPkg/Library/DxeTcg2PhysicalPresenceMinimumLib/DxeTcg2PhysicalPresenceMinimumLib.inf
   TpmMeasurementLib       |SecurityPkg/Library/DxeTpmMeasurementLib/DxeTpmMeasurementLib.inf
 !endif
@@ -386,7 +386,7 @@
   BaseCryptLib               |CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
   TlsLib                     |CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
   SmmRelocationLib           |QemuQ35Pkg/Library/SmmRelocationLib/SmmRelocationLib.inf
-!if $(TPM_ENABLE) == TRUE
+!if $(TPM2_ENABLE) == TRUE
   Tpm2DeviceLib              |SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
   Tcg2PreUefiEventLogLib     |SecurityPkg/Library/Tcg2PreUefiEventLogLibNull/Tcg2PreUefiEventLogLibNull.inf
 !endif
@@ -459,7 +459,7 @@
   UpdateFacsHardwareSignatureLib|OemPkg/Library/UpdateFacsHardwareSignatureLib/UpdateFacsHardwareSignatureLib.inf
   PcdDatabaseLoaderLib|MdeModulePkg/Library/PcdDatabaseLoaderLib/Dxe/PcdDatabaseLoaderLibDxe.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeCapsuleLib.inf
-!if $(TPM_ENABLE) == TRUE
+!if $(TPM2_ENABLE) == TRUE
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg2.inf
 !endif
 
@@ -846,7 +846,7 @@
 
   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x00
 
-!if $(TPM_ENABLE) == TRUE
+!if $(TPM2_ENABLE) == TRUE
   # Set this to gEfiTpmDeviceInstanceTpm20DtpmGuid
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x5a, 0xf2, 0x6b, 0x28, 0xc3, 0xc2, 0x8c, 0x40, 0xb3, 0xb4, 0x25, 0xe6, 0x75, 0x8b, 0x73, 0x17}
 !endif
@@ -868,7 +868,7 @@
   !endif
 
 [PcdsDynamicHii]
-!if $(TPM_ENABLE) == TRUE
+!if $(TPM2_ENABLE) == TRUE
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableRev|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x8|4|NV,BS
 !endif
 !if $(TPM_CONFIG_ENABLE) == TRUE
@@ -979,7 +979,7 @@
       NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
 !endif
 
-!if $(TPM_ENABLE) == TRUE
+!if $(TPM2_ENABLE) == TRUE
 !if $(TPM_REPLAY_ENABLED) == TRUE
       # Only TPM 2.0 is supported by the feature
       NULL|TpmTestingPkg/Overrides/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBootLib.inf
@@ -1354,7 +1354,7 @@
   #
   # TPM support
   #
-!if $(TPM_ENABLE) == TRUE
+!if $(TPM2_ENABLE) == TRUE
 !if $(TPM_REPLAY_ENABLED) == TRUE
   TpmTestingPkg/Overrides/Tcg2Dxe/Tcg2Dxe.inf {
     <LibraryClasses>
@@ -1381,7 +1381,7 @@
   }
 !endif
 !endif
-!if $(TPM_CONFIG_ENABLE) == TRUE AND $(TPM_ENABLE) == TRUE
+!if $(TPM_CONFIG_ENABLE) == TRUE AND $(TPM2_ENABLE) == TRUE
   SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
 !endif
 
@@ -1423,7 +1423,7 @@
 # The TpmShellApp can run without TPM enabled. It will report that the
 # Tcg2Protocol was not installed, however, it really isn't meant to run
 # without TPM enabled.
-!if $(TPM_ENABLE) == TRUE
+!if $(TPM2_ENABLE) == TRUE
   # TPM shell application to test PCR bank operations via TCG2 Protocol
   SecurityPkg/Applications/TpmShellApp/TpmShellApp.inf
 !endif
