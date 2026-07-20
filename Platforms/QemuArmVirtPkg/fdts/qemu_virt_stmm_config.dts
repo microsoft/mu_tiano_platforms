@@ -87,8 +87,8 @@
 			 * heap buffer.
 			 */
 			description = "heap";
-			base-address = <0x0 0x0EB00000>;
-			pages-count = <0x3ff>;
+			base-address = <0x0 0x0E780000>;
+			pages-count = <0x77f>;
 			attributes = <0x3>;
 		};
 
