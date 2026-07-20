@@ -1298,6 +1298,9 @@
   StandaloneMmPkg/Core/StandaloneMmCore.inf {
     <LibraryClasses>
       NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
+      # Register the LZMA guided-section handler so the MM core can decompress
+      # and dispatch OneCryptoBin from the dedicated compressed [FV.OneCryptoFv].
+      NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
     <PcdsFixedAtBuild>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
       gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
