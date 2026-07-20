@@ -458,7 +458,6 @@ FILE MM_CORE_STANDALONE = gMmSupervisorCoreGuid {
   SECTION PE32 = D:\Repos\patina-dxe-core-qemu\target\x86_64-unknown-uefi\debug\q35_mm_supervisor.efi
   SECTION UI   = "MmSupervisorCore"
 }
-INF  MmSupervisorPkg/Drivers/MmSupervisedCpu/MmSupervisedCpu.inf
 # INF  StandaloneMmPkg/Core/StandaloneMmCore.inf
 FILE MM_CORE_STANDALONE = gMmSupervisorUserGuid {
   SECTION PE32 = D:\Repos\patina-dxe-core-qemu\target\x86_64-unknown-uefi\debug\q35_mm_user_core.efi
