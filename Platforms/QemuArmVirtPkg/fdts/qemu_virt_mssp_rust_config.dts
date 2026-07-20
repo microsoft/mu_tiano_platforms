@@ -35,7 +35,7 @@
 	execution-state = <0>; /* AArch64*/
 	load-address = <0x0 0x0e700000>;
 	entrypoint-offset = <0x2000>;
-	image-size = <0x0 0x400000>;
+	image-size = <0x0 0x80000>;
 	xlat-granule = <0>; /* 4KiB */
 	boot-order = <2>;
 	messaging-method = <0x603>; /* Direct request/response supported. */

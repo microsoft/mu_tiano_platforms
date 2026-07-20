@@ -35,7 +35,7 @@
        load_address = <0x0 0x0e700000>;
        debug_name = "mssp-rust";
        vcpu_count = <1>;
-       mem_size = <0x400000>;
+       mem_size = <0x80000>;
      };
    };
 
