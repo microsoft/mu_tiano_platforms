@@ -445,7 +445,6 @@ INF  QemuQ35Pkg/SmmAccess/SmmAccess2Dxe.inf
     # INF  StandaloneMmPkg/Drivers/StandaloneMmIplPei/StandaloneMmIplPei.inf
     INF  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmIplPei.inf
   !endif
-  INF  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmPeiSupport.inf
   INF  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmIplX64Relay.inf
   INF  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmDxeSupport.inf
   INF  StandaloneMmPkg/Drivers/MmCommunicationDxe/MmCommunicationDxe.inf

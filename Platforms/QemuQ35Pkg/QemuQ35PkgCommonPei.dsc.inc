@@ -64,7 +64,6 @@ QemuQ35Pkg/ResetVector/ResetVector.inf
   QemuQ35Pkg/SmmAccess/SmmAccessPei.inf
   MmSupervisorPkg/Drivers/MmCommunicationBuffer/MmCommunicationBufferPei.inf
 !if $(PEI_MM_IPL_ENABLED) == TRUE
-  MmSupervisorPkg/Drivers/MmPeiLaunchers/MmPeiSupport.inf
   QemuQ35Pkg/SmmControl2Dxe/MmControlPei.inf
 !endif
 

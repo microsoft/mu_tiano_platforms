@@ -1233,7 +1233,7 @@
     <PcdsFeatureFlag>
       gDfciPkgTokenSpaceGuid.PcdSettingsManagerInstallProvider|TRUE
   }
-  SeaPkg/Tests/ResponderValidationTest/ResponderValidationTestApp.inf
+  # SeaPkg/Tests/ResponderValidationTest/ResponderValidationTestApp.inf
   MdeModulePkg/Universal/EsrtFmpDxe/EsrtFmpDxe.inf
   MsCorePkg/AcpiRGRT/AcpiRgrt.inf
   DfciPkg/Application/DfciMenu/DfciMenu.inf
