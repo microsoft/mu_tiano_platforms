@@ -51,11 +51,12 @@ MmPlatformHobProducerLib|StandaloneMmPkg/Library/MmPlatformHobProducerLibNull/Mm
   MSFT:*_*_X64_GENFW_FLAGS  = --keepexceptiontable
   GCC:*_*_X64_GENFW_FLAGS   = --keepexceptiontable
 
-!if $(TPM_ENABLE) == TRUE
+!if $(TPM2_ENABLE) == TRUE
   #
   # Enable TPM support
   #
-  *_CLANGPDB_*_CC_FLAGS = -DTPM_ENABLE
+  MSFT:*_*_*_CC_FLAGS = /DTPM2_ENABLE
+  GCC:*_*_*_CC_FLAGS  = -DTPM2_ENABLE
 !endif
 
   #

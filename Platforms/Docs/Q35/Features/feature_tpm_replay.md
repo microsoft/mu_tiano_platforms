@@ -21,7 +21,7 @@ default. It can be enabled either by changing the `TPM_REPLAY_ENABLED` value to 
 Or, as a `stuart_build` argument:
 
 ```bash
-> stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py --flashrom TOOL_CHAIN_TAG=GCC5 BLD_*_TPM_ENABLE=TRUE \
+> stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py --flashrom TOOL_CHAIN_TAG=GCC5 BLD_*_TPM2_ENABLE=TRUE \
                BLD_*_TPM_REPLAY_ENABLED=TRUE
 ```
 

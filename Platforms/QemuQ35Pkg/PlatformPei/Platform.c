@@ -205,7 +205,7 @@ MemMapInitialization (
   AddIoMemoryBaseSizeHob (0xFED00000, SIZE_4KB);
 
   // Only generate this HOB if TPM is enabled
- #ifdef TPM_ENABLE
+ #ifdef TPM2_ENABLE
   AddIoMemoryBaseSizeHob (0xFED40000, SIZE_4KB);
  #endif
 
