@@ -1395,6 +1395,11 @@
 !endif
 
 [BuildOptions.common.EDKII.SEC,BuildOptions.common.EDKII.MM_CORE_STANDALONE]
+  # DLINK_XIPFLAGS (which pairs FILEALIGN with ALIGN for CLANGPDB XIP rebasing) is only used in build_rule.template
+  # for SEC/PEI_CORE/PEIM module types. MM_CORE_STANDALONE is packaged as FFS type SEC in QemuArmVirtPkg's
+  # Rule.Common.MM_CORE_STANDALONE. This causes it to be rebased by GenFv the same way SEC is, and therefore also needs
+  # FileAlignment == SectionAlignment. This sets /FILEALIGN here explicitly. Not needed in QemuQ35Pkg because
+  # [Rule.Common.MM_CORE_STANDALONE] specifies the FFS type as MM_CORE_STANDALONE there.
   GCC:*_CLANGPDB_*_DLINK_FLAGS = /ALIGN:0x1000 /FILEALIGN:0x1000
 
 [BuildOptions.common.EDKII.DXE_CORE,BuildOptions.common.EDKII.DXE_DRIVER,BuildOptions.common.EDKII.UEFI_DRIVER,BuildOptions.common.EDKII.UEFI_APPLICATION,BuildOptions.common.EDKII.MM_CORE_STANDALONE,BuildOptions.common.EDKII.MM_STANDALONE]
