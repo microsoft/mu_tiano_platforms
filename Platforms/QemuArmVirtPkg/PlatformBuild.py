@@ -35,7 +35,7 @@ cached_env = os.environ.copy()
 # When the TF-A source code is updated in a way that is not compatible with the existing prebuilts, this should be set
 # to False, which ensures that HAF / TF-A will be build from source if supported. On Windows, TF-A cannot be built from
 # source, so the platform build will be skipped with a warning.
-HAF_TFA_EXTDEP_BINS_CURRENT = False
+HAF_TFA_EXTDEP_BINS_CURRENT = True
 
 # Declare test whose failure will not return a non-zero exit code
 FAILURE_EXEMPT_TESTS = {
@@ -328,7 +328,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         self.env.SetValue("MU_SCHEMA_DIR", self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuArmVirtPkg", "CfgData"), "Platform Defined")
         self.env.SetValue("MU_SCHEMA_FILE_NAME", "QemuArmVirtPkgCfgData.xml", "Platform Hardcoded")
         self.env.SetValue("HAF_TFA_BUILD", "FALSE", "Platform Hardcoded", overridable=True)
-        
+
         # If HAF/TF-A binaries are not in sync, and we are on Windows, exit without building the platform because we
         # cannot compile TF-A on Windows. Otherwise, (if on Linux) we force the build of TF-A to ensure the binaries
         # are in sync.
