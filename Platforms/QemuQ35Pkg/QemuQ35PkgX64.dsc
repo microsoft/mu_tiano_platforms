@@ -25,6 +25,10 @@
 
 !include QemuQ35Pkg/QemuQ35PkgCommon.dsc.inc
 
+[LibraryClasses.common.PEIM]
+MmPlatformHobProducerLib|StandaloneMmPkg/Library/MmPlatformHobProducerLibNull/MmPlatformHobProducerLibNull.inf
+# MmPlatformHobProducerLib|QemuQ35Pkg/Library/MmPlatformHobProducerLib/MmPlatformHobProducerLib.inf
+
 [Components.X64]
 !include QemuQ35Pkg/QemuQ35PkgCommonPei.dsc.inc
 

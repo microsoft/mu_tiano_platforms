@@ -268,7 +268,7 @@ INF  PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
 INF  QemuQ35Pkg/ConfigKnobs/ConfigKnobs.inf
 INF  OemPkg/OemConfigPolicyCreatorPei/OemConfigPolicyCreatorPei.inf
 
-INF  DebuggerFeaturePkg/DebugConfigPei/DebugConfigPei.inf
+# INF  DebuggerFeaturePkg/DebugConfigPei/DebugConfigPei.inf
 
 !include $(SHARED_CRYPTO_PATH)/Driver/Bin/CryptoDriver.PEI.inc.fdf
 
@@ -447,7 +447,16 @@ INF  QemuQ35Pkg/SmmAccess/SmmAccess2Dxe.inf
 !else
   INF  MmSupervisorPkg/Drivers/StandaloneMmIpl/PiSmmIpl.inf
 !endif
-INF  MmSupervisorPkg/Core/MmSupervisorCore.inf
+INF  MmSupervisorPkg/Core/MmSupervisorInit.inf
+FILE MM_CORE_STANDALONE = gMmSupervisorCoreGuid {
+  SECTION PE32 = D:\Repos\patina-dxe-core-qemu\target\x86_64-unknown-uefi\debug\q35_mm_supervisor.efi
+  SECTION UI   = "MmSupervisorCore"
+}
+# INF  StandaloneMmPkg/Core/StandaloneMmCore.inf
+FILE MM_CORE_STANDALONE = gMmSupervisorUserGuid {
+  SECTION PE32 = D:\Repos\patina-dxe-core-qemu\target\x86_64-unknown-uefi\debug\q35_mm_user_core.efi
+  SECTION UI   = "MmUserCore"
+}
 INF  UefiCpuPkg/CpuIo2Smm/CpuIo2StandaloneMm.inf
 
 #
@@ -490,7 +499,7 @@ INF  MdeModulePkg/Universal/ReportStatusCodeRouter/Smm/ReportStatusCodeRouterSta
 INF  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableSmm/FirmwarePerformanceStandaloneMm.inf
 INF  MsCorePkg/MuVarPolicyFoundationDxe/MuVarPolicyFoundationDxe.inf
 INF MsCorePkg/LoadOptionVariablePolicyDxe/LoadOptionVariablePolicyDxe.inf
-INF  MmSupervisorPkg/Drivers/MmSupervisorRing3Broker/MmSupervisorRing3Broker.inf
+# INF  MmSupervisorPkg/Drivers/MmSupervisorRing3Broker/MmSupervisorRing3Broker.inf
 INF  MmSupervisorPkg/Drivers/StandaloneMmUnblockMem/StandaloneMmUnblockMem.inf
 !if $(PERF_TRACE_ENABLE) == TRUE
 INF  MmSupervisorPkg/Drivers/MmSupervisorRing3Performance/MmSupervisorRing3Performance.inf
@@ -508,9 +517,9 @@ INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
 #
 # OneCrypto Drivers
 #
-INF $(ONE_CRYPTO_PATH)/$(TARGET)/X64/OneCryptoBin/OneCryptoBinSupvMm.inf
+INF $(ONE_CRYPTO_PATH)/$(TARGET)/X64/OneCryptoBin/OneCryptoBinStandaloneMm.inf
 INF $(ONE_CRYPTO_PATH)/$(TARGET)/X64/OneCryptoLoaders/OneCryptoLoaderDxe.inf
-INF $(ONE_CRYPTO_PATH)/$(TARGET)/X64/OneCryptoLoaders/OneCryptoLoaderSupvMm.inf
+INF $(ONE_CRYPTO_PATH)/$(TARGET)/X64/OneCryptoLoaders/OneCryptoLoaderStandaloneMm.inf
 
 !if $(BUILD_UNIT_TESTS) == TRUE
   # INF UefiTestingPkg/FunctionalSystemTests/SmmPagingProtectionsTest/Smm/SmmPagingProtectionsTestStandaloneMm.inf # NOT YET SUPPORTED
@@ -555,7 +564,7 @@ FILE FREEFORM = PCD(gZeroTouchPkgTokenSpaceGuid.PcdZeroTouchCertificateFile) {
   INF MsGraphicsPkg/OnScreenKeyboardDxe/OnScreenKeyboardDxe.inf
   INF MsGraphicsPkg/SimpleWindowManagerDxe/SimpleWindowManagerDxe.inf
   INF AdvLoggerPkg/Application/AdvancedLogDumper/AdvancedLogDumper.inf
-  INF MmSupervisorPkg/Drivers/MmSupervisorErrorReport/MmSupervisorErrorReport.inf
+  # INF MmSupervisorPkg/Drivers/MmSupervisorErrorReport/MmSupervisorErrorReport.inf
   FILE APPLICATION=PCD(gPcBdsPkgTokenSpaceGuid.PcdShellFile) {
     SECTION PE32=$(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/X64/Shell.efi
     SECTION UI= "EdkShell"
@@ -584,6 +593,9 @@ FILE FREEFORM = PCD(gZeroTouchPkgTokenSpaceGuid.PcdZeroTouchCertificateFile) {
   }
   FILE FREEFORM = gMmSupervisorPolicyFileGuid {
     SECTION RAW = $(POLICY_BIN_PATH)
+  }
+  FILE FREEFORM = gMmiEntrySeaFileGuid {
+    SECTION RAW = $(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/X64/SeaPkg/MmiEntrySea/MmiEntrySea/OUTPUT/MmiEntrySea.bin
   }
 
 ################################################################################
