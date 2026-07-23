@@ -226,7 +226,6 @@ READ_LOCK_STATUS   = TRUE
   # OneCrypto DXE Driver
   #
   INF $(ONE_CRYPTO_PATH)/$(TARGET)/AARCH64/OneCryptoLoaders/OneCryptoLoaderDxe.inf
-  INF $(ONE_CRYPTO_PATH)/$(TARGET)/AARCH64/OneCryptoBin/OneCryptoBinDxe.inf
   
   #
   # Multiple Console IO support
@@ -516,8 +515,21 @@ READ_LOCK_STATUS   = TRUE
   #
   # OneCrypto StandaloneMM Drivers
   #
+  # Single-copy, Mode B (dedicated compressed FV): the loaders and image
+  # provider live here; OneCryptoBin itself lives in the dedicated, LZMA-wrapped
+  # [FV.OneCryptoFv] below. The MM core decompresses and dispatches OneCryptoBin
+  # from that FV, and the image provider locates it by its well-known container
+  # FILE_GUID to serve the compressed payload to DXE.
+  #
   INF $(ONE_CRYPTO_PATH)/$(TARGET)/AARCH64/OneCryptoLoaders/OneCryptoLoaderStandaloneMm.inf
-  INF $(ONE_CRYPTO_PATH)/$(TARGET)/AARCH64/OneCryptoBin/OneCryptoBinStandaloneMm.inf
+  INF $(ONE_CRYPTO_PATH)/$(TARGET)/AARCH64/OneCryptoLoaders/OneCryptoImageProviderStandaloneMm.inf
+
+  # Dedicated, identity-tagged, LZMA-compressed OneCrypto FV (ONE_CRYPTO_CONTAINER_FV_GUID).
+  FILE FV_IMAGE = 1DC82EA3-D1E9-4C10-A788-335D166E23A1 {
+    SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
+      SECTION FV_IMAGE = OneCryptoFv
+    }
+  }
 
   INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteStandaloneMm.inf
   INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStandaloneMm.inf
@@ -526,6 +538,30 @@ READ_LOCK_STATUS   = TRUE
 !if $(TPM2_ENABLE) == TRUE
   INF SecurityPkg/Tcg/Tcg2StandaloneMmArm/Tcg2StandaloneMmArm.inf
 !endif
+
+[FV.OneCryptoFv]
+# Dedicated OneCrypto firmware volume (single stored copy). LZMA-wrapped and
+# anchored in [FV.FV_STANDALONE_MM_COMPACT] by ONE_CRYPTO_CONTAINER_FV_GUID. The
+# MM core decompresses and dispatches OneCryptoBin from here; the image provider
+# serves the same compressed payload to DXE.
+FvAlignment        = 16
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+  INF $(ONE_CRYPTO_PATH)/$(TARGET)/AARCH64/OneCryptoBin/OneCryptoBinStandaloneMm.inf
 
 ################################################################################
 #

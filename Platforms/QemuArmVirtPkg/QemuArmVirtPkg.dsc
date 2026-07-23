@@ -886,11 +886,11 @@
     <PcdsPatchableInModule>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8040004F
   }
-  $(ONE_CRYPTO_PATH)/$(TARGET)/AARCH64/OneCryptoBin/OneCryptoBinStandaloneMm.inf {
+  $(ONE_CRYPTO_PATH)/$(TARGET)/AARCH64/OneCryptoLoaders/OneCryptoImageProviderStandaloneMm.inf {
     <PcdsPatchableInModule>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8040004F
   }
-  $(ONE_CRYPTO_PATH)/$(TARGET)/AARCH64/OneCryptoBin/OneCryptoBinDxe.inf {
+  $(ONE_CRYPTO_PATH)/$(TARGET)/AARCH64/OneCryptoBin/OneCryptoBinStandaloneMm.inf {
     <PcdsPatchableInModule>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8040004F
   }
@@ -1298,6 +1298,9 @@
   StandaloneMmPkg/Core/StandaloneMmCore.inf {
     <LibraryClasses>
       NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
+      # Register the LZMA guided-section handler so the MM core can decompress
+      # and dispatch OneCryptoBin from the dedicated compressed [FV.OneCryptoFv].
+      NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
     <PcdsFixedAtBuild>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
       gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
