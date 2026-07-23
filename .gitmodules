@@ -1,6 +1,6 @@
 [submodule "MU_BASECORE"]
 	path = MU_BASECORE
-	url = https://windowspartners.visualstudio.com/MSCoreUEFI/_git/mu_basecore
+	url = https://github.com/microsoft/mu_basecore.git
 	branch = release/202511
 [submodule "Common/MU"]
 	path = Common/MU
@@ -22,7 +22,7 @@
 	url = https://github.com/microsoft/mu_feature_config.git
 [submodule "Features/MM_SUPV"]
 	path = Features/MM_SUPV
-	url = https://windowspartners.visualstudio.com/MsCoreUefi_Thanos/_git/msft_mmsupervisor
+	url = https://github.com/microsoft/mu_feature_mm_supv.git
 	branch = v13.0.0
 [submodule "Features/DEBUGGER"]
 	path = Features/DEBUGGER
