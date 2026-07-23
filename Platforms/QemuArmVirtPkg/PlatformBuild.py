@@ -35,7 +35,7 @@ cached_env = os.environ.copy()
 # When the TF-A source code is updated in a way that is not compatible with the existing prebuilts, this should be set
 # to False, which ensures that HAF / TF-A will be build from source if supported. On Windows, TF-A cannot be built from
 # source, so the platform build will be skipped with a warning.
-HAF_TFA_EXTDEP_BINS_CURRENT = True
+HAF_TFA_EXTDEP_BINS_CURRENT = False
 
 # Declare test whose failure will not return a non-zero exit code
 FAILURE_EXEMPT_TESTS = {
@@ -754,7 +754,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         args += " DEBUG=" + str(1 if self.env.GetValue("TARGET").lower() == 'debug' else 0)
         args += " ENABLE_SME_FOR_SWD=0 ENABLE_SVE_FOR_SWD=0 ENABLE_SME_FOR_NS=0 ENABLE_SVE_FOR_NS=0"
         args += f" SPD=spmd SPMD_SPM_AT_SEL2=1 SP_LAYOUT_FILE={filename}"
-        args += " ENABLE_FEAT_HCX=1 HOB_LIST=1 TRANSFER_LIST=1 LOG_LEVEL=40 ENABLE_FEAT_MTE2=2 CTX_INCLUDE_PAUTH_REGS=1 " # Features used by hypervisor
+        args += " ENABLE_FEAT_HCX=1 HOB_LIST=1 TRANSFER_LIST=1 LOG_LEVEL=40 ENABLE_FEAT_MTE2=2 CTX_INCLUDE_PAUTH_REGS=1 ENABLE_FEAT_TCR2=1 ENABLE_FEAT_S1PIE=1" # Features used by hypervisor
         # args += " FEATURE_DETECTION=1" # Enforces support for features enabled.
         args += f" BL32={str(haf_out / 'secure_qemu_aarch64_clang' / 'hafnium.bin')}"
         args += f" PRELOADED_BL33_BASE=0x04000000" # This value matches the QEMU_FLASH1_BASE in platform_def.h
