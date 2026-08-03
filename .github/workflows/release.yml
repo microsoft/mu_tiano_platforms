@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Azure Pipeline Publication
-      uses: Azure/pipelines@v1
+      uses: Azure/pipelines@354dddefceb0b503a61338ca81e4091eae3bc84f # v1
       with:
         azure-devops-project-url: https://dev.azure.com/projectmu/mu
         azure-pipeline-name: 'Mu Tiano Platforms Release'
