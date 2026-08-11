@@ -23,7 +23,7 @@
 [submodule "Features/MM_SUPV"]
 	path = Features/MM_SUPV
 	url = https://github.com/microsoft/mu_feature_mm_supv.git
-	branch = v13.0.0
+	branch = dev/202511/post-quantum-staging
 [submodule "Features/DEBUGGER"]
 	path = Features/DEBUGGER
 	url = https://github.com/microsoft/mu_feature_debugger.git
