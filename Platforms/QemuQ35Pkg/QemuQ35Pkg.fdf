@@ -236,7 +236,9 @@ INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
 INF  MdeModulePkg/Universal/FaultTolerantWritePei/FaultTolerantWritePei.inf
 INF  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
-
+!if $(INTEL_STM_ENABLED) == TRUE
+INF  SeaPkg/Drivers/MsegSmramPei/MsegSmramPei.inf
+!endif
 INF  QemuQ35Pkg/SmmAccess/SmmAccessPei.inf
 INF  MmSupervisorPkg/Drivers/MmCommunicationBuffer/MmCommunicationBufferPei.inf
 
@@ -596,6 +598,9 @@ FILE FREEFORM = PCD(gZeroTouchPkgTokenSpaceGuid.PcdZeroTouchCertificateFile) {
   }
   FILE FREEFORM = gMmiEntrySeaFileGuid {
     SECTION RAW = $(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/X64/SeaPkg/MmiEntrySea/MmiEntrySea/OUTPUT/MmiEntrySea.bin
+  }
+  FILE FREEFORM = gSeaBinFileGuid {
+    SECTION RAW = $(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/X64/SeaPkg/Core/Stm/DEBUG/Stm.bin
   }
 
 ################################################################################

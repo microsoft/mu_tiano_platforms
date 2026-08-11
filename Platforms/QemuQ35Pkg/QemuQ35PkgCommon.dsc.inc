@@ -39,6 +39,7 @@
   DEFINE PEI_MM_IPL_ENABLED             = TRUE
   DEFINE GUI_FRONT_PAGE                 = FALSE
   DEFINE TPM_REPLAY_ENABLED             = FALSE
+  DEFINE INTEL_STM_ENABLED              = TRUE
 
   DEFINE NETWORK_HTTP_ENABLE            = TRUE
   DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS = TRUE
@@ -318,6 +319,8 @@
   XenHypercallLib|QemuQ35Pkg/Library/XenHypercallLib/XenHypercallLib.inf
   AmdSysCallLib|UefiCpuPkg/Library/AmdSysCallLibNull/AmdSysCallLibNull.inf
 
+  SecurePolicyLib|MmSupervisorPkg/Library/SecurePolicyLib/SecurePolicyLib.inf
+  PeCoffValidationLib|SeaPkg/Library/BasePeCoffValidationLib/BasePeCoffValidationLib.inf
 
 #########################################
 # SEC Libraries
@@ -347,7 +350,7 @@
   MmMemoryProtectionHobLib|MdeModulePkg/Library/MemoryProtectionHobLib/StandaloneMmMemoryProtectionHobLib.inf
   MmSupervisorCoreInitLib|MmSupervisorPkg/Library/BaseMmSupervisorCoreInitLibNull/BaseMmSupervisorCoreInitLibNull.inf
   PeCoffLibNegative|SeaPkg/Library/BasePeCoffLibNegative/BasePeCoffLibNegative.inf
-  SecurePolicyLib|MmSupervisorPkg/Library/SecurePolicyLib/SecurePolicyLib.inf
+
 #########################################
 # PEI Libraries
 #########################################
@@ -499,7 +502,8 @@
   MemLib|MmSupervisorPkg/Library/MmSupervisorMemLib/MmSupervisorCoreMemLib.inf
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
   StandaloneMmCoreEntryPoint|MdePkg/Library/StandaloneMmCoreEntryPoint/StandaloneMmCoreEntryPoint.inf
-  SmmCpuFeaturesLib|QemuQ35Pkg/Library/SmmCpuFeaturesLib/StandaloneMmCpuFeaturesLib.inf
+  SmmCpuFeaturesLib|SeaPkg/Library/SmmCpuFeaturesLib/StandaloneMmCpuFeaturesLibStm.inf
+  SmrrLib|SeaPkg/Library/BaseSmrrLibNull/BaseSmrrLibNull.inf
   SmmCpuPlatformHookLib|QemuQ35Pkg/Library/SmmCpuPlatformHookLibQemu/SmmCpuPlatformHookLibQemu.inf
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/SmmCpuExceptionHandlerLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibBase.inf
@@ -511,6 +515,7 @@
   MmSaveStateLib|UefiCpuPkg/Library/MmSaveStateLib/AmdMmSaveStateLib.inf
   SmmCpuSyncLib|MmSupervisorPkg/Library/StandaloneMmCpuSyncLib/StandaloneMmCpuSyncLib.inf
   RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
+  TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
 
 [LibraryClasses.common.MM_STANDALONE]
   TimerLib|QemuQ35Pkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
@@ -537,6 +542,11 @@
 !if $(PERF_TRACE_ENABLE) == TRUE
   PerformanceLib|MdeModulePkg/Library/SmmPerformanceLib/StandaloneMmPerformanceLib.inf
 !endif
+
+[LibraryClasses.common.USER_DEFINED]
+  StmLib|SeaPkg/Library/StmLib/StmLib.inf
+  StmPlatformLib|SeaPkg/Library/StmPlatformLibNull/StmPlatformLibNull.inf
+  SynchronizationLib|SeaPkg/Library/SimpleSynchronizationLib/SimpleSynchronizationLib.inf
 
 #########################################
 # Advanced Logger Libraries
@@ -595,10 +605,11 @@
 
   gQemuPkgTokenSpaceGuid.PcdEnableMemoryProtection|$(MEMORY_PROTECTION)
 
+  gMmSupervisorPkgTokenSpaceGuid.PcdMmSupervisorTestEnable|TRUE
   !if $(BUILD_UNIT_TESTS) == TRUE
     gUefiCpuPkgTokenSpaceGuid.PcdSmmExceptionTestModeSupport|TRUE
-    gMmSupervisorPkgTokenSpaceGuid.PcdMmSupervisorTestEnable|TRUE
   !endif
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiMemoryBinsEnable|TRUE
 
 [PcdsPatchableInModule]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
@@ -893,6 +904,10 @@
   QemuQ35Pkg/Library/ResetSystemLib/BaseResetSystemLib.inf
   QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
   QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
+
+!if $(INTEL_STM_ENABLED) == TRUE
+  SeaPkg/Drivers/MsegSmramPei/MsegSmramPei.inf
+!endif
 
 [Components.X64]
 
@@ -1233,7 +1248,6 @@
     <PcdsFeatureFlag>
       gDfciPkgTokenSpaceGuid.PcdSettingsManagerInstallProvider|TRUE
   }
-  # SeaPkg/Tests/ResponderValidationTest/ResponderValidationTestApp.inf
   MdeModulePkg/Universal/EsrtFmpDxe/EsrtFmpDxe.inf
   MsCorePkg/AcpiRGRT/AcpiRgrt.inf
   DfciPkg/Application/DfciMenu/DfciMenu.inf
@@ -1330,6 +1344,31 @@
   #
   MmSupervisorPkg/Core/MmSupervisorInit.inf
   SeaPkg/MmiEntrySea/MmiEntrySea.inf
+
+!if $(INTEL_STM_ENABLED) == TRUE
+!ifdef $(SKIP_MM_BIN_BUILD)
+  SeaPkg/Core/Stm.inf {
+    <LibraryClasses>
+      NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf # We do not even run it on Q35. Do not do this for production code.
+      HashLibRaw|SeaPkg/Library/HashLibRaw/HashLibRaw.inf
+      BaseCryptLib|SeaPkg/Library/BaseCryptLibMbedTls/BaseCryptLib.inf
+      MbedTlsLib|SeaPkg/Library/MbedTlsLib/MbedTlsLib.inf
+      IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+      PeCoffLibNegative|SeaPkg/Library/BasePeCoffLibNegative/BasePeCoffLibNegative.inf
+      DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+      MemoryAllocationLib|SeaPkg/Library/SimpleMemoryAllocationLib/SimpleMemoryAllocationLib.inf
+    <PcdsFixedAtBuild>
+      !include $(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/MmArtifacts.dsc.inc
+  }
+  SeaPkg/Tests/ResponderValidationTest/ResponderValidationTestApp.inf {
+    <LibraryClasses>
+      HashLibRaw|SeaPkg/Library/HashLibRaw/HashLibRaw.inf
+      PeCoffLibNegative|SeaPkg/Library/BasePeCoffLibNegative/BasePeCoffLibNegative.inf
+    <PcdsFixedAtBuild>
+      !include $(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/MmArtifacts.dsc.inc
+  }
+!endif
+!endif
 
   #
   # Privileged drivers (DXE_SMM_DRIVER modules)
