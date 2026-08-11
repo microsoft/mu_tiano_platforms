@@ -39,6 +39,8 @@ updates:
       day: "monday"
       timezone: "America/Los_Angeles"
       time: "03:00"
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: "Rust Dependency"
     labels:
@@ -53,6 +55,8 @@ updates:
       day: "monday"
       timezone: "America/Los_Angeles"
       time: "06:00"
+    cooldown:
+      default-days: 7
     ignore:
       # Ignore dependencies that are synced from mu_devops
       - dependency-name: "microsoft/mu_devops*"
@@ -108,6 +112,8 @@ updates:
       day: "wednesday"
       timezone: "America/Los_Angeles"
       time: "01:00"
+    cooldown:
+      default-days: 7
     groups:
       all-pip-dependencies:
         patterns:
