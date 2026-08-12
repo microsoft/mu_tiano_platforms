@@ -23,7 +23,7 @@ from edk2toolext.invocables.edk2_setup import (RequiredSubmodule,
                                                SetupSettingsManager)
 from edk2toolext.invocables.edk2_update import UpdateSettingsManager
 from edk2toolext.invocables.edk2_parse import ParseSettingsManager
-from edk2toollib.utility_functions import RunCmd
+from edk2toollib.utility_functions import RemoveTree, RunCmd
 
 WORKSPACE_ROOT = str(Path(__file__).parent.parent.parent)
 
@@ -293,6 +293,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         self.env.SetValue("BLD_*_MEMORY_PROTECTION", "TRUE", "Default")
         # Include the MFCI test cert by default, override on the commandline with "BLD_*_SHIP_MODE=TRUE" if you want the retail MFCI cert
         self.env.SetValue("BLD_*_SHIP_MODE", "FALSE", "Default")
+        self.env.SetValue("BLD_*_TARGET", "DEBUG", "Default")
+        self.env.SetValue("BLD_*_TOOL_CHAIN_TAG", "VS2022", "Default")
         self.env.SetValue("CONF_AUTOGEN_INCLUDE_PATH", self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuQ35Pkg", "Include"), "Platform Defined")
 
         self.env.SetValue('MU_SCHEMA_DIR', self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuQ35Pkg", "CfgData"), "Platform Defined")
@@ -311,6 +313,13 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         if self.Helper.generate_secureboot_pcds(self) != 0:
             logging.error("Failed to generate include PCDs")
             return -1
+
+        inc_file_path = str(Path(self.ws, "Build", "QemuQ35PkgX64", "DEBUG_VS2022", "MmArtifacts.dsc.inc"))
+        if not os.path.exists(inc_file_path):
+            # create the folder if it doesn't exist
+            os.makedirs(os.path.dirname(inc_file_path), exist_ok=True)
+            with open(inc_file_path, "w"):
+                pass
 
         return 0
 
@@ -349,6 +358,91 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             raise Exception("SupervisorPolicyMaker Failed: Errorcode %d" % ret)
         self.env.SetValue("BLD_*_POLICY_BIN_PATH", output_name, "Set generated secure policy path")
         return ret
+
+    def Build(self) -> int:
+
+        build_output = Path(self.env.GetValue("BUILD_OUTPUT_BASE"))
+
+        spam_pkg_dir = build_output / "X64" / "SeaPkg" # / "Core" / "Stm" / "DEBUG"
+
+        logging.info("Building regular modules for QEMU...")
+        shell_environment.CheckpointBuildVars()
+
+        if self.env.GetValue("BUILDMODULE") is not None:
+            return super().Build()
+
+        # UefiBuilder.Build() forces SkipPostBuild=True and FlashImage=False whenever BUILDMODULE is
+        # set. This routine performs several single module builds before the final full build, so
+        # stash the caller's intent (e.g. --flashrom) and restore it once the full build is done.
+        requested_flash_image = self.FlashImage
+        requested_skip_post_build = self.SkipPostBuild
+
+        build_report = str(Path(self.env.GetValue("BUILD_OUTPUT_BASE"), "BUILD_MMI_ENTRY_REPORT.txt"))
+        self.env.GetEntry("BUILDREPORT_FILE").AllowOverride()
+        self.env.SetValue("BUILDREPORT_FILE", build_report, "Set By Command Line Options.")
+
+        self.env.SetValue("BUILDMODULE", "SeaPkg/MmiEntrySea/MmiEntrySea.inf", "Single Build Module")
+        ret = super().Build()
+        if ret != 0:
+            return ret
+
+        # Generate the spam artifacts for the MmSupervisorCore and co.
+        mmsupv_dir = Path("D:/Repos/surface_patina_intel_reviews/target/x86_64-unknown-uefi/debug")
+        aux_cfg = self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuQ35Pkg", "aux_config.spam.cfg")
+
+        # Directory where generated SEA artifacts (MmArtifacts.dsc.inc, MmSupervisorCore.aux, AuxConfig.toml) are placed.
+        artifact_out_dir = Path(self.env.GetValue("BUILD_OUTPUT_BASE"))
+        mmi_file_path = spam_pkg_dir / "MmiEntrySea" / "MmiEntrySea" / "OUTPUT" / "MmiEntrySea.bin"
+
+        sea_scopes = [self.env.GetValue("TARGET")]
+
+        ret = self.Helper.generate_sea_includes(sea_scopes, aux_cfg, mmsupv_dir, mmi_file_path, artifact_out_dir, supervisor_name="mm_supervisor")
+        if ret != 0:
+            return ret
+
+        # Now build the SPAM core and disable the other MM binary producers.
+        self.env.SetValue("BLD_*_SKIP_MM_BIN_BUILD", "TRUE", "Skip building MM core and entry block")
+
+        build_report = str(Path(self.env.GetValue("BUILD_OUTPUT_BASE"), "BUILD_SEA_CORE_REPORT.txt"))
+        self.env.GetEntry("BUILDREPORT_FILE").AllowOverride()
+        self.env.SetValue("BUILDREPORT_FILE", build_report, "Set By Command Line Options.")
+
+        self.env.GetEntry("BUILDMODULE").AllowOverride()
+        self.env.SetValue("BUILDMODULE", "SeaPkg/Core/Stm.inf", "Single Build Module")
+        ret = super().Build()
+        if ret != 0:
+            return ret
+
+        # Stm.bin must exist before the full build assembles the firmware volume. The responder
+        # validation test is already a component of that full build and does not need its own pass.
+        ret = self.Helper.generate_stm_binary(
+            spam_pkg_dir / "Core" / "Stm" / "DEBUG" / "Stm.dll",
+            spam_pkg_dir / "Core" / "Stm" / "DEBUG",
+        )
+        if ret != 0:
+            return ret
+
+        # Build everything else, including ResponderValidationTestApp. Stm.bin is already
+        # complete and consumed directly by the FDF, so do not relink Stm.dll in this pass.
+        self.env.SetValue("BLD_*_SKIP_STM_BUILD", "TRUE", "Skip rebuilding the generated STM binary")
+
+        build_report = str(Path(self.env.GetValue("BUILD_OUTPUT_BASE"), "BUILD_REPORT.txt"))
+        self.env.GetEntry("BUILDREPORT_FILE").AllowOverride()
+        self.env.SetValue("BUILDREPORT_FILE", build_report, "Set By Command Line Options.")
+
+        self.env.GetEntry("BUILDMODULE").AllowOverride()
+        self.env.SetValue("BUILDMODULE", "", "Clear to build all modules")
+        ret = super().Build()
+        if ret != 0:
+            return ret
+
+        # Restore what the single module builds above clobbered.
+        self.FlashImage = requested_flash_image
+        self.SkipPostBuild = requested_skip_post_build
+
+        shell_environment.RevertBuildVars()
+
+        return 0
 
     # TODO: Validation should be done by parsing the cpu.c file from qemu
     def __ValidateCpuModelInfo(self):
@@ -479,7 +573,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         FEOL = FAILURE_EXEMPT_OMISSION_LENGTH
 
         if run_paging_audit:
-            self.Helper.generate_paging_audit (virtual_drive, Path(drive_path).parent / "unit_test_results", self.env.GetValue("VERSION"), "Q35")
+            self.Helper.generate_paging_audit (virtual_drive, Path(drive_path).parent / "unit_test_results", self.env.GetValue("VERSION"), "Q35", supervisor_name="mm_supervisor")
 
         # Filter out tests that are exempt
         tests = list(filter(lambda file: file.name not in FET or not (now - FET.get(file.name)).total_seconds() < FEOL, file_list))

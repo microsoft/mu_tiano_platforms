@@ -108,7 +108,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             args += f" -L {str(Path(env.GetValue('QEMU_DIR'), 'share'))}"
 
         # debug messages out thru virtual io port
-        args += " -global isa-debugcon.iobase=0x402"
+        args += " -global isa-debugcon.iobase=0x3f8"
         # Turn off S3 support
         args += " -global ICH9-LPC.disable_s3=1"
         # Increase TSEG to 32 Mb
@@ -155,7 +155,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         logging.log(logging.INFO, "CPU model: " + cpu_model)
 
         #args += " -cpu qemu64,+rdrand,umip,+smep,+popcnt" # most compatible x64 CPU model + RDRAND + UMIP + SMEP +POPCNT support (not included by default)
-        cpu_arg = " -cpu " + cpu_model + ",rdrand=on,umip=on,smep=on,pdpe1gb=on,popcnt=on,+sse,+sse2,+sse3,+ssse3,+sse4.2,+sse4.1"
+        cpu_arg = " -cpu " + cpu_model + ",rdrand=on,umip=on,smep=on,smap=on,pdpe1gb=on,popcnt=on,+sse,+sse2,+sse3,+ssse3,+sse4.2,+sse4.1"
         args += cpu_arg
 
         if env.GetBuildValue ("QEMU_CORE_NUM") is not None:
