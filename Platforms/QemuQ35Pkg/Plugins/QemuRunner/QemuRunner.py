@@ -108,7 +108,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             args += f" -L {str(Path(env.GetValue('QEMU_DIR'), 'share'))}"
 
         # debug messages out thru virtual io port
-        args += " -global isa-debugcon.iobase=0x402"
+        args += " -global isa-debugcon.iobase=0x3f8"
         # Turn off S3 support
         args += " -global ICH9-LPC.disable_s3=1"
         # Increase TSEG to 32 Mb

@@ -451,12 +451,12 @@ INF  QemuQ35Pkg/SmmAccess/SmmAccess2Dxe.inf
 !endif
 INF  MmSupervisorPkg/Core/MmSupervisorInit.inf
 FILE MM_CORE_STANDALONE = gMmSupervisorCoreGuid {
-  SECTION PE32 = D:\Repos\patina-dxe-core-qemu\target\x86_64-unknown-uefi\debug\q35_mm_supervisor.efi
+  SECTION PE32 = D:\Repos\surface_patina_intel_reviews\target\x86_64-unknown-uefi\debug\mm_supervisor.efi
   SECTION UI   = "MmSupervisorCore"
 }
 # INF  StandaloneMmPkg/Core/StandaloneMmCore.inf
 FILE MM_CORE_STANDALONE = gMmSupervisorUserGuid {
-  SECTION PE32 = D:\Repos\patina-dxe-core-qemu\target\x86_64-unknown-uefi\debug\q35_mm_user_core.efi
+  SECTION PE32 = D:\Repos\surface_patina_intel_reviews\target\x86_64-unknown-uefi\debug\mm_user_core.efi
   SECTION UI   = "MmUserCore"
 }
 INF  UefiCpuPkg/CpuIo2Smm/CpuIo2StandaloneMm.inf
