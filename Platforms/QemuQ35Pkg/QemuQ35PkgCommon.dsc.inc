@@ -1347,6 +1347,7 @@
 
 !if $(INTEL_STM_ENABLED) == TRUE
 !ifdef $(SKIP_MM_BIN_BUILD)
+!ifndef $(SKIP_STM_BUILD)
   SeaPkg/Core/Stm.inf {
     <LibraryClasses>
       NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf # We do not even run it on Q35. Do not do this for production code.
@@ -1360,6 +1361,7 @@
     <PcdsFixedAtBuild>
       !include $(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/MmArtifacts.dsc.inc
   }
+!endif
   SeaPkg/Tests/ResponderValidationTest/ResponderValidationTestApp.inf {
     <LibraryClasses>
       HashLibRaw|SeaPkg/Library/HashLibRaw/HashLibRaw.inf

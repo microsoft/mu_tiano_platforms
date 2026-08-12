@@ -318,10 +318,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         if not os.path.exists(inc_file_path):
             # create the folder if it doesn't exist
             os.makedirs(os.path.dirname(inc_file_path), exist_ok=True)
-
-        with open(inc_file_path, "w") as inc_file:
-            # just need to create the file
-            pass
+            with open(inc_file_path, "w"):
+                pass
 
         return 0
 
@@ -389,7 +387,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             return ret
 
         # Generate the spam artifacts for the MmSupervisorCore and co.
-        mmsupv_dir = Path("D:/Repos/patina-dxe-core-qemu/target/x86_64-unknown-uefi/debug")
+        mmsupv_dir = Path("D:/Repos/surface_patina_intel_reviews/target/x86_64-unknown-uefi/debug")
         aux_cfg = self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuQ35Pkg", "aux_config.spam.cfg")
 
         # Directory where generated SEA artifacts (MmArtifacts.dsc.inc, MmSupervisorCore.aux, AuxConfig.toml) are placed.
@@ -398,11 +396,11 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         sea_scopes = [self.env.GetValue("TARGET")]
 
-        ret = self.Helper.generate_sea_includes(sea_scopes, aux_cfg, mmsupv_dir, mmi_file_path, artifact_out_dir, supervisor_name="q35_mm_supervisor")
+        ret = self.Helper.generate_sea_includes(sea_scopes, aux_cfg, mmsupv_dir, mmi_file_path, artifact_out_dir, supervisor_name="mm_supervisor")
         if ret != 0:
             return ret
 
-        # Now really build the SPAM core, unit test and disable other components
+        # Now build the SPAM core and disable the other MM binary producers.
         self.env.SetValue("BLD_*_SKIP_MM_BIN_BUILD", "TRUE", "Skip building MM core and entry block")
 
         build_report = str(Path(self.env.GetValue("BUILD_OUTPUT_BASE"), "BUILD_SEA_CORE_REPORT.txt"))
@@ -415,27 +413,19 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         if ret != 0:
             return ret
 
-        # Add a post build step to build spam core bin and assemble the FD files
-        cmd = "GenStm"
-        args = "-e --debug 5 %s -o %s" % (
-            os.path.join(spam_pkg_dir, "Core", "Stm", "DEBUG", "Stm.dll"),
-            os.path.join(spam_pkg_dir, "Core", "Stm", "DEBUG", "Stm.bin")
+        # Stm.bin must exist before the full build assembles the firmware volume. The responder
+        # validation test is already a component of that full build and does not need its own pass.
+        ret = self.Helper.generate_stm_binary(
+            spam_pkg_dir / "Core" / "Stm" / "DEBUG" / "Stm.dll",
+            spam_pkg_dir / "Core" / "Stm" / "DEBUG",
         )
-        ret = RunCmd(cmd, args)
         if ret != 0:
             return ret
 
-        build_report = str(Path(self.env.GetValue("BUILD_OUTPUT_BASE"), "BUILD_SEA_TEST_REPORT.txt"))
-        self.env.GetEntry("BUILDREPORT_FILE").AllowOverride()
-        self.env.SetValue("BUILDREPORT_FILE", build_report, "Set By Command Line Options.")
+        # Build everything else, including ResponderValidationTestApp. Stm.bin is already
+        # complete and consumed directly by the FDF, so do not relink Stm.dll in this pass.
+        self.env.SetValue("BLD_*_SKIP_STM_BUILD", "TRUE", "Skip rebuilding the generated STM binary")
 
-        self.env.GetEntry("BUILDMODULE").AllowOverride()
-        self.env.SetValue("BUILDMODULE", "SeaPkg/Tests/ResponderValidationTest/ResponderValidationTestApp.inf", "Single Build Module")
-        ret = super().Build()
-        if ret != 0:
-            return ret
-
-        # Build everything else...
         build_report = str(Path(self.env.GetValue("BUILD_OUTPUT_BASE"), "BUILD_REPORT.txt"))
         self.env.GetEntry("BUILDREPORT_FILE").AllowOverride()
         self.env.SetValue("BUILDREPORT_FILE", build_report, "Set By Command Line Options.")
@@ -583,7 +573,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         FEOL = FAILURE_EXEMPT_OMISSION_LENGTH
 
         if run_paging_audit:
-            self.Helper.generate_paging_audit (virtual_drive, Path(drive_path).parent / "unit_test_results", self.env.GetValue("VERSION"), "Q35", supervisor_name="q35_mm_supervisor")
+            self.Helper.generate_paging_audit (virtual_drive, Path(drive_path).parent / "unit_test_results", self.env.GetValue("VERSION"), "Q35", supervisor_name="mm_supervisor")
 
         # Filter out tests that are exempt
         tests = list(filter(lambda file: file.name not in FET or not (now - FET.get(file.name)).total_seconds() < FEOL, file_list))
