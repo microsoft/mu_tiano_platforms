@@ -1241,6 +1241,7 @@
 
   MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
   SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+  SecurityPkg/CryptoIndicatorTable/CryptoIndicatorTableDxe.inf
 
 ## Unit Tests
 #
