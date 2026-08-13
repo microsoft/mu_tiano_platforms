@@ -504,6 +504,7 @@ INF  DfciPkg/Application/DfciMenu/DfciMenu.inf
 INF  MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
 INF  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
 INF  SecurityPkg/CryptoIndicatorTable/CryptoIndicatorTableDxe.inf
+INF  SecurityPkg/CryptoIndicatorReporter/ImageVerificationEcitReporterDxe.inf
 INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
 
 #
