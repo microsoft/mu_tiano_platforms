@@ -1,0 +1,232 @@
+# This workflow automates the process of updating the HAF/TF-A binaries external dependency in this repository.
+#
+# This workflow triggers automatically after the Hafnium and Trusted Firmware-A Build workflow completes successfully
+# on a release event, ensuring the binaries are already uploaded before this workflow runs. It will create a PR to
+# update the external dependency files and set the `HAF_TFA_EXTDEP_BINS_CURRENT` variable to True in the
+# PlatformBuild.py file. If a PR exists for an older release, it will be closed in favor of the new PR.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+name: Update HAF/TF-A Binaries External Dependency
+
+on:
+  workflow_run:
+    workflows:
+      - Hafnium and Trusted Firmware-A Build
+    types:
+      - completed
+  workflow_dispatch: # Manual trigger
+
+env:
+  REPO: ${{ github.repository }}
+
+jobs:
+  check:
+    name: Find New Releases
+
+    # For workflow_run events, only proceed when the build workflow succeeded and was triggered by a release.
+    # For workflow_dispatch, always proceed to allow manual runs.
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'release')
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      pr_exists: ${{ steps.pr-check.outputs.exists }}
+
+    steps:
+      - name: Find Latest Release
+        id: release
+        env:
+          REPO: ${{ env.REPO }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # We can use the normal token here, as we are just reading releases.
+          EVENT_NAME: ${{ github.event_name }}
+        shell: bash
+        run: |
+          # Get the latest release that matches semver format v<major>.<minor>.<patch>
+          RELEASE=$(gh release list --repo "$REPO" --limit 100 --json tagName,publishedAt,isDraft | \
+            jq -c '
+              [ .[]
+              | select(.isDraft == false)
+              | select(.tagName | test("^v[0-9]+\\.[0-9]+\\.[0-9]+$"))
+              ]
+              | sort_by(.publishedAt)
+              | reverse
+              | .[0]
+            ')
+
+          TAG_NAME=$(echo "$RELEASE" | jq -r '.tagName // ""')
+          PUBLISHED_AT=$(echo "$RELEASE" | jq -r '.publishedAt // ""')
+
+          echo "Latest release: $TAG_NAME (published: $PUBLISHED_AT)"
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+
+      - name: Check if PR already exists
+        id: pr-check
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # We can use the normal token here, as we are just reading PRs.
+          PR_BRANCH_NAME: sync-haf-tfa/${{ steps.release.outputs.tag_name }}
+          REPO: ${{ env.REPO }}
+        run: |
+          echo "Checking if PR already exists for branch: $PR_BRANCH_NAME"
+          RESULT=$(gh pr list --repo "$REPO" --state open --head "$PR_BRANCH_NAME" --json number --jq '.[0].number')
+
+          if [[ -n "$RESULT" ]]; then
+            echo "PR already exists: Pr Number $RESULT."
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "No existing PR found."
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+  update:
+    name: "Update HAF/TF-A Binary to ${{ needs.check.outputs.tag_name }}"
+
+    if: ${{ needs.check.outputs.tag_name != '' && !fromJson(needs.check.outputs.pr_exists) }}
+
+    needs: check
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    env:
+      ARTIFACT_BASE_URL: https://github.com/${{ github.repository }}/releases/download
+      HAF_TFA_PATH: Platforms/QemuArmVirtPkg/Binaries/haf_tfa_binaries_ext_dep.yaml
+      PLATFORM_BUILD_PATH: Platforms/QemuArmVirtPkg/PlatformBuild.py
+      TAG_NAME: ${{ needs.check.outputs.tag_name }}
+      PR_BRANCH_PREFIX: sync-haf-tfa/
+      PR_BRANCH_NAME: sync-haf-tfa/${{ needs.check.outputs.tag_name }}
+
+    steps:
+      # If testing on a local fork with less strict permissions, you can remove this step, and update token usage to
+      # use ${{ secrets.GITHUB_TOKEN }} instead of the app token. You must also add the permission `pull-requests: write`
+      # to this job.
+      - name: Generate Token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ vars.MU_ACCESS_APP_ID }}
+          private-key: ${{ secrets.MU_ACCESS_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Checkout Code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+
+      # If `HAF_TFA_EXTDEP_BINS_CURRENT` is already true, then we do not need to update the external dependency,
+      # so we will skip all remaining steps.
+      - name: Check if HAF_TFA_EXTDEP_BINS_CURRENT is already True
+        id: extdep-check
+        env:
+          PLATFORM_BUILD_PATH: ${{ env.PLATFORM_BUILD_PATH }}
+        shell: bash
+        run: |
+          if grep -qE '^HAF_TFA_EXTDEP_BINS_CURRENT[[:space:]]*=[[:space:]]*True' "$PLATFORM_BUILD_PATH"; then
+            echo "HAF_TFA_EXTDEP_BINS_CURRENT is already True."
+            echo "is_current=true" >> $GITHUB_OUTPUT
+          else
+            echo "HAF_TFA_EXTDEP_BINS_CURRENT is not True."
+            echo "is_current=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install Dependencies
+        if: steps.extdep-check.outputs.is_current != 'true'
+        shell: bash
+        run: sudo apt install curl coreutils moreutils -y
+
+      - name: Calculate HAF/TF-A External Dependency File SHA256
+        if: steps.extdep-check.outputs.is_current != 'true'
+        id: sha256
+        shell: bash
+        env:
+          SOURCE_URL: ${{ env.ARTIFACT_BASE_URL }}/${{ env.TAG_NAME }}/haf-tfa-firmware-${{ env.TAG_NAME }}.zip
+        run: |
+          SHA256=$(curl -sSL "$SOURCE_URL" | sha256sum | awk '{print $1}')
+          echo "sha256=${SHA256}" >> $GITHUB_OUTPUT
+
+      - name: Update HAF/TF-A External Dependency File
+        if: steps.extdep-check.outputs.is_current != 'true'
+        env:
+          HAF_TFA_PATH: ${{ env.HAF_TFA_PATH }}
+          SOURCE_URL: ${{ env.ARTIFACT_BASE_URL }}/${{ env.TAG_NAME }}/haf-tfa-firmware-${{ env.TAG_NAME }}.zip
+          VERSION: ${{ env.TAG_NAME }}
+          SHA256: ${{ steps.sha256.outputs.sha256 }}
+        uses: mikefarah/yq@v4
+        with:
+          cmd: yq -i -P '.source = strenv(SOURCE_URL) | .version = strenv(VERSION) | .sha256 = strenv(SHA256)' ${HAF_TFA_PATH}
+
+      - name: Update PlatformBuild.py HAF_TFA_EXTDEP_BINS_CURRENT
+        if: steps.extdep-check.outputs.is_current != 'true'
+        env:
+          PLATFORM_BUILD_PATH: ${{ env.PLATFORM_BUILD_PATH }}
+        shell: bash
+        run: |
+          # Replace HAF_TFA_EXTDEP_BINS_CURRENT = False with HAF_TFA_EXTDEP_BINS_CURRENT = True
+          # Handles variable spacing around the = sign
+          sed -i -E 's/^(HAF_TFA_EXTDEP_BINS_CURRENT[[:space:]]*=[[:space:]]*)False/\1True/' "$PLATFORM_BUILD_PATH"
+
+      - name: Commit and push changes
+        if: steps.extdep-check.outputs.is_current != 'true'
+        env:
+          HAF_TFA_PATH: ${{ env.HAF_TFA_PATH }}
+          PLATFORM_BUILD_PATH: ${{ env.PLATFORM_BUILD_PATH }}
+          TAG_NAME: ${{ env.TAG_NAME }}
+          PR_BRANCH_NAME: ${{ env.PR_BRANCH_NAME }}
+        shell: bash
+        run: |
+          git config user.name "Project Mu Bot"
+          git config user.email "mubot@microsoft.com"
+          git add $HAF_TFA_PATH
+          git add $PLATFORM_BUILD_PATH
+          git commit -m "Update HAF/TF-A external dependency to $TAG_NAME" -m "" -m "Signed-off-by: Project Mu Bot <mubot@microsoft.com>"
+          git push origin HEAD:refs/heads/$PR_BRANCH_NAME
+
+      - name: Create Pull Request
+        if: steps.extdep-check.outputs.is_current != 'true'
+        id: pr
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          REPO: ${{ env.REPO }}
+          HEAD: ${{ env.PR_BRANCH_NAME}}
+          BASE: main
+        run: |
+          gh pr create \
+            --repo "$REPO" \
+            --head "$HEAD" \
+            --base "$BASE" \
+            --title "Update HAF/TF-A ext dep to ${{ env.TAG_NAME }}" \
+            --body "This PR updates the HAF/TF-A external dependency to version ${{ env.TAG_NAME }}."
+
+          PR_NUMBER=$(gh pr view "$HEAD" --repo "$REPO" --json number -q '.number')
+          echo "Pr Created: Pr Number $PR_NUMBER."
+          echo "pr_number=${PR_NUMBER}" >> $GITHUB_OUTPUT
+
+      - name: Close Existing Pull Request
+        if: steps.extdep-check.outputs.is_current != 'true'
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          PR_BRANCH_PREFIX: ${{ env.PR_BRANCH_PREFIX }}
+          KEEP_PR_NUMBER: ${{ steps.pr.outputs.pr_number }}
+          # Only close existing PRs authored by the bot associated with MU_ACCESS_APP_ID.
+          PR_AUTHOR: 'app/project-mu-bot'
+        run: |
+          OPEN_PRS=$(gh pr list --state open --json number,headRefName,author \
+            -q ".[] | select(.headRefName | startswith(\"${PR_BRANCH_PREFIX}\")) | select(.author.login == \"${PR_AUTHOR}\") | .number")
+
+          for PR in $OPEN_PRS; do
+            if [[ "$PR" != "$KEEP_PR_NUMBER" ]]; then
+              echo "Closing PR #$PR"
+              gh pr comment "$PR" --body "Closing in favor of #${KEEP_PR_NUMBER}."
+              gh pr close "$PR" --delete-branch
+            fi
+          done
