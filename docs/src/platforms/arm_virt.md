@@ -23,7 +23,7 @@ corresponding trusted-firmware entities are more mature and feature-rich.
 ## Compiling and Running QEMU
 
 QemuArmVirtPkg uses the Project Mu repositories and Edk2 PyTools for its build operations.
-Specific details can be found here [Development/building.md](../Common/building.md)
+Specific details can be found here [Development/building.md](../building/building.md)
 
 ## Firmware Features
 
@@ -36,7 +36,7 @@ Enable the Project Mu OEM sample "front page".
 This is a touch friendly, graphical, UEFI HII based UI application that
 allows basic platform and boot device configuration.
 
-[Details](../Common/Features/feature_frontpage.md)
+[Details](../features/common/feature_frontpage.md)
 
 ### Device Firmware Configuration Interface
 
@@ -45,7 +45,7 @@ bios settings **securely**.  DFCI is a foundational feature that provides a shar
 model between the device firmware and the cloud.  Once a device is enrolled this shared identity can be used
 to securely communicate across untrusted mediums (network or usb).
 
-[Details](../Common/Features/feature_dfci.md)
+[Details](../features/common/feature_dfci.md)
 
 ### Mu Telemetry / WHEA / HwErrorRecord
 
@@ -54,7 +54,7 @@ designed to collect critical (platform defined) status codes, record them into a
 and then transfer them through the Microsoft WHEA pipeline.  From there an OEM can use Microsoft
 provided reports to check on in market device health.  *Some work still pending completion.
 
-[Details](../Common/Features/feature_whea.md)
+[Details](../features/common/feature_whea.md)
 
 ### Trusted Platform Module (TPM)
 
@@ -63,7 +63,7 @@ Specific TPM Interface Specification (TIS) in addition to a TPM CRB interface th
 TPM Profile (PTP) Specification. `QemuArmVirtPkg` has support to include TPM drivers and connect to the software TPM
 socket interface. Usage is covered in the detailed feature readme.
 
-[Details](../Common/Features/feature_tpm.md)
+[Details](../features/common/feature_tpm.md)
 
 ## Mu Customized Components
 
@@ -71,10 +71,10 @@ socket interface. Usage is covered in the detailed feature readme.
 
 | Modules | Link to Documentation |
 | --- | --- |
-| **QemuVideoDxe** | [QEMU Video Controller](../../../QemuPkg/QemuVideoDxe/ReadMe.md) |
+| **QemuVideoDxe** | [QEMU Video Controller](https://github.com/microsoft/mu_tiano_platforms/blob/main/QemuPkg/QemuVideoDxe/ReadMe.md) |
 
 ### Libraries
 
 | Libraries | Link to Documentation |
 | --- | --- |
-| **MsPlatformDevicesLib** | [MsPlatformDevicesLib](../../QemuArmVirtPkg/Library/MsPlatformDevicesLibQemuArmVirt/ReadMe.md) |
+| **MsPlatformDevicesLib** | [MsPlatformDevicesLib](https://github.com/microsoft/mu_tiano_platforms/blob/main/Platforms/QemuArmVirtPkg/Library/MsPlatformDevicesLibQemuArmVirt/ReadMe.md) |

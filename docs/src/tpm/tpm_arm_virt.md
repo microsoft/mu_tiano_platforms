@@ -26,7 +26,7 @@ path between the normal world and the secure world.
 | ------------- | ------- |
 | **Host OS** | Linux (native) or **WSL** on Windows. Native Windows is not supported. |
 | **swtpm** | TPM 2.0 emulator. Install via your distro's package manager (e.g. `apt install swtpm swtpm-tools`). |
-| **QEMU** | QEMU v10.0 or later. |
+| **QEMU** | Built with `tpm-tis-device` support (standard upstream QEMU includes this). |
 | **Build host** | Same Linux/WSL environment used to run `stuart_build` and launch QEMU. |
 
 See [swtpm Setup](#swtpm-setup) for the full setup commands.
@@ -37,8 +37,7 @@ The TPM is disabled by default. To enable it, set `BLD_*_TPM2_ENABLE=TRUE` on th
 BuildConfig.conf file placed at the root level of the repo:
 
 ```bash
-stuart_build -c Platforms/QemuArmVirtPkg/PlatformBuild.py --FlashRom \
-  BLD_*_TPM2_ENABLE=TRUE \
+stuart_build -c Platforms/QemuArmVirtPkg/PlatformBuild.py --FlashRom BLD_*_TPM2_ENABLE=TRUE
 ```
 
 The following defines control TPM behavior in `QemuArmVirtPkg.dsc`:
@@ -65,8 +64,8 @@ The Internal CRB address is published via PCDs:
 - `PcdTpmBaseAddress` = `0x40200000`
 - `PcdTpmMaxAddress` = `0x40204FFF` (5 localities × 0x1000)
 
-The Internal CRB is marked as `EfiACPIMemoryNVS` via a HOB in `ArmPlatformLibQemu.inf` so the OS
-can locate it through the ACPI TPM2 table.
+The Internal CRB is marked as `EfiACPIMemoryNVS` via a HOB in [ArmPlatformLibQemu.c](https://github.com/microsoft/mu_tiano_platforms/blob/main/Platforms/QemuArmVirtPkg/Library/ArmPlatformLibQemu/ArmPlatformLibQemu.c)
+so the OS can locate it through the ACPI TPM2 table.
 
 ## Architecture Overview
 
@@ -248,10 +247,10 @@ PC Client Platform TPM Profile (PTP) specification (and mirrored in `TpmPtp.h`):
 
 This is the CRB visible to normal-world firmware (DXE drivers and UEFI applications).
 `Tpm2DeviceLibFfa` writes TPM commands into this CRB's data buffer and reads responses
-from it. The Internal CRB uses the standard CRB register interface. It is the TPM service's
-responsibility to setup and maintain this region. The goal is to have this region mimic
-a normal MMIO CRB region only with the added caveat that an FF-A message must be sent for
-any action to be taken on any register modifications.
+from it. The Internal CRB uses the standard CRB register interface. It is the TPM
+service's responsibility to set up and maintain this region. The goal is for this region
+to mimic a normal MMIO CRB region, with the added caveat that an FF-A message must be sent
+for any register modification to take effect.
 
 The normal-world code performs MMIO writes to the CRB control registers (cmdReady, Start,
 goIdle) and then sends FF-A messages to notify the secure partition. The secure partition
@@ -261,7 +260,7 @@ the response back.
 ### External CRB (`0x0c000000`)
 
 This is the QEMU-emulated TPM device MMIO region. It is **only accessible from the secure
-world** i.e. the TPM Service within the MSSP secure partition. On QEMU ArmVirt, this region
+world** i.e. the TPM Service within the MSSP secure partition. On QEMU Arm Virt, this region
 presents a FIFO interface (**not CRB**), which the `TpmServiceStateTranslationLib` handles by
 detecting the interface type at initialization and using the appropriate FIFO
 command/response protocol (burst-count reads, data register writes).
@@ -272,7 +271,6 @@ infrastructure:
 ```text
 QEMU args: -chardev socket,id=chrtpm,path={BUILD_OUTPUT_BASE}/swtpm-sock
            -tpmdev emulator,id=tpm0,chardev=chrtpm
-           -device tpm-tis-device,tpmdev=tpm0
 ```
 
 ## FF-A Communication Protocol
@@ -325,11 +323,11 @@ the locality to take action upon.
 
 A locality **must** first be requested before any commands can be sent to
 the TPM via that locality's CRB region. The active locality **must** be
-relinquished before another locality is requested. The current entity
-engaging with the TPM must take the responsibility of relinquishing the
-active locality when they are no longer using it. If the locality being
-requested is 'CLOSED', a DENIED error is returned. If the locality being
-relinquished is not the current active locality, a DENIED error is returned.
+relinquished before another locality is requested. The entity currently
+engaging with the TPM is responsible for relinquishing the active locality
+when it is no longer in use. If the locality being requested is `CLOSED`, a
+DENIED error is returned. If the locality being relinquished is not the
+current active locality, a DENIED error is returned.
 
 A single TPM command requires multiple FF-A round trips:
 
@@ -369,10 +367,10 @@ sequenceDiagram
 
 If the secure partition is preempted by a non-secure interrupt during processing, the FF-A
 call returns `EFI_INTERRUPT_PENDING`. The normal-world code handles this by calling
-`ArmFfaLibRun()` in a loop until the operation completes. Note that this can only happen
-if ns-interrupts-action in the secure partition's manifest is set to 0x02, otherwise, the
-non-secure interrupt is queued and the service will continue execution until it completes
-or responds with a YIELD.
+`ArmFfaLibRun()` in a loop until the operation completes. Note that this can only happen if
+`ns-interrupts-action` in the secure partition's manifest is set to `0x02`, otherwise, the
+non-secure interrupt is queued and the service continues execution until it completes or
+responds with a YIELD.
 
 ## Hash Library Architecture
 
@@ -510,22 +508,34 @@ swtpm socket \
 
 ### Automatic Setup (QemuRunner)
 
-When `SWTPM_ENABLE=TRUE`, `QemuRunner.py` automatically starts swtpm in a background thread
-before launching QEMU. The swtpm state directory is set to `BUILD_OUTPUT_BASE` and the
-Unix socket is placed at `{BUILD_OUTPUT_BASE}/swtpm-sock`:
+When `SWTPM_ENABLE=TRUE`, `QemuRunner.py` automatically starts swtpm as a subprocess before
+launching QEMU. The swtpm state directory is set to `BUILD_OUTPUT_BASE` and the Unix socket
+is placed at `{BUILD_OUTPUT_BASE}/swtpm-sock`:
 
 ```python
 # Platforms/QemuArmVirtPkg/Plugins/QemuRunner/QemuRunner.py
 @staticmethod
-def RunSwTpmThread(tpm_dir, tpm_sock):
-    """Runs SWTPM in a separate thread"""
-    tpm_cmd = "swtpm"
-    tpm_args = f"socket --tpmstate dir={tpm_dir} --ctrl type=unixio,path={tpm_sock} --tpm2 --log level=1"
+def StartSwTpm(tpm_dir, tpm_sock):
+    """Starts the swtpm emulator and returns its Popen handle."""
+    cmd = [
+        "swtpm", "socket",
+        "--tpmstate", f"dir={tpm_dir}",
+        "--ctrl", f"type=unixio,path={tpm_sock}",
+        "--tpm2",
+        "--log", "level=1",
+    ]
+    return subprocess.Popen(cmd)
 ```
 
-The thread is launched before QEMU starts and joined after QEMU exits. Note that the SWTPM
-is enabled by default. You can disable it by setting `SWTPM_ENABLE=FALSE` from the command
-line or in the BuildConfig.conf file.
+swtpm is started before QEMU launches. `QemuRunner` then waits (up to 30 seconds) for the
+Unix socket to appear before starting QEMU, and terminates the swtpm process so it doesn't
+outlive the run. SWTPM is enabled by default. Disable it by setting `SWTPM_ENABLE=FALSE` on
+the command line or in the BuildConfig.conf file.
+
+```admonish note
+SWTPM is only available on Linux builds. `QemuRunner` automatically disables it on Windows
+hosts even if `SWTPM_ENABLE=TRUE`.
+```
 
 ### QEMU Arguments
 
@@ -535,7 +545,12 @@ When `SWTPM_ENABLE=TRUE`, `QemuRunner.py` adds the following to the QEMU command
 ```text
 -chardev socket,id=chrtpm,path={BUILD_OUTPUT_BASE}/swtpm-sock
 -tpmdev emulator,id=tpm0,chardev=chrtpm
+-device tpm-tis-device,tpmdev=tpm0
 ```
+
+The `-device tpm-tis-device` argument is Arm-specific. It attaches a sysbus TIS-compatible
+TPM device to the Arm Virt machine at the Internal CRB address `0x40200000`. This differs
+from Q35, which uses the ISA/PCI `tpm-tis` device instead (see [TPM on QEMU Q35](tpm_q35.md#qemu-arguments)).
 
 ## Communication Flow
 
@@ -609,7 +624,7 @@ Response returned to caller
 | `PcdTpmMaxAddress` | `0x40204FFF` | FixedAtBuild | Internal CRB end address (5 localities) |
 | `PcdTpm2HashMask` | `0x02` | DynamicDefault | Hash algorithm filter (SHA256 only) |
 | `PcdTpmInstanceGuid` | `gEfiTpmDeviceInstanceTpm20DtpmGuid` | FixedAtBuild | Selects discrete TPM 2.0 device type |
-| `PcdTpm2AcpiTableRev` | `4` | DynamicHii | ACPI TPM2 table revision |
+| `PcdTpm2AcpiTableRev` | `5` | DynamicHii | ACPI TPM2 table revision |
 | `PcdUserPhysicalPresence` | `FALSE` | FixedAtBuild | No physical user presence assertion |
 
 ### Memory Type PCDs

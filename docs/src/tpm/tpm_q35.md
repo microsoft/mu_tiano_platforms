@@ -33,8 +33,7 @@ The TPM is disabled by default. To enable it, set `BLD_*_TPM2_ENABLE=TRUE` on th
 BuildConfig.conf file placed at the root level of the repo:
 
 ```bash
-stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py --FlashRom \
-  BLD_*_TPM2_ENABLE=TRUE \
+stuart_build -c Platforms/QemuQ35Pkg/PlatformBuild.py --FlashRom BLD_*_TPM2_ENABLE=TRUE
 ```
 
 The following defines control TPM behavior in `QemuQ35Pkg.dsc`:
@@ -323,22 +322,34 @@ swtpm socket \
 
 ### Automatic Setup (QemuRunner)
 
-When `SWTPM_ENABLE=TRUE`, `QemuRunner.py` automatically starts swtpm in a background thread
-before launching QEMU. The swtpm state directory is set to `BUILD_OUTPUT_BASE` and the
-Unix socket is placed at `{BUILD_OUTPUT_BASE}/swtpm-sock`:
+When `SWTPM_ENABLE=TRUE`, `QemuRunner.py` automatically starts swtpm as a subprocess before
+launching QEMU. The swtpm state directory is set to `BUILD_OUTPUT_BASE` and the Unix socket
+is placed at `{BUILD_OUTPUT_BASE}/swtpm-sock`:
 
 ```python
 # Platforms/QemuQ35Pkg/Plugins/QemuRunner/QemuRunner.py
 @staticmethod
-def RunSwTpmThread(tpm_dir, tpm_sock):
-    """Runs TPM in a separate thread"""
-    tpm_cmd = "swtpm"
-    tpm_args = f"socket --tpmstate dir={tpm_dir} --ctrl type=unixio,path={tpm_sock} --tpm2 --log level=1"
+def StartSwTpm(tpm_dir, tpm_sock):
+    """Starts the swtpm emulator and returns its Popen handle."""
+    cmd = [
+        "swtpm", "socket",
+        "--tpmstate", f"dir={tpm_dir}",
+        "--ctrl", f"type=unixio,path={tpm_sock}",
+        "--tpm2",
+        "--log", "level=1",
+    ]
+    return subprocess.Popen(cmd)
 ```
 
-The thread is launched before QEMU starts and joined after QEMU exits. Note that the SWTPM
-is enabled by default. You can disable it by setting `SWTPM_ENABLE=FALSE` from the command
-line or in the BuildConfig.conf file.
+swtpm is started before QEMU launches. `QemuRunner` then waits (up to 30 seconds) for the
+Unix socket to appear before starting QEMU, and terminates the swtpm process so it doesn't
+outlive the run. SWTPM is enabled by default. Disable it by setting `SWTPM_ENABLE=FALSE` on
+the command line or in the BuildConfig.conf file.
+
+```admonish note
+SWTPM is only available on Linux builds. `QemuRunner` automatically disables it on Windows
+hosts even if `SWTPM_ENABLE=TRUE`.
+```
 
 ### QEMU Arguments
 
