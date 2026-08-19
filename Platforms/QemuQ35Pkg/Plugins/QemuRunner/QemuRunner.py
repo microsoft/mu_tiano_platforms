@@ -298,7 +298,9 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
         # Run QEMU
         try:
-            ret = utility_functions.RunCmd(executable, args)
+            ret = utility_functions.RunCmd(
+                executable, args, encodingErrors="replace"
+            )
         except KeyboardInterrupt:
             logging.critical("QEMU run interrupted by user (ctrl+c).")
             ret = -1
