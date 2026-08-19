@@ -223,7 +223,9 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
         # Run QEMU
         try:
-            ret = utility_functions.RunCmd(executable, args)
+            ret = utility_functions.RunCmd(
+                executable, args, encodingErrors="replace"
+            )
         finally:
             QemuRunner.StopSwTpm(swtpm_proc)
 
