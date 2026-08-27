@@ -208,10 +208,12 @@ MemTypeInfoInitialization (
 {
   EFI_STATUS  Status;
 
-  if (!FeaturePcdGet (PcdSmmSmramRequire)) {
+  if (FeaturePcdGet (PcdPeiMemoryBinsEnable) ||
+      !FeaturePcdGet (PcdSmmSmramRequire))
+  {
     //
-    // EFI_PEI_READ_ONLY_VARIABLE2_PPI will never be available; install
-    // the default memory type information HOB right away.
+    // PEI memory bins require this HOB before PEI Core is relaunched in
+    // permanent memory. Without SMM, the variable PPI will never be available.
     //
     BuildMemTypeInfoHob ();
     return;

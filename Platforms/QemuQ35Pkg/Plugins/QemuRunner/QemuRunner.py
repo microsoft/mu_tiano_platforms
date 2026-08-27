@@ -99,8 +99,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         # First query the version
         qemu_version = QemuRunner.QueryQemuVersion(executable)
 
-        # write messages to stdio
-        args = "-debugcon stdio"
+        args = ""
 
         # If we are using the QEMU external dependency, we need to tell it
         # where to look for roms
@@ -155,7 +154,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         logging.log(logging.INFO, "CPU model: " + cpu_model)
 
         #args += " -cpu qemu64,+rdrand,umip,+smep,+popcnt" # most compatible x64 CPU model + RDRAND + UMIP + SMEP +POPCNT support (not included by default)
-        cpu_arg = " -cpu " + cpu_model + ",rdrand=on,umip=on,smep=on,pdpe1gb=on,popcnt=on,+sse,+sse2,+sse3,+ssse3,+sse4.2,+sse4.1"
+        cpu_arg = " --no-reboot -cpu " + cpu_model + ",vendor=GenuineIntel,vmx=on,tsc-frequency=1000000000,rdrand=on,umip=on,smep=on,smap=on,pdpe1gb=on,popcnt=on,+sse,+sse2,+sse3,+ssse3,+sse4.2,+sse4.1"
         args += cpu_arg
 
         if env.GetBuildValue ("QEMU_CORE_NUM") is not None:
@@ -276,10 +275,9 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
             logging.log(logging.INFO, "Enabling GDB server at port tcp::" + gdb_port + ".")
             args += " -gdb tcp::" + gdb_port
 
-        # write ConOut messages to telnet localhost port
-        serial_port = env.GetValue("SERIAL_PORT")
-        if serial_port != None:
-            args += " -serial tcp:127.0.0.1:" + serial_port + ",server,nowait"
+        args += " -serial none"
+        args += " -chardev stdio,id=char0"
+        args += " -device serial-mm,id=serial0,addr=0xFE02E000,regshift=0,chardev=char0"
 
         # Connect the debug monitor to a telnet localhost port
         monitor_port = env.GetValue("MONITOR_PORT")
@@ -298,7 +296,9 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
         # Run QEMU
         try:
-            ret = utility_functions.RunCmd(executable, args)
+            ret = utility_functions.RunCmd(
+                executable, args, encodingErrors="replace"
+            )
         except KeyboardInterrupt:
             logging.critical("QEMU run interrupted by user (ctrl+c).")
             ret = -1

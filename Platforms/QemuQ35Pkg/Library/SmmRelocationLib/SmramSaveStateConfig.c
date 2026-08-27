@@ -7,6 +7,7 @@
 **/
 #include "InternalSmmRelocationLib.h"
 #include <Register/Amd/SmramSaveStateMap.h>
+#include <Library/CpuLib.h>
 
 /**
   This function configures the SmBase on the currently executing CPU.
@@ -21,13 +22,18 @@ ConfigureSmBase (
   )
 {
   AMD_SMRAM_SAVE_STATE_MAP  *CpuSaveState;
+  SMRAM_SAVE_STATE_MAP      *IntelCpuSaveState;
 
-  CpuSaveState = (AMD_SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
-
-  if ((CpuSaveState->x86.SMMRevId & 0xFFFF) == 0) {
-    CpuSaveState->x86.SMBASE = (UINT32)SmBase;
+  if (StandardSignatureIsAuthenticAMD ()) {
+    CpuSaveState = (AMD_SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
+    if ((CpuSaveState->x86.SMMRevId & 0xFFFF) == 0) {
+      CpuSaveState->x86.SMBASE = (UINT32)SmBase;
+    } else {
+      CpuSaveState->x64.SMBASE = (UINT32)SmBase;
+    }
   } else {
-    CpuSaveState->x64.SMBASE = (UINT32)SmBase;
+    IntelCpuSaveState = (SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
+    IntelCpuSaveState->x86.SMBASE = (UINT32)SmBase;
   }
 }
 
@@ -67,33 +73,48 @@ HookReturnFromSmm (
 {
   UINT64                    OriginalInstructionPointer;
   AMD_SMRAM_SAVE_STATE_MAP  *CpuSaveState;
+  SMRAM_SAVE_STATE_MAP      *IntelCpuSaveState;
 
-  CpuSaveState = (AMD_SMRAM_SAVE_STATE_MAP *)CpuState;
-  if ((CpuSaveState->x86.SMMRevId & 0xFFFF) == 0) {
-    OriginalInstructionPointer = (UINT64)CpuSaveState->x86._EIP;
-    CpuSaveState->x86._EIP     = (UINT32)NewInstructionPointer;
-    //
-    // Clear the auto HALT restart flag so the RSM instruction returns
-    // program control to the instruction following the HLT instruction.
-    //
-    if ((CpuSaveState->x86.AutoHALTRestart & BIT0) != 0) {
-      CpuSaveState->x86.AutoHALTRestart &= ~BIT0;
+  if (StandardSignatureIsAuthenticAMD ()) {
+    CpuSaveState = (AMD_SMRAM_SAVE_STATE_MAP *)CpuState;
+    if ((CpuSaveState->x86.SMMRevId & 0xFFFF) == 0) {
+      OriginalInstructionPointer = (UINT64)CpuSaveState->x86._EIP;
+      CpuSaveState->x86._EIP     = (UINT32)NewInstructionPointer;
+      if ((CpuSaveState->x86.AutoHALTRestart & BIT0) != 0) {
+        CpuSaveState->x86.AutoHALTRestart &= ~BIT0;
+      }
+    } else {
+      OriginalInstructionPointer = CpuSaveState->x64._RIP;
+      if ((CpuSaveState->x64.EFER & LMA) == 0) {
+        CpuSaveState->x64._RIP = (UINT32)NewInstructionPointer32;
+      } else {
+        CpuSaveState->x64._RIP = (UINT32)NewInstructionPointer;
+      }
+
+      if ((CpuSaveState->x64.AutoHALTRestart & BIT0) != 0) {
+        CpuSaveState->x64.AutoHALTRestart &= ~BIT0;
+      }
     }
   } else {
-    OriginalInstructionPointer = CpuSaveState->x64._RIP;
-    if ((CpuSaveState->x64.EFER & LMA) == 0) {
-      CpuSaveState->x64._RIP = (UINT32)NewInstructionPointer32;
+    IntelCpuSaveState = CpuState;
+#if defined (MDE_CPU_X64)
+    OriginalInstructionPointer = IntelCpuSaveState->x64._RIP;
+    if ((IntelCpuSaveState->x64.IA32_EFER & LMA) == 0) {
+      IntelCpuSaveState->x64._RIP = (UINT32)NewInstructionPointer32;
     } else {
-      CpuSaveState->x64._RIP = (UINT32)NewInstructionPointer;
+      IntelCpuSaveState->x64._RIP = (UINT32)NewInstructionPointer;
     }
 
-    //
-    // Clear the auto HALT restart flag so the RSM instruction returns
-    // program control to the instruction following the HLT instruction.
-    //
-    if ((CpuSaveState->x64.AutoHALTRestart & BIT0) != 0) {
-      CpuSaveState->x64.AutoHALTRestart &= ~BIT0;
+    if ((IntelCpuSaveState->x64.AutoHALTRestart & BIT0) != 0) {
+      IntelCpuSaveState->x64.AutoHALTRestart &= ~BIT0;
     }
+#else
+    OriginalInstructionPointer    = (UINT64)IntelCpuSaveState->x86._EIP;
+    IntelCpuSaveState->x86._EIP   = (UINT32)NewInstructionPointer;
+    if ((IntelCpuSaveState->x86.AutoHALTRestart & BIT0) != 0) {
+      IntelCpuSaveState->x86.AutoHALTRestart &= ~BIT0;
+    }
+#endif
   }
 
   return OriginalInstructionPointer;

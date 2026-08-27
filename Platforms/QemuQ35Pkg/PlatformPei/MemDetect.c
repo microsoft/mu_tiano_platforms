@@ -895,8 +895,6 @@ InitializeRamRegions (
   VOID
   )
 {
-  UINT32  TsegSize;
-
   QemuInitializeRam ();
   SevInitializeRam ();
 
@@ -904,16 +902,6 @@ InitializeRamRegions (
   ASSERT (mBootMode != BOOT_ON_S3_RESUME);
 
   if (FeaturePcdGet (PcdSmmSmramRequire)) {
-    //
-    // Make sure the TSEG area that we reported as a reserved memory resource
-    // cannot be used for reserved memory allocations.
-    //
-    TsegSize = mQ35TsegMbytes * SIZE_1MB;
-    BuildMemoryAllocationHob (
-      GetSystemMemorySizeBelow4gb () - TsegSize,
-      TsegSize,
-      EfiReservedMemoryType
-      );
     //
     // Similarly, allocate away the (already reserved) SMRAM at the default
     // SMBASE, if it exists.

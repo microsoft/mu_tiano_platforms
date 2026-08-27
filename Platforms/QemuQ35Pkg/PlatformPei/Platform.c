@@ -263,6 +263,8 @@ MemMapInitialization (
     AddIoMemoryBaseSizeHob (PcdGet32 (PcdOvmfFdBaseAddress), PcdGet32 (PcdOvmfFirmwareFdSize));
   }
 
+  AddIoMemoryBaseSizeHob (0xFE02E000, BASE_4KB);
+
   //
   // Add PCI IO Port space available for PCI resource allocations.
   //
