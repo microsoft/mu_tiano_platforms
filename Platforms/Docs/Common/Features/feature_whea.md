@@ -1,3 +1,0 @@
-# Mu Telemetry / WHEA
-
-Todo

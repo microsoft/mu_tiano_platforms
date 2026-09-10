@@ -1,0 +1,89 @@
+# @file publish-mdbook.yml
+#
+# A GitHub workflow that compiles the mdbook located at docs/* and publishes it
+# to the repository's GitHub Pages site.
+#
+##
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+name: Publish Documentation
+
+on:
+  # Trigger this workflow manually if necessary
+  workflow_dispatch:
+
+  # Triggers this workflow if a commit is pushed to main in which a file in
+  # docs/** has been updated
+  push:
+    branches:
+      - main
+    paths:
+      - docs/**
+      - .github/workflows/publish-mdbook.yml
+
+jobs:
+  build:
+    name: Build Documentation
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ✅ Checkout Repository ✅
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: 🛠️ Install mdbook Toolchain 🛠️
+        uses: taiki-e/install-action@d438492cf8a250514fa2d34b30bc3c0dc37c65ff # v2.87.8
+        with:
+          # mdbook is pinned because mdbook 0.5.x made breaking changes to the preprocessor
+          # protocol that the latest mdbook-admonish release cannot parse, causing it to crash
+          # with "invalid type: null, expected any valid TOML value".
+          # Re-evaluate this pin once mdbook-admonish releases 0.5.x support.
+          # Other mdbook plugins are pinned to known compatible versions with mdbook 0.4.52.
+          tool: |
+            mdbook@0.4.52
+            mdbook-admonish@1.20.0
+            mdbook-mermaid@0.16.2
+            mdbook-linkcheck@0.7.7
+
+      - name: 📄 Build Documentation 📄
+        run: mdbook build docs
+
+      - name: Upload GitHub Pages Site Artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          name: github-pages
+          path: docs/book/html
+
+  publish:
+    if: github.repository_owner == 'microsoft'
+    name: Publish Documentation
+
+    needs: [build]
+
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    permissions:
+      id-token: write
+      contents: read
+      pages: write
+
+    steps:
+      - name: 🔐 Generate GitHub App Token 🔐
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ vars.MU_ACCESS_APP_ID }}
+          private-key: ${{ secrets.MU_ACCESS_APP_PRIVATE_KEY }}
+
+      - name: 🚀 Deploy GitHub Pages Site 🚀
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          artifact_name: github-pages
