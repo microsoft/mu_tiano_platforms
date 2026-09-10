@@ -160,7 +160,7 @@ jobs:
           SOURCE_URL: ${{ env.ARTIFACT_BASE_URL }}/${{ env.TAG_NAME }}/haf-tfa-firmware-${{ env.TAG_NAME }}.zip
           VERSION: ${{ env.TAG_NAME }}
           SHA256: ${{ steps.sha256.outputs.sha256 }}
-        uses: mikefarah/yq@v4
+        uses: mikefarah/yq@c14f446382944492701b16c1ddb48bb9dbe683e3 # v4.53.6
         with:
           cmd: yq -i -P '.source = strenv(SOURCE_URL) | .version = strenv(VERSION) | .sha256 = strenv(SHA256)' ${HAF_TFA_PATH}
 
