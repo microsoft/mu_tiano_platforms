@@ -1,4 +1,5 @@
 /Build/
+/venv/
 .DS_Store
 *_extdep/
 *.pyc
