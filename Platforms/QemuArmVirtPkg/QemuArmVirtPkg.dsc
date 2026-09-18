@@ -78,17 +78,6 @@
   # PEI uses BaseCrypto (OneCrypto doesn't have PEI support yet)
   PEI_CRYPTO_SERVICES                 = TINY_SHA
   PEI_CRYPTO_ARCH                     = AARCH64
-  # DXE and StandaloneMM use OneCrypto - set to NONE to skip BaseCrypto drivers
-  DXE_CRYPTO_SERVICES                 = NONE
-  DXE_CRYPTO_ARCH                     = NONE
-  RUNTIMEDXE_CRYPTO_SERVICES          = NONE
-  RUNTIMEDXE_CRYPTO_ARCH              = NONE
-  STANDALONEMM_CRYPTO_SERVICES        = NONE
-  STANDALONEMM_CRYPTO_ARCH            = NONE
-  STANDALONEMM_MMSUPV_CRYPTO_SERVICES = NONE
-  STANDALONEMM_MMSUPV_CRYPTO_ARCH     = NONE
-  SMM_CRYPTO_SERVICES                 = NONE
-  SMM_CRYPTO_ARCH                     = NONE
 
 !if $(NETWORK_SNP_ENABLE) == TRUE
   !error "NETWORK_SNP_ENABLE is IA32/X64/EBC only"
@@ -147,14 +136,12 @@
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
 
   # Networking Requirements
-!include NetworkPkg/NetworkLibs.dsc.inc
+  !include NetworkPkg/NetworkLibs.dsc.inc
 
   NonDiscoverableDeviceRegistrationLib|MdeModulePkg/Library/NonDiscoverableDeviceRegistrationLib/NonDiscoverableDeviceRegistrationLib.inf
 
   # ARM Architectural Libraries
   CacheMaintenanceLib|ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
-  DefaultExceptionHandlerLib|ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
-  CpuExceptionHandlerLib|ArmPkg/Library/ArmExceptionLib/ArmExceptionLib.inf
   ArmSmcLib|MdePkg/Library/ArmSmcLib/ArmSmcLib.inf
   ArmHvcLib|ArmPkg/Library/ArmHvcLib/ArmHvcLib.inf
   ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerVirtCounterLib/ArmGenericTimerVirtCounterLib.inf
@@ -240,11 +227,10 @@
   SecPlatformSmmuConfigLib|QemuArmVirtPkg/Library/SecPlatformSmmuConfigLib/SecPlatformSmmuConfigLib.inf
 
   # Base ARM libraries
-  ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
+  ArmLib|MdePkg/Library/ArmLib/ArmBaseLib.inf
   ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
-  MmuLib|ArmPkg/Library/MmuLib/BaseMmuLib.inf
   ArmSvcLib|MdePkg/Library/ArmSvcLib/ArmSvcLib.inf
-
+  StandaloneMmMmuLib|ArmPkg/Library/StandaloneMmMmuLib/ArmMmuStandaloneMmLib.inf
   # Virtio Support
   VirtioLib|QemuPkg/Library/VirtioLib/VirtioLib.inf
 
@@ -380,6 +366,8 @@
 
   HobPrintLib|MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
 
+  GptLib|MdeModulePkg/Library/GptLib/GptLib.inf
+
 [LibraryClasses.common.DXE_CORE, LibraryClasses.common.DXE_RUNTIME_DRIVER, LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.UEFI_APPLICATION]
   MsUiThemeLib|MsGraphicsPkg/Library/MsUiThemeLib/Dxe/MsUiThemeLib.inf
   ArmFfaLib|MdeModulePkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
@@ -419,6 +407,9 @@
   Tpm2StartupLib|SecurityPkg/Library/Tpm2StartupLib/Tpm2StartupLib.inf
 !endif
 
+[LibraryClasses.common.DXE_CORE, LibraryClasses.common.DXE_DRIVER]
+  CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
+
 [LibraryClasses.common.DXE_CORE]
   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
   MemoryAllocationLib|MdeModulePkg/Library/DxeCoreMemoryAllocationLib/DxeCoreMemoryAllocationLib.inf
@@ -454,7 +445,7 @@
 [LibraryClasses.common.MM_CORE_STANDALONE]
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   ExtractGuidedSectionLib|StandaloneMmPkg/Library/StandaloneMmExtractGuidedSectionLib/StandaloneMmExtractGuidedSectionLib.inf
-  FvLib|StandaloneMmPkg/Library/FvLib/FvLib.inf
+  FvLib|MdePkg/Library/FvLib/FvLib.inf
   HobLib|StandaloneMmPkg/Library/StandaloneMmCoreHobLib/StandaloneMmCoreHobLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmCoreMemoryAllocationLib/StandaloneMmCoreMemoryAllocationLib.inf
@@ -873,8 +864,6 @@
 #
 ################################################################################
 [Components]
-  !include $(SHARED_CRYPTO_PATH)/Driver/Bin/CryptoDriver.inc.dsc
-
   #
   # OneCrypto Binary Drivers
   #
@@ -1172,7 +1161,7 @@
 ## Where-Object {(Select-String -InputObject $_ -Pattern "MODULE_TYPE\s*=\s*UEFI_APPLICATION")} | ^
 ## ForEach-Object {$path = $_.FullName -replace '\\','/'; Write-Output $path}
 !if $(BUILD_UNIT_TESTS) == TRUE
-  CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf
+  #CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf
   AdvLoggerPkg/UnitTests/LineParser/LineParserTestApp.inf
   DfciPkg/UnitTests/DeviceIdTest/DeviceIdTestApp.inf
   # DfciPkg/UnitTests/DfciVarLockAudit/UEFI/DfciVarLockAuditTestApp.inf # DOESN'T PRODUCE OUTPUT
@@ -1394,25 +1383,8 @@
   GCC:*_*_*_CC_FLAGS = -DTPM2_ENABLE
 !endif
 
-[BuildOptions.common.EDKII.SEC,BuildOptions.common.EDKII.MM_CORE_STANDALONE]
-  # DLINK_XIPFLAGS (which pairs FILEALIGN with ALIGN for CLANGPDB XIP rebasing) is only used in build_rule.template
-  # for SEC/PEI_CORE/PEIM module types. MM_CORE_STANDALONE is packaged as FFS type SEC in QemuArmVirtPkg's
-  # Rule.Common.MM_CORE_STANDALONE. This causes it to be rebased by GenFv the same way SEC is, and therefore also needs
-  # FileAlignment == SectionAlignment. This sets /FILEALIGN here explicitly. Not needed in QemuQ35Pkg because
-  # [Rule.Common.MM_CORE_STANDALONE] specifies the FFS type as MM_CORE_STANDALONE there.
-  GCC:*_CLANGPDB_*_DLINK_FLAGS = /ALIGN:0x1000 /FILEALIGN:0x1000
-
-[BuildOptions.common.EDKII.DXE_CORE,BuildOptions.common.EDKII.DXE_DRIVER,BuildOptions.common.EDKII.UEFI_DRIVER,BuildOptions.common.EDKII.UEFI_APPLICATION,BuildOptions.common.EDKII.MM_CORE_STANDALONE,BuildOptions.common.EDKII.MM_STANDALONE]
-  GCC:*_GCC5_*_DLINK_FLAGS = -z common-page-size=0x1000
-  GCC:*_GCC_*_DLINK_FLAGS = -z common-page-size=0x1000
-  GCC:*_CLANGPDB_*_DLINK_FLAGS = /ALIGN:0x1000
-  GCC:*_*_*_DLINK_XIPFLAGS = -z common-page-size=0x1000
-
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_GCC5_AARCH64_DLINK_FLAGS = -z common-page-size=0x10000
   GCC:*_GCC_AARCH64_DLINK_FLAGS = -z common-page-size=0x10000
   GCC:*_CLANGPDB_AARCH64_DLINK_FLAGS = /ALIGN:0x10000
   RVCT:*_*_ARM_DLINK_FLAGS = --scatter $(EDK_TOOLS_PATH)/Scripts/Rvct-Align4K.sct
-
-[BuildOptions.AARCH64.EDKII.MM_CORE_STANDALONE,BuildOptions.AARCH64.EDKII.MM_STANDALONE]
-  GCC:*_*_*_CC_FLAGS = -mstrict-align -march=armv8-a
