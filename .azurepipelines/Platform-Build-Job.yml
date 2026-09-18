@@ -127,7 +127,7 @@ jobs:
       condition: |
         and(not(EndsWith('${{ item.Key }}', 'CODE_COVERAGE')),
             succeeded(),
-            and(ne(variables['tool_chain_tag'], 'GCC5'),
+            and(ne(variables['tool_chain_tag'], 'GCC'),
                 and(StartsWith('${{ item.Key }}', 'QemuQ35'), EndsWith('${{ item.Key }}', 'ARM'))))
 
       pool:

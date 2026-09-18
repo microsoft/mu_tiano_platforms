@@ -44,7 +44,7 @@ jobs:
 
       matrix:
         target: [DEBUG, RELEASE]
-        tool-chain: [CLANGPDB, VS2022, GCC5]
+        tool-chain: [CLANGPDB, VS2022, GCC]
         os: [windows-2022, ubuntu-latest]
         container: ['', '${{ needs.vars.outputs.container-image}}']
         platform: [Q35, ARMVIRT]
@@ -67,9 +67,9 @@ jobs:
           #########################################
           # Temporary Filters until only CLANGPDB #
           #########################################
-          # Exclude GCC5 builds on Windows
+          # Exclude GCC builds on Windows
           - os: windows-2022
-            tool-chain: GCC5
+            tool-chain: GCC
           # Exclude VS builds on Ubuntu
           - os: ubuntu-latest
             tool-chain: VS2022
