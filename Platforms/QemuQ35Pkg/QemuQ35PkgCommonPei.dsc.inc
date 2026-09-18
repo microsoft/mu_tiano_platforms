@@ -55,6 +55,8 @@ QemuQ35Pkg/ResetVector/ResetVector.inf
       RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
   }
 
+  $(ONE_CRYPTO_PATH)/$(TARGET)/$(PEI_CRYPTO_ARCH)/MbedTlsCryptoPei/MbedTlsCryptoPei.inf
+
   QemuQ35Pkg/PlatformPei/PlatformPei.inf {
     <LibraryClasses>
       NULL|StandaloneMmPkg/Library/PeiStandaloneMmHobProductionLib/PeiStandaloneMmHobProductionLib.inf

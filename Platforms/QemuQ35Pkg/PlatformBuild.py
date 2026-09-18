@@ -12,17 +12,15 @@ import sys
 import uuid
 from io import StringIO
 from pathlib import Path
-from typing import Tuple
 
 from edk2toolext import codeql as codeql_helpers
 from edk2toolext.environment import shell_environment
 from edk2toolext.environment.uefi_build import UefiBuilder
+from edk2toolext.invocables.edk2_parse import ParseSettingsManager
 from edk2toolext.invocables.edk2_platform_build import BuildSettingsManager
 from edk2toolext.invocables.edk2_pr_eval import PrEvalSettingsManager
-from edk2toolext.invocables.edk2_setup import (RequiredSubmodule,
-                                               SetupSettingsManager)
+from edk2toolext.invocables.edk2_setup import RequiredSubmodule, SetupSettingsManager
 from edk2toolext.invocables.edk2_update import UpdateSettingsManager
-from edk2toolext.invocables.edk2_parse import ParseSettingsManager
 from edk2toollib.utility_functions import RunCmd
 
 WORKSPACE_ROOT = str(Path(__file__).parent.parent.parent)
@@ -42,7 +40,7 @@ DXE_PAGING_AUDIT_BIN_NAME = "DxePagingAuditTestApp.efi"
 # ####################################################################################### #
 #                                Common Configuration                                     #
 # ####################################################################################### #
-class CommonPlatform():
+class CommonPlatform:
     ''' Common settings for this platform.  Define static data here and use
         for the different parts of stuart
     '''
@@ -93,7 +91,7 @@ class CommonPlatform():
         return codeql_helpers.is_codeql_enabled_on_command_line(args)
 
     @staticmethod
-    def get_active_scopes(codeql_enabled: bool) -> Tuple[str]:
+    def get_active_scopes(codeql_enabled: bool) -> tuple[str]:
         """Returns the active scopes for the platform."""
         active_scopes = CommonPlatform.Scopes
         active_scopes += codeql_helpers.get_scopes(codeql_enabled)
@@ -385,7 +383,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         cur_guid = uuid.UUID(guid_str)
         self.env.SetValue("BLD_*_%s_REGISTRY" % var_name, guid_str, desc_string)
         self.env.SetValue("BLD_*_%s_BYTES" % var_name, "'{" + (",".join(("0x%X" % byte) for byte in cur_guid.bytes_le)) + "}'", desc_string)
-        return
 
     def FlashRomImage(self):
         # Values with defaults specified via `SetPlatformDefaultEnv`
