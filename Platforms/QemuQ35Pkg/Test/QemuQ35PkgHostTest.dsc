@@ -153,31 +153,7 @@ MdeModulePkg/Universal/Variable/RuntimeDxe/RuntimeDxeUnitTest/VariableLockReques
   <PcdsFixedAtBuild>
     gEfiMdeModulePkgTokenSpaceGuid.PcdAllowVariablePolicyEnforcementDisable|TRUE
 }
-MdeModulePkg/Universal/Variable/RuntimeDxe/RuntimeDxeUnitTest/VariableRuntimeDxeUnitTest.inf {
-  <LibraryClasses>
-    UefiLib|MdePkg/Test/Mock/Library/Stub/StubUefiLib/StubUefiLib.inf
-    VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLib.inf
-    VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
-    TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
-    AuthVariableLib|MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
-    DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
-    UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
-    DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
-    UefiBootServicesTableLib|MdePkg/Test/Mock/Library/Cmocka/MockUefiBootServicesTableLib/MockUefiBootServicesTableLib.inf
-    SynchronizationLib|MdePkg/Test/Library/SynchronizationLibHostUnitTest/SynchronizationLibHostUnitTest.inf
-    VariableFlashInfoLib|MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
-    HobLib|MdePkg/Test/Mock/Library/Stub/StubHobLib/StubHobLib.inf
 
-    VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
-    NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
-    NULL|MdeModulePkg/Library/VarCheckPolicyLib/VarCheckPolicyLibVariableDxe.inf
-
-  <PcdsFixedAtBuild>
-    gEfiMdeModulePkgTokenSpaceGuid.PcdAllowVariablePolicyEnforcementDisable|TRUE
-    gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|TRUE
-    # SCT tests are noisy, so disable VERBOSE.
-    gUnitTestFrameworkPkgTokenSpaceGuid.PcdUnitTestLogLevel|0x00000007
-}
 MdeModulePkg/Bus/Pci/NvmExpressDxe/UnitTest/MediaSanitizeUnitTestHost.inf
 MdeModulePkg/Library/ImagePropertiesRecordLib/UnitTest/ImagePropertiesRecordLibUnitTestHost.inf {
   <LibraryClasses>

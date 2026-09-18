@@ -231,6 +231,8 @@ INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 INF  MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei.inf
 INF  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
 INF  SecurityPkg/RandomNumberGenerator/RngPei/RngPei.inf
+INF $(ONE_CRYPTO_PATH)/$(TARGET)/$(PEI_CRYPTO_ARCH)/MbedTlsCryptoPei/MbedTlsCryptoPei.inf
+
 INF  QemuQ35Pkg/PlatformPei/PlatformPei.inf
 INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
@@ -269,8 +271,6 @@ INF  QemuQ35Pkg/ConfigKnobs/ConfigKnobs.inf
 INF  OemPkg/OemConfigPolicyCreatorPei/OemConfigPolicyCreatorPei.inf
 
 INF  DebuggerFeaturePkg/DebugConfigPei/DebugConfigPei.inf
-
-!include $(SHARED_CRYPTO_PATH)/Driver/Bin/CryptoDriver.PEI.inc.fdf
 
 ################################################################################
 
