@@ -310,7 +310,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         self.env.SetValue("PRODUCT_NAME", "QemuArmVirt", "Platform Hardcoded")
         self.env.SetValue("ACTIVE_PLATFORM", "QemuArmVirtPkg/QemuArmVirtPkg.dsc", "Platform Hardcoded")
         self.env.SetValue("TARGET_ARCH", "AARCH64", "Platform Hardcoded")
-        self.env.SetValue("TOOL_CHAIN_TAG", "GCC5", "set default to gcc5")
+        self.env.SetValue("TOOL_CHAIN_TAG", "GCC", "set default to gcc")
         self.env.SetValue("QEMU_HEADLESS", "FALSE", "Default to false")
         self.env.SetValue("QEMU_PLATFORM", "qemu", "Platform Hardcoded")
         self.env.SetValue("SHUTDOWN_AFTER_RUN", "FALSE", "Default to false")
