@@ -48,7 +48,7 @@ extends:
       TARGET_QEMU:
         Pkgs: 'QemuPkg'
         Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
-        ArchList: IA32,X64,AARCH64
+        ArchList: IA32,X64
       TARGET_Q35:
         Pkgs: 'QemuQ35Pkg'
         Targets: 'NO-TARGET'
