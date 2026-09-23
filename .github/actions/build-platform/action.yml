@@ -98,6 +98,15 @@ runs:
       path: .git/modules
       key: ${{ runner.os }}-${{ inputs.platform-name }}-submodules-${{ steps.submodules-hash.outputs.hash}}
 
+  - name: Redirect Hafnium submodule URLs
+    if: ${{ inputs.command == 'all' || inputs.command == 'build' }}
+    shell: bash
+    run: |
+      git config --global url."https://github.com/TF-Hafnium/hafnium-prebuilts".insteadOf "https://git.trustedfirmware.org/hafnium/prebuilts"
+      git config --global url."https://github.com/TF-Hafnium/hafnium-project-reference".insteadOf "https://git.trustedfirmware.org/hafnium/project/reference"
+      git config --global url."https://github.com/TF-Hafnium/hafnium-third_party-dtc".insteadOf "https://git.trustedfirmware.org/hafnium/third_party/dtc"
+      git config --global url."https://github.com/TF-Hafnium/hafnium-third_party-googletest".insteadOf "https://git.trustedfirmware.org/hafnium/third_party/googletest"
+
   # Stuart setup should be slightly faster if we were able to restore the cache to .git/modules
   - name: Download required submodules (stuart_setup)
     if: ${{ inputs.command == 'all' || inputs.command == 'build' }}
