@@ -38,7 +38,7 @@ stages:
   jobs:
     - template: Platform-Build-Job.yml
       parameters:
-        tool_chain_tag: 'GCC5'
+        tool_chain_tag: 'GCC'
         vm_image: ubuntu-latest
         os_type: Linux
         container_image: linux-gcc

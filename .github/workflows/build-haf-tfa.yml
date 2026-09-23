@@ -70,7 +70,7 @@ jobs:
         if: github.event_name == 'release'
         run: |
           mkdir -p "${RUNNER_TEMP}/haf-tfa-firmware/DEF"
-          cp -a Build/QemuArmVirtPkg/DEBUG_GCC5/HafTfaBins/. "${RUNNER_TEMP}/haf-tfa-firmware/DEF"/
+          cp -a Build/QemuArmVirtPkg/DEBUG_GCC/HafTfaBins/. "${RUNNER_TEMP}/haf-tfa-firmware/DEF"/
           ls "${RUNNER_TEMP}/haf-tfa-firmware/DEF"
 
       - name: Stuart Build (TPM)
@@ -80,7 +80,7 @@ jobs:
         if: github.event_name == 'release'
         run: |
           mkdir -p "${RUNNER_TEMP}/haf-tfa-firmware/TPM"
-          cp -a Build/QemuArmVirtPkg/DEBUG_GCC5/HafTfaBins/. "${RUNNER_TEMP}/haf-tfa-firmware/TPM"/
+          cp -a Build/QemuArmVirtPkg/DEBUG_GCC/HafTfaBins/. "${RUNNER_TEMP}/haf-tfa-firmware/TPM"/
           ls "${RUNNER_TEMP}/haf-tfa-firmware/TPM"
 
       - name: Install archive tools
