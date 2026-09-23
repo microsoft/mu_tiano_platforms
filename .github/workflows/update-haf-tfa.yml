@@ -164,6 +164,13 @@ jobs:
         with:
           cmd: yq -i -P '.source = strenv(SOURCE_URL) | .version = strenv(VERSION) | .sha256 = strenv(SHA256)' ${HAF_TFA_PATH}
 
+      - name: Normalize HAF/TF-A External Dependency File Line Endings
+        if: steps.extdep-check.outputs.is_current != 'true'
+        env:
+          HAF_TFA_PATH: ${{ env.HAF_TFA_PATH }}
+        shell: bash
+        run: perl -pi -e 's/\r?\n$/\r\n/' "$HAF_TFA_PATH"
+
       - name: Update PlatformBuild.py HAF_TFA_EXTDEP_BINS_CURRENT
         if: steps.extdep-check.outputs.is_current != 'true'
         env:
