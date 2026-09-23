@@ -31,7 +31,7 @@ jobs:
       matrix:
         ${{ if eq(parameters.publish_q35_binaries, true) }}:
           QEMU Q35 Debug:
-            gcc_artifact_name: 'Binaries QemuQ35Pkg GCC5 DEBUG'
+            gcc_artifact_name: 'Binaries QemuQ35Pkg GCC DEBUG'
             gcc_folder_name: GCC-x64
             nuget_package_config_file: >-
               Platforms/QemuQ35Pkg/NugetPublishing/DebugConfig.yaml
@@ -39,7 +39,7 @@ jobs:
             vs_folder_name: VisualStudio-x64
 
           QEMU Q35 Release:
-            gcc_artifact_name: 'Binaries QemuQ35Pkg GCC5 RELEASE'
+            gcc_artifact_name: 'Binaries QemuQ35Pkg GCC RELEASE'
             gcc_folder_name: GCC-x64
             nuget_package_config_file: >-
               Platforms/QemuQ35Pkg/NugetPublishing/ReleaseConfig.yaml
@@ -47,7 +47,7 @@ jobs:
             vs_folder_name: VisualStudio-x64
 
           QEMU Q35 No SMM Release:
-            gcc_artifact_name: 'Binaries QemuQ35Pkg GCC5 RELEASE NO_SMM'
+            gcc_artifact_name: 'Binaries QemuQ35Pkg GCC RELEASE NO_SMM'
             gcc_folder_name: GCC-NoSmm-x64
             nuget_package_config_file: >-
               Platforms/QemuQ35Pkg/NugetPublishing/ReleaseNoSmmConfig.yaml
@@ -56,7 +56,7 @@ jobs:
 
         ${{ if eq(parameters.publish_armvirt_binaries, true) }}:
           QEMU ArmVirt Debug:
-            gcc_artifact_name: 'Binaries QemuArmVirtPkg GCC5 DEBUG'
+            gcc_artifact_name: 'Binaries QemuArmVirtPkg GCC DEBUG'
             gcc_folder_name: GCC-AARCH64
             nuget_package_config_file: >-
               Platforms/QemuArmVirtPkg/NugetPublishing/DebugConfig.yaml
@@ -64,7 +64,7 @@ jobs:
             vs_folder_name: ''
 
           QEMU ArmVirt Release:
-            gcc_artifact_name: 'Binaries QemuArmVirtPkg GCC5 RELEASE'
+            gcc_artifact_name: 'Binaries QemuArmVirtPkg GCC RELEASE'
             gcc_folder_name: GCC-AARCH64
             nuget_package_config_file: >-
               Platforms/QemuArmVirtPkg/NugetPublishing/ReleaseConfig.yaml
