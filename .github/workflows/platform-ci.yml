@@ -82,9 +82,6 @@ jobs:
           # Exclude CLANGPDB RELEASE builds due to PEI bug
           - tool-chain: CLANGPDB
             target: RELEASE
-          # Exclude ARMVIRT CLANG builds due to ldr assembly issue
-          - tool-chain: CLANGPDB
-            platform: ARMVIRT
           ###########################
           # TPM variant constraints #
           ###########################
