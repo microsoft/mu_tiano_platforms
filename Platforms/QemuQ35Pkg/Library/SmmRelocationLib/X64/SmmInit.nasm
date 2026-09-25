@@ -15,7 +15,6 @@
 %include "StuffRsbNasm.inc"
 
 extern ASM_PFX(SmmInitHandler)
-extern ASM_PFX(ReleaseSmmRelocationSemaphore)
 extern ASM_PFX(mRebasedFlag)
 extern ASM_PFX(mSmmRelocationOriginalAddress)
 
@@ -85,10 +84,6 @@ CodeSeg64:
             DB      0                   ; BaseHigh
 GDT_SIZE equ $ -   NullSeg
 
-ASM_PFX(gcSmmInitGdtr):
-    DW      GDT_SIZE - 1
-    DQ      NullSeg
-
 
     DEFAULT REL
     SECTION .text
@@ -96,6 +91,11 @@ ASM_PFX(gcSmmInitGdtr):
 global ASM_PFX(SmmStartup)
 
 BITS 16
+;
+; Run the entire 16-bit transition at SMBASE + 0x8000. Jumping to the
+; image with a high EIP in 16-bit mode is unsafe across QEMU page boundaries.
+;
+ASM_PFX(gcSmmInitTemplate):
 ASM_PFX(SmmStartup):
     mov     eax, 0x80000001             ; read capability
     cpuid
@@ -103,7 +103,7 @@ ASM_PFX(SmmStartup):
     mov     eax, strict dword 0         ; source operand will be patched
 ASM_PFX(gPatchSmmInitCr3):
     mov     cr3, eax
-o32 lgdt    [cs:ebp + (ASM_PFX(gcSmmInitGdtr) - ASM_PFX(SmmStartup))]
+o32 lgdt    [cs:ASM_PFX(gcSmmInitGdtr) - ASM_PFX(gcSmmInitTemplate) + 0x8000]
     mov     eax, strict dword 0         ; source operand will be patched
 ASM_PFX(gPatchSmmInitCr4):
     or      ah,  2                      ; enable XMM registers access
@@ -121,6 +121,12 @@ ASM_PFX(gPatchSmmInitCr0):
     mov     cr0, eax                    ; enable protected mode & paging
     jmp     LONG_MODE_CS : dword 0      ; offset will be patched to @LongMode
 @PatchLongModeOffset:
+
+ASM_PFX(gcSmmInitGdtr):
+    DW      GDT_SIZE - 1
+    DQ      NullSeg                     ; GDT base relocated with the image before copying
+
+ASM_PFX(gcSmmInitSize): DW $ - ASM_PFX(gcSmmInitTemplate)
 
 BITS 64
 @LongMode:                              ; long-mode starts here
@@ -156,16 +162,6 @@ ASM_PFX(gPatchSmmInitStack):
     StuffRsb64
     rsm
 
-BITS 16
-ASM_PFX(gcSmmInitTemplate):
-    mov ebp, [cs:@L1 - ASM_PFX(gcSmmInitTemplate) + 0x8000]
-    sub ebp, 0x30000
-    jmp ebp
-@L1:
-    DQ     0; ASM_PFX(SmmStartup)
-
-ASM_PFX(gcSmmInitSize): DW $ - ASM_PFX(gcSmmInitTemplate)
-
 BITS 64
 global ASM_PFX(SmmRelocationSemaphoreComplete)
 ASM_PFX(SmmRelocationSemaphoreComplete):
@@ -173,34 +169,7 @@ ASM_PFX(SmmRelocationSemaphoreComplete):
     mov     rax, [ASM_PFX(mRebasedFlag)]
     mov     byte [rax], 1
     pop     rax
-    ; save the volatile registers before messing with them...
-    push    rax
-    push    rcx
-    push    rdx
-    push    r8
-    push    r9
-    push    r10
-    push    r11
-    ; load the contents in ASM_PFX(mSmmRelocationOriginalAddress)
-    mov     rax, [ASM_PFX(mSmmRelocationOriginalAddress)]
-    push    rax
-    ; now the stack should still be the same alignment as before
-    add     rsp, -0x20
-    ; Release the semaphore to let other CPUs proceed
-    call    ASM_PFX(ReleaseSmmRelocationSemaphore)
-    add     rsp, 0x20
-    pop     rax
-    ; restore the volatile registers
-    pop     r11
-    pop     r10
-    pop     r9
-    pop     r8
-    pop     rdx
-    pop     rcx
-    ; here we need to swap the top of stack with rax
-    xchg    rax, [rsp]
-    ; this is essentially jmp to eax we pushed earlier and also balances the stack
-    ret
+    jmp     [ASM_PFX(mSmmRelocationOriginalAddress)]
 
 ;
 ; Semaphore code running in 32-bit mode
@@ -213,26 +182,8 @@ ASM_PFX(SmmRelocationSemaphoreComplete32):
 ASM_PFX(gPatchRebasedFlagAddr32):
     mov     byte [eax], 1
     pop     eax
-    ; save the volatile registers before messing with them...
-    push    eax
-    push    ecx
-    push    edx
-    ; load the contents in gPatchSmmRelocationOriginalAddressPtr32
-    mov     eax, dword [dword 0]
+    jmp     dword [dword 0]                    ; destination will be patched
 ASM_PFX(gPatchSmmRelocationOriginalAddressPtr32):
-    push    eax
-    add     esp, -0x20
-    ; Release the semaphore to let other CPUs proceed
-    call    ASM_PFX(ReleaseSmmRelocationSemaphore)
-    add     esp, 0x20
-    pop     eax
-    ; restore the volatile registers
-    pop     edx
-    pop     ecx
-    ; here we need to swap the top of stack with eax
-    xchg    eax, [esp]
-    ; this is essentially jmp to eax we pushed earlier and also balances the stack
-    ret
 
 BITS 64
 global ASM_PFX(SmmInitFixupAddress)
@@ -241,7 +192,4 @@ ASM_PFX(SmmInitFixupAddress):
     lea    rcx, [@PatchLongModeOffset - 6]
     mov    dword [rcx], eax
 
-    lea    rax, [ASM_PFX(SmmStartup)]
-    lea    rcx, [@L1]
-    mov    qword [rcx], rax
     ret
