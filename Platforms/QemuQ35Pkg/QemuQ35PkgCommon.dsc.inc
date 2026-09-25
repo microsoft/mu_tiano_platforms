@@ -63,6 +63,7 @@
 
 [LibraryClasses]
   PcdLib          |MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+  EcitEncodingLib|SecurityPkg/Library/EcitEncodingLib/EcitEncodingLib.inf
   TimerLib        |QemuQ35Pkg/Library/AcpiTimerLib/BaseAcpiTimerLib.inf
   PrintLib        |MdePkg/Library/BasePrintLib/BasePrintLib.inf
   BaseLib         |MdePkg/Library/BaseLib/BaseLib.inf
@@ -425,6 +426,7 @@
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   ReportStatusCodeLib|MdeModulePkg/Library/RuntimeDxeReportStatusCodeLib/RuntimeDxeReportStatusCodeLib.inf
+  CryptoIndicatorRegistrationLib|SecurityPkg/Library/CryptoIndicatorRegistrationLib/CryptoIndicatorRegistrationLibNull.inf
   ResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
   HwResetSystemLib|QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
@@ -441,6 +443,7 @@
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
+  CryptoIndicatorRegistrationLib|SecurityPkg/Library/CryptoIndicatorRegistrationLib/CryptoIndicatorRegistrationLibDxe.inf
   PlatformBootManagerLib|MsCorePkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   PlatformBmPrintScLib|QemuPkg/Library/PlatformBmPrintScLib/PlatformBmPrintScLib.inf
   QemuLoadImageLib|QemuQ35Pkg/Library/GenericQemuLoadImageLib/GenericQemuLoadImageLib.inf
@@ -503,6 +506,7 @@
   RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
 
 [LibraryClasses.common.MM_STANDALONE]
+  CryptoIndicatorRegistrationLib|SecurityPkg/Library/CryptoIndicatorRegistrationLib/CryptoIndicatorRegistrationLibStandaloneMm.inf
   TimerLib|QemuQ35Pkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
   MmServicesTableLib|MmSupervisorPkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
   MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
@@ -1236,6 +1240,7 @@
   MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
   SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
   SecurityPkg/CryptoIndicatorTable/CryptoIndicatorTableDxe.inf
+  SecurityPkg/CryptoIndicatorTable/CryptoIndicatorBridgeDxe.inf
   SecurityPkg/Application/DumpCryptoIndicatorTable/DumpCryptoIndicatorTable.inf
 
 ## Unit Tests
