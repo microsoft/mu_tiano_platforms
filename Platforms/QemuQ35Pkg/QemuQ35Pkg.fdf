@@ -503,6 +503,8 @@ INF  MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.
 INF  DfciPkg/Application/DfciMenu/DfciMenu.inf
 INF  MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
 INF  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+INF  SecurityPkg/CryptoIndicatorTable/CryptoIndicatorTableDxe.inf
+INF  SecurityPkg/CryptoIndicatorTable/CryptoIndicatorBridgeDxe.inf
 INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
 
 #
