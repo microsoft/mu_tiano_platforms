@@ -120,7 +120,7 @@ ASM_PFX(gPatchSmmInitCr0):
 
 ASM_PFX(gcSmmInitGdtr):
     DW      GDT_SIZE - 1
-    DQ      NullSeg                     ; GDT base relocated with the image before copying
+    DD      NullSeg                     ; GDT base relocated with the image before copying
 
 ASM_PFX(gcSmmInitSize): DW $ - ASM_PFX(gcSmmInitTemplate)
 
