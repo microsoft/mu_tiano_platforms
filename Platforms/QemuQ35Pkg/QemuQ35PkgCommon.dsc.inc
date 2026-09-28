@@ -980,7 +980,8 @@
 !if $(TPM_REPLAY_ENABLED) == TRUE
       NULL|TpmTestingPkg/Overrides/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
 !else
-      NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
+      NULL|SecurityPkg/Library/DxeImageVerificationLib2/DxeImageVerificationLib.inf
+      AuthenticodeLib|SecurityPkg/Library/AuthenticodeLib/AuthenticodeLib.inf
 !endif
 
 !if $(TPM2_ENABLE) == TRUE
