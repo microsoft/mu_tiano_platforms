@@ -35,7 +35,7 @@ cached_env = os.environ.copy()
 # When the TF-A source code is updated in a way that is not compatible with the existing prebuilts, this should be set
 # to False, which ensures that HAF / TF-A will be build from source if supported. On Windows, TF-A cannot be built from
 # source, so the platform build will be skipped with a warning.
-HAF_TFA_EXTDEP_BINS_CURRENT = False
+HAF_TFA_EXTDEP_BINS_CURRENT = True
 
 # Declare test whose failure will not return a non-zero exit code
 FAILURE_EXEMPT_TESTS = {
