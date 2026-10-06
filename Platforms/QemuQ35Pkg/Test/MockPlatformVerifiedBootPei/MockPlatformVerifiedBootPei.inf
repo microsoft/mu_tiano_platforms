@@ -1,0 +1,29 @@
+## @file
+#  Mock platform verified boot PEIM for ECIT capability HOB reporting.
+#
+#  Copyright (c) Microsoft Corporation.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MockPlatformVerifiedBootPei
+  FILE_GUID                      = E38836CB-32F4-4BF3-9202-A7A0060BEFB4
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = MockPlatformVerifiedBootPeiEntryPoint
+
+[Sources]
+  MockPlatformVerifiedBootPei.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  EcitReportLib
+  PeimEntryPoint
+
+[Depex]
+  TRUE

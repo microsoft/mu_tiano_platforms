@@ -232,6 +232,7 @@ INF  MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei
 INF  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
 INF  SecurityPkg/RandomNumberGenerator/RngPei/RngPei.inf
 INF  QemuQ35Pkg/PlatformPei/PlatformPei.inf
+INF  QemuQ35Pkg/Test/MockPlatformVerifiedBootPei/MockPlatformVerifiedBootPei.inf
 INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
 INF  MdeModulePkg/Universal/FaultTolerantWritePei/FaultTolerantWritePei.inf
