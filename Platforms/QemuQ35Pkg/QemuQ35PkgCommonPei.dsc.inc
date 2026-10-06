@@ -59,6 +59,10 @@ QemuQ35Pkg/ResetVector/ResetVector.inf
     <LibraryClasses>
       NULL|StandaloneMmPkg/Library/PeiStandaloneMmHobProductionLib/PeiStandaloneMmHobProductionLib.inf
   }
+  QemuQ35Pkg/Test/MockPlatformVerifiedBootPei/MockPlatformVerifiedBootPei.inf {
+    <LibraryClasses>
+      CryptoIndicatorRegistrationLib|SecurityPkg/Library/CryptoIndicatorRegistrationLib/CryptoIndicatorRegistrationLibPei.inf
+  }
   MdeModulePkg/Universal/FaultTolerantWritePei/FaultTolerantWritePei.inf
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
   QemuQ35Pkg/SmmAccess/SmmAccessPei.inf
