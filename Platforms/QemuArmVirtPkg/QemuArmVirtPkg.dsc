@@ -1146,6 +1146,12 @@
 !endif
 
   SecurityPkg/Tcg/Tcg2AcpiFfa/Tcg2AcpiFfa.inf
+
+  OemPkg/PlatformTpm/PlatformTpm.inf {
+    <LibraryClasses>
+      OemTpm2InitLibVendor|SecurityPkg/Library/OemTpm2InitLibNull/OemTpm2InitLibVendorNull.inf
+      Tcg2PhysicalPresencePromptLib|SecurityPkg/Library/Tcg2PhysicalPresencePromptLib/Tcg2PhysicalPresencePromptLibConsole.inf
+  }
 !endif
 
   #
@@ -1288,7 +1294,7 @@
       NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
     <PcdsFixedAtBuild>
-      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
+      # gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
       gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
     <PcdsPatchableInModule>
       gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc|FALSE
@@ -1296,7 +1302,7 @@
 
   ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf {
     <PcdsFixedAtBuild>
-      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
+      # gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
       gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|62500000
     <PcdsPatchableInModule>
       gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc|FALSE
