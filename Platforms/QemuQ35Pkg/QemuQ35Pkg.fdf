@@ -470,6 +470,7 @@ INF  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
 !if $(TPM_CONFIG_ENABLE) == TRUE
 INF  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
 !endif
+INF  OemPkg/PlatformTpm/PlatformTpm.inf
 !endif
 
 !if $(TPM2_ENABLE) == TRUE
