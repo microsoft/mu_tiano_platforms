@@ -1146,6 +1146,12 @@
 !endif
 
   SecurityPkg/Tcg/Tcg2AcpiFfa/Tcg2AcpiFfa.inf
+
+  OemPkg/PlatformTpm/PlatformTpm.inf {
+    <LibraryClasses>
+      OemTpm2InitLibVendor|SecurityPkg/Library/OemTpm2InitLibNull/OemTpm2InitLibVendorNull.inf
+      Tcg2PhysicalPresencePromptLib|SecurityPkg/Library/Tcg2PhysicalPresencePromptLib/Tcg2PhysicalPresencePromptLibConsole.inf
+  }
 !endif
 
   #
