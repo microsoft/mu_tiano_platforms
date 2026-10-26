@@ -37,7 +37,7 @@
 #include "TestData.h"
 
 #define UNIT_TEST_APP_NAME     "SecureBootKeyAuditApp"
-#define UNIT_TEST_APP_VERSION  "0.11"
+#define UNIT_TEST_APP_VERSION  "0.12"
 
 #if defined (MDE_CPU_X64)
 #define AUDIT_TARGET_ARCH  "X64"
@@ -486,7 +486,7 @@ AuditRunIdentityTest (
   UT_LOG_INFO (
     "[AUDIT_RUN] app=%a version=%a arch=%a firmware_vendor=%a "
     "firmware_vendor_truncated=%a firmware_revision=0x%08x "
-    "uefi_revision=0x%08x fixture=%a manifest_sha256=%a\n",
+    "uefi_revision=0x%08x fixture=%a manifest_sha256=%a mode=%a\n",
     UNIT_TEST_APP_NAME,
     UNIT_TEST_APP_VERSION,
     AUDIT_TARGET_ARCH,
@@ -495,7 +495,8 @@ AuditRunIdentityTest (
     gST->FirmwareRevision,
     gST->Hdr.Revision,
     FixtureId,
-    ManifestSha256
+    ManifestSha256,
+    FixedPcdGetBool (PcdSecureBootKeyAuditProbeAll) ? "ROBUSTNESS_PROBE_ALL" : "CAPABILITY_GATED"
     );
 
   return UNIT_TEST_PASSED;
@@ -747,6 +748,13 @@ RequireUpdateAuthorities (
 {
   UINT8  Mask;
 
+  if (FixedPcdGetBool (PcdSecureBootKeyAuditProbeAll) &&
+      (!EFI_ERROR (mEcitParseStatus) || (mEcitParseStatus == EFI_NOT_FOUND)))
+  {
+    UT_LOG_WARNING ("ROBUSTNESS: probing update profiles 0x%x without capability gating; cleanup may fail\n", RequiredMask);
+    return UNIT_TEST_PASSED;
+  }
+
   if (RequireParsedEcit (NULL) != UNIT_TEST_PASSED) {
     return UNIT_TEST_ERROR_PREREQUISITE_NOT_MET;
   }
@@ -765,6 +773,21 @@ RequireUpdateAuthorities (
   }
 
   return UNIT_TEST_PASSED;
+}
+
+STATIC
+UNIT_TEST_STATUS
+EFIAPI
+RequireOperationalEcit (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  if (FixedPcdGetBool (PcdSecureBootKeyAuditProbeAll) && (mEcitParseStatus == EFI_NOT_FOUND)) {
+    UT_LOG_WARNING ("ROBUSTNESS: running without ECIT; no conformance conclusion is possible\n");
+    return UNIT_TEST_PASSED;
+  }
+
+  return RequireParsedEcit (Context);
 }
 
 /**
@@ -802,6 +825,7 @@ RequireRsaMldsaUpdates (
            AUDIT_IMAGE_ALGORITHM_RSA | AUDIT_IMAGE_ALGORITHM_ML_DSA
            );
 }
+
 
 /**
   Validates ECIT correlation and capability-path classification helpers.
@@ -3374,12 +3398,12 @@ CapabilityAuthorityPathTest (
              ARRAY_SIZE (mEcitClaimResults)
              );
   UT_LOG_INFO ("Advertised update-algorithm mask: 0x%x\n", Mask);
-  if (Mask == 0) {
+  if ((Mask == 0) && !FixedPcdGetBool (PcdSecureBootKeyAuditProbeAll)) {
     UT_LOG_INFO ("No fixture-backed update algorithm is advertised; authority path is not applicable\n");
     return UNIT_TEST_ERROR_PREREQUISITE_NOT_MET;
   }
 
-  Status = BuildImageCapabilityPath (Mask, FALSE, &Path);
+  Status = BuildImageCapabilityPath (Mask, FixedPcdGetBool (PcdSecureBootKeyAuditProbeAll), &Path);
   if (EFI_ERROR (Status)) {
     return UNIT_TEST_ERROR_TEST_FAILED;
   }
@@ -4014,6 +4038,10 @@ CumulativeCaRetirementTest (
            );
   UT_LOG_INFO ("Advertised image-algorithm mask: 0x%x\n", Mask);
 
+  if (FixedPcdGetBool (PcdSecureBootKeyAuditProbeAll)) {
+    Mask = AUDIT_IMAGE_ALGORITHM_ALL;
+  }
+
   if (Mask == 0) {
     UT_LOG_INFO ("No fixture-backed image algorithm is advertised; migration is not applicable\n");
     return UNIT_TEST_ERROR_PREREQUISITE_NOT_MET;
@@ -4086,8 +4114,8 @@ ImageFormatSweepTest (
   }
 
   for (Index = 0; Index < gSecureBootKeyAuditFormatSweepCaseCount; Index++) {
-    if (mEcitClaimResults[mImageAuthorizationFormatClaims[Index]].Claim !=
-        EcitClaimAdvertised)
+    if (!FixedPcdGetBool (PcdSecureBootKeyAuditProbeAll) &&
+        (mEcitClaimResults[mImageAuthorizationFormatClaims[Index]].Claim != EcitClaimAdvertised))
     {
       continue;
     }
@@ -4153,8 +4181,8 @@ ImageFormatSweepTest (
   }
 
   for (Index = 0; Index < gSecureBootKeyAuditFormatSweepCaseCount; Index++) {
-    if (mEcitClaimResults[mImageRevocationFormatClaims[Index]].Claim !=
-        EcitClaimAdvertised)
+    if (!FixedPcdGetBool (PcdSecureBootKeyAuditProbeAll) &&
+        (mEcitClaimResults[mImageRevocationFormatClaims[Index]].Claim != EcitClaimAdvertised))
     {
       continue;
     }
@@ -4367,19 +4395,19 @@ STATIC CONST AUDIT_TEST_CASE  mAuditTestCases[] = {
     "Retire RSA, ECDSA, and ML-DSA image CAs cumulatively",
     "CumulativeCaRetirement",
     CumulativeCaRetirementTest,
-    RequireParsedEcit
+    RequireOperationalEcit
   },
   {
     "Traverse every advertised Secure Boot update authority",
     "CapabilityAuthorityPath",
     CapabilityAuthorityPathTest,
-    RequireParsedEcit
+    RequireOperationalEcit
   },
   {
     "Exercise every advertised image authorization and revocation format",
     "ImageFormatSweep",
     ImageFormatSweepTest,
-    RequireParsedEcit
+    RequireOperationalEcit
   },
   {
     "Report ECIT claim and observation correlation",

@@ -19,6 +19,11 @@
   DEFINE SECURE_BOOT_KEY_AUDIT_ONLY = FALSE
 !endif
 
+[PcdsFixedAtBuild]
+!ifdef $(SECURE_BOOT_KEY_AUDIT_PROBE_ALL)
+  gQemuPkgTokenSpaceGuid.PcdSecureBootKeyAuditProbeAll|$(SECURE_BOOT_KEY_AUDIT_PROBE_ALL)
+!endif
+
 [LibraryClasses.common]
   DebugLib                     |MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   BaseLib                      |MdePkg/Library/BaseLib/BaseLib.inf

@@ -385,6 +385,16 @@ def generate_report(
         ),
     ]
 
+    if run_fields.get("mode") == "ROBUSTNESS_PROBE_ALL":
+        lines[1:1] = [
+            "",
+            "> **DESTRUCTIVE ROBUSTNESS EXPERIMENT — NOT A CONFORMANCE VERDICT.** "
+            "All fixture-backed profiles were selected regardless of advertisement. "
+            "Results apply only to this firmware build; they do not establish safety "
+            "on deployed devices. Safety preconditions and recovery failures can still "
+            "stop a scenario.",
+        ]
+
     if journal is not None:
         lines.append(
             f"| Reboot journal | `{journal.get('phase', 'UNKNOWN')}` after "
