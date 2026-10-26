@@ -69,9 +69,9 @@ def extract_audit_run_identity(root: ET.Element) -> str | None:
             raise ValueError(f"duplicate AUDIT_RUN field: {key!r}")
         fields[key] = value
 
-    if set(fields) != set(AUDIT_RUN_FIELDS):
+    if set(fields) - {"mode"} != set(AUDIT_RUN_FIELDS):
         missing = sorted(set(AUDIT_RUN_FIELDS) - set(fields))
-        unknown = sorted(set(fields) - set(AUDIT_RUN_FIELDS))
+        unknown = sorted(set(fields) - set(AUDIT_RUN_FIELDS) - {"mode"})
         raise ValueError(
             f"invalid AUDIT_RUN fields: missing={missing!r} unknown={unknown!r}"
         )
@@ -88,9 +88,19 @@ def extract_audit_run_identity(root: ET.Element) -> str | None:
     if re.fullmatch(r"[0-9a-f]{64}", fields["manifest_sha256"]) is None:
         raise ValueError("invalid AUDIT_RUN manifest_sha256")
 
+    if re.fullmatch(r"[0-9]+(?:\.[0-9]+)*", fields["version"]) is None:
+        raise ValueError("invalid AUDIT_RUN version")
+    version = tuple(int(part) for part in fields["version"].split("."))
+    if version >= (0, 12) and "mode" not in fields:
+        raise ValueError("AUDIT_RUN mode is required for version 0.12 and later")
+
+    if "mode" in fields and fields["mode"] not in {
+        "CAPABILITY_GATED", "ROBUSTNESS_PROBE_ALL"
+    }:
+        raise ValueError("invalid AUDIT_RUN mode")
     return "AUDIT_RUN " + " ".join(
         f"{key}={fields[key]}" for key in AUDIT_RUN_FIELDS
-    )
+    ) + (f" mode={fields['mode']}" if "mode" in fields else "")
 
 
 def extract_native_claim_results(root: ET.Element) -> dict[str, Result]:
