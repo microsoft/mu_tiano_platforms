@@ -12,6 +12,29 @@ from Host.GenerateMarkdownReport import generate_report, main
 
 
 class GenerateMarkdownReportTests(unittest.TestCase):
+    def test_rejects_current_run_without_mode(self) -> None:
+        junit = self._junit()
+        junit.write_text(junit.read_text().replace("version=0.10", "version=0.12"))
+        with self.assertRaisesRegex(ValueError, "mode is required"):
+            generate_report(junit)
+
+    def test_probe_all_report_is_not_a_conformance_verdict(self):
+        junit = self._junit()
+        original = junit.read_text().replace("version=0.10", "version=0.12")
+        junit.write_text(original.replace(
+            "manifest_sha256=b07ac802e30515d42b956e5fbfdd48f2974d63e6e36f21e7d06ac56313ff44db",
+            "manifest_sha256=b07ac802e30515d42b956e5fbfdd48f2974d63e6e36f21e7d06ac56313ff44db mode=CAPABILITY_GATED",
+        ))
+        self.assertNotIn("DESTRUCTIVE ROBUSTNESS", generate_report(junit))
+        junit.write_text(original.replace(
+            "manifest_sha256=b07ac802e30515d42b956e5fbfdd48f2974d63e6e36f21e7d06ac56313ff44db",
+            "manifest_sha256=b07ac802e30515d42b956e5fbfdd48f2974d63e6e36f21e7d06ac56313ff44db mode=ROBUSTNESS_PROBE_ALL",
+        ))
+        self.assertIn("NOT A CONFORMANCE VERDICT", generate_report(junit))
+        junit.write_text(junit.read_text().replace("ROBUSTNESS_PROBE_ALL", "INVALID"))
+        with self.assertRaisesRegex(ValueError, "invalid AUDIT_RUN mode"):
+            generate_report(junit)
+
     def _write(self, name: str, contents: str) -> Path:
         temporary_directory = tempfile.TemporaryDirectory(dir=Path(__file__).parent)
         self.addCleanup(temporary_directory.cleanup)

@@ -17,6 +17,44 @@ unevaluated by this application.
 
 ## Run on a recoverable test machine
 
+### Explicit all-profile robustness opt-in
+
+The default audit remains capability-gated. A platform may explicitly set
+`gQemuPkgTokenSpaceGuid.PcdSecureBootKeyAuditProbeAll` to `TRUE` to select all
+fixture-backed V2 formats and RSA, ECDSA, and ML-DSA operational scenarios,
+including profiles that ECIT does not advertise. In QemuPkg, build with:
+
+```bash
+stuart_ci_build -c .pytool/CISettings.py -p QemuPkg -a X64 -t DEBUG \
+  TOOL_CHAIN_TAG=GCC5 'BLD_*_SECURE_BOOT_KEY_AUDIT_ONLY=TRUE' \
+  'BLD_*_SECURE_BOOT_KEY_AUDIT_PROBE_ALL=TRUE'
+```
+
+This is a destructive robustness experiment, **not a conformance verdict**.
+An unsupported format can be accepted for enrollment yet ignored during image
+verification, or an installed authority can make signed cleanup impossible.
+Start with disposable QEMU images and restore the entire variable store and
+virtual drive afterward. Do not use this mode on deployed machines.
+
+Opt-in bypasses advertisement-based selection only. Malformed ECIT, unknown
+variable states, failed preconditions, and failed cleanup still stop the
+affected scenario. Missing ECIT does not prevent operational probes, but
+ECIT-dependent reporting and reboot-checkpoint tests remain unavailable.
+An earlier unsafe failure can prevent later steps from running; inspect JUnit
+diagnostics rather than treating "probe all" as proof of complete coverage.
+
+The JUnit run identity records `mode=ROBUSTNESS_PROBE_ALL`; Markdown reports
+display a warning. ECIT advertisements and their correlation rules are not
+changed, and the existing unadvertised-success policy is a separate setting.
+Run records from version 0.12 onward must include a valid `mode`; host tools
+reject a missing mode rather than silently omitting the robustness warning.
+Older run records without a mode remain readable. The `PrerequisiteGate`
+test checks valid, missing, and malformed ECIT states without changing
+firmware variables; run both build modes to cover both sets of expectations.
+Record actual update/load statuses, exact variable-state checks, cleanup and
+boot behavior, and full-image restoration. Results describe only the tested
+firmware build, not the safety of all in-market devices.
+
 The target may be virtual or physical, but it must be a non-production test
 machine that publishes ECIT and can be completely reflashed or restored. It
 must boot a UEFI Shell and audit application matching the fixture architecture.
