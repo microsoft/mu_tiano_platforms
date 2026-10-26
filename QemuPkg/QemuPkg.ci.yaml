@@ -40,6 +40,8 @@
             "MsGraphicsPkg/MsGraphicsPkg.dec",
             "SecurityPkg/SecurityPkg.dec",
             "ShellPkg/ShellPkg.dec",
+            "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec",
+            "XmlSupportPkg/XmlSupportPkg.dec",
             "EmbeddedPkg/EmbeddedPkg.dec",
             "QemuPkg/QemuPkg.dec",
             "TpmTestingPkg/TpmTestingPkg.dec",
@@ -58,7 +60,11 @@
     "GuidCheck": {
         "IgnoreGuidName": [],
         "IgnoreGuidValue": [],
-        "IgnoreFoldersAndFiles": [],
+        "IgnoreFoldersAndFiles": [
+            # Temporary platform ownership leaves the recorded mu_plus snapshot in the workspace.
+            "**/UefiTestingPkg/AuditTests/SecureBootKeyAudit/UEFI/HelloUefiApp.inf",
+            "**/UefiTestingPkg/AuditTests/SecureBootKeyAudit/UEFI/SecureBootKeyAuditApp.inf"
+        ],
         "IgnoreDuplicates": []
     },
     "LibraryClassCheck": {
