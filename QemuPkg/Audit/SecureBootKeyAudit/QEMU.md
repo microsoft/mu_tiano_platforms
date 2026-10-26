@@ -16,6 +16,17 @@ QEMU exercises the same:
 
 ## Architecture support
 
+For the explicit all-profile robustness opt-in and its build switch, see
+[README.md](README.md#explicit-all-profile-robustness-opt-in). Run a default
+baseline and an opt-in build against the same firmware, restoring the complete
+variable-store and drive images between runs. Keep separate evidence directories
+and record both application and firmware SHA-256 hashes. Do not reuse the
+framework cache between modes.
+
+QemuQ35Pkg results are results for the local Project Mu firmware, not stock
+OVMF. A stock OVMF comparison requires a separately identified CODE/VARS pair
+and may lack ECIT; do not generalize local capability support to older devices.
+
 The QEMU mechanics are shared between the supported platform architectures:
 
 | Architecture | Platform | Writable variable-state image | Audit status |

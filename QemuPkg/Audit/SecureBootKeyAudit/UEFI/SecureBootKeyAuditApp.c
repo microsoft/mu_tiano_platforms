@@ -826,6 +826,82 @@ RequireRsaMldsaUpdates (
            );
 }
 
+/**
+  Tests prerequisite gates without changing firmware variables.
+
+  @param[in] Context  The unit-test context supplied by the framework.
+
+  @return The prerequisite-gate test result.
+**/
+STATIC
+UNIT_TEST_STATUS
+EFIAPI
+PrerequisiteGateTest (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  STATIC CONST struct {
+    EFI_STATUS    ParseStatus;
+    BOOLEAN       Advertised;
+    BOOLEAN       UpdateAllowed[2];
+    BOOLEAN       OperationalAllowed[2];
+  } Cases[] = {
+    { EFI_SUCCESS,          TRUE,  { TRUE,  TRUE  }, { TRUE,  TRUE  }
+    },
+    { EFI_SUCCESS,          FALSE, { FALSE, TRUE  }, { TRUE,  TRUE  }
+    },
+    { EFI_NOT_FOUND,        FALSE, { FALSE, TRUE  }, { FALSE, TRUE  }
+    },
+    { EFI_COMPROMISED_DATA, TRUE,  { FALSE, FALSE }, { FALSE, FALSE }
+    },
+    { EFI_NOT_READY,        TRUE,  { FALSE, FALSE }, { FALSE, FALSE }
+    },
+    { EFI_DEVICE_ERROR,     TRUE,  { FALSE, FALSE }, { FALSE, FALSE }
+    }
+  };
+  ECIT_CLAIM_RESULT  SavedClaims[EcitClaimCount];
+  EFI_STATUS         SavedParseStatus;
+  UNIT_TEST_STATUS   UpdateResults[ARRAY_SIZE (Cases)];
+  UNIT_TEST_STATUS   OperationalResults[ARRAY_SIZE (Cases)];
+  UINTN              CaseIndex;
+  UINTN              ClaimIndex;
+  UINTN              Mode;
+
+  Mode             = FixedPcdGetBool (PcdSecureBootKeyAuditProbeAll) ? 1 : 0;
+  SavedParseStatus = mEcitParseStatus;
+  CopyMem (SavedClaims, mEcitClaimResults, sizeof (SavedClaims));
+  for (CaseIndex = 0; CaseIndex < ARRAY_SIZE (Cases); CaseIndex++) {
+    mEcitParseStatus = Cases[CaseIndex].ParseStatus;
+    for (ClaimIndex = 0; ClaimIndex < EcitClaimCount; ClaimIndex++) {
+      mEcitClaimResults[ClaimIndex].Claim = Cases[CaseIndex].Advertised ?
+                                            EcitClaimAdvertised : EcitClaimAbsent;
+    }
+
+    UpdateResults[CaseIndex]      = RequireUpdateAuthorities (AUDIT_IMAGE_ALGORITHM_ALL);
+    OperationalResults[CaseIndex] = RequireOperationalEcit (NULL);
+  }
+
+  mEcitParseStatus = SavedParseStatus;
+  CopyMem (mEcitClaimResults, SavedClaims, sizeof (SavedClaims));
+  for (CaseIndex = 0; CaseIndex < ARRAY_SIZE (Cases); CaseIndex++) {
+    UT_LOG_INFO (
+      "Checking prerequisite gates: probe_all=%u parse_status=%r advertised=%u\n",
+      Mode,
+      Cases[CaseIndex].ParseStatus,
+      Cases[CaseIndex].Advertised
+      );
+    UT_ASSERT_EQUAL (
+      UpdateResults[CaseIndex],
+      Cases[CaseIndex].UpdateAllowed[Mode] ? UNIT_TEST_PASSED : UNIT_TEST_ERROR_PREREQUISITE_NOT_MET
+      );
+    UT_ASSERT_EQUAL (
+      OperationalResults[CaseIndex],
+      Cases[CaseIndex].OperationalAllowed[Mode] ? UNIT_TEST_PASSED : UNIT_TEST_ERROR_PREREQUISITE_NOT_MET
+      );
+  }
+
+  return UNIT_TEST_PASSED;
+}
 
 /**
   Validates ECIT correlation and capability-path classification helpers.
@@ -4323,6 +4399,12 @@ STATIC CONST AUDIT_TEST_CASE  mAuditTestCases[] = {
     "Parse ECIT capability claims",
     "EcitClaimsParse",
     EcitClaimsParseTest,
+    NULL
+  },
+  {
+    "Check capability and robustness prerequisite gates without mutation",
+    "PrerequisiteGate",
+    PrerequisiteGateTest,
     NULL
   },
   {
