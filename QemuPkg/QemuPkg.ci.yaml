@@ -26,6 +26,13 @@
     "CompilerPlugin": {
         "DscPath": "QemuPkg.dsc"
     },
+    "HostUnitTestCompilerPlugin": {
+        "DscPath": "Test/QemuPkgHostTest.dsc"
+    },
+    "HostUnitTestDscCompleteCheck": {
+        "DscPath": "Test/QemuPkgHostTest.dsc",
+        "IgnoreInf": []
+    },
     "CharEncodingCheck": {
         "IgnoreFiles": []
     },
