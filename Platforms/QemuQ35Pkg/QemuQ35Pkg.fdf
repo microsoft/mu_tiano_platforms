@@ -511,6 +511,7 @@ INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
 #
 # OneCrypto Drivers
 #
+INF  SecurityPkg/RandomNumberGenerator/RngStandaloneMm/RngStandaloneMm.inf
 INF $(ONE_CRYPTO_PATH)/$(TARGET)/X64/OneCryptoBin/OneCryptoBinSupvMm.inf
 INF $(ONE_CRYPTO_PATH)/$(TARGET)/X64/OneCryptoLoaders/OneCryptoLoaderDxe.inf
 INF $(ONE_CRYPTO_PATH)/$(TARGET)/X64/OneCryptoLoaders/OneCryptoLoaderSupvMm.inf
