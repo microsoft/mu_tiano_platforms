@@ -15,6 +15,10 @@
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
+!ifndef $(SECURE_BOOT_KEY_AUDIT_ONLY)
+  DEFINE SECURE_BOOT_KEY_AUDIT_ONLY = FALSE
+!endif
+
 [LibraryClasses.common]
   DebugLib                     |MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   BaseLib                      |MdePkg/Library/BaseLib/BaseLib.inf
@@ -52,6 +56,8 @@
   UnitTestLib|UnitTestFrameworkPkg/Library/UnitTestLib/UnitTestLib.inf
   UnitTestPersistenceLib|UnitTestFrameworkPkg/Library/UnitTestPersistenceLibNull/UnitTestPersistenceLibNull.inf
   UnitTestResultReportLib|UnitTestFrameworkPkg/Library/UnitTestResultReportLib/UnitTestResultReportLibDebugLib.inf
+  XmlTreeLib|XmlSupportPkg/Library/XmlTreeLib/XmlTreeLib.inf
+  XmlTreeQueryLib|XmlSupportPkg/Library/XmlTreeQueryLib/XmlTreeQueryLib.inf
 
   # PCI libraries
   PciCf8Lib           |MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
@@ -128,6 +134,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0
   gQemuPkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
 
+!if $(SECURE_BOOT_KEY_AUDIT_ONLY) == FALSE
+
 [Components.AARCH64]
   QemuPkg/Library/QemuFwCfgLib/QemuFwCfgLibMmio.inf
 
@@ -136,7 +144,21 @@
   QemuPkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
   QemuPkg/Library/QemuFwCfgLib/QemuFwCfgSecLib.inf
 
+!endif
+
 [Components]
+  QemuPkg/Audit/SecureBootKeyAudit/UEFI/HelloUefiApp.inf
+  QemuPkg/Audit/SecureBootKeyAudit/UEFI/SecureBootKeyAuditApp.inf {
+    <LibraryClasses>
+      MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
+      PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
+      PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
+      UnitTestPersistenceLib|UnitTestFrameworkPkg/Library/UnitTestPersistenceLibSimpleFileSystem/UnitTestPersistenceLibSimpleFileSystem.inf
+      UnitTestResultReportLib|XmlSupportPkg/Library/UnitTestResultReportJUnitFormatLib/UnitTestResultReportLib.inf
+  }
+
+!if $(SECURE_BOOT_KEY_AUDIT_ONLY) == FALSE
+
   QemuPkg/Library/BaseFwCfgInputChannelLib/BaseFwCfgInputChannelLib.inf
   QemuPkg/Library/BasePciCapLib/BasePciCapLib.inf
   QemuPkg/Library/BasePciCapPciSegmentLib/BasePciCapPciSegmentLib.inf
@@ -173,3 +195,5 @@
   QemuPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
   QemuPkg/Tcg/Tcg2Config/Tcg12ConfigPei.inf
   QemuPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
+
+!endif
