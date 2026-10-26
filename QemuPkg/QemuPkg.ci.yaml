@@ -66,6 +66,9 @@
     },
     "SpellCheck": {
         "AuditOnly": False,
+        "IgnoreFiles": [
+            "Audit/SecureBootKeyAudit/UEFI/TestData.c"
+        ],
         "ExtendWords": [
             "bochs",
             "capbility",
