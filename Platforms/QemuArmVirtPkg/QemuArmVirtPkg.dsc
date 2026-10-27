@@ -889,6 +889,7 @@
     <PcdsPatchableInModule>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8040004F
   }
+  SecurityPkg/RandomNumberGenerator/RngStandaloneMm/RngStandaloneMm.inf
   $(ONE_CRYPTO_PATH)/$(TARGET)/AARCH64/OneCryptoBin/OneCryptoBinStandaloneMm.inf {
     <PcdsPatchableInModule>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8040004F

@@ -517,6 +517,7 @@ READ_LOCK_STATUS   = TRUE
   # OneCrypto StandaloneMM Drivers
   #
   INF $(ONE_CRYPTO_PATH)/$(TARGET)/AARCH64/OneCryptoLoaders/OneCryptoLoaderStandaloneMm.inf
+  INF SecurityPkg/RandomNumberGenerator/RngStandaloneMm/RngStandaloneMm.inf
   INF $(ONE_CRYPTO_PATH)/$(TARGET)/AARCH64/OneCryptoBin/OneCryptoBinStandaloneMm.inf
 
   INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteStandaloneMm.inf
