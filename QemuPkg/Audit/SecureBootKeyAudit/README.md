@@ -58,7 +58,9 @@ firmware build, not the safety of all in-market devices.
 The target may be virtual or physical, but it must be a non-production test
 machine that publishes ECIT and can be completely reflashed or restored. It
 must boot a UEFI Shell and audit application matching the fixture architecture.
-The checked-in signed-image fixture is currently X64. Do not use an end-user or
+Separate signed-image fixtures are checked in for X64 (`UEFI/TestData.c`) and
+AARCH64 (`UEFI/TestDataAArch64.c`); the build selects the one matching the
+application architecture. Do not use an end-user or
 production machine.
 
 The steps below describe removable-media execution on a physical target. For a
@@ -290,12 +292,12 @@ The current identity binds the fixture, not a unique execution: artifacts
 from separate runs using the same fixture and manifest cannot be distinguished
 by this check. Keep each run's evidence together as described above.
 
-The checked-in `Host/TestData.manifest.json` is byte-bound evidence with LF
-line endings. Do not normalize its line endings: its raw SHA-256 is embedded
-in the application and checked against the reboot journal. The current EDK2
-PatchCheck reports its JSON lines as non-CRLF; this is a documented data-file
-exception, not a reason to change the manifest without updating its binding.
-Keep textual diffs enabled so changes to this manifest remain reviewable.
+The checked-in `Host/TestData.manifest.json` (X64) and
+`Host/TestDataAArch64.manifest.json` (AARCH64) are byte-bound evidence with
+CRLF line endings. Do not normalize their line endings: each raw SHA-256 is
+embedded in the matching application and checked against the reboot journal.
+The generator hashes exactly the CRLF bytes it writes.
+Keep textual diffs enabled so changes to these manifests remain reviewable.
 
 For QEMU, pass
 `--restored-variable-store-sha256` with the independently verified restored
@@ -322,10 +324,9 @@ same standalone application, FAT filesystem, two-boot sequence, evidence
 collection, and recovery checks.
 
 See [QEMU.md](QEMU.md) for the architecture-parameterized QemuQ35/X64 and
-QemuArmVirt/AARCH64 procedure. The QEMU harness supports both architectures,
-but the current embedded signed-image fixtures are generated from an X64
-application. X64 is therefore the only fully validated audit target until
-architecture-matched AARCH64 fixtures are generated and verified.
+QemuArmVirt/AARCH64 procedure. Each architecture embeds signed images derived
+from its own `HelloUefiApp.efi`, so X64 and AARCH64 results are each
+architecture-native.
 
 ## Targets without ECIT
 
@@ -473,7 +474,7 @@ accept a mutation and later reject its matching cleanup update.
 
 `SecureBootKeyAuditJournal.bin` is written to the current test volume before
 the reboot boundary. The journal contains no private key material. It records
-the fixture ID, SHA-256 of `Host/TestData.manifest.json`, boot count, prior
+the fixture ID, SHA-256 of the architecture's fixture manifest, boot count, prior
 result, phase, and the recognized Secure Boot baseline. Journal format version
 3 records PK, `db`, and `dbx` baseline state without requiring a target crypto
 protocol. The firmware flushes each fixed-size journal update before
@@ -506,23 +507,41 @@ Validate and decode the archived journal against its fixture manifest with:
 python3 Host/InspectJournal.py SecureBootKeyAuditJournal.bin
 ```
 
+For an AARCH64 run, add `--arch AARCH64` so the AARCH64 manifest is used.
+
 ## Generate the public fixture
 
-Build `HelloUefiApp.efi`, then run the generator from the
-`SecureBootKeyAudit` directory:
+Signed test images are architecture-specific, so each architecture has its own
+fixture. Build `HelloUefiApp.efi` for the target architecture, then run the
+generator from the `SecureBootKeyAudit` directory:
 
 ```bash
-python3 Host/GenerateTestData.py
+python3 Host/GenerateTestData.py              # X64 (default)
+python3 Host/GenerateTestData.py --arch AARCH64
 ```
 
-The generator writes:
+The X64 input defaults to the QemuQ35Pkg build output; the AARCH64 input
+defaults to `Build/QemuPkg/DEBUG_GCC5/AARCH64/HelloUefiApp.efi` from the
+QemuPkg CI build. The generator refuses an input whose PE machine type does
+not match `--arch`.
 
-- `UEFI/TestData.c`, containing public certificates, signature lists,
-  authenticated updates, signed test images, fixture ID, and manifest hash;
-  and
-- `Host/TestData.manifest.json`, containing artifact hashes, explicit
-  certificate roles, unsigned-image identity, and ECIT prerequisites. The
-  current fixture schema is `secure-boot-key-audit-v6`.
+For each architecture the generator writes:
+
+| Architecture | Firmware source | Manifest |
+| --- | --- | --- |
+| X64 | `UEFI/TestData.c` | `Host/TestData.manifest.json` |
+| AARCH64 | `UEFI/TestDataAArch64.c` | `Host/TestDataAArch64.manifest.json` |
+
+- The firmware source contains public certificates, signature lists,
+  authenticated updates, signed test images, fixture ID, and manifest hash.
+  `SecureBootKeyAuditApp.inf` compiles the one matching the build
+  architecture.
+- The manifest contains artifact hashes, explicit certificate roles,
+  unsigned-image identity, and ECIT prerequisites. The current fixture schema
+  is `secure-boot-key-audit-v6`.
+
+Each run generates fresh keys, so the X64 and AARCH64 fixtures use different
+keys and manifests; regenerate only the architecture whose image changed.
 
 RSA, ECDSA, and ML-DSA private keys exist only in memory while the generator
 runs and are never written to disk or emitted into the application. The v6
@@ -565,7 +584,8 @@ After generation, verify the exact arrays that will be compiled into the
 firmware:
 
 ```bash
-python3 Host/VerifyTestData.py
+python3 Host/VerifyTestData.py                # X64 (default)
+python3 Host/VerifyTestData.py --arch AARCH64
 python3 -m unittest -v \
   Host.test_inspect_journal \
   Host.test_print_ecit_report \
@@ -574,8 +594,9 @@ python3 -m unittest -v \
 ```
 
 The verifier does not import the generator or use its construction helpers. It
-parses `UEFI/TestData.c` and independently checks:
+parses the selected architecture's fixture source and independently checks:
 
+- that every signed image targets the selected architecture's PE machine type;
 - every artifact size and SHA-256 binding in the versioned manifest;
 - X.509 ESL layout and generated self-signed certificate signatures;
 - every generated V1/V2 full-X.509, image-hash, and TBSCertificate-hash

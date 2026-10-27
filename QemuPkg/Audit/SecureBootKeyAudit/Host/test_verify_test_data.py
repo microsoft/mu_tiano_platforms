@@ -59,6 +59,44 @@ class GenerateTestDataDefaultsTests(unittest.TestCase):
         )
         generate.assert_not_called()
 
+    def test_aarch64_defaults_select_separate_fixture(self) -> None:
+        host_dir = Path(__file__).resolve().parent
+        repo_root = Path(__file__).resolve().parents[4]
+        with mock.patch("sys.argv", ["GenerateTestData.py", "--arch", "AARCH64"]):
+            args = GenerateTestData.parse_args()
+        self.assertEqual(args.output_c, host_dir.parent / "UEFI" / "TestDataAArch64.c")
+        self.assertEqual(args.output_manifest, host_dir / "TestDataAArch64.manifest.json")
+        self.assertEqual(
+            args.unsigned_image,
+            repo_root / "Build" / "QemuPkg" / "DEBUG_GCC5" / "AARCH64" / "HelloUefiApp.efi",
+        )
+
+
+class VerifyFixtureArchitectureTests(unittest.TestCase):
+    """Verify every checked-in per-architecture fixture set."""
+
+    @staticmethod
+    def load(arch):
+        host_dir = Path(__file__).resolve().parent
+        fixture = VerifyTestData.FIXTURE_ARCHITECTURES[arch]
+        manifest_data = (host_dir / fixture["manifest"]).read_bytes()
+        arrays = parse_c_arrays(host_dir.parent / "UEFI" / fixture["test_data"])
+        return arrays, json.loads(manifest_data), manifest_data
+
+    def test_each_fixture_verifies_for_its_architecture(self) -> None:
+        for arch in VerifyTestData.FIXTURE_ARCHITECTURES:
+            with self.subTest(arch=arch):
+                arrays, manifest, manifest_data = self.load(arch)
+                verify_fixture(arrays, manifest, manifest_data)
+                self.assertGreater(VerifyTestData.verify_image_machines(arrays, arch), 0)
+
+    def test_signed_images_reject_the_other_architecture(self) -> None:
+        for arch, other in (("X64", "AARCH64"), ("AARCH64", "X64")):
+            with self.subTest(arch=arch):
+                arrays, _manifest, _data = self.load(arch)
+                with self.assertRaisesRegex(VerificationError, "is machine"):
+                    VerifyTestData.verify_image_machines(arrays, other)
+
 
 class VerifyTestDataTests(unittest.TestCase):
     """Test positive and deliberately invalid final fixture objects."""

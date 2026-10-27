@@ -30,7 +30,12 @@
   SecureBootState.c
   SecureBootState.h
   SecureBootKeyAuditApp.c
+
+[Sources.IA32, Sources.X64]
   TestData.c
+
+[Sources.AARCH64]
+  TestDataAArch64.c
 
 [Packages]
   MdePkg/MdePkg.dec

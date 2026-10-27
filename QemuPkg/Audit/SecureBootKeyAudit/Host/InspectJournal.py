@@ -151,12 +151,22 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("journal", type=Path, help="journal file to inspect")
     parser.add_argument(
+        "--arch",
+        choices=("AARCH64", "X64"),
+        default="X64",
+        help="fixture architecture; selects the default manifest",
+    )
+    parser.add_argument(
         "--manifest",
         type=Path,
-        default=script_dir / "TestData.manifest.json",
-        help="fixture manifest bound to the journal",
+        help="fixture manifest bound to the journal (default: per-architecture)",
     )
-    return parser.parse_args()
+    args = parser.parse_args()
+    if args.manifest is None:
+        args.manifest = script_dir / (
+            "TestDataAArch64.manifest.json" if args.arch == "AARCH64" else "TestData.manifest.json"
+        )
+    return args
 
 
 def main() -> None:

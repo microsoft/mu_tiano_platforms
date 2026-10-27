@@ -78,6 +78,23 @@ SPC_INDIRECT_DATA_OID = "1.3.6.1.4.1.311.2.1.4"
 
 BASE_TIME = datetime.datetime(2026, 1, 1, tzinfo=datetime.timezone.utc)
 
+# Signed images are architecture-specific, so each architecture has its own
+# fixture set. The X64 names predate AARCH64 support and are kept unchanged.
+FIXTURE_ARCHITECTURES = {
+    "X64": {
+        "machine": 0x8664,
+        "test_data": "TestData.c",
+        "manifest": "TestData.manifest.json",
+        "unsigned_image": ("QemuQ35PkgX64", "DEBUG_GCC5", "X64", "HelloUefiApp.efi"),
+    },
+    "AARCH64": {
+        "machine": 0xAA64,
+        "test_data": "TestDataAArch64.c",
+        "manifest": "TestDataAArch64.manifest.json",
+        "unsigned_image": ("QemuPkg", "DEBUG_GCC5", "AARCH64", "HelloUefiApp.efi"),
+    },
+}
+
 FORMAT_SWEEP_DEFINITIONS = (
     ("X509V1", "X.509 certificate", EFI_CERT_X509_GUID, "certificate", None, False),
     (
@@ -761,6 +778,12 @@ def pe_security_directory_offset(image: bytes) -> int:
         )
 
     return data_directory_offset + (4 * 8)
+
+
+def pe_machine(image: bytes) -> int:
+    """Return the PE/COFF Machine field."""
+    pe_security_directory_offset(image)
+    return struct.unpack_from("<H", image, struct.unpack_from("<I", image, 0x3C)[0] + 4)[0]
 
 
 def prepare_unsigned_pe_image(image: bytes) -> bytes:
@@ -2002,36 +2025,49 @@ def parse_args() -> argparse.Namespace:
     uefi_dir = script_dir.parent / "UEFI"
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
+        "--arch",
+        choices=sorted(FIXTURE_ARCHITECTURES),
+        default="X64",
+        help="fixture architecture; selects the default paths below",
+    )
+    parser.add_argument(
         "--output-c",
         type=Path,
-        default=uefi_dir / "TestData.c",
-        help="generated C output path",
+        help="generated C output path (default: per-architecture UEFI file)",
     )
     parser.add_argument(
         "--output-manifest",
         type=Path,
-        default=script_dir / "TestData.manifest.json",
-        help="public artifact manifest output path",
+        help="public artifact manifest output path (default: per-architecture)",
     )
     parser.add_argument(
         "--unsigned-image",
         type=Path,
-        default=(
-            script_dir.parents[3]
-            / "Build"
-            / "QemuQ35PkgX64"
-            / "DEBUG_GCC5"
-            / "X64"
-            / "HelloUefiApp.efi"
-        ),
-        help="unsigned HelloUefiApp.efi input path",
+        help="unsigned HelloUefiApp.efi input path (default: per-architecture build)",
     )
-    return parser.parse_args()
+    args = parser.parse_args()
+    fixture = FIXTURE_ARCHITECTURES[args.arch]
+    if args.output_c is None:
+        args.output_c = uefi_dir / fixture["test_data"]
+    if args.output_manifest is None:
+        args.output_manifest = script_dir / fixture["manifest"]
+    if args.unsigned_image is None:
+        args.unsigned_image = script_dir.parents[3].joinpath(
+            "Build", *fixture["unsigned_image"]
+        )
+    return args
 
 
 def main() -> None:
     """Generate the fixture and manifest."""
     args = parse_args()
+    machine = pe_machine(args.unsigned_image.resolve().read_bytes())
+    expected = FIXTURE_ARCHITECTURES[args.arch]["machine"]
+    if machine != expected:
+        raise ValueError(
+            f"{args.unsigned_image} is machine 0x{machine:04x}, "
+            f"not {args.arch} (0x{expected:04x})"
+        )
     generate(
         args.output_c.resolve(),
         args.output_manifest.resolve(),
