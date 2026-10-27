@@ -417,6 +417,8 @@ READ_LOCK_STATUS   = TRUE
   INF  MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
   INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
   INF  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+  INF  SecurityPkg/CryptoIndicatorTable/CryptoIndicatorTableDxe.inf
+  INF  SecurityPkg/CryptoIndicatorTable/CryptoIndicatorBridgeDxe.inf
   INF  AdvLoggerPkg/Application/AdvancedLogDumper/AdvancedLogDumper.inf
 
   #

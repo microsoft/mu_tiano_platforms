@@ -440,6 +440,7 @@
   UpdateFacsHardwareSignatureLib|OemPkg/Library/UpdateFacsHardwareSignatureLib/UpdateFacsHardwareSignatureLib.inf
   MuArmGicExLib|MsCorePkg/Library/MuArmGicExLib/MuArmGicExLib.inf
   ConfigKnobShimLib|SetupDataPkg/Library/ConfigKnobShimLib/ConfigKnobShimDxeLib/ConfigKnobShimDxeLib.inf
+  CryptoIndicatorRegistrationLib|SecurityPkg/Library/CryptoIndicatorRegistrationLib/CryptoIndicatorRegistrationLibDxe.inf
 
 !if $(TPM2_ENABLE) == TRUE
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibFfa/Tpm2DeviceLibFfa.inf
@@ -492,6 +493,7 @@
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
   MemoryTypeInfoSecVarCheckLib|MdeModulePkg/Library/MemoryTypeInfoSecVarCheckLib/MemoryTypeInfoSecVarCheckLib.inf
   ArmFfaLib|MdeModulePkg/Library/ArmFfaLib/ArmFfaStandaloneMmLib.inf
+  CryptoIndicatorRegistrationLib|SecurityPkg/Library/CryptoIndicatorRegistrationLib/CryptoIndicatorRegistrationLibStandaloneMm.inf
 
 !if $(TPM2_ENABLE) == TRUE
   Tcg2PhysicalPresenceLib|SecurityPkg/Library/SmmTcg2PhysicalPresenceLib/StandaloneMmTcg2PhysicalPresenceLib.inf
@@ -1033,6 +1035,9 @@
   MsCorePkg/AcpiRGRT/AcpiRgrt.inf
   MsGraphicsPkg/PrintScreenLogger/PrintScreenLogger.inf
   SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+  SecurityPkg/CryptoIndicatorTable/CryptoIndicatorTableDxe.inf
+  SecurityPkg/CryptoIndicatorTable/CryptoIndicatorBridgeDxe.inf
+  SecurityPkg/Application/DumpCryptoIndicatorTable/DumpCryptoIndicatorTable.inf
   AdvLoggerPkg/Application/AdvancedLogDumper/AdvancedLogDumper.inf
 
   #
