@@ -12,9 +12,11 @@ on:
   push:
     branches:
       - main
+      - dev/post-quantum-staging
   pull_request:
     branches:
       - main
+      - dev/post-quantum-staging
 
 jobs:
 
