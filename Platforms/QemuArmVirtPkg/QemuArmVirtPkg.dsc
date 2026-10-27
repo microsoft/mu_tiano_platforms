@@ -88,6 +88,8 @@
 !include MdePkg/MdeLibs.dsc.inc
 
 [LibraryClasses.common]
+  CryptoIndicatorRegistrationLib|SecurityPkg/Library/CryptoIndicatorRegistrationLib/CryptoIndicatorRegistrationLibNull.inf
+  EcitEncodingLib|SecurityPkg/Library/EcitEncodingLib/EcitEncodingLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLibNull/BaseCryptLibNull.inf
   DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
 
