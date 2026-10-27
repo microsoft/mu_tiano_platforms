@@ -792,6 +792,13 @@
   gArmTokenSpaceGuid.PcdMmBufferBase|0xbfe00000
 
   #
+  # Standalone MM stack. OneCrypto CMS verification of authenticated variables
+  # needs more than the 8 KiB ArmPkg default. Must be platform-wide: the core
+  # entry point library reads it with FixedPcdGet32 in assembly.
+  #
+  gArmTokenSpaceGuid.PcdStMmStackSize|0x4000
+
+  #
   # Advanced Logger Base Address
   #
   gAdvLoggerPkgTokenSpaceGuid.PcdAdvancedLoggerBase|0x40210000
