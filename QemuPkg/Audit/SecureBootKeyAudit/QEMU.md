@@ -32,18 +32,21 @@ The QEMU mechanics are shared between the supported platform architectures:
 | Architecture | Platform | Writable variable-state image | Audit status |
 | --- | --- | --- | --- |
 | X64 | QemuQ35Pkg | `QEMUQ35_VARS.fd` | Fully validated |
-| AARCH64 | QemuArmVirtPkg | `SECURE_FLASH0.fd` | Harness supported; full audit not yet validated |
+| AARCH64 | QemuArmVirtPkg | `SECURE_FLASH0.fd` | Validated with the AARCH64 fixture |
 
-The current generated fixture embeds signed X64 PE/COFF images derived from
-`QemuQ35PkgX64/DEBUG_GCC5/X64/HelloUefiApp.efi`. An AARCH64 build of
-`SecureBootKeyAuditApp.efi` does not make those embedded images AARCH64.
-Consequently, AARCH64 can validate the QEMU transport and two-boot mechanics,
-but image authorization, revocation, and verification results are not
-conformance evidence until the fixture generator produces and independently
-verifies architecture-matched AARCH64 images.
+Each architecture embeds signed images derived from its own
+`HelloUefiApp.efi`: X64 uses `UEFI/TestData.c` and AARCH64 uses
+`UEFI/TestDataAArch64.c`, selected by `SecureBootKeyAuditApp.inf`. The two
+fixtures are generated with different keys and are bound to different
+manifests, so the application, journal, and host tools must all use the same
+architecture.
 
-Do not compare X64 and AARCH64 ECIT verdicts until both use equivalent native
-fixtures.
+Compare X64 and AARCH64 ECIT verdicts by claim, not by fixture identity.
+
+AARCH64 authenticated-variable and image tests require the QemuArmVirtPkg
+Standalone MM RNG provider, a 16 KiB Standalone MM stack, 0x8400-byte
+authenticated variables, `DxeImageVerificationLib2`, published ECIT, and a
+OneCrypto release whose AARCH64 assembly has BTI landing pads.
 
 ## Prerequisites
 
@@ -115,9 +118,7 @@ test -f "$audit_app"
 sha256sum "$audit_app"
 ```
 
-For AARCH64, a successful application build proves only that the audit
-application is buildable for AARCH64. It does not replace the embedded X64
-image fixtures.
+The application build selects the fixture matching `$arch` automatically.
 
 ## 2. Build the QEMU platform
 
@@ -269,6 +270,7 @@ python3 "$audit_dir/Host/PrintEcitReport.py" \
   tee "$evidence/ecit-report.txt"
 
 python3 "$audit_dir/Host/InspectJournal.py" \
+  --arch "$arch" \
   "$evidence/SecureBootKeyAuditJournal.bin" |
   tee "$evidence/journal.json"
 
@@ -280,9 +282,5 @@ python3 "$audit_dir/Host/GenerateMarkdownReport.py" \
   --output "$evidence/SecureBootKeyAuditReport.md"
 ```
 
-For X64, apply the result interpretation in [README.md](README.md). For
-AARCH64, treat failures involving the embedded signed images as an expected
-fixture-architecture limitation, not as platform conformance results. The
-AARCH64 audit becomes comparable only after regenerating `TestData.c` from an
-AARCH64 `HelloUefiApp.efi`, independently verifying the generated artifacts,
-and completing the full two-boot run.
+Apply the result interpretation in [README.md](README.md) to both
+architectures.

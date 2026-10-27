@@ -58,6 +58,20 @@ ARRAY_PATTERN = re.compile(
 )
 SIZE_PATTERN = re.compile(r"CONST UINTN\s+(?P<name>\w+)Size\s*=\s*(?P<size>\d+);")
 
+# Kept independent of GenerateTestData so verification does not trust the generator.
+FIXTURE_ARCHITECTURES = {
+    "X64": {
+        "machine": 0x8664,
+        "test_data": "TestData.c",
+        "manifest": "TestData.manifest.json",
+    },
+    "AARCH64": {
+        "machine": 0xAA64,
+        "test_data": "TestDataAArch64.c",
+        "manifest": "TestDataAArch64.manifest.json",
+    },
+}
+
 
 class VerificationError(ValueError):
     """Raised when generated fixture evidence is invalid."""
@@ -1761,18 +1775,44 @@ def parse_args() -> argparse.Namespace:
     script_dir = Path(__file__).resolve().parent
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
+        "--arch",
+        choices=sorted(FIXTURE_ARCHITECTURES),
+        default="X64",
+        help="fixture architecture; selects the default paths below",
+    )
+    parser.add_argument(
         "--test-data",
         type=Path,
-        default=script_dir.parent / "UEFI" / "TestData.c",
-        help="generated TestData.c to verify",
+        help="generated TestData C file to verify (default: per-architecture)",
     )
     parser.add_argument(
         "--manifest",
         type=Path,
-        default=script_dir / "TestData.manifest.json",
-        help="fixture manifest to verify",
+        help="fixture manifest to verify (default: per-architecture)",
     )
-    return parser.parse_args()
+    args = parser.parse_args()
+    fixture = FIXTURE_ARCHITECTURES[args.arch]
+    if args.test_data is None:
+        args.test_data = script_dir.parent / "UEFI" / fixture["test_data"]
+    if args.manifest is None:
+        args.manifest = script_dir / fixture["manifest"]
+    return args
+
+
+def verify_image_machines(arrays: dict[str, bytes], arch: str) -> int:
+    """Require every signed image fixture to target the selected architecture."""
+    expected = FIXTURE_ARCHITECTURES[arch]["machine"]
+    images = sorted(name for name in arrays if name.startswith("gSecureBootKeyAuditHello"))
+    require(images, "fixture contains no signed image arrays")
+    for name in images:
+        image = arrays[name]
+        pe_layout(image)
+        machine = struct.unpack_from("<H", image, struct.unpack_from("<I", image, 0x3C)[0] + 4)[0]
+        require(
+            machine == expected,
+            f"{name} is machine 0x{machine:04x}, not {arch} (0x{expected:04x})",
+        )
+    return len(images)
 
 
 def main() -> None:
@@ -1782,6 +1822,10 @@ def main() -> None:
     manifest = json.loads(manifest_data)
     arrays = parse_c_arrays(args.test_data.resolve())
     evidence = verify_fixture(arrays, manifest, manifest_data)
+    evidence["architecture"] = {
+        "arch": args.arch,
+        "signed_images": verify_image_machines(arrays, args.arch),
+    }
     evidence["corruption_negative"] = verify_corruption_negative(
         arrays,
         manifest,
