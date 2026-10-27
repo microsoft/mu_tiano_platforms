@@ -640,8 +640,10 @@
 
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x4007c000
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x8000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800
+  # ML-DSA-87 certificates and signatures make authenticated Secure Boot
+  # updates larger than 10 KiB; match QemuQ35Pkg.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x8400
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x8400
   gEfiSecurityPkgTokenSpaceGuid.PcdUserPhysicalPresence|FALSE
 
 !if $(TPM2_ENABLE) == TRUE
