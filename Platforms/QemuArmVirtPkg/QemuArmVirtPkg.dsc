@@ -166,6 +166,9 @@
   PL011UartClockLib|ArmPlatformPkg/Library/PL011UartClockLib/PL011UartClockLib.inf
   PL011UartLib|ArmPlatformPkg/Library/PL011UartLib/PL011UartLib.inf
   SerialPortLib|ArmPlatformPkg/Library/PL011SerialPortLib/PL011SerialPortLib.inf
+  CryptoIndicatorRegistrationLib|SecurityPkg/Library/CryptoIndicatorRegistrationLib/CryptoIndicatorRegistrationLibNull.inf
+  EcitEncodingLib|SecurityPkg/Library/EcitEncodingLib/EcitEncodingLib.inf
+  GptLib|MdeModulePkg/Library/GptLib/GptLib.inf
 
   # Extended support for FF-A transactions
   ArmFfaLibEx|FfaFeaturePkg/Library/ArmFfaLibEx/ArmFfaLibEx.inf
