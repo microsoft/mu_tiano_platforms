@@ -114,7 +114,12 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         # Increase TSEG to 32 Mb
         args += " -global mch.extended-tseg-mbytes=32"
 
-        accel = ""
+        # If this is x64 running on a host that supports KVM, default to KVM acceleration for better performance
+        if os.name == "posix" and os.uname().machine == "x86_64":
+            accel = ",accel=kvm"
+        else:
+            accel = ""
+
         if env.GetValue("QEMU_ACCEL") is not None:
             if env.GetValue("QEMU_ACCEL").lower() == "kvm":
                 accel = ",accel=kvm"
@@ -222,7 +227,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
             if boot_to_front_page is None:
                 # Booting to Windows, use a PCI nic
-                args += " -device e1000,netdev=net0"
+                args += " -device e1000,netdev=net0,addr=0x05"
             else:
                 # Booting to UEFI, use virtio-net-pci
                 args += " -device virtio-net-pci,netdev=net0"
