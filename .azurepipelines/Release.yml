@@ -21,7 +21,7 @@ resources:
   containers:
     - container: linux-gcc
       image: ghcr.io/microsoft/mu_devops/ubuntu-24-test:latest
-      options: --name mu_devops_build_container
+      options: --name mu_devops_build_container ${{ matrix.platform == 'Q35' && '--device=/dev/kvm:/dev/kvm' || '' }}
 
 name: $(Date:yyyyMMdd)$(Rev:.r) Mu Tiano Platforms Release
 
@@ -53,7 +53,7 @@ stages:
             BuildExtraStep:
               - template: Steps/RustSetupSteps.yml@mu_devops
             Run: true
-            RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+            RunFlags: "QEMU_ACCEL=kvm SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
             BuildArtifactsBinary: |
               **/QEMUQ35_*.fd
             BuildArtifactsOther: "**/unit_test_results/*"
@@ -68,7 +68,7 @@ stages:
             BuildExtraStep:
               - template: Steps/RustSetupSteps.yml@mu_devops
             Run: true
-            RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
+            RunFlags: "QEMU_ACCEL=kvm SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE BLD_*_QEMU_CORE_NUM=2 FILE_REGEX=*TestApp*.efi RUN_TESTS=TRUE"
             BuildArtifactsBinary: |
               **/QEMUQ35_*.fd
             BuildArtifactsOther: "**/unit_test_results/*"
@@ -83,7 +83,7 @@ stages:
             BuildExtraStep:
               - template: Steps/RustSetupSteps.yml@mu_devops
             Run: true
-            RunFlags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE"
+            RunFlags: "QEMU_ACCEL=kvm SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE BLD_*_QEMU_CORE_NUM=2 BLD_*_SMM_ENABLED=FALSE"
             BuildArtifactsBinary: |
               **/QEMUQ35_*.fd
             BuildArtifactsOther: ""
