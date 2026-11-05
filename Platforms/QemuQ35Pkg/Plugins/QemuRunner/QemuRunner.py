@@ -13,6 +13,7 @@ import re
 import io
 import shutil
 import subprocess
+import sys
 import time
 from pathlib import Path
 from edk2toolext.environment.plugintypes import uefi_helper_plugin
@@ -114,9 +115,9 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         # Increase TSEG to 32 Mb
         args += " -global mch.extended-tseg-mbytes=32"
 
-        # If this is x64 running on a host that supports KVM, default to KVM acceleration for better performance
-        if os.name == "posix" and os.uname().machine == "x86_64":
-            accel = ",accel=kvm"
+        # Prefer KVM on Linux x64, but allow QEMU to fall back to software emulation.
+        if sys.platform == "linux" and os.uname().machine == "x86_64":
+            accel = ",accel=kvm:tcg"
         else:
             accel = ""
 
