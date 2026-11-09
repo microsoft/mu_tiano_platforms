@@ -228,6 +228,7 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
             if boot_to_front_page is None:
                 # Booting to Windows, use a PCI nic
+                # Setting the PCI address for the network device to ensure it does not conflict with other devices such as NIC
                 args += " -device e1000,netdev=net0,addr=0x05"
             else:
                 # Booting to UEFI, use virtio-net-pci
