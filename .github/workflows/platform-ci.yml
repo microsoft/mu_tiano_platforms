@@ -36,7 +36,7 @@ jobs:
     # If matrix.container is not defined, then `image` will be null and no container will be used.
     container:
       image: ${{ matrix.container || null }}
-      options: --security-opt seccomp=unconfined
+      options: --security-opt seccomp=unconfined --device=/dev/kvm:/dev/kvm
 
     strategy:
       # This setting prevents the cancellation of other jobs when one job fails.

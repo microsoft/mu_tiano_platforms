@@ -13,6 +13,7 @@ import re
 import io
 import shutil
 import subprocess
+import sys
 import time
 from pathlib import Path
 from edk2toolext.environment.plugintypes import uefi_helper_plugin
@@ -114,7 +115,12 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
         # Increase TSEG to 32 Mb
         args += " -global mch.extended-tseg-mbytes=32"
 
-        accel = ""
+        # Prefer KVM on Linux x64, but allow QEMU to fall back to software emulation.
+        if sys.platform == "linux" and os.uname().machine == "x86_64":
+            accel = ",accel=kvm:tcg"
+        else:
+            accel = ""
+
         if env.GetValue("QEMU_ACCEL") is not None:
             if env.GetValue("QEMU_ACCEL").lower() == "kvm":
                 accel = ",accel=kvm"
@@ -222,7 +228,8 @@ class QemuRunner(uefi_helper_plugin.IUefiHelperPlugin):
 
             if boot_to_front_page is None:
                 # Booting to Windows, use a PCI nic
-                args += " -device e1000,netdev=net0"
+                # Setting the PCI address for the network device to ensure it does not conflict with other devices such as NIC
+                args += " -device e1000,netdev=net0,addr=0x05"
             else:
                 # Booting to UEFI, use virtio-net-pci
                 args += " -device virtio-net-pci,netdev=net0"
