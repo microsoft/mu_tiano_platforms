@@ -78,6 +78,12 @@
   gQemuPkgTokenSpaceGuid.PcdVirtioScsiMaxTargetLimit|31|UINT16|0x2
   gQemuPkgTokenSpaceGuid.PcdVirtioScsiMaxLunLimit|7|UINT32|0x3
 
+  ## Allow a successful operation for an unadvertised Secure Boot capability to pass the audit.
+  # FALSE treats the unexpected capability as an audit failure.
+  gQemuPkgTokenSpaceGuid.PcdSecureBootKeyAuditAllowUnadvertisedSuccess|FALSE|BOOLEAN|0x4
+  ## Explicit destructive robustness opt-in; never changes ECIT advertisements.
+  gQemuPkgTokenSpaceGuid.PcdSecureBootKeyAuditProbeAll|FALSE|BOOLEAN|0x5
+
 [PcdsFixedAtBuild, PcdsDynamic, PcdsDynamicEx]
   gQemuPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0|UINT16|0x10
 
