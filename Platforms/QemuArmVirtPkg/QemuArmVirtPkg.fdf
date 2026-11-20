@@ -418,7 +418,7 @@ READ_LOCK_STATUS   = TRUE
   INF  MsCorePkg/AcpiRGRT/AcpiRgrt.inf
   INF  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
   INF  SecurityPkg/CryptoIndicatorTable/CryptoIndicatorTableDxe.inf
-  # Package the DXE bridge only once the MM image registers its ECIT handler.
+  INF  SecurityPkg/CryptoIndicatorTable/CryptoIndicatorBridgeDxe.inf
   INF  AdvLoggerPkg/Application/AdvancedLogDumper/AdvancedLogDumper.inf
 
   #
