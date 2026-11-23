@@ -385,6 +385,7 @@
 
 [LibraryClasses.common.UEFI_APPLICATION]
   CheckHwErrRecHeaderLib|MsWheaPkg/Library/CheckHwErrRecHeaderLib/CheckHwErrRecHeaderLib.inf
+  ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   FlatPageTableLib|UefiTestingPkg/Library/FlatPageTableLib/FlatPageTableLib.inf
 
 [LibraryClasses.common.SEC]
@@ -633,7 +634,10 @@
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x4007c000
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x8000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800
+  # Match Q35's allowance for ML-DSA authenticated updates, including their certificates.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x8400
+  # Reserve hardware-error storage for the enabled WHEA reporting service.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize|0x1000
   gEfiSecurityPkgTokenSpaceGuid.PcdUserPhysicalPresence|FALSE
 
 !if $(TPM2_ENABLE) == TRUE

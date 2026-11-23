@@ -162,6 +162,9 @@ AdvLoggerPkg/Library/AdvancedLoggerLib/Dxe/GoogleTest/AdvancedLoggerDxeLibGoogle
   <LibraryClasses>
     AdvancedLoggerHdwPortLib|AdvLoggerPkg/Test/Mock/Library/GoogleTest/MockAdvancedLoggerHdwPortLib/MockAdvancedLoggerHdwPortLib.inf
     UefiBootServicesTableLib|MdePkg/Test/Mock/Library/GoogleTest/MockUefiBootServicesTableLib/MockUefiBootServicesTableLib.inf
+  <PcdsFixedAtBuild>
+    # Negative protocol tests depend on asserts being disabled.
+    gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x02
 }
 MdeModulePkg/Bus/Pci/NvmExpressDxe/UnitTest/MediaSanitizeUnitTestHost.inf
 MdeModulePkg/Library/VariablePolicyLib/VariablePolicyUnitTest/VariablePolicyUnitTest.inf {
