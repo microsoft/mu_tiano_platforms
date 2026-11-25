@@ -26,6 +26,13 @@
     "CompilerPlugin": {
         "DscPath": "QemuPkg.dsc"
     },
+    "HostUnitTestCompilerPlugin": {
+        "DscPath": "Test/QemuPkgHostTest.dsc"
+    },
+    "HostUnitTestDscCompleteCheck": {
+        "DscPath": "Test/QemuPkgHostTest.dsc",
+        "IgnoreInf": []
+    },
     "CharEncodingCheck": {
         "IgnoreFiles": []
     },
@@ -40,6 +47,8 @@
             "MsGraphicsPkg/MsGraphicsPkg.dec",
             "SecurityPkg/SecurityPkg.dec",
             "ShellPkg/ShellPkg.dec",
+            "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec",
+            "XmlSupportPkg/XmlSupportPkg.dec",
             "EmbeddedPkg/EmbeddedPkg.dec",
             "QemuPkg/QemuPkg.dec",
             "TpmTestingPkg/TpmTestingPkg.dec",
@@ -58,7 +67,11 @@
     "GuidCheck": {
         "IgnoreGuidName": [],
         "IgnoreGuidValue": [],
-        "IgnoreFoldersAndFiles": [],
+        "IgnoreFoldersAndFiles": [
+            # Temporary platform ownership leaves the recorded mu_plus snapshot in the workspace.
+            "**/UefiTestingPkg/AuditTests/SecureBootKeyAudit/UEFI/HelloUefiApp.inf",
+            "**/UefiTestingPkg/AuditTests/SecureBootKeyAudit/UEFI/SecureBootKeyAuditApp.inf"
+        ],
         "IgnoreDuplicates": []
     },
     "LibraryClassCheck": {
@@ -66,13 +79,18 @@
     },
     "SpellCheck": {
         "AuditOnly": False,
+        "IgnoreFiles": [
+            "Audit/SecureBootKeyAudit/UEFI/TestData.c"
+        ],
         "ExtendWords": [
             "bochs",
+            "bootx",
             "capbility",
             "comms",
             "csprd",
             "dispi",
             "disqulified",
+            "dosfstools",
             "dramc",
             "enumer",
             "esmramc",
@@ -80,12 +98,16 @@
             "hvmloader",
             "implementaion",
             "iomem",
+            "mcopy",
+            "mldsa",
+            "mtools",
             "noclearmem",
             "pciexbar",
             "pflash",
             "pmbase",
             "pmcon",
             "preos",
+            "qemuq",
             "requestq",
             "rpmsg",
             "rxbuf",
@@ -97,6 +119,7 @@
             "sucess",
             "tolud",
             "unblank",
+            "unmodeled",
             "vring",
             "vscsi",
             "bhyve",
