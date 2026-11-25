@@ -391,7 +391,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         empty_drive = (self.env.GetValue("EMPTY_DRIVE").upper() == "TRUE")
         file_regex = self.env.GetValue("FILE_REGEX")
         startup_nsh = self.env.GetValue("STARTUP_NSH")
-        target_arch = self.env.GetValue("TARGET_ARCH", "X64")
+        # Q35 runs DXE and the shell on X64, including builds with IA32 PEI.
+        target_arch = "X64"
 
         # Other configurable values
         output_base = self.env.GetValue("BUILD_OUTPUT_BASE")

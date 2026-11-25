@@ -1264,6 +1264,7 @@
   UefiTestingPkg/FunctionalSystemTests/MemoryAttributeProtocolFuncTestApp/MemoryAttributeProtocolFuncTestApp.inf
   MdePkg/Test/UnitTest/Library/BaseLib/BaseLibUnitTestApp.inf
   MdePkg/Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLibTestApp.inf
+  SecurityPkg/Test/ShellTest/ImageValidationTestApp/ImageValidationTestApp.inf
   MfciPkg/UnitTests/MfciPolicyParsingUnitTest/MfciPolicyParsingUnitTestApp.inf
   # MsCorePkg/UnitTests/JsonTest/JsonTestApp.inf # SOMETIMES RESULTS IN INFINITE LOOP
   MsCorePkg/UnitTests/MathLibUnitTest/MathLibUnitTestApp.inf
