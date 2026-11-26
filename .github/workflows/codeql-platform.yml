@@ -117,7 +117,7 @@ jobs:
 
   analyze:
     name: Analyze
-    runs-on: windows-2022
+    runs-on: windows-2025-vs2026
     needs:
       - gather_build_files
     permissions:
@@ -130,7 +130,7 @@ jobs:
       matrix:
         build_file: ${{ fromJson(needs.gather_build_files.outputs.platform_build_files) }}
         include:
-          - tool_chain_tag: VS2022
+          - tool_chain_tag: VS2026
 
     steps:
     - name: Checkout repository
@@ -489,7 +489,7 @@ jobs:
       shell: pwsh
       working-directory: "Z:"
       env:
-        RUST_ENV_CHECK_TOOL_EXCLUSIONS: "cargo fmt, cargo tarpaulin"
+        RUST_ENV_CHECK_TOOL_EXCLUSIONS: "cargo fmt, cargo llvm-cov"
         STUART_CODEQL_PATH: ${{ steps.cache_key_gen.outputs.codeql_cli_ext_dep_dir }}
       run: stuart_build -c ${{ matrix.build_file }} TARGET=DEBUG TOOL_CHAIN_TAG=${{ matrix.tool_chain_tag }} --codeql
 
@@ -569,3 +569,5 @@ jobs:
       shell: pwsh
       run: |
           subst Z: /D
+
+
